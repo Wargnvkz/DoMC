@@ -6,9 +6,26 @@ using System.Threading.Tasks;
 
 namespace DoMCModuleControl
 {
-    public class ModuleStatus
+    /// <summary>
+    /// Статус работы модуля
+    /// </summary>
+    public class ModuleStatus : ICloneable
     {
+        /// <summary>
+        /// Инициализирован ли модуль
+        /// </summary>
         public bool IsInitialized;
-        public bool IsRun;
+        /// <summary>
+        /// Запущен ли модуль
+        /// </summary>
+        public bool IsRuning;
+        /// <summary>
+        /// Клонирование статуса.
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }
