@@ -72,7 +72,7 @@ namespace DoMCModuleControl
             Error = null;
             try
             {
-                if (InputType != null && InputType == null) throw new InvalidOperationException("Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
+                if (InputType != null && InputData == null) throw new InvalidOperationException("Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
                 Executing();
             }
             catch (Exception ex)
