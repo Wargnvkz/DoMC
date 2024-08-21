@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoMCModuleControl
+namespace DoMCModuleControl.Modules
 {
     /// <summary>
     /// Базовый класс для модулей программы. Модули сами разбираются что и как им делать
@@ -27,7 +27,7 @@ namespace DoMCModuleControl
         /// <summary>
         /// Список команд, которые поддерживает модуль
         /// </summary>
-        protected List<CommandInfo> commandInfos = new List<CommandInfo>();
+        protected List<Command.CommandInfo> commandInfos = new List<Command.CommandInfo>();
         /// <summary>
         /// Конструктор
         /// </summary>

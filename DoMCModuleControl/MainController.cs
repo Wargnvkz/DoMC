@@ -2,6 +2,10 @@
 using System;
 using System.Reflection;
 using System.Windows.Input;
+using DoMCModuleControl.Configuration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using DoMCModuleControl.Interface; // Для работы с JSON-файлами конфигурации
 
 namespace DoMCModuleControl
 {
@@ -10,19 +14,41 @@ namespace DoMCModuleControl
     /// </summary>
     public class MainController
     {
+        private static string appsettingsPath = "appsettings.json";
+        private static string MainInterfaceFieldString = "MainUserInterface";
         /// <summary>
         /// список команд(паттерн команда), которые могут выполняться, к которым можно получить доступ по именам
         /// </summary>
-        private readonly Dictionary<string, CommandInfo> _commands = new Dictionary<string, CommandInfo>();
+        private readonly Dictionary<string, Command.CommandInfo> _commands = new Dictionary<string, Command.CommandInfo>();
         /// <summary>
         /// список модулей, к которым можно получить доступ по именам
         /// </summary>
-        private readonly Dictionary<string, ModuleBase> _modules = new Dictionary<string, ModuleBase>();
+        private readonly Dictionary<string, Modules.ModuleBase> _modules = new Dictionary<string, Modules.ModuleBase>();
+        /// <summary>
+        /// конфигурация и данные работы приложения
+        /// </summary>
+        public ApplicationContext Context { get; private set; }
+        /// <summary>
+        /// Основной интерфейс программы
+        /// </summary>
+        public Interface.MainUserInterface MainUserInterface { get; private set; }
+
+        public MainController(ApplicationContext context, Type mainUserInterfaceType)
+        {
+            Context = context;
+            // Создаем экземпляр интерфейса
+            var mainUserInterface = (Interface.MainUserInterface?)Activator.CreateInstance(mainUserInterfaceType, this);
+            if (mainUserInterface == null)
+            {
+                throw new InvalidOperationException($"Не удалось создать экземпляр типа '{mainUserInterfaceType.Name}'.");
+            }
+            MainUserInterface = mainUserInterface;
+        }
         /// <summary>
         /// регистрация модуля
         /// </summary>
         /// <param name="module">экземпляр модуля</param>
-        public void RegisterModule(ModuleBase module)
+        public void RegisterModule(Modules.ModuleBase module)
         {
             _modules.Add(module.GetType().Name, module);
         }
@@ -80,32 +106,76 @@ namespace DoMCModuleControl
         /// Создание основного контроллера с созданием модулей из библиотек в папке Modules/*.dll
         /// </summary>
         /// <returns>Новый главный контроллер</returns>
-        public static MainController LoadModules()
+        public static MainController LoadModules(ApplicationContext context)
         {
-            var mainController = new MainController();
+
+            var StartingConfiguration = GetMainApplicationConfiguration();
 
             // Поиск всех сборок с модулями
             var moduleAssemblies = Directory.GetFiles("Modules", "*.dll");
+            List<Type> UITypes = new List<Type>();
+            List<Type> ModuleTypes = new List<Type>();
 
             foreach (var assemblyPath in moduleAssemblies)
             {
                 var assembly = Assembly.LoadFrom(assemblyPath);
 
                 // Поиск всех классов, реализующих ModuleBase
-                var moduleTypes = assembly.GetTypes().Where(t => typeof(ModuleBase).IsAssignableFrom(t) && !t.IsInterface);
-
-                foreach (var moduleType in moduleTypes)
+                var moduleTypes = assembly.GetTypes().Where(t => typeof(Modules.ModuleBase).IsAssignableFrom(t) && !t.IsInterface);
+                ModuleTypes.AddRange(moduleTypes);
+                var uiTypes = assembly.GetTypes().Where(t => typeof(Interface.MainUserInterface).IsAssignableFrom(t) && !t.IsInterface).ToList();
+                UITypes.AddRange(uiTypes);
+            }
+            Type UIType;
+            var interfaceClassName = StartingConfiguration[MainInterfaceFieldString];
+            if (!String.IsNullOrEmpty(interfaceClassName))
+            {
+                var uiType = Type.GetType(interfaceClassName);
+                if (uiType == null)
                 {
-                    // Создание экземпляра модуля и регистрация его в MainController
-                    var module = (ModuleBase?)Activator.CreateInstance(moduleType, mainController);
-                    if (module == null)
+                    throw new InvalidOperationException($"Интерфейс \"{interfaceClassName}\", указанный в файле {appsettingsPath}, не найден.");
+                }
+                UIType = uiType;
+            }
+            else
+            {
+                if (UITypes.Count == 1)
+                {
+                    UIType = UITypes[0];
+
+                }
+                else
+                {
+                    if (UITypes.Count > 1)
                     {
-                        //TODO: залогировать, что модуль не ModuleBase
+                        throw new InvalidOperationException($"Найден несколько главных интерфейсов, но в файле \"{appsettingsPath}\" нет значения \"{MainInterfaceFieldString}\"");
                     }
                     else
                     {
-                        mainController.RegisterModule(module);
+                        throw new InvalidOperationException("Не найден ни один главный интерфейс");
                     }
+                }
+            }
+            // Проверяем, что найденный тип наследуется от MainUserInterface
+            if (!typeof(Interface.MainUserInterface).IsAssignableFrom(UIType))
+            {
+                throw new InvalidOperationException($"Тип интерфейса '{interfaceClassName}' не является наследником MainUserInterface.");
+            }
+
+            var mainController = new MainController(context, UIType);
+
+            foreach (var moduleType in ModuleTypes)
+            {
+
+                // Создание экземпляра модуля и регистрация его в MainController
+                var module = (Modules.ModuleBase?)Activator.CreateInstance(moduleType, mainController);
+                if (module == null)
+                {
+                    //TODO: залогировать, что модуль не ModuleBase
+                }
+                else
+                {
+                    mainController.RegisterModule(module);
                 }
             }
 
@@ -113,31 +183,23 @@ namespace DoMCModuleControl
             return mainController;
         }
         /// <summary>
-        /// Добавление стандартных модулей в программу
+        /// Загружает конфигурацию работы программы из файла appsettings.json
         /// </summary>
-        /// <param name="CCDCards">Модуль чтения 12-ти плат управляющих 8-ю ПЗС матрицами на 96 гнездах</param>
-        /// <param name="LCB">Модуль управления Блоком управления светодиодам (БУС)</param>
-        /// <param name="Database">Модуль записи данных в базу данных</param>
-        /// <param name="Archive">Модуль переноса данных из базы данных в архив</param>
-        /// <param name="RDPB">Модуль бракёра (блок удаления дефектной преформы</param>
-        public void SetStandardModules(ModuleBase CCDCards, ModuleBase LCB, ModuleBase Database, ModuleBase Archive, ModuleBase RDPB)
+        private static IConfiguration GetMainApplicationConfiguration()
         {
-            var mainController = new MainController();
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory()) // Установка базового пути
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true); // Добавление файла конфигурации
 
-            mainController.RegisterModule(CCDCards);
-            mainController.RegisterModule(LCB);
-            mainController.RegisterModule(Database);
-            mainController.RegisterModule(Archive);
-            mainController.RegisterModule(RDPB);
+            return builder.Build(); // Построение конфигурации
 
-            mainController.InitializeModules();
 
         }
         /// <summary>
         /// Регистрация команды в контроллере
         /// </summary>
         /// <param name="commandInfo"></param>
-        public void RegisterCommand(CommandInfo commandInfo)
+        public void RegisterCommand(Command.CommandInfo commandInfo)
         {
             if (commandInfo == null || commandInfo.CommandName == null) return;
             _commands[commandInfo.CommandName] = commandInfo;
@@ -149,14 +211,13 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public CommandBase CreateCommand(string commandName)
+        public Command.CommandBase? CreateCommand(string commandName)
         {
             if (_commands.TryGetValue(commandName, out var commandInfo))
             {
-                var commandType = commandInfo.CommandClass;
-                if (commandType != null)
+                if (commandInfo.CommandClass != null)
                 {
-                    return (CommandBase)Activator.CreateInstance(commandType, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
+                    return (Command.CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
                 }
                 throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class '{commandInfo.CommandClass.Name}' not found.");
             }

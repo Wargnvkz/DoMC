@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DoMCModuleControl.Modules;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoMCModuleControl
+namespace DoMCModuleControl.Command
 {
     /// <summary>
     /// Команда, которую поддерживает модуль. Ее имя используется для создания объепкта испольнителя команды
@@ -30,6 +31,15 @@ namespace DoMCModuleControl
         /// <summary>
         /// Экземпляр модуля к которому будет обращаться команда
         /// </summary>
-        public ModuleBase Module { get; set; }
+        public Modules.ModuleBase Module { get; set; }
+
+        public CommandInfo(string? commandName, Type? inputType, Type? outputType, Type commandClass, ModuleBase module)
+        {
+            CommandName = commandName;
+            InputType = inputType;
+            OutputType = outputType;
+            CommandClass = commandClass;
+            Module = module;
+        }
     }
 }

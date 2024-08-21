@@ -4,17 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoMCModuleControl
+namespace DoMCModuleControl.Factories.ApplicationConfiguration
 {
     /// <summary>
     /// Здесь будут хранится соответствие логических гнезд платам и физическим номера на платах, адреса, порты, пути, настройки логирования, время переноса данных в архив и т.д.
     /// </summary>
-    public class HardwareSettings
+    public abstract class HardwareSettings
     {
-        // Пример базовых настроек оборудования
-        public string DeviceName { get; set; }
-        public string SerialNumber { get; set; }
-        // Добавьте другие базовые параметры
+        // Добавьте базовые параметры
     }
 
 

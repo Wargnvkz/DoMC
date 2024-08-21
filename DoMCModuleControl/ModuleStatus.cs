@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoMCModuleControl
+namespace DoMCModuleControl.Modules
 {
     /// <summary>
     /// Статус работы модуля

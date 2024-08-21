@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoMCModuleControl
+namespace DoMCModuleControl.Command
 {
     /// <summary>
     /// шаблон команды. Каждая команда сама выполняет код.
@@ -31,7 +31,7 @@ namespace DoMCModuleControl
         /// <summary>
         /// Модуль с которым работает команда
         /// </summary>
-        protected ModuleBase Module { get; private set; }
+        protected Modules.ModuleBase Module { get; private set; }
         /// <summary>
         /// Статус: Команда запущена
         /// </summary>
@@ -54,7 +54,7 @@ namespace DoMCModuleControl
         /// <param name="module">Модуль с которым будет работать команда</param>
         /// <param name="inputType">Тип входных данных</param>
         /// <param name="outputType">Тип выходных данных</param>
-        public CommandBase(ModuleBase module, Type? inputType, Type? outputType)
+        public CommandBase(Modules.ModuleBase module, Type? inputType, Type? outputType)
         {
             Module = module;
             InputType = inputType;
