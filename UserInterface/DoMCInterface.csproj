@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HIC.System.Windows.Forms.DataVisualization" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DoMCModuleControl\DoMCModuleControl.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="DisplayMessage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="DoMCInnerVarsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="DoMCSettingsInterface.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="DoMCStandardCreateInterface.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="DoMCWorkModeInterface.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="PressButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="ShowFrameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>

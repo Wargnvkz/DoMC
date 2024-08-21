@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DoMCModuleControl\DoMCModuleControl.csproj" />
+  </ItemGroup>
+
 </Project>

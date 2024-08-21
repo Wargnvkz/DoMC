@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DoMCModuleControl.Commands;
 
 namespace DoMCModuleControl.Modules
 {
@@ -27,7 +28,7 @@ namespace DoMCModuleControl.Modules
         /// <summary>
         /// Список команд, которые поддерживает модуль
         /// </summary>
-        protected List<Command.CommandInfo> commandInfos = new List<Command.CommandInfo>();
+        protected List<CommandInfo> commandInfos = new List<CommandInfo>();
         /// <summary>
         /// Конструктор
         /// </summary>

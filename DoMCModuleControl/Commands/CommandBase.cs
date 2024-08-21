@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoMCModuleControl.Command
+namespace DoMCModuleControl.Commands
 {
     /// <summary>
     /// шаблон команды. Каждая команда сама выполняет код.

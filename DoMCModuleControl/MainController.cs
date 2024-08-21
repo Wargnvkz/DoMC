@@ -5,7 +5,8 @@ using System.Windows.Input;
 using DoMCModuleControl.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
-using DoMCModuleControl.Interface; // Для работы с JSON-файлами конфигурации
+using DoMCModuleControl.Commands;
+using DoMCModuleControl.UI; // Для работы с JSON-файлами конфигурации
 
 namespace DoMCModuleControl
 {
@@ -15,11 +16,11 @@ namespace DoMCModuleControl
     public class MainController
     {
         private static string appsettingsPath = "appsettings.json";
-        private static string MainInterfaceFieldString = "MainUserInterface";
+        private static string MainInterfaceFieldString = "IMainUserInterface";
         /// <summary>
         /// список команд(паттерн команда), которые могут выполняться, к которым можно получить доступ по именам
         /// </summary>
-        private readonly Dictionary<string, Command.CommandInfo> _commands = new Dictionary<string, Command.CommandInfo>();
+        private readonly Dictionary<string, CommandInfo> _commands = new Dictionary<string, CommandInfo>();
         /// <summary>
         /// список модулей, к которым можно получить доступ по именам
         /// </summary>
@@ -28,21 +29,17 @@ namespace DoMCModuleControl
         /// конфигурация и данные работы приложения
         /// </summary>
         public ApplicationContext Context { get; private set; }
+
+        public Type MainUserInterfaceType { get; private set; }
         /// <summary>
         /// Основной интерфейс программы
         /// </summary>
-        public Interface.MainUserInterface MainUserInterface { get; private set; }
+        public IMainUserInterface? MainUserInterface { get; private set; }
 
         public MainController(ApplicationContext context, Type mainUserInterfaceType)
         {
             Context = context;
-            // Создаем экземпляр интерфейса
-            var mainUserInterface = (Interface.MainUserInterface?)Activator.CreateInstance(mainUserInterfaceType, this);
-            if (mainUserInterface == null)
-            {
-                throw new InvalidOperationException($"Не удалось создать экземпляр типа '{mainUserInterfaceType.Name}'.");
-            }
-            MainUserInterface = mainUserInterface;
+            MainUserInterfaceType = mainUserInterfaceType;
         }
         /// <summary>
         /// регистрация модуля
@@ -99,7 +96,7 @@ namespace DoMCModuleControl
             }
             else
             {
-                Console.WriteLine($"Module '{moduleName}' not found.");
+                Console.WriteLine($"Module \"{moduleName}\" not found.");
             }
         }
         /// <summary>
@@ -123,7 +120,7 @@ namespace DoMCModuleControl
                 // Поиск всех классов, реализующих ModuleBase
                 var moduleTypes = assembly.GetTypes().Where(t => typeof(Modules.ModuleBase).IsAssignableFrom(t) && !t.IsInterface);
                 ModuleTypes.AddRange(moduleTypes);
-                var uiTypes = assembly.GetTypes().Where(t => typeof(Interface.MainUserInterface).IsAssignableFrom(t) && !t.IsInterface).ToList();
+                var uiTypes = assembly.GetTypes().Where(t => typeof(IMainUserInterface).IsAssignableFrom(t) && !t.IsInterface).ToList();
                 UITypes.AddRange(uiTypes);
             }
             Type UIType;
@@ -156,10 +153,10 @@ namespace DoMCModuleControl
                     }
                 }
             }
-            // Проверяем, что найденный тип наследуется от MainUserInterface
-            if (!typeof(Interface.MainUserInterface).IsAssignableFrom(UIType))
+            // Проверяем, что найденный тип наследуется от IMainUserInterface
+            if (!typeof(IMainUserInterface).IsAssignableFrom(UIType))
             {
-                throw new InvalidOperationException($"Тип интерфейса '{interfaceClassName}' не является наследником MainUserInterface.");
+                throw new InvalidOperationException($"Тип интерфейса \"{interfaceClassName}\" не является наследником IMainUserInterface.");
             }
 
             var mainController = new MainController(context, UIType);
@@ -199,7 +196,7 @@ namespace DoMCModuleControl
         /// Регистрация команды в контроллере
         /// </summary>
         /// <param name="commandInfo"></param>
-        public void RegisterCommand(Command.CommandInfo commandInfo)
+        public void RegisterCommand(CommandInfo commandInfo)
         {
             if (commandInfo == null || commandInfo.CommandName == null) return;
             _commands[commandInfo.CommandName] = commandInfo;
@@ -211,19 +208,45 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public Command.CommandBase? CreateCommand(string commandName)
+        public CommandBase? CreateCommand(string commandName)
         {
             if (_commands.TryGetValue(commandName, out var commandInfo))
             {
                 if (commandInfo.CommandClass != null)
                 {
-                    return (Command.CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
+                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
                 }
                 throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class '{commandInfo.CommandClass.Name}' not found.");
             }
             throw new ArgumentException($"Команда \"{commandName}\" не зарегистрирована.");
         }
 
+        public void CreateMainUserInterface()
+        {
+            // Создаем экземпляр интерфейса
+            var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(MainUserInterfaceType, this);
+            if (mainUserInterface == null)
+            {
+                throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{MainUserInterfaceType.Name}\".");
+            }
+            MainUserInterface = mainUserInterface;
+            MainUserInterface?.SetMainController(this);
+
+        }
+        public void ShowInterface()
+        {
+            MainUserInterface?.Show();
+        }
+        public void HideInterface()
+        {
+            MainUserInterface?.Hide();
+
+        }
+        public void CloseInterface()
+        {
+            MainUserInterface?.Close();
+
+        }
 
     }
 

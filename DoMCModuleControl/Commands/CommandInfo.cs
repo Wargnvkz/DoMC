@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoMCModuleControl.Command
+namespace DoMCModuleControl.Commands
 {
     /// <summary>
     /// Команда, которую поддерживает модуль. Ее имя используется для создания объепкта испольнителя команды
@@ -31,7 +31,7 @@ namespace DoMCModuleControl.Command
         /// <summary>
         /// Экземпляр модуля к которому будет обращаться команда
         /// </summary>
-        public Modules.ModuleBase Module { get; set; }
+        public ModuleBase Module { get; set; }
 
         public CommandInfo(string? commandName, Type? inputType, Type? outputType, Type commandClass, ModuleBase module)
         {
