@@ -1,4 +1,4 @@
-﻿using DoMCLib.Classes;
+﻿using DoMCLib.Classes.CCD;
 using DoMCLib.Classes.Configuration;
 using DoMCLib.Tools;
 using System;

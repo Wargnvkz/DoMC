@@ -1,4 +1,4 @@
-﻿using DoMCLib.Classes;
+﻿using DoMCLib.Classes.CCD;
 using DoMCLib.Classes.Configuration;
 using DoMCLib.Classes.LCB;
 using DoMCLib.ProcessState;
@@ -23,7 +23,7 @@ namespace DoMCLib.Configuration
 
         public bool[] SocketsToCheck;
          
-        public DoMCGeneralSettings WorkModeSettings;
+        public DoMCStandardRecalculationSettings WorkModeSettings;
 
          
         public LCBSettings LCBSettings = new LCBSettings();
@@ -109,7 +109,7 @@ namespace DoMCLib.Configuration
                 if (cfg.WorkModeSettings != null)
                     this.WorkModeSettings = cfg.WorkModeSettings;
                 else
-                    this.WorkModeSettings = new DoMCGeneralSettings();
+                    this.WorkModeSettings = new DoMCStandardRecalculationSettings();
 
                 LogPackets = cfg.LogPackets;
 
@@ -159,7 +159,7 @@ namespace DoMCLib.Configuration
             {
                 this.SocketQuantity = 1;
                 this.SocketToCardSocketConfigurations = new Dictionary<int, CCDSocketReadParameters>();
-                this.WorkModeSettings = new DoMCGeneralSettings();
+                this.WorkModeSettings = new DoMCStandardRecalculationSettings();
                 this.SocketsToCheck = new bool[SocketQuantity];
                 RemoveDefectedPreformBlockConfig = new RemoveDefectedPreformBlockConfig();
                 LogPackets = false;

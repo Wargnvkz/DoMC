@@ -1,0 +1,12 @@
+﻿namespace DoMCLib.Classes.CCD.CCDCardDataExchangeCommands
+{
+    public class CCDCardFrameParamsResponse4
+    {
+        [BinaryConverter.Byte]
+        public byte Address = 1;
+        [BinaryConverter.Byte]
+        public byte Command = 4;
+        [BinaryConverter.OneDimensionalArray(typeof(byte), 84)]
+        public byte[] Data;
+    }
+}

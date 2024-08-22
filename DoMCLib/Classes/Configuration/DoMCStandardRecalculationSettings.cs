@@ -1,6 +1,6 @@
 ﻿namespace DoMCLib.Classes.Configuration
 {
-    public class DoMCGeneralSettings
+    public class DoMCStandardRecalculationSettings
     {
 
         public int NCycle;

@@ -25,6 +25,7 @@ namespace DoMCModuleControl.Modules
         /// <returns></returns>
         public object Clone()
         {
+            //Если статус будет содержать сложные/ссылочные типы данных его нужно будет переписать, чтобы эти данные тоже переносились
             return this.MemberwiseClone();
         }
     }

@@ -12,6 +12,8 @@ namespace DoMCModuleControl.Commands
     /// </summary>
     public abstract class CommandBase
     {
+
+        //TODO: сделать синхронизаци для многопоточности
         /// <summary>
         /// Тип входных данных
         /// </summary>

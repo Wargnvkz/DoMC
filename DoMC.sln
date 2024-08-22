@@ -15,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserInterface", "UserInterf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMCInterface", "UserInterface\DoMCInterface.csproj", "{068129FF-1DEF-4812-8BC2-DA79DF9510D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "TestApplication\TestApplication.csproj", "{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LEDControlBlock", "LEDControlBlock\LEDControlBlock.csproj", "{677D37AF-815F-49CE-AA94-85EB482C35EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,12 +41,21 @@ Global
 		{068129FF-1DEF-4812-8BC2-DA79DF9510D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{068129FF-1DEF-4812-8BC2-DA79DF9510D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{068129FF-1DEF-4812-8BC2-DA79DF9510D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}.Release|Any CPU.Build.0 = Release|Any CPU
+		{677D37AF-815F-49CE-AA94-85EB482C35EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{677D37AF-815F-49CE-AA94-85EB482C35EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{677D37AF-815F-49CE-AA94-85EB482C35EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{677D37AF-815F-49CE-AA94-85EB482C35EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{068129FF-1DEF-4812-8BC2-DA79DF9510D7} = {86CA6DF1-2095-4E39-B27E-4674A66E43E9}
+		{677D37AF-815F-49CE-AA94-85EB482C35EC} = {95C9931E-B407-4131-B4B9-26D2027151D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2EA11693-849C-4A59-832B-A350062E23A7}

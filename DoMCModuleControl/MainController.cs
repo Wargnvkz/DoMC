@@ -35,11 +35,13 @@ namespace DoMCModuleControl
         /// Основной интерфейс программы
         /// </summary>
         public IMainUserInterface? MainUserInterface { get; private set; }
+        public readonly Observer Observer;
 
         public MainController(ApplicationContext context, Type mainUserInterfaceType)
         {
             Context = context;
             MainUserInterfaceType = mainUserInterfaceType;
+            Observer = new Observer();
         }
         /// <summary>
         /// регистрация модуля
