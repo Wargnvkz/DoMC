@@ -23,7 +23,7 @@ namespace DoMCModuleControl.Modules
         /// <summary>
         /// гравные контроллер управляющий всеми связями, объектами, модулями, интерфесом и командой
         /// </summary>
-        private MainController mainController;
+        private IMainController mainController;
 
         /// <summary>
         /// Список команд, которые поддерживает модуль
@@ -33,7 +33,7 @@ namespace DoMCModuleControl.Modules
         /// Конструктор
         /// </summary>
         /// <param name="MainController">Главный контроллер всего</param>
-        public ModuleBase(MainController MainController)
+        public ModuleBase(IMainController MainController)
         {
             mainController = MainController;
         }

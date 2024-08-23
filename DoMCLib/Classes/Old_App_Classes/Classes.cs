@@ -1,6 +1,5 @@
 ﻿using DoMCLib.Configuration;
 using DoMCLib.Tools;
-using DoMCLib.Classes;
 using DoMCLib.DB;
 using System;
 using System.Collections.Concurrent;

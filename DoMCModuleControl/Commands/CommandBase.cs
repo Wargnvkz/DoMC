@@ -25,11 +25,11 @@ namespace DoMCModuleControl.Commands
         /// <summary>
         /// Входные данные
         /// </summary>
-        public object? InputData { get; private set; }
+        public object? InputData { get; set; }
         /// <summary>
         /// Выходные данные
         /// </summary>
-        public object? OutputData { get; protected set; }
+        public object? OutputData { get; set; }
         /// <summary>
         /// Модуль с которым работает команда
         /// </summary>
@@ -61,6 +61,20 @@ namespace DoMCModuleControl.Commands
             Module = module;
             InputType = inputType;
             OutputType = outputType;
+        }
+        /// <summary>
+        /// Конструктор
+        /// </summary>
+        /// <param name="module">Модуль с которым будет работать команда</param>
+        /// <param name="inputType">Тип входных данных</param>
+        /// <param name="outputType">Тип выходных данных</param>
+        /// <param name="inputData">Входные данные</param>
+        public CommandBase(Modules.ModuleBase module, Type? inputType, Type? outputType, object? inputData=null)
+        {
+            Module = module;
+            InputType = inputType;
+            OutputType = outputType;
+            InputData = inputData;
         }
         /// <summary>
         /// Метод запускающий команду в работу и регулирующий статусы и логирование

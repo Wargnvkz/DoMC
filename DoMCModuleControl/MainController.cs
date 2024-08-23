@@ -13,7 +13,7 @@ namespace DoMCModuleControl
     /// <summary>
     /// Главный контроллер управляющий всей программой
     /// </summary>
-    public class MainController
+    public class MainController : IMainController
     {
         private static string appsettingsPath = "appsettings.json";
         private static string MainInterfaceFieldString = "IMainUserInterface";
@@ -25,24 +25,29 @@ namespace DoMCModuleControl
         /// список модулей, к которым можно получить доступ по именам
         /// </summary>
         private readonly Dictionary<string, Modules.ModuleBase> _modules = new Dictionary<string, Modules.ModuleBase>();
-        /// <summary>
-        /// конфигурация и данные работы приложения
-        /// </summary>
-        public ApplicationContext Context { get; private set; }
 
-        public Type MainUserInterfaceType { get; private set; }
+        /// <summary>
+        /// Наблюдательн
+        /// </summary>
+        protected readonly Observer Observer;
+
         /// <summary>
         /// Основной интерфейс программы
         /// </summary>
-        public IMainUserInterface? MainUserInterface { get; private set; }
-        public readonly Observer Observer;
+        public IMainUserInterface MainUserInterface { get; private set; }
 
-        public MainController(ApplicationContext context, Type mainUserInterfaceType)
+        public MainController(Type mainUserInterfaceType)
         {
-            Context = context;
-            MainUserInterfaceType = mainUserInterfaceType;
+            // Создаем экземпляр интерфейса
+            var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(mainUserInterfaceType, this);
+            if (mainUserInterface == null)
+            {
+                throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{mainUserInterfaceType.Name}\".");
+            }
+            MainUserInterface = mainUserInterface;
             Observer = new Observer();
         }
+
         /// <summary>
         /// регистрация модуля
         /// </summary>
@@ -51,6 +56,7 @@ namespace DoMCModuleControl
         {
             _modules.Add(module.GetType().Name, module);
         }
+
         /// <summary>
         /// Инициализация всех модулей
         /// </summary>
@@ -61,6 +67,7 @@ namespace DoMCModuleControl
                 module.Value.Initialize();
             }
         }
+
         /// <summary>
         /// Подготовка всех модулей к уничтожению
         /// </summary>
@@ -71,6 +78,7 @@ namespace DoMCModuleControl
                 module.Value.Shutdown();
             }
         }
+
         /// <summary>
         /// Запуск модуля по имени
         /// </summary>
@@ -83,9 +91,10 @@ namespace DoMCModuleControl
             }
             else
             {
-                Console.WriteLine($"Module '{moduleName}' not found.");
+                Console.WriteLine($"Module \"{moduleName}\" not found.");
             }
         }
+
         /// <summary>
         /// Остановка модуля по имени
         /// </summary>
@@ -101,11 +110,12 @@ namespace DoMCModuleControl
                 Console.WriteLine($"Module \"{moduleName}\" not found.");
             }
         }
+
         /// <summary>
         /// Создание основного контроллера с созданием модулей из библиотек в папке Modules/*.dll
         /// </summary>
         /// <returns>Новый главный контроллер</returns>
-        public static MainController LoadModules(ApplicationContext context)
+        public static MainController LoadModules()
         {
 
             var StartingConfiguration = GetMainApplicationConfiguration();
@@ -161,7 +171,7 @@ namespace DoMCModuleControl
                 throw new InvalidOperationException($"Тип интерфейса \"{interfaceClassName}\" не является наследником IMainUserInterface.");
             }
 
-            var mainController = new MainController(context, UIType);
+            var mainController = new MainController(UIType);
 
             foreach (var moduleType in ModuleTypes)
             {
@@ -181,6 +191,7 @@ namespace DoMCModuleControl
             mainController.InitializeModules();
             return mainController;
         }
+
         /// <summary>
         /// Загружает конфигурацию работы программы из файла appsettings.json
         /// </summary>
@@ -194,6 +205,7 @@ namespace DoMCModuleControl
 
 
         }
+
         /// <summary>
         /// Регистрация команды в контроллере
         /// </summary>
@@ -203,6 +215,7 @@ namespace DoMCModuleControl
             if (commandInfo == null || commandInfo.CommandName == null) return;
             _commands[commandInfo.CommandName] = commandInfo;
         }
+
         /// <summary>
         /// Создание команды по имени (из списка известных команд создается экземпляр команды, который выполняет код
         /// </summary>
@@ -210,30 +223,17 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public CommandBase? CreateCommand(string commandName)
+        public CommandBase? CreateCommand(string commandName, object? data = null)
         {
             if (_commands.TryGetValue(commandName, out var commandInfo))
             {
                 if (commandInfo.CommandClass != null)
                 {
-                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
+                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType,data);
                 }
-                throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class '{commandInfo.CommandClass.Name}' not found.");
+                throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
             }
             throw new ArgumentException($"Команда \"{commandName}\" не зарегистрирована.");
-        }
-
-        public void CreateMainUserInterface()
-        {
-            // Создаем экземпляр интерфейса
-            var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(MainUserInterfaceType, this);
-            if (mainUserInterface == null)
-            {
-                throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{MainUserInterfaceType.Name}\".");
-            }
-            MainUserInterface = mainUserInterface;
-            MainUserInterface?.SetMainController(this);
-
         }
         public void ShowInterface()
         {
@@ -248,6 +248,11 @@ namespace DoMCModuleControl
         {
             MainUserInterface?.Close();
 
+        }
+
+        public Observer GetObserver()
+        {
+            return Observer;
         }
 
     }

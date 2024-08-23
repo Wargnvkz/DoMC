@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
 using DoMCModuleControl.Factories.ApplicationConfiguration;
-using DoMCModuleControl.Factories.ProcessState;
 
 namespace DoMCModuleControl.Configuration
 {
@@ -17,13 +16,10 @@ namespace DoMCModuleControl.Configuration
     public class ApplicationContext
     {
         public ApplicationConfiguration Configuration { get; private set; }
-        public ProcessState State { get; private set; }
 
-
-        public ApplicationContext(ApplicationConfigurationFactory configurationFactory, ProcessStateFactory processStateFactory, string configurationFilePath)
+        public ApplicationContext(ApplicationConfigurationFactory configurationFactory, string configurationFilePath)
         {
             Configuration = new ApplicationConfiguration(configurationFactory, configurationFilePath);
-            State = processStateFactory.CreateProcessState();
 
             // Загрузка данных из файла
             Configuration.Load();

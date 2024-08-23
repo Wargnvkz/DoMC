@@ -6,31 +6,53 @@ using System.Threading.Tasks;
 
 namespace DoMCModuleControl
 {
+    /// <summary>
+    /// Наблюдатель. Модули вызывают его, чтобы сообщить о событии
+    /// Те, кто хочет знать о событии подписываются на события
+    /// </summary>
     public class Observer
     {
-        // Событие для синхронных операций
-        public event Action<string, object?> SyncNotificationReceived;
+        /// <summary>
+        /// Для подписчиков на событие. При наступлении события подписчики вызываются асинхронно
+        /// </summary>
+        public event Action<string, object?> NotificationReceived;
+        private ILogger Logger;
+        public Observer(ILogger logger)
+        {
+            NotificationReceived = delegate { };
+            Logger = logger;
+        }
 
-        // Событие для асинхронных операций
-        public event Func<string, object?> AsyncNotificationReceived;
-
-        // Метод для вызова событий
-        public async Task Notify(string eventName, object eventData)
+        /// <summary>
+        /// Посылает уведомления подписчикам
+        /// </summary>
+        /// <param name="eventName">Название события</param>
+        /// <param name="eventData">Данные о событии</param>
+        public void Notify(string eventName, object? eventData)
         {
             // Сначала вызываем асинхронные события
-            if (AsyncNotificationReceived != null)
+            if (NotificationReceived != null)
             {
-                var handlers = AsyncNotificationReceived.GetInvocationList();
+                var handlers = NotificationReceived.GetInvocationList();
 
                 foreach (Func<string, object?, Task> handler in handlers)
                 {
-                    _ = Task.Run(() => handler.Invoke(eventName, eventData));
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await handler.Invoke(eventName, eventData);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Логируем исключение или выполняем другую обработку
+                            Console.WriteLine($"Exception in handler: {ex.Message}");
+                        }
+                    });
                 }
 
             }
 
-            // Затем вызываем синхронные события
-            SyncNotificationReceived?.Invoke(eventName, eventData);
         }
     }
 

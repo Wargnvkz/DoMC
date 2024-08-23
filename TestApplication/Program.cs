@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Runtime.InteropServices;
 
 namespace TestApplication
@@ -7,54 +8,34 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
-            var a = new A();
-            var arr = a.ToByteArray();
-            var b = A.FromByteArray(arr);
-            Console.WriteLine("Hello, World!");
-        }
+            dynamic myVar = "Hello, World!";
+            Console.WriteLine(myVar);  // Выводит: Hello, World!
 
+            // Присваиваем число переменной myVar
+            myVar = 42;
+            Console.WriteLine(myVar);  // Выводит: 42
 
+            // Теперь myVar ведет себя как число, и мы можем выполнять математические операции
+            myVar += 8;
+            Console.WriteLine(myVar);  // Выводит: 50
 
-        public struct A
-        {
-            public byte w = 1;
-            public int x = -1;
-            public byte y = 2;
-            public short z = 3;
-            public A() { }
-            public byte[] ToByteArray()
+            // Вызов метода, который доступен в текущем типе myVar (число)
+            Console.WriteLine(myVar.GetType()); // Выводит: System.Int32
+
+            // Пример неправильного вызова метода (если вызвать несуществующий метод)
+            try
             {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    using (BinaryWriter writer = new BinaryWriter(ms))
-                    {
-                        writer.Write(w);   // Записываем байт
-                        writer.Write(x);   // Записываем байт
-                        writer.Write(y);         // Записываем ushort (2 байта)
-                        writer.Write(z);         // Записываем ushort (2 байта)
-                    }
-                    return ms.ToArray();
-                }
+                myVar.NonExistentMethod(); // Ошибка на этапе выполнения
             }
-
-            // Метод для преобразования массива байт обратно в объект
-            public static A FromByteArray(byte[] data)
+            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException ex)
             {
-                A result = new A();
-
-                using (MemoryStream ms = new MemoryStream(data))
-                {
-                    using (BinaryReader reader = new BinaryReader(ms))
-                    {
-                        result.w = reader.ReadByte();   // Читаем байт
-                        result.x = reader.ReadInt32();   // Читаем байт
-                        result.y = reader.ReadByte();       // Читаем ushort (2 байта)
-                        result.z = reader.ReadInt16();       // Читаем ushort (2 байта)
-                    }
-                }
-
-                return result;
+                Console.WriteLine("Runtime error: " + ex.Message);
             }
+            Console.ReadKey();
         }
+        
+
     }
+
+
 }

@@ -11,6 +11,8 @@ using System.Text;
 using DoMCModuleControl.Modules;
 using DoMCModuleControl;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using DoMCModuleControl.Configuration;
+using DoMCLib.Classes.Old_App_Classes;
 
 namespace LedControlBlock
 {
@@ -30,17 +32,18 @@ namespace LedControlBlock
         //int LEDLoadConfigStatus = 0;
 
         static byte startbyte = 0xff;
-        MainController MainController;
+        IMainController MainController;
+        Observer CurrentObserver;
+        ApplicationContext CurrentContext;
 
         Log WorkingLog;
 
-        public LedControlBlock(MainController mainController) : base(mainController)
+        public LedControlBlock(IMainController mainController) : base(mainController)
         {
             MainController = mainController;
             Broadcast = new IPEndPoint(IPAddress.Broadcast, portTo);
             Localaddress = new IPEndPoint(IPAddress.Any, portFrom);
             Any = new IPEndPoint(IPAddress.Any, 0);
-
         }
 
         public override void Initialize()
