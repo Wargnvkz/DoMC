@@ -4,9 +4,10 @@ using System.Reflection;
 using System.Windows.Input;
 using DoMCModuleControl.Configuration;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Configuration.Json;// Для работы с JSON-файлами конфигурации
 using DoMCModuleControl.Commands;
-using DoMCModuleControl.UI; // Для работы с JSON-файлами конфигурации
+using DoMCModuleControl.UI;
+using DoMCModuleControl.Logging;
 
 namespace DoMCModuleControl
 {
@@ -15,21 +16,25 @@ namespace DoMCModuleControl
     /// </summary>
     public class MainController : IMainController
     {
-        private static string appsettingsPath = "appsettings.json";
-        private static string MainInterfaceFieldString = "IMainUserInterface";
+        private readonly static string appsettingsPath = "appsettings.json";
+        private readonly static string MainInterfaceFieldString = "IMainUserInterface";
         /// <summary>
         /// список команд(паттерн команда), которые могут выполняться, к которым можно получить доступ по именам
         /// </summary>
-        private readonly Dictionary<string, CommandInfo> _commands = new Dictionary<string, CommandInfo>();
+        private readonly Dictionary<string, CommandInfo> _commands = [];
         /// <summary>
         /// список модулей, к которым можно получить доступ по именам
         /// </summary>
-        private readonly Dictionary<string, Modules.ModuleBase> _modules = new Dictionary<string, Modules.ModuleBase>();
+        private readonly Dictionary<string, Modules.ModuleBase> _modules = [];
 
         /// <summary>
         /// Наблюдательн
         /// </summary>
         protected readonly Observer Observer;
+
+        protected BaseFilesLogger MainFileLogger;
+        protected BaseSystemLogger MainSystemLogger;
+        protected Logger SystemLogger;
 
         /// <summary>
         /// Основной интерфейс программы
@@ -40,12 +45,12 @@ namespace DoMCModuleControl
         {
             // Создаем экземпляр интерфейса
             var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(mainUserInterfaceType, this);
-            if (mainUserInterface == null)
-            {
-                throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{mainUserInterfaceType.Name}\".");
-            }
-            MainUserInterface = mainUserInterface;
-            Observer = new Observer();
+            MainUserInterface = mainUserInterface ?? throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{mainUserInterfaceType.Name}\".");
+            MainFileLogger = new BaseFilesLogger();
+            MainSystemLogger = new BaseSystemLogger();
+            SystemLogger = new Logger("DoMC", MainSystemLogger);
+            MainFileLogger.RegisterExternalLogger(SystemLogger);
+            Observer = new Observer(GetLogger("Events"));
         }
 
         /// <summary>
@@ -122,8 +127,8 @@ namespace DoMCModuleControl
 
             // Поиск всех сборок с модулями
             var moduleAssemblies = Directory.GetFiles("Modules", "*.dll");
-            List<Type> UITypes = new List<Type>();
-            List<Type> ModuleTypes = new List<Type>();
+            List<Type> UITypes = [];
+            List<Type> ModuleTypes = [];
 
             foreach (var assemblyPath in moduleAssemblies)
             {
@@ -140,11 +145,7 @@ namespace DoMCModuleControl
             if (!String.IsNullOrEmpty(interfaceClassName))
             {
                 var uiType = Type.GetType(interfaceClassName);
-                if (uiType == null)
-                {
-                    throw new InvalidOperationException($"Интерфейс \"{interfaceClassName}\", указанный в файле {appsettingsPath}, не найден.");
-                }
-                UIType = uiType;
+                UIType = uiType ?? throw new InvalidOperationException($"Интерфейс \"{interfaceClassName}\", указанный в файле {appsettingsPath}, не найден.");
             }
             else
             {
@@ -229,7 +230,7 @@ namespace DoMCModuleControl
             {
                 if (commandInfo.CommandClass != null)
                 {
-                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType,data);
+                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType, data);
                 }
                 throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
             }
@@ -255,6 +256,10 @@ namespace DoMCModuleControl
             return Observer;
         }
 
+        public ILogger GetLogger(string ModuleName)
+        {
+            return new Logger(ModuleName, MainFileLogger);
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 ﻿using DoMCLib.Configuration;
 using DoMCLib.Tools;
-using DoMCLib.DB;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,15 +7,15 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
+using DoMCLib.Classes.Model.LCB;
 
 namespace DoMCLib.Classes
 {
-
+    /*
     public class DoMCInterfaceDataExchange
     {
         public FullDoMCConfiguration Configuration;
@@ -103,10 +102,7 @@ namespace DoMCLib.Classes
 
             ModuleCommandSteps = new ModuleCommandStep[maxc + 1];
         }
-        /*public long GetCurrentTick()
-        {
-            return PreciseTimer.ElapsedTicks;
-        }*/
+
 
         public DateTime GetTimeByTick(long tick)
         {
@@ -276,32 +272,32 @@ namespace DoMCLib.Classes
                         this.CurrentCycleCCD.MaxDeviationPoint = result.MaxDeviationPoint;
                         this.CurrentCycleCCD.Differences[socket0Started] = result.ResultImage;
                         this.CurrentCycleCCD.SocketErrorType = result.SocketErrorType;
-                        /*
-                        //получаем разницу текущего изображения с эталоном
-                        var diffImg = ImageTools.GetDifference(this.CurrentCycleCCD.WorkModeImages[socket0Started], this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].StandardImage);
-
-                        //считаем среднее, на случай если отличается цвет, но дефектов нет
-                        var average = ImageTools.Average(diffImg, this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.GetRectangle());
-                        this.CurrentCycleCCD.Average = average;
-
-                        //считаем отклонения по волокнам
-                        var deviationImg = ImageTools.DeviationByLine(diffImg, this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.DeviationWindow);
-                        this.CurrentCycleCCD.Differences[socket0Started] = deviationImg;
-
-                        //определяем максимальное отклонение в изображении
-                        var maxImageDeviation = ImageTools.MaxDeviation(deviationImg, out Point pMaxDev, this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.GetRectangle());
-                        this.CurrentCycleCCD.MaxDeviationPoint = pMaxDev;
-
-                        //если максимальное отклонение больше допустимого, то ошибка в отклонении
-                        //если среднее отклоняется больше допустимого, то ошибка в среднем
-                        // иначе в этом гнезде хорошая преформа
-                        this.CurrentCycleCCD.SocketErrorType =
-                            (average < this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.MaxAverage ? DoMCSocketErrorType.None : DoMCSocketErrorType.Average) |
-                            (maxImageDeviation < this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.MaxDeviation ? DoMCSocketErrorType.None : DoMCSocketErrorType.Deviation);
-
-                        //сохраняем данные о статусе преформы в этом гнезде
-                        this.CurrentCycleCCD.IsSocketGood[socket0Started] = this.CurrentCycleCCD.SocketErrorType == DoMCSocketErrorType.None;
-                        */
+                        
+                        ////получаем разницу текущего изображения с эталоном
+                        //var diffImg = ImageTools.GetDifference(this.CurrentCycleCCD.WorkModeImages[socket0Started], this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].StandardImage);
+                        //
+                        ////считаем среднее, на случай если отличается цвет, но дефектов нет
+                        //var average = ImageTools.Average(diffImg, this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.GetRectangle());
+                        //this.CurrentCycleCCD.Average = average;
+                        //
+                        ////считаем отклонения по волокнам
+                        //var deviationImg = ImageTools.DeviationByLine(diffImg, this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.DeviationWindow);
+                        //this.CurrentCycleCCD.Differences[socket0Started] = deviationImg;
+                        //
+                        ////определяем максимальное отклонение в изображении
+                        //var maxImageDeviation = ImageTools.MaxDeviation(deviationImg, out Point pMaxDev, this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.GetRectangle());
+                        //this.CurrentCycleCCD.MaxDeviationPoint = pMaxDev;
+                        //
+                        ////если максимальное отклонение больше допустимого, то ошибка в отклонении
+                        ////если среднее отклоняется больше допустимого, то ошибка в среднем
+                        //// иначе в этом гнезде хорошая преформа
+                        //this.CurrentCycleCCD.SocketErrorType =
+                        //    (average < this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.MaxAverage ? DoMCSocketErrorType.None : DoMCSocketErrorType.Average) |
+                        //    (maxImageDeviation < this.Configuration.SocketToCardSocketConfigurations[socketNumberStartedFrom1].ImageProcessParameters.MaxDeviation ? DoMCSocketErrorType.None : DoMCSocketErrorType.Deviation);
+                        //
+                        ////сохраняем данные о статусе преформы в этом гнезде
+                        //this.CurrentCycleCCD.IsSocketGood[socket0Started] = this.CurrentCycleCCD.SocketErrorType == DoMCSocketErrorType.None;
+                        
 
                     }
                 }
@@ -605,16 +601,7 @@ namespace DoMCLib.Classes
         {
             var stdImgArr = Enumerable.Range(1, 96).Select(sn => Configuration.SocketToCardSocketConfigurations.ContainsKey(sn) && Configuration.SocketToCardSocketConfigurations[sn].StandardImage != null).ToArray();
             return sBoolArrayToHex(stdImgArr);
-            /*StringBuilder sb = new StringBuilder();
-            var keys = Configuration.SocketToCardSocketConfigurations.Keys.OrderBy(k => k);
-            int N = 0;
-            foreach (var key in keys)
-            {
-                sb.Append(Configuration.SocketToCardSocketConfigurations[key].StandardImage != null ? "+" : "-");
-                N++;
-                if (N % 8 == 0) sb.Append(" ");
-            }
-            return sb.ToString();*/
+
         }
         public static string sBoolArrayToHex(bool[] array)
         {
@@ -654,7 +641,7 @@ namespace DoMCLib.Classes
             return "";
         }
     }
-
+    */
     public enum ModuleCommandStep
     {
         None,
@@ -1231,11 +1218,11 @@ namespace DoMCLib.Classes
             }
         }
 
-        public void SetFromConfiguration(FullDoMCConfiguration cfg)
+        /*public void SetFromConfiguration(FullDoMCConfiguration cfg)
         {
             CoolingBlocksQuantity = cfg.RemoveDefectedPreformBlockConfig?.CoolingBlocksQuantity ?? 4;
             CoolingBlocksQuantityToSet = cfg.RemoveDefectedPreformBlockConfig?.CoolingBlocksQuantity ?? 4;
-        }
+        }*/
 
         public void SetTimeCurrentStatusGot() { TimeCurrentStatusGot = Timer.ElapsedTicks; }
         public void SetTimeCommandSent() { TimeCommandSent = Timer.ElapsedTicks; }

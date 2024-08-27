@@ -1,4 +1,4 @@
-﻿using DoMCLib.Classes.CCD;
+﻿using DoMCLib.Classes.Model.CCD;
 using DoMCLib.Configuration;
 using DoMCLib.ProcessState;
 using DoMCLib.Tools;

@@ -1,7 +1,5 @@
-﻿using DoMCLib.Classes.CCD;
-using DoMCLib.Classes.Configuration;
-using DoMCLib.Classes.LCB;
-using DoMCLib.ProcessState;
+﻿using DoMCLib.Classes.Model.Configuration;
+using DoMCLib.Classes.Model.LCB;
 using DoMCLib.Tools;
 using System;
 using System.Collections.Generic;
@@ -9,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Windows.Forms;
 
 namespace DoMCLib.Configuration
 {

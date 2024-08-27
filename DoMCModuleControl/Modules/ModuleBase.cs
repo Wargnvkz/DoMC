@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable IDE0090
+#pragma warning disable IDE0290
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,12 +25,17 @@ namespace DoMCModuleControl.Modules
         /// <summary>
         /// гравные контроллер управляющий всеми связями, объектами, модулями, интерфесом и командой
         /// </summary>
-        private IMainController mainController;
+        private readonly IMainController mainController;
 
         /// <summary>
         /// Список команд, которые поддерживает модуль
         /// </summary>
-        protected List<CommandInfo> commandInfos = new List<CommandInfo>();
+        protected List<CommandInfo> commandInfos = [];
+
+        /// <summary>
+        /// Переменная, чтобы быть уверенным, что ресурсы уже были освобождены
+        /// </summary>
+        private bool disposed = false;
         /// <summary>
         /// Конструктор
         /// </summary>
@@ -69,8 +76,13 @@ namespace DoMCModuleControl.Modules
         /// </summary>
         public void Dispose()
         {
-            Stop();
-            Shutdown();
+            if (!disposed)
+            {
+                Stop();
+                Shutdown();
+                GC.SuppressFinalize(this);
+                disposed = true;
+            }
         }
     }
 }

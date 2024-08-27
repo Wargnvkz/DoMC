@@ -13,6 +13,7 @@ using DoMCModuleControl;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using DoMCModuleControl.Configuration;
 using DoMCLib.Classes.Old_App_Classes;
+using DoMCLib.Classes.Model.LCB;
 
 namespace LedControlBlock
 {

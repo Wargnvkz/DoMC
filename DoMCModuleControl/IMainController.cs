@@ -1,5 +1,6 @@
 ﻿using DoMCModuleControl.Commands;
 using DoMCModuleControl.Configuration;
+using DoMCModuleControl.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,5 +25,11 @@ namespace DoMCModuleControl
         /// </summary>
         /// <param name="commandInfo"></param>
         public void RegisterCommand(CommandInfo commandInfo);
+        /// <summary>
+        /// Создает класс для логорования указанного модуля
+        /// </summary>
+        /// <param name="ModuleName">Имя модуля</param>
+        /// <returns></returns>
+        public ILogger GetLogger(string ModuleName);
     }
 }

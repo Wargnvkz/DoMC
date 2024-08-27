@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+using DoMCModuleControl.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +18,7 @@ namespace DoMCModuleControl
         /// Для подписчиков на событие. При наступлении события подписчики вызываются асинхронно
         /// </summary>
         public event Action<string, object?> NotificationReceived;
-        private ILogger Logger;
+        private readonly ILogger Logger;
         public Observer(ILogger logger)
         {
             NotificationReceived = delegate { };
@@ -35,7 +37,7 @@ namespace DoMCModuleControl
             {
                 var handlers = NotificationReceived.GetInvocationList();
 
-                foreach (Func<string, object?, Task> handler in handlers)
+                foreach (Func<string, object?, Task> handler in handlers.Cast<Func<string, object?, Task>>())
                 {
                     Task.Run(async () =>
                     {
@@ -45,8 +47,7 @@ namespace DoMCModuleControl
                         }
                         catch (Exception ex)
                         {
-                            // Логируем исключение или выполняем другую обработку
-                            Console.WriteLine($"Exception in handler: {ex.Message}");
+                            Logger.Add(LoggerLevel.Critical, $"Ошибка при обработке сообщения {eventName}{(eventData != null ? $" с данными {eventData}" : string.Empty)} в методе {handler.Method.Name}:", ex);
                         }
                     });
                 }

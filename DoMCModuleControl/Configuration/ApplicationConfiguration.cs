@@ -1,4 +1,7 @@
-﻿using DoMCModuleControl.Factories.ApplicationConfiguration;
+﻿#pragma warning disable IDE0063
+#pragma warning disable IDE0090
+#pragma warning disable IDE0290
+using DoMCModuleControl.Factories.ApplicationConfiguration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,9 +21,9 @@ namespace DoMCModuleControl.Configuration
         public CurrentSettings CurrentSettings { get; set; }
         public ProcessingData ProcessingData { get; set; }
 
-        private string ConfigurationFilePath;
+        private readonly string ConfigurationFilePath;
         private const int CurrentFileVersion = 2;
-        private ApplicationConfigurationFactory CurrentFactory;
+        private readonly ApplicationConfigurationFactory CurrentFactory;
 
         public ApplicationConfiguration(ApplicationConfigurationFactory factory, string configurationFilePath)
         {
@@ -38,7 +41,7 @@ namespace DoMCModuleControl.Configuration
             {
                 using (ZipArchive archive = ZipFile.OpenRead(ConfigurationFilePath))
                 {
-                    var metadata = ReadZipEntry<dynamic>(archive, "metadata.json");
+                    var metadata = ApplicationConfiguration.ReadZipEntry<dynamic>(archive, "metadata.json");
                     int fileVersion = metadata?.FileVersion != null ? int.Parse((string)metadata.FileVersion) : 1;
 
                     if (fileVersion != CurrentFileVersion)
@@ -82,10 +85,7 @@ namespace DoMCModuleControl.Configuration
                     using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
                     {
                         var entry = archive.GetEntry(entryName);
-                        if (entry != null)
-                        {
-                            entry.Delete();
-                        }
+                        entry?.Delete();
                         entry = archive.CreateEntry(entryName);
                         using (Stream entryStream = entry.Open())
                         {
@@ -96,7 +96,7 @@ namespace DoMCModuleControl.Configuration
             }
         }
 
-        private T? ReadZipEntry<T>(ZipArchive archive, string entryName)
+        private static T? ReadZipEntry<T>(ZipArchive archive, string entryName)
         {
             var entry = archive.GetEntry(entryName);
             if (entry != null)
@@ -111,7 +111,7 @@ namespace DoMCModuleControl.Configuration
                     });
                 }
             }
-            return default(T);
+            return default;
         }
 
         public void SaveCurrentSettings()
