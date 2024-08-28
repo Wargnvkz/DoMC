@@ -1,4 +1,5 @@
-﻿using DoMCLib.Classes.Model.Configuration;
+﻿using DoMCLib.Classes.Model;
+using DoMCLib.Classes.Model.Configuration;
 using DoMCLib.Tools;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,7 @@ using System.Text;
 
 namespace DoMCLib.Configuration
 {
-
-    public class CurrentSettings
+    public class ReadingSocketsSettings
     {
         public Dictionary<int, CCDSocketReadParameters> CCDSocketReadParameters;
         public Dictionary<int, ImageProcessParameters> ImageProcessParameters;

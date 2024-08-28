@@ -14,7 +14,7 @@ namespace DoMCLib.Factories.ApplicationConfiguration
     public class ApplicationConfigurationFactory
     {
         public HardwareSettings CreateHardwareSettings() => new HardwareSettings();
-        public CurrentSettings CreateCurrentSettings() => new CurrentSettings();
-        public ProcessingData CreateProcessingData() => new ProcessingData();
+        public ReadingSocketsSettings CreateCurrentSettings() => new ReadingSocketsSettings();
+        public ProcessingSettings CreateProcessingData() => new ProcessingSettings();
     }
 }

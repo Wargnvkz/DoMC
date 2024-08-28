@@ -195,9 +195,9 @@ namespace DoMCLib.Tools
         {
             byte[] res;
             var type = obj.GetType();
-            if (type == typeof(sbyte)) res = BitConverter.GetBytes((sbyte)obj);
+            if (type == typeof(sbyte)) res = new[] { (byte)obj };
             else
-            if (type == typeof(byte)) res = BitConverter.GetBytes((byte)obj);
+            if (type == typeof(byte)) res = new[] { (byte)obj };
             else
             if (type == typeof(short)) res = BitConverter.GetBytes((short)obj);
             else
@@ -223,11 +223,11 @@ namespace DoMCLib.Tools
             else
             if (type.IsEnum) res = BitConverter.GetBytes((int)obj);
             else
-                res = ObjectToByteArrayObject(obj);
+                res = [];
 
             return res;
         }
-        public static object ByteArrayToObject(byte[] arr, Type type)
+        public static object? ByteArrayToObject(byte[] arr, Type type)
         {
             object res;
             if (type == typeof(sbyte)) res = (sbyte)arr[0];
@@ -258,10 +258,11 @@ namespace DoMCLib.Tools
             else
             if (type.IsEnum) res = BitConverter.ToInt32(arr, 0);
             else
-                res = ByteArrayToObjectObject(arr);
+                res = null;
 
             return res;
         }
+  /*
         private static byte[] ObjectToByteArrayObject(object obj)
         {
             if (obj == null)
@@ -282,6 +283,7 @@ namespace DoMCLib.Tools
 
             return obj;
         }
+  */
         public static byte[] GetBytes(decimal dec)
         {
             //Load four 32 bit integers from the Decimal.GetBits function

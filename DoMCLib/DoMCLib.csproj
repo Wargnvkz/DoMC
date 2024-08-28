@@ -10,4 +10,8 @@
     <ProjectReference Include="..\DoMCModuleControl\DoMCModuleControl.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DB\" />
+  </ItemGroup>
+
 </Project>

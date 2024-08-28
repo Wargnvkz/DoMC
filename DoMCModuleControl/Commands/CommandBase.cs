@@ -12,6 +12,7 @@ namespace DoMCModuleControl.Commands
     /// </summary>
     public abstract class CommandBase
     {
+        public abstract string CommandName { get; set; }
 
         //TODO: сделать синхронизаци для многопоточности
         /// <summary>
@@ -69,7 +70,7 @@ namespace DoMCModuleControl.Commands
         /// <param name="inputType">Тип входных данных</param>
         /// <param name="outputType">Тип выходных данных</param>
         /// <param name="inputData">Входные данные</param>
-        public CommandBase(Modules.ModuleBase module, Type? inputType, Type? outputType, object? inputData=null)
+        public CommandBase(Modules.ModuleBase module, Type? inputType, Type? outputType, object? inputData = null)
         {
             Module = module;
             InputType = inputType;

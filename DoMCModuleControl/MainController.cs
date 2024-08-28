@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration.Json;// Для работы с JSON-ф�
 using DoMCModuleControl.Commands;
 using DoMCModuleControl.UI;
 using DoMCModuleControl.Logging;
+using DoMCModuleControl.Modules;
 
 namespace DoMCModuleControl
 {
@@ -216,6 +217,51 @@ namespace DoMCModuleControl
             if (commandInfo == null || commandInfo.CommandName == null) return;
             _commands[commandInfo.CommandName] = commandInfo;
         }
+
+        public void RegisterAllCommands()
+        {
+            // Получаем все типы, реализующие CommandBase
+            var commandTypes = Assembly.GetExecutingAssembly()
+                                        .GetTypes()
+                                        .Where(t => typeof(CommandBase).IsAssignableFrom(t) && !t.IsAbstract);
+
+            foreach (var commandType in commandTypes)
+            {
+                ModuleBase? moduleInstance = null;
+
+                // Проверяем, является ли команда вложенным классом
+                if (commandType.DeclaringType != null && typeof(ModuleBase).IsAssignableFrom(commandType.DeclaringType))
+                {
+                    moduleInstance = (ModuleBase?)Activator.CreateInstance(commandType.DeclaringType);
+                }
+                else
+                {
+                    // Если команда не вложенная, проверяем наличие атрибута
+                    var moduleAttribute = commandType.GetCustomAttribute<CommandModuleAttribute>();
+                    if (moduleAttribute != null)
+                    {
+                        moduleInstance = (ModuleBase?)Activator.CreateInstance(moduleAttribute.ModuleType);
+                    }
+                }
+
+                if (moduleInstance != null)
+                {
+                    var commandInstance = (CommandBase?)Activator.CreateInstance(commandType, moduleInstance);
+                    if (commandInstance != null)
+                    {
+                        var commandInfo = new CommandInfo(
+                            commandInstance.CommandName,
+                            commandInstance.InputType,
+                            commandInstance.OutputType,
+                            commandType,
+                            moduleInstance
+                        );
+                        RegisterCommand(commandInfo);
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// Создание команды по имени (из списка известных команд создается экземпляр команды, который выполняет код
