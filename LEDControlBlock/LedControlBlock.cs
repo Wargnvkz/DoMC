@@ -284,7 +284,7 @@ namespace LedControlBlock
                             throw ex;
                         }
                     }
-                    //udp.Connect(Broadcast);
+                    //udp.LoadConfiguration(Broadcast);
                     buffer = new byte[0];
                     InterfaceDataExchange.LEDOutCommands = new ConcurrentQueue<LEDBlockCommand>();
                     /*var configcmd = new LEDBlockCommand();

@@ -13,8 +13,7 @@ namespace DoMCModuleControl.Commands
     /// </summary>
     public abstract class CommandBase
     {
-
-        //TODO: сделать синхронизаци для многопоточности
+        //TODO: сделать синхронизацию для многопоточности
         /// <summary>
         /// Тип входных данных
         /// </summary>
@@ -51,32 +50,21 @@ namespace DoMCModuleControl.Commands
         /// Статус: ошибка приведшая к завершению
         /// </summary>
         public Exception? Error { get; private set; }
+
+
         /// <summary>
-        /// Конструктор
+        /// Конструктор. Потомки сами определяют типы данных и передают их в этот конструктор
         /// </summary>
         /// <param name="module">Модуль с которым будет работать команда</param>
         /// <param name="inputType">Тип входных данных</param>
         /// <param name="outputType">Тип выходных данных</param>
-        public CommandBase(Modules.ModuleBase module, Type? inputType, Type? outputType)
+        public CommandBase(Modules.ModuleBase module, Type? inputType = null, Type? outputType = null)
         {
             Module = module;
             InputType = inputType;
             OutputType = outputType;
         }
-        /// <summary>
-        /// Конструктор
-        /// </summary>
-        /// <param name="module">Модуль с которым будет работать команда</param>
-        /// <param name="inputType">Тип входных данных</param>
-        /// <param name="outputType">Тип выходных данных</param>
-        /// <param name="inputData">Входные данные</param>
-        public CommandBase(Modules.ModuleBase module, Type? inputType, Type? outputType, object? inputData = null)
-        {
-            Module = module;
-            InputType = inputType;
-            OutputType = outputType;
-            InputData = inputData;
-        }
+
         /// <summary>
         /// Возвращает имя команды, по которому ее будет создавать главный контроллер
         /// </summary>
@@ -125,6 +113,15 @@ namespace DoMCModuleControl.Commands
         /// </summary>
         public void ExecuteCommand()
         {
+            var task = new Task(ExecuteCommandBase);
+            task.Start();
+        }
+        /// <summary>
+        /// Запуск команды на асинхронное выполнение с передачей входных данный
+        /// </summary>
+        public void ExecuteCommand(object? InputData)
+        {
+            SetInputData(InputData);
             var task = new Task(ExecuteCommandBase);
             task.Start();
         }

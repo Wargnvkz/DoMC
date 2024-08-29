@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable IDE0090
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;

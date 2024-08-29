@@ -279,7 +279,7 @@ namespace DoMCLib.Classes.Model.RDPB
                 var lrcindex = str.LastIndexOf(" ");
                 if (lrcindex == -1 || lrcindex != str.Length - 5) return;
                 var lrcstr = str.Substring(lrcindex + 1, 4).ToUpper();
-                var basestring = str.Substring(0, lrcindex + 1);
+                var basestring = str[..(lrcindex + 1)];
                 var lrcbase = CalcLRC(basestring);
                 if (lrcbase != lrcstr) return; // несовпадение контрольной суммы
                 var doublespace = basestring.IndexOf("  ");
@@ -316,11 +316,11 @@ namespace DoMCLib.Classes.Model.RDPB
             }
         }
 
-        public void SetFromConfiguration(FullDoMCConfiguration cfg)
+        /*public void SetFromConfiguration(FullDoMCConfiguration cfg)
         {
             CoolingBlocksQuantity = cfg.RemoveDefectedPreformBlockConfig?.CoolingBlocksQuantity ?? 4;
             CoolingBlocksQuantityToSet = cfg.RemoveDefectedPreformBlockConfig?.CoolingBlocksQuantity ?? 4;
-        }
+        }*/
 
         public void SetTimeCurrentStatusGot() { TimeCurrentStatusGot = Timer.ElapsedTicks; }
         public void SetTimeCommandSent() { TimeCommandSent = Timer.ElapsedTicks; }

@@ -1,3 +1,4 @@
+//using DoMCUserInterface;
 namespace DoMC
 {
     internal static class Program
@@ -8,8 +9,15 @@ namespace DoMC
         [STAThread]
         static void Main()
         {
-            
-            DoMCModuleControl.MainController.LoadDLLModules();
+            // var type = typeof(DoMCUserInterface.WorkingForm);
+            DoMCModuleControl.AssemblyLoader.LoadAssembliesFromEXEPath();
+            var mc = DoMCModuleControl.MainController.Create();
+            mc.RegisterAllCommands();
+            var cl = mc.GetRegisteredCommandList();
+            var ui = mc.GetMainUserInterface();
+            //ui.Show();
+            Application.Run((Form)ui);
+
         }
     }
 }

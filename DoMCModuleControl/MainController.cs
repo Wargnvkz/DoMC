@@ -10,6 +10,8 @@ using DoMCModuleControl.Commands;
 using DoMCModuleControl.UI;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
+using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace DoMCModuleControl
 {
@@ -41,18 +43,54 @@ namespace DoMCModuleControl
         /// <summary>
         /// Основной интерфейс программы
         /// </summary>
-        public IMainUserInterface MainUserInterface { get; private set; }
+        private readonly IMainUserInterface MainUserInterface;
 
         public MainController(Type mainUserInterfaceType)
         {
             // Создаем экземпляр интерфейса
-            var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(mainUserInterfaceType, this);
+            var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(mainUserInterfaceType);
             MainUserInterface = mainUserInterface ?? throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{mainUserInterfaceType.Name}\".");
+            MainUserInterface.SetMainController(this);
             MainFileLogger = new BaseFilesLogger();
             MainSystemLogger = new BaseSystemLogger();
             SystemLogger = new Logger("DoMC", MainSystemLogger);
             MainFileLogger.RegisterExternalLogger(SystemLogger);
             Observer = new Observer(GetLogger("Events"));
+        }
+        /// <summary>
+        /// Создает модуль управления. Перед вызовом нужно вызвать AssemblyLoader.LoadAssembliesFromPath иначе нужные библиотеки с командами, модулями и интрефейсом не будут найдены
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static MainController Create()
+        {
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            Type UIType;
+            var UITypes = new List<Type>();
+            foreach (var assembly in assemblies)
+            {
+                UITypes.AddRange(assembly.GetTypes().Where(t => typeof(IMainUserInterface).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
+            }
+
+            if (UITypes.Count == 1)
+            {
+                UIType = UITypes[0];
+
+            }
+            else
+            {
+                if (UITypes.Count > 1)
+                {
+                    throw new InvalidOperationException($"Найден несколько главных интерфейсов, но в файле \"{appsettingsPath}\" нет значения \"{MainInterfaceFieldString}\"");
+                }
+                else
+                {
+                    throw new InvalidOperationException("Не найден ни один главный интерфейс");
+                }
+            }
+            var mainController = new MainController(UIType);
+            return mainController;
         }
 
         /// <summary>
@@ -198,9 +236,14 @@ namespace DoMCModuleControl
 
         public void FindAndRegisterAllModules()
         {
-            var moduleTypes = Assembly.GetExecutingAssembly()
-                                        .GetTypes()
-                                        .Where(t => typeof(ModuleBase).IsAssignableFrom(t) && !t.IsAbstract);
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var moduleTypes = new List<Type>();
+            foreach (var assembly in assemblies)
+            {
+                moduleTypes.AddRange(assembly.GetTypes().Where(t => typeof(ModuleBase).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
+            }
+
             foreach (var moduleType in moduleTypes)
             {
                 var module = (Modules.ModuleBase?)Activator.CreateInstance(moduleType, this);
@@ -234,9 +277,14 @@ namespace DoMCModuleControl
 
         public void RegisterAllCommands()
         {
-            var commandTypes = Assembly.GetExecutingAssembly()
-                                        .GetTypes()
-                                        .Where(t => typeof(CommandBase).IsAssignableFrom(t) && !t.IsAbstract);
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var commandTypes = new List<Type>();
+            foreach (var assembly in assemblies)
+            {
+                commandTypes.AddRange(assembly.GetTypes().Where(t => typeof(CommandBase).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
+            }
+
 
             foreach (var commandType in commandTypes)
             {
@@ -244,14 +292,14 @@ namespace DoMCModuleControl
 
                 if (commandType.DeclaringType != null && typeof(ModuleBase).IsAssignableFrom(commandType.DeclaringType))
                 {
-                    moduleInstance = (ModuleBase?)Activator.CreateInstance(commandType.DeclaringType);
+                    moduleInstance = (ModuleBase?)Activator.CreateInstance(commandType.DeclaringType, this);
                 }
                 else
                 {
                     var moduleAttribute = commandType.GetCustomAttribute<CommandModuleTypeAttribute>();
                     if (moduleAttribute != null)
                     {
-                        moduleInstance = (ModuleBase?)Activator.CreateInstance(moduleAttribute.ModuleType);
+                        moduleInstance = (ModuleBase?)Activator.CreateInstance(moduleAttribute.ModuleType, this);
                     }
                 }
 
@@ -273,8 +321,18 @@ namespace DoMCModuleControl
             }
         }
 
+        public List<CommandInfo> GetRegisteredCommandList()
+        {
+            var result = new List<CommandInfo>();
+            foreach (var kv in _commands)
+            {
+                result.Add(kv.Value.Clone());
+            }
+            return result;
+        }
+
         /// <summary>
-        /// Создание команды по имени (из списка известных команд создается экземпляр команды, который выполняет код
+        /// Создание команды по имени (из списка известных команд создается экземпляр команды, который выполняет код)
         /// </summary>
         /// <param name="commandName">Текстовое имя команды</param>
         /// <returns>Созданная команда</returns>
@@ -292,20 +350,6 @@ namespace DoMCModuleControl
             }
             throw new ArgumentException($"Команда \"{commandName}\" не зарегистрирована.");
         }
-        public void ShowInterface()
-        {
-            MainUserInterface?.Show();
-        }
-        public void HideInterface()
-        {
-            MainUserInterface?.Hide();
-
-        }
-        public void CloseInterface()
-        {
-            MainUserInterface?.Close();
-
-        }
 
         public Observer GetObserver()
         {
@@ -315,6 +359,11 @@ namespace DoMCModuleControl
         public ILogger GetLogger(string ModuleName)
         {
             return new Logger(ModuleName, MainFileLogger);
+        }
+
+        public IMainUserInterface GetMainUserInterface()
+        {
+            return MainUserInterface;
         }
     }
 

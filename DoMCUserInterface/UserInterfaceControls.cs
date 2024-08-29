@@ -133,7 +133,7 @@ namespace DoMCLib.Tools
             return String.Join(":", mac.Select(b => b.ToString("X2")));
         }
 
-        public static bool[] GetListOfSetSocketConfiguration(int SocketQuantity, Dictionary<int, DoMCLib.Configuration.CCDSocketConfiguration> SocketConfigurations)
+        public static bool[] GetListOfSetSocketConfiguration(int SocketQuantity, Dictionary<int, DoMCLib.Configuration.SocketDoMCConfiguration> SocketConfigurations)
         {
             bool[] setConfig = new bool[SocketQuantity];
             SocketConfigurations?.Keys.Select(k => k).ToList().ForEach(s => setConfig[s - 1] = true);
@@ -145,16 +145,16 @@ namespace DoMCLib.Tools
         /// <param name="SocketQuantity"></param>
         /// <param name="SocketConfigurations"></param>
         /// <returns>0 - нет конфигурации или эталона, 1 - есть кофигурация и эталон</returns>
-        public static int[] GetIntListOfSetSocketConfiguration(int SocketQuantity, Dictionary<int, DoMCLib.Configuration.CCDSocketConfiguration> SocketConfigurations)
+        public static int[] GetIntListOfSetSocketConfiguration(int SocketQuantity, Dictionary<int, DoMCLib.Configuration.SocketDoMCConfiguration> SocketConfigurations)
         {
             int[] setConfig = new int[SocketQuantity];
 
             for (int i = 0; i < SocketQuantity; i++)
             {
                 setConfig[i] = 0;
-                if (SocketConfigurations.ContainsKey(i+1))
+                if (SocketConfigurations.ContainsKey(i + 1))
                 {
-                    if (SocketConfigurations[i + 1].StandardImage != null)
+                    //if (SocketConfigurations[i + 1].StandardImage != null)
                     {
                         setConfig[i] = 1;
                     }
@@ -164,10 +164,10 @@ namespace DoMCLib.Tools
             return setConfig;
         }
 
-        public static bool[] GetListOfSetStandardSocketConfiguration(int SocketQuantity, Dictionary<int, DoMCLib.Configuration.CCDSocketConfiguration> SocketConfigurations)
+        public static bool[] GetListOfSetStandardSocketConfiguration(int SocketQuantity, Dictionary<int, DoMCLib.Configuration.SocketDoMCConfiguration> SocketConfigurations)
         {
             bool[] setConfig = new bool[SocketQuantity];
-            SocketConfigurations?.Keys.Select(k => k).ToList().ForEach(s => setConfig[s - 1] = SocketConfigurations[s].StandardImage != null);
+            //SocketConfigurations?.Keys.Select(k => k).ToList().ForEach(s => setConfig[s - 1] = SocketConfigurations[s].StandardImage != null);
             return setConfig;
         }
 

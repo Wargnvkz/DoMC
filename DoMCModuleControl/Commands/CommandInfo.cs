@@ -41,5 +41,11 @@ namespace DoMCModuleControl.Commands
             CommandClass = commandClass;
             Module = module;
         }
+
+        public CommandInfo Clone()
+        {
+            var ci = new CommandInfo(CommandName, InputType, OutputType, CommandClass, Module);
+            return ci;
+        }
     }
 }

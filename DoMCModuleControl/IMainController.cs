@@ -1,6 +1,7 @@
 ﻿using DoMCModuleControl.Commands;
 using DoMCModuleControl.Configuration;
 using DoMCModuleControl.Logging;
+using DoMCModuleControl.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,5 +32,11 @@ namespace DoMCModuleControl
         /// <param name="ModuleName">Имя модуля</param>
         /// <returns></returns>
         public ILogger GetLogger(string ModuleName);
+
+        /// <summary>
+        /// Получить главный интерфейс программы
+        /// </summary>
+        /// <returns></returns>
+        public IMainUserInterface GetMainUserInterface();
     }
 }
