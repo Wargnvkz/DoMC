@@ -9,7 +9,7 @@ namespace DoMC
         static void Main()
         {
             
-            DoMCModuleControl.MainController.LoadModules();
+            DoMCModuleControl.MainController.LoadDLLModules();
         }
     }
 }

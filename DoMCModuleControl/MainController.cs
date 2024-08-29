@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿#pragma warning disable IDE0270
+using System.Data;
 using System;
 using System.Reflection;
 using System.Windows.Input;
@@ -121,7 +122,7 @@ namespace DoMCModuleControl
         /// Создание основного контроллера с созданием модулей из библиотек в папке Modules/*.dll
         /// </summary>
         /// <returns>Новый главный контроллер</returns>
-        public static MainController LoadModules()
+        public static MainController LoadDLLModules()
         {
 
             var StartingConfiguration = GetMainApplicationConfiguration();
@@ -194,6 +195,19 @@ namespace DoMCModuleControl
             return mainController;
         }
 
+
+        public void FindAndRegisterAllModules()
+        {
+            var moduleTypes = Assembly.GetExecutingAssembly()
+                                        .GetTypes()
+                                        .Where(t => typeof(ModuleBase).IsAssignableFrom(t) && !t.IsAbstract);
+            foreach (var moduleType in moduleTypes)
+            {
+                var module = (Modules.ModuleBase?)Activator.CreateInstance(moduleType, this);
+                if (module == null) throw new InvalidOperationException("Не получилось создать экземпляр модуля");
+                RegisterModule(module);
+            }
+        }
         /// <summary>
         /// Загружает конфигурацию работы программы из файла appsettings.json
         /// </summary>
@@ -220,7 +234,6 @@ namespace DoMCModuleControl
 
         public void RegisterAllCommands()
         {
-            // Получаем все типы, реализующие CommandBase
             var commandTypes = Assembly.GetExecutingAssembly()
                                         .GetTypes()
                                         .Where(t => typeof(CommandBase).IsAssignableFrom(t) && !t.IsAbstract);
@@ -229,15 +242,13 @@ namespace DoMCModuleControl
             {
                 ModuleBase? moduleInstance = null;
 
-                // Проверяем, является ли команда вложенным классом
                 if (commandType.DeclaringType != null && typeof(ModuleBase).IsAssignableFrom(commandType.DeclaringType))
                 {
                     moduleInstance = (ModuleBase?)Activator.CreateInstance(commandType.DeclaringType);
                 }
                 else
                 {
-                    // Если команда не вложенная, проверяем наличие атрибута
-                    var moduleAttribute = commandType.GetCustomAttribute<CommandModuleAttribute>();
+                    var moduleAttribute = commandType.GetCustomAttribute<CommandModuleTypeAttribute>();
                     if (moduleAttribute != null)
                     {
                         moduleInstance = (ModuleBase?)Activator.CreateInstance(moduleAttribute.ModuleType);
@@ -261,7 +272,6 @@ namespace DoMCModuleControl
                 }
             }
         }
-
 
         /// <summary>
         /// Создание команды по имени (из списка известных команд создается экземпляр команды, который выполняет код

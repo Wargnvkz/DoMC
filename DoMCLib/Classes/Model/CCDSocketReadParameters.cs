@@ -32,16 +32,6 @@ namespace DoMCLib.Classes.Model
         public bool AnswerAfterScanAutomaticly;
 
 
-        [IgnoreDataMember]
-        public short[][,] TempImages;
-        [IgnoreDataMember]
-        public Tools.Deviation TempDeviations;
-        [IgnoreDataMember]
-        public short[,] TempAverageImage;
-        [IgnoreDataMember]
-        public int DeviationLevel;
-
-
         public CCDCardConfigRequestB GetMainConfiguration()
         {
             var conf = new CCDCardConfigRequestB()

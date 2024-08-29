@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,7 +13,6 @@ namespace DoMCModuleControl.Commands
     /// </summary>
     public abstract class CommandBase
     {
-        public abstract string CommandName { get; set; }
 
         //TODO: сделать синхронизаци для многопоточности
         /// <summary>
@@ -76,6 +76,21 @@ namespace DoMCModuleControl.Commands
             InputType = inputType;
             OutputType = outputType;
             InputData = inputData;
+        }
+        /// <summary>
+        /// Возвращает имя команды, по которому ее будет создавать главный контроллер
+        /// </summary>
+        public virtual string CommandName
+        {
+            get
+            {
+                // Получаем имя модуля и команды
+                var moduleName = Module.GetType().Name;
+                var commandName = GetType().Name;
+
+                // Формируем полное имя команды
+                return $"{moduleName}.{commandName}";
+            }
         }
         /// <summary>
         /// Метод запускающий команду в работу и регулирующий статусы и логирование
