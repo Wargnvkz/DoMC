@@ -461,16 +461,16 @@ namespace DoMCLib.Classes
             if (!res || CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
             {
                 CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                return LoadError.LoadConfiguration;
+                return LoadError.LoadConfigurationCommand;
 
             }
 
-            SendCommand(ModuleCommand.LoadConfiguration);
-            res = UserInterfaceControls.Wait(Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.LoadConfiguration && CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete || CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error, () => CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+            SendCommand(ModuleCommand.LoadConfigurationCommand);
+            res = UserInterfaceControls.Wait(Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.LoadConfigurationCommand && CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete || CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error, () => CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
             if (!res || CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
             {
                 CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                return LoadError.LoadConfiguration;
+                return LoadError.LoadConfigurationCommand;
 
             }
             CCDDataEchangeStatuses.IsConfigurationLoaded = true;
@@ -560,7 +560,7 @@ namespace DoMCLib.Classes
             NetworkCard,
             ConfigurationNotComplete,
             CardsAndSocketsConfiguration,
-            LoadConfiguration,
+            LoadConfigurationCommand,
             LCBConfigurationNotComplete,
             InitLCB,
             LCBCurrentRequest,

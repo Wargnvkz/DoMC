@@ -102,59 +102,6 @@ namespace DoMCModuleControl
             _modules.Add(module.GetType().Name, module);
         }
 
-        /// <summary>
-        /// Инициализация всех модулей
-        /// </summary>
-        public void InitializeModules()
-        {
-            foreach (var module in _modules)
-            {
-                module.Value.Initialize();
-            }
-        }
-
-        /// <summary>
-        /// Подготовка всех модулей к уничтожению
-        /// </summary>
-        public void ShutdownModules()
-        {
-            foreach (var module in _modules)
-            {
-                module.Value.Shutdown();
-            }
-        }
-
-        /// <summary>
-        /// Запуск модуля по имени
-        /// </summary>
-        /// <param name="moduleName">Имя модуля</param>
-        public void StartModule(string moduleName)
-        {
-            if (_modules.TryGetValue(moduleName, out var module))
-            {
-                module.Start();
-            }
-            else
-            {
-                Console.WriteLine($"Module \"{moduleName}\" not found.");
-            }
-        }
-
-        /// <summary>
-        /// Остановка модуля по имени
-        /// </summary>
-        /// <param name="moduleName">Имя модуля</param>
-        public void StopModule(string moduleName)
-        {
-            if (_modules.TryGetValue(moduleName, out var module))
-            {
-                module.Stop();
-            }
-            else
-            {
-                Console.WriteLine($"Module \"{moduleName}\" not found.");
-            }
-        }
 
         /// <summary>
         /// Создание основного контроллера с созданием модулей из библиотек в папке Modules/*.dll
@@ -229,7 +176,6 @@ namespace DoMCModuleControl
                 }
             }
 
-            mainController.InitializeModules();
             return mainController;
         }
 
@@ -296,20 +242,25 @@ namespace DoMCModuleControl
                 }
                 else
                 {
-                    var moduleAttribute = commandType.GetCustomAttribute<CommandModuleTypeAttribute>();
-                    if (moduleAttribute != null)
+                    var moduleTypeAttribute = commandType.GetCustomAttribute<CommandModuleTypeAttribute>();
+                    if (moduleTypeAttribute != null)
                     {
-                        moduleInstance = (ModuleBase?)Activator.CreateInstance(moduleAttribute.ModuleType, this);
+                        moduleInstance = (ModuleBase?)Activator.CreateInstance(moduleTypeAttribute.ModuleType, this);
                     }
+
                 }
+                //var moduleNameAttribute = commandType.GetCustomAttribute<CommandModuleNameAttribute>();
 
                 if (moduleInstance != null)
                 {
-                    var commandInstance = (CommandBase?)Activator.CreateInstance(commandType, moduleInstance);
+                    var commandInstance = (CommandBase?)Activator.CreateInstance(commandType, this, moduleInstance);
                     if (commandInstance != null)
                     {
                         var commandInfo = new CommandInfo(
-                            commandInstance.CommandName,
+                                //moduleNameAttribute == null ?
+                                commandInstance.CommandName
+                                //:$"{moduleInstance.GetType().Name}.{moduleNameAttribute.ModuleName}"
+                                ,
                             commandInstance.InputType,
                             commandInstance.OutputType,
                             commandType,
@@ -344,7 +295,7 @@ namespace DoMCModuleControl
             {
                 if (commandInfo.CommandClass != null)
                 {
-                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType, data);
+                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType, data);
                 }
                 throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
             }

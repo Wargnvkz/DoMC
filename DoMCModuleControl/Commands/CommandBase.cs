@@ -10,6 +10,10 @@ namespace DoMCModuleControl.Commands
     /// <summary>
     /// шаблон команды. Каждая команда сама выполняет код.
     /// Все команды выполняются асинхронно.
+    /// При обработке: События логируются и посылается сообщение в Obsever
+    /// "{CommandName}.Start" - InputData (logging - Informational
+    /// "{CommandName}.Success" - OutputData (loggin - Informational)
+    /// "{CommandName}.Error" - Exception (loggin - Critical)
     /// </summary>
     public abstract class CommandBase
     {
@@ -51,6 +55,8 @@ namespace DoMCModuleControl.Commands
         /// </summary>
         public Exception? Error { get; private set; }
 
+        public IMainController Controller { get; private set; }
+
 
         /// <summary>
         /// Конструктор. Потомки сами определяют типы данных и передают их в этот конструктор
@@ -58,8 +64,9 @@ namespace DoMCModuleControl.Commands
         /// <param name="module">Модуль с которым будет работать команда</param>
         /// <param name="inputType">Тип входных данных</param>
         /// <param name="outputType">Тип выходных данных</param>
-        public CommandBase(Modules.ModuleBase module, Type? inputType = null, Type? outputType = null)
+        public CommandBase(IMainController mainController, Modules.ModuleBase module, Type? inputType = null, Type? outputType = null)
         {
+            Controller = mainController;
             Module = module;
             InputType = inputType;
             OutputType = outputType;
@@ -92,8 +99,12 @@ namespace DoMCModuleControl.Commands
             Error = null;
             try
             {
+                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.Information, $"Начало выполнения {CommandName}.");
+                Controller.GetObserver().Notify($"{CommandName}.Start", InputData);
                 if (InputType != null && InputData == null) throw new InvalidOperationException("Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
                 Executing();
+                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.Information, $"Команды {CommandName} выполнена");
+                Controller.GetObserver().Notify($"{CommandName}.Success", OutputData);
             }
             catch (Exception ex)
             {
@@ -101,6 +112,8 @@ namespace DoMCModuleControl.Commands
                 IsComplete = false;
                 IsError = true;
                 Error = ex;
+                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.Critical, $"Ошибка при выполнении команды {CommandName}. ", ex);
+                Controller.GetObserver().Notify($"{CommandName}.Error", ex);
             }
             finally
             {
@@ -126,7 +139,7 @@ namespace DoMCModuleControl.Commands
             task.Start();
         }
         /// <summary>
-        /// Метод описываемый в потомках, то есть в конкретной команде и выполняющий сам код команды
+        /// Метод описываемый в потомках, то есть в конкретной команде и выполняющий сам код команды. Классам реализующим этот метод не нужно заботиться о логировании или ошибках. Все это сделано в базовом классе, чтобы соблюсти стандартизацию
         /// </summary>
         protected abstract void Executing();
         /// <summary>

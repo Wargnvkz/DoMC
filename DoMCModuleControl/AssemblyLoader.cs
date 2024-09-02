@@ -16,8 +16,9 @@ namespace DoMCModuleControl
         /// Загрузить сборки из библиотек в указанном пути
         /// </summary>
         /// <param name="path"></param>
-        public static void LoadAssembliesFromPath(string path)
+        public static void LoadAssembliesFromPath(string? path)
         {
+            if (path == null) path = String.Empty;
             var assemblies = Directory.GetFiles(path, "*.dll");
             foreach (var assembly in assemblies)
             {
@@ -26,7 +27,7 @@ namespace DoMCModuleControl
         }
         public static void LoadAssembliesFromEXEPath()
         {
-            LoadAssembliesFromPath(Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName));
+            LoadAssembliesFromPath(Path.GetDirectoryName(Environment.ProcessPath));
         }
 
     }

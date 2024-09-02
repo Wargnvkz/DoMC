@@ -138,7 +138,7 @@ namespace DoMCLib.Classes.Model.RDPB
 
                     }
                     break;
-                case RDPBCommandType.GetParameters:
+                case RDPBCommandType.MakeBlockSendWorkingState:
                     {
 
                     }
@@ -174,7 +174,7 @@ namespace DoMCLib.Classes.Model.RDPB
                         data[1] = (ushort)(CoolingBlocksQuantity << 12 | (BlockIsOn ? 1 : 0) << 8 | (int)(TransporterSide - 0x30) << 4 | (int)(Errors - 0x30));
                     }
                     break;
-                case RDPBCommandType.GetParameters:
+                case RDPBCommandType.MakeBlockSendWorkingState:
                     {
                         data = new ushort[4];
                         data[0] = 0x2001;
@@ -235,7 +235,7 @@ namespace DoMCLib.Classes.Model.RDPB
 
                         }
                         break;
-                    case RDPBCommandType.GetParameters:
+                    case RDPBCommandType.MakeBlockSendWorkingState:
                         {
                             if (parts.Length != 5) return;
                             switch (parts[1][0])
@@ -299,7 +299,7 @@ namespace DoMCLib.Classes.Model.RDPB
 
                         }
                         break;
-                    case RDPBCommandType.GetParameters:
+                    case RDPBCommandType.MakeBlockSendWorkingState:
                         {
 
                         }

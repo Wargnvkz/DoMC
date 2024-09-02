@@ -11,7 +11,7 @@ namespace DoMCLib.Classes.Model.RDPB
         SetIsBad = 0x3831,
         On = 0x3832,
         Off = 0x3833,
-        GetParameters = 0x3930,
+        MakeBlockSendWorkingState = 0x3930,
         SetCoolingBlocks = 0x4130,
 
     }

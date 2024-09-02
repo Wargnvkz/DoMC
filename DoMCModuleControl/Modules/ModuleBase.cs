@@ -12,7 +12,7 @@ namespace DoMCModuleControl.Modules
     /// <summary>
     /// Базовый класс для модулей программы. Модули сами разбираются что и как им делать
     /// </summary>
-    public abstract class ModuleBase : IDisposable
+    public abstract class ModuleBase
     {
         /// <summary>
         /// Статусы работы модуля
@@ -55,34 +55,7 @@ namespace DoMCModuleControl.Modules
                 mainController.RegisterCommand(ci);
             });
         }
-        /// <summary>
-        /// Первичная инициализация модуля
-        /// </summary>
-        public abstract void Initialize();
-        /// <summary>
-        /// Полное отключение модуля
-        /// </summary>
-        public abstract void Shutdown();
-        /// <summary>
-        /// Запуск модуля в работу
-        /// </summary>
-        public abstract void Start();
-        /// <summary>
-        /// Отстановка работы модуля
-        /// </summary>
-        public abstract void Stop();
-        /// <summary>
-        /// Остановка и полное отключение модуля перед уничтожением
-        /// </summary>
-        public void Dispose()
-        {
-            if (!disposed)
-            {
-                Stop();
-                Shutdown();
-                GC.SuppressFinalize(this);
-                disposed = true;
-            }
-        }
+
+
     }
 }
