@@ -16,7 +16,7 @@ namespace DoMCModuleControl.Logging
         {
             ModuleName = moduleName;
             BaseLogger = baseLogger;
-            MaxLogginLevel = LoggerLevel.Important;
+            MaxLogginLevel = LoggerLevel.Information;
         }
 
         public void Add(LoggerLevel level, string Message)

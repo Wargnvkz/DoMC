@@ -8,9 +8,6 @@ namespace DoMCModuleControl.Tools
 {
     public class Converting
     {
-        public static string ByteArrayToHexString(byte[] data)
-        {
-            return string.Join(", ", data.Select(d => "0x" + d.ToString("X2")));
-        }
+        
     }
 }

@@ -36,7 +36,7 @@ namespace DoMCLib.Classes.Model.RDPB
         {
             mainController = MainController;
             WorkingLog = mainController.GetLogger(this.GetType().Name);
-            WorkingLog.SetMaxLogginLevel(LoggerLevel.Information);
+            WorkingLog.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
         }
 
         public void Start()
@@ -94,7 +94,7 @@ namespace DoMCLib.Classes.Model.RDPB
         {
             if (client.Connected)
             {
-                WorkingLog.Add(LoggerLevel.Information, $"Команда модулю бракера: <{Command.ToString()}>");
+                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда модулю бракера: <{Command.ToString()}>");
                 CurrentStatus.SetTimeLastSent();
                 //CurrentStatus.LastSentTime = Timer.ElapsedTicks;//DateTime.Now;
                 RDPBStatus stat = new RDPBStatus();
@@ -105,7 +105,7 @@ namespace DoMCLib.Classes.Model.RDPB
                 CurrentStatus.SetTimeCommandSent();
                 //CurrentStatus.TimeCommandSent = Timer.ElapsedTicks;//DateTime.Now;
                 var str = stat.ToString();
-                WorkingLog.Add(LoggerLevel.Information, $"Команда бракеру: <{str.Trim()}>");
+                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда бракеру: <{str.Trim()}>");
                 var bytes = Encoding.ASCII.GetBytes(str);
                 var ns = client.GetStream();
                 ns.Write(bytes, 0, bytes.Length);
@@ -116,7 +116,7 @@ namespace DoMCLib.Classes.Model.RDPB
         {
             var crc = RDPBStatus.CalcLRC(cmd);
             var rescmd = cmd.Trim() + " " + crc + "\r\n";
-            WorkingLog.Add(LoggerLevel.Information, $"Команда бракеру: <{rescmd.Trim()}>");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда бракеру: <{rescmd.Trim()}>");
             var bytes = Encoding.ASCII.GetBytes(rescmd);
             var ns = client.GetStream();
             ns.Write(bytes, 0, bytes.Length);
@@ -193,7 +193,7 @@ namespace DoMCLib.Classes.Model.RDPB
                     Array.Resize(ref buffer, newbufferlength);
                     if (CurrentStatus == null) CurrentStatus = new RDPBStatus();
                     var AnswerString = Encoding.ASCII.GetString(msgarr);
-                    WorkingLog.Add(LoggerLevel.Information, $"Получено от бракера: <{AnswerString.Trim()}>");
+                    WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получено от бракера: <{AnswerString.Trim()}>");
                     CurrentStatus.ChangeFromString(AnswerString);
                     mainController.GetObserver().Notify($"{this.GetType().Name}.StatusChanged", CurrentStatus);
                 }

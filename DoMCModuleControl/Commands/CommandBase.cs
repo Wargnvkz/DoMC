@@ -99,11 +99,11 @@ namespace DoMCModuleControl.Commands
             Error = null;
             try
             {
-                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.Information, $"Начало выполнения {CommandName}.");
+                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Начало выполнения {CommandName}.");
                 Controller.GetObserver().Notify($"{CommandName}.Start", InputData);
                 if (InputType != null && InputData == null) throw new InvalidOperationException("Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
                 Executing();
-                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.Information, $"Команды {CommandName} выполнена");
+                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Команды {CommandName} выполнена");
                 Controller.GetObserver().Notify($"{CommandName}.Success", OutputData);
             }
             catch (Exception ex)

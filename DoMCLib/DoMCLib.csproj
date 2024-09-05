@@ -11,9 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Classes\Model\ArchiveDB\Commands\" />
     <Folder Include="Classes\Model\CCD\Commands\" />
+    <Folder Include="Classes\Model\DB\Commands\" />
     <Folder Include="Classes\Model\RDPB\Module\" />
-    <Folder Include="DB\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace DoMCLib.Tools
 {
-    public class BoolArrayTools
+    public class ArrayTools
     {
         public static string BoolArrayToBase6xString(bool[] array)
         {
@@ -40,6 +40,29 @@ namespace DoMCLib.Tools
             bitarray.CopyTo(bools, 0);
             return bools;
         }
-        
+        public static string ByteArrayToHexString(byte[] data)
+        {
+            return string.Join(", ", data.Select(d => "0x" + d.ToString("X2")));
+        }
+        public static string BoolArrayToHex(bool[] array)
+        {
+            if (array == null || array.Length == 0) return "x";
+            StringBuilder sb = new StringBuilder();
+            var N = 8;
+            var bytes = array.Length / N;
+            if (array.Length % N != 0) bytes++;
+            for (int b = 0; b < bytes; b++)
+            {
+                int value = 0;
+                for (var i = 0; i < N; i++)
+                {
+                    var ind = b * N + i;
+                    if (ind >= array.Length) break;
+                    value |= (array[ind] ? 1 : 0) << i;
+                }
+                sb.Insert(0, value.ToString("X2"));
+            }
+            return "0x" + sb.ToString();
+        }
     }
 }

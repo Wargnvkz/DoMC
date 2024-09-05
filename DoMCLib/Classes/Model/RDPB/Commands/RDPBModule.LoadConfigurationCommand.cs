@@ -84,14 +84,6 @@ namespace DoMCLib.Classes.Model.RDPB
             protected override void Executing() => ((RDPBModule)Module).SendManualCommandProc((string)(InputData ?? String.Empty));
 
         }
-        /*
-        public class Command : CommandBase
-        {
-            public Command(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
 
-            protected override void Executing() => ((RDPBModule)Module).();
-
-        }
-        */
     }
 }
