@@ -105,15 +105,15 @@ namespace DoMCLib.DB
         public ImageProcessParameters ImageProcessParameters;
     }
 
-    public class Box
+    public class BoxDB
     {
         public int BoxID;
         public DateTime CompletedTime;
         public int BadCyclesCount;
         public string TransporterSide = "";
-        public Box() { }
+        public BoxDB() { }
 
-        public Box(DoMCLib.Classes.Box box)
+        public BoxDB(DoMCLib.Classes.Box box)
         {
             this.CompletedTime = box.CompletedTime;
             this.BadCyclesCount = box.BadCyclesCount;

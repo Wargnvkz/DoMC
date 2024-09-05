@@ -1,5 +1,6 @@
 ﻿using DoMCLib.Classes.Model.ArchiveDB;
 using DoMCLib.DB;
+using DoMCLib.Tools;
 using DoMCModuleControl;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
@@ -23,7 +24,8 @@ namespace DoMCLib.Classes.Model.DB
         CancellationTokenSource cancelationTockenSource;
         ThrottledErrorNotifier errorNotifier;
         Observer ObserverForDataStorage;
-        ConcurrentQueue<CycleData> cycleDatas = new ConcurrentQueue<CycleData>();
+        ConcurrentQueue<CycleImagesCCD> cycleDatas = new ConcurrentQueue<CycleImagesCCD>();
+        ConcurrentQueue<Box> BoxDatas = new ConcurrentQueue<Box>();
         public DBModule(IMainController MainController) : base(MainController)
         {
             errorNotifier = new ThrottledErrorNotifier(MainController.GetObserver(), 300, 5);
@@ -68,9 +70,14 @@ namespace DoMCLib.Classes.Model.DB
             task.Wait();
         }
 
-        public void EnqueueDate(CycleData cd)
+        public void EnqueueCycleDate(CycleImagesCCD cd)
         {
             cycleDatas.Enqueue(cd);
+
+        }
+        public void EnqueueBoxDate(Box box)
+        {
+            BoxDatas.Enqueue(box);
 
         }
 
@@ -88,99 +95,46 @@ namespace DoMCLib.Classes.Model.DB
                 {
                     try
                     {
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Начало сохранения съема");
+                        WorkingLog.Add(LoggerLevel.Information, $"Съем {cycle.CycleCCDDateTime}. Начало сохранения съема");
                         var cycleData = CycleData.ConvertFromCycleImageCCD(cycle);
 
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Изображения: " + InterfaceDataExchange.BoolArrayToHex(cycle.WorkModeImages.Select(wi => wi != null).ToArray()));
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Разница: " + InterfaceDataExchange.BoolArrayToHex(cycle.Differences.Select(wi => wi != null).ToArray()));
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Эталон: " + InterfaceDataExchange.BoolArrayToHex(cycle.StandardImage.Select(wi => wi != null).ToArray()));
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Съем {cycle.CycleCCDDateTime}. Изображения: " + ArrayTools.BoolArrayToHex(cycle.WorkModeImages.Select(wi => wi != null).ToArray()));
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Съем {cycle.CycleCCDDateTime}. Разница: " + ArrayTools.BoolArrayToHex(cycle.Differences.Select(wi => wi != null).ToArray()));
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Съем {cycle.CycleCCDDateTime}. Эталон: " + ArrayTools.BoolArrayToHex(cycle.StandardImage.Select(wi => wi != null).ToArray()));
 
 
-                        if (InterfaceDataExchange.DataStorage == null) return;
-                        InterfaceDataExchange.DataStorage.LocalSaveCycleAndImagesOfActiveSockets(cycleData);
-                        InterfaceDataExchange.Errors.NoLocalSQL = false;
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Сохранен");
+                        Storage.LocalSaveCycleAndImagesOfActiveSockets(cycleData);
+                        WorkingLog.Add(LoggerLevel.Information, $"Съем {cycle.CycleCCDDateTime}. Сохранен");
                     }
                     catch (Exception ex)
                     {
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Ошибка при сохранении данных цикла", ex);
-                        InterfaceDataExchange.Errors.LocalSQLCycleSaveError = true;
+                        WorkingLog.Add(LoggerLevel.Critical, $"Съем {cycle.CycleCCDDateTime}. Ошибка при сохранении данных цикла", ex);
                         return;
                     }
                 });
+
+                while (BoxDatas.Count > 0)
+                {
+                    BoxDatas.TryDequeue(out Box box);
+                    try
+                    {
+                        WorkingLog.Add(LoggerLevel.Information, $"Короб: {box.CompletedTime.ToString("G")} {box.BadCyclesCount} {box.TransporterSide.ToString()}");
+                        Storage.LocalSaveBox(new BoxDB(box));
+                    }
+                    catch (Exception ex)
+                    {
+                        WorkingLog.Add(LoggerLevel.Critical, "Ошибка при сохранении данных короба. ", ex);
+                    }
+                    WorkingLog.Add(LoggerLevel.Information, $"Несохраненных коробов: {BoxDatas.Count}");
+
+                }
                 Task.Delay(100).Wait();
             }
             IsStarted = false;
         }
 
-        public bool OnCalculate(ref DataExchangeKernel.ACS_Core.Memory data, double dt)
-        {
-            if (InterfaceDataExchange == null) return true;
-            if (InterfaceDataExchange.CyclesCCD == null) return true;
-            if (InterfaceDataExchange.DataStorage == null) return true;
-            try
-            {
-                var CycleDataList = new List<CycleImagesCCD>();
-                while (InterfaceDataExchange.CyclesCCD.TryDequeue(out CycleImagesCCD cycle))
-                {
-                    CycleDataList.Add(cycle);
-                }
-
-                Parallel.ForEach(CycleDataList, cycle =>
-                {
-                    try
-                    {
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Начало сохранения съема");
-                        var cycleData = CycleData.ConvertFromCycleImageCCD(cycle);
-
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Изображения: " + InterfaceDataExchange.BoolArrayToHex(cycle.WorkModeImages.Select(wi => wi != null).ToArray()));
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Разница: " + InterfaceDataExchange.BoolArrayToHex(cycle.Differences.Select(wi => wi != null).ToArray()));
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Эталон: " + InterfaceDataExchange.BoolArrayToHex(cycle.StandardImage.Select(wi => wi != null).ToArray()));
-
-
-                        if (InterfaceDataExchange.DataStorage == null) return;
-                        InterfaceDataExchange.DataStorage.LocalSaveCycleAndImagesOfActiveSockets(cycleData);
-                        InterfaceDataExchange.Errors.NoLocalSQL = false;
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Сохранен");
-                    }
-                    catch (Exception ex)
-                    {
-                        WorkingLog.Add($"Съем {cycle.CycleCCDDateTime}. Ошибка при сохранении данных цикла", ex);
-                        InterfaceDataExchange.Errors.LocalSQLCycleSaveError = true;
-                        return;
-                    }
-                });
-                if (CycleDataList.Count > 0)
-                    WorkingLog.Add($"Несохраненных съемов: {InterfaceDataExchange.CyclesCCD.Count}");
-            }
-            catch { }
-            try
-            {
-                while (InterfaceDataExchange.Boxes.TryPeek(out Classes.Box box))
-                {
-                    InterfaceDataExchange.Boxes.TryDequeue(out Classes.Box box1);
-                    try
-                    {
-                        WorkingLog.Add($"Короб: {box.CompletedTime.ToString("G")} {box.BadCyclesCount} {box.TransporterSide.ToString()}");
-                        if (InterfaceDataExchange.DataStorage == null) return true;
-                        InterfaceDataExchange.DataStorage.LocalSaveBox(new DB.Box(box));
-                        InterfaceDataExchange.Errors.NoLocalSQL = false;
-                    }
-                    catch (Exception ex)
-                    {
-                        WorkingLog.Add("Ошибка при сохранении данных короба");
-                        WorkingLog.Add(ex);
-                        InterfaceDataExchange.Errors.LocalSQLCycleSaveError = true;
-                        return false;
-                    }
-                    WorkingLog.Add($"Несохраненных коробов: {InterfaceDataExchange.Boxes.Count}");
-
-                }
-            }
-            catch { }
-
-            return true;
-        }
 
     }
+
+ 
 }

@@ -10,7 +10,7 @@ namespace DoMCLib.DB
         #region Insert Commands
         void SaveCycleAndImagesOfActiveSockets(CycleData cd);
         void SaveCycleAndCompressedImagesOfActiveSockets(CycleData cd);
-        void SaveBox(Box box);
+        void SaveBox(BoxDB box);
         #endregion
 
         #region select
@@ -24,8 +24,8 @@ namespace DoMCLib.DB
 
         List<CycleData> GetCyclesHeadersBefore(DateTime To);
 
-        List<Box> GetBox(DateTime start, DateTime end);
-        List<Box> GetBoxesBefore(DateTime end);
+        List<BoxDB> GetBox(DateTime start, DateTime end);
+        List<BoxDB> GetBoxesBefore(DateTime end);
 
         byte[] GetCycleBinary(CycleData cd);
         void SetCycleBinary(CycleData cd, byte[] data);

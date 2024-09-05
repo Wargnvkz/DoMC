@@ -22,7 +22,7 @@ namespace DoMCLib.DB
         double CacheTimeoutInSeconds = 60;
         private List<CycleDBFileHeader> _CycleDataFiles;
         private List<BoxFileHeader> _BoxFiles;
-        private ILogger WorkingLog;
+        private ILogger? WorkingLog;
         private List<CycleDBFileHeader> CycleDataFiles
         {
             get
@@ -155,7 +155,7 @@ namespace DoMCLib.DB
             CycleDataFiles.Add(new CycleDBFileHeader() { FileName = fn, CycleHeader = localCD });
         }
 
-        public void SaveBox(DB.Box box)
+        public void SaveBox(DB.BoxDB box)
         {
             var newid = GetLastBoxID() + 1;
             box.BoxID = newid;
@@ -263,7 +263,7 @@ namespace DoMCLib.DB
             return list;
         }
 
-        public List<DB.Box> GetBox(DateTime start, DateTime end)
+        public List<DB.BoxDB> GetBox(DateTime start, DateTime end)
         {
 
             var fromTicks = start.Ticks;
@@ -273,7 +273,7 @@ namespace DoMCLib.DB
             return list;
         }
 
-        public List<DB.Box> GetBoxesBefore(DateTime end)
+        public List<DB.BoxDB> GetBoxesBefore(DateTime end)
         {
             var toTicks = end.Ticks;
 
@@ -472,16 +472,16 @@ namespace DoMCLib.DB
             [FileStorageHeader]
             public string TransporterSide = "";
             public Box() { }
-            public Box(DB.Box box)
+            public Box(DB.BoxDB box)
             {
                 BoxID = box.BoxID;
                 CompletedTime = box.CompletedTime;
                 BadCyclesCount = box.BadCyclesCount;
                 TransporterSide = box.TransporterSide;
             }
-            public static DB.Box ToDBBox(Box box)
+            public static DB.BoxDB ToDBBox(Box box)
             {
-                var res = new DB.Box();
+                var res = new DB.BoxDB();
                 res.BoxID = box.BoxID;
                 res.CompletedTime = box.CompletedTime;
                 res.BadCyclesCount = box.BadCyclesCount;

@@ -34,30 +34,43 @@ namespace DoMCLib.DB
         {
             Observer = observer;
             WorkingLog = logger;
-            try
-            {
-                ConnectionStringLocal = connectionStringLocal;
-                if (String.IsNullOrWhiteSpace(ConnectionStringLocal)) throw new Exception("Строка подключения не может быть пустой");
-                LocalStorage = new FileDB(ConnectionStringLocal);
-                LocalStorage.CheckDB(false);
-                LocalIsActive = true;
-            }
-            catch
+            if (String.IsNullOrWhiteSpace(ConnectionStringLocal))
             {
                 LocalIsActive = false;
             }
-
-            try
+            else
             {
-                ConnectionStringRemote = connectionStringRemote;
-                if (String.IsNullOrWhiteSpace(ConnectionStringRemote)) return;
-                RemoteStorage = new FileDB(ConnectionStringRemote);//new MSSQLDBStorage(ConnectionStringRemote);
-                RemoteStorage.CheckDB(false);
-                RemoteIsActive = true;
+                try
+                {
+                    ConnectionStringLocal = connectionStringLocal;
+                    //if (String.IsNullOrWhiteSpace(ConnectionStringLocal)) throw new Exception("Строка подключения не может быть пустой");
+                    LocalStorage = new FileDB(ConnectionStringLocal);
+                    LocalStorage.CheckDB(false);
+                    LocalIsActive = true;
+                }
+                catch
+                {
+                    LocalIsActive = false;
+                }
             }
-            catch
+            if (String.IsNullOrWhiteSpace(ConnectionStringRemote))
             {
                 RemoteIsActive = false;
+            }
+            else
+            {
+                try
+                {
+                    ConnectionStringRemote = connectionStringRemote;
+                    //if (String.IsNullOrWhiteSpace(ConnectionStringRemote)) return;
+                    RemoteStorage = new FileDB(ConnectionStringRemote);//new MSSQLDBStorage(ConnectionStringRemote);
+                    RemoteStorage.CheckDB(false);
+                    RemoteIsActive = true;
+                }
+                catch
+                {
+                    RemoteIsActive = false;
+                }
             }
             if (LocalStorage != null) LocalStorage.SetLog(WorkingLog);
             if (RemoteStorage != null) RemoteStorage.SetLog(WorkingLog);
@@ -124,13 +137,13 @@ namespace DoMCLib.DB
             }
         }
 
-        public virtual void LocalSaveBox(Box box)
+        public virtual void LocalSaveBox(BoxDB box)
         {
             if (LocalStorage == null) return;
             LocalStorage.SaveBox(box);
         }
 
-        public virtual List<Box> LocalGetBox(DateTime start, DateTime end)
+        public virtual List<BoxDB> LocalGetBox(DateTime start, DateTime end)
         {
             if (LocalStorage == null) return null;
             var res = LocalStorage.GetBox(start, end);
@@ -198,13 +211,13 @@ namespace DoMCLib.DB
         }
 
 
-        public virtual void RemoteSaveBox(Box box)
+        public virtual void RemoteSaveBox(BoxDB box)
         {
             if (RemoteStorage == null) return;
             RemoteStorage.SaveBox(box);
         }
 
-        public virtual List<Box> RemoteGetBox(DateTime start, DateTime end)
+        public virtual List<BoxDB> RemoteGetBox(DateTime start, DateTime end)
         {
             if (RemoteStorage == null) return null;
             var res = RemoteStorage.GetBox(start, end);
@@ -314,7 +327,7 @@ namespace DoMCLib.DB
                     catch (Exception ex)
                     {
                         WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при попытке переноса: " + ex.Message);
-                        Observer.Notify($"{this.GetType().Name}.Box.Move.Error", ex);
+                        Observer.Notify($"{this.GetType().Name}.BoxDB.Move.Error", ex);
 
                     }
                 }
@@ -322,7 +335,7 @@ namespace DoMCLib.DB
             catch (Exception ex)
             {
                 WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при чтении списка коробов: " + ex.Message);
-                Observer.Notify($"{this.GetType().Name}.Box.Read.Error", ex);
+                Observer.Notify($"{this.GetType().Name}.BoxDB.Read.Error", ex);
             }
             IsMovingToArchive = false;
             IsTerminatingMovingToArchive = false;
@@ -407,14 +420,14 @@ namespace DoMCLib.DB
                     catch (Exception ex)
                     {
                         WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при попытке переноса: " + ex.Message);
-                        Observer.Notify($"{this.GetType().Name}.Box.Move.Error", ex);
+                        Observer.Notify($"{this.GetType().Name}.BoxDB.Move.Error", ex);
                     }
                 }
             }
             catch (Exception ex)
             {
                 WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при чтении списка коробов: " + ex.Message);
-                Observer.Notify($"{this.GetType().Name}.Box.Read.Error", ex);
+                Observer.Notify($"{this.GetType().Name}.BoxDB.Read.Error", ex);
             }
             IsMovingToArchive = false;
             IsTerminatingMovingToArchive = false;
