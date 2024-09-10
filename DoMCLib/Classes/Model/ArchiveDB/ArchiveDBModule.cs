@@ -1,15 +1,17 @@
-﻿using DoMCLib.DB;
+﻿using DoMCLib.Classes.Model.RDPB;
+using DoMCLib.DB;
 using DoMCModuleControl;
 using DoMCModuleControl.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DoMCLib.Classes.Model.ArchiveDB
 {
-    public class ArchiveDBModule : DoMCModuleControl.Modules.ModuleBase
+    public partial class ArchiveDBModule : DoMCModuleControl.Modules.ModuleBase
     {
         ArchiveDBConfiguration Configuration;
         DateTime TimeLastLocalToRemoteCheck;
@@ -65,6 +67,7 @@ namespace DoMCLib.Classes.Model.ArchiveDB
         {
             cancelationTockenSource.Cancel();
             task.Wait();
+            IsStarted = false;
         }
 
         private void Process()
@@ -99,5 +102,6 @@ namespace DoMCLib.Classes.Model.ArchiveDB
             }
             IsStarted = false;
         }
+       
     }
 }

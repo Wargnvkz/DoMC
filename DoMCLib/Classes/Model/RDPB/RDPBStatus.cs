@@ -199,20 +199,20 @@ namespace DoMCLib.Classes.Model.RDPB
             return sb.ToString();
         }
 
-        public void ChangeFromString(string str)
+        public RDPBStatusGhangeResult ChangeFromString(string str)
         {
             if (str.StartsWith("N") && str.EndsWith("\r\n"))
             {
                 var lrcindex = str.LastIndexOf(" ");
-                if (lrcindex == -1 || lrcindex != str.Length - 5) return;
+                if (lrcindex == -1 || lrcindex != str.Length - 5) return RDPBStatusGhangeResult.WrongFormat;
                 var lrcstr = str.Substring(lrcindex + 1, 4).ToUpper();
                 var basestring = str.Substring(0, lrcindex + 1);
                 var lrcbase = CalcLRC(basestring);
-                if (lrcbase != lrcstr) return; // несовпадение контрольной суммы
+                if (lrcbase != lrcstr) return RDPBStatusGhangeResult.CRCError; // несовпадение контрольной суммы
                 var doublespace = basestring.IndexOf("  ");
-                if (doublespace != -1) return; // неправильный формат
+                if (doublespace != -1) return RDPBStatusGhangeResult.WrongFormat; // неправильный формат
                 var parts = basestring.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Any(p => !(p.Length == 4 || p.Length == 0))) return; // неправильный формат
+                if (parts.Any(p => !(p.Length == 4 || p.Length == 0))) return RDPBStatusGhangeResult.WrongFormat; // неправильный формат
                 int.TryParse(parts[0][1].ToString(), System.Globalization.NumberStyles.HexNumber, null, out MachineNumber);
                 var cmd = (RDPBCommandType)BitConverter.ToUInt16(Encoding.ASCII.GetBytes(parts[0].Substring(2, 2)).Reverse().ToArray(), 0);
                 CommandType = cmd;
@@ -224,7 +224,7 @@ namespace DoMCLib.Classes.Model.RDPB
                     case RDPBCommandType.On:
                     case RDPBCommandType.Off:
                         {
-                            if (parts.Length != 3) return;
+                            if (parts.Length != 3) return 0;
                             int.TryParse(parts[1], System.Globalization.NumberStyles.HexNumber, null, out CycleNumber);
                             int.TryParse(parts[2][0].ToString(), out CoolingBlocksQuantity);
                             int.TryParse(parts[2][1].ToString(), out int iBlockIsOn);
@@ -237,7 +237,7 @@ namespace DoMCLib.Classes.Model.RDPB
                         break;
                     case RDPBCommandType.MakeBlockSendWorkingState:
                         {
-                            if (parts.Length != 5) return;
+                            if (parts.Length != 5) return RDPBStatusGhangeResult.WrongFormat;
                             switch (parts[1][0])
                             {
                                 case '2':
@@ -265,11 +265,11 @@ namespace DoMCLib.Classes.Model.RDPB
                         }
                         break;
                 }
-                return;
+                return (RDPBStatusGhangeResult)((int)cmd);
             }
             else
             {
-                return;
+                return RDPBStatusGhangeResult.WrongFormat;
             }
         }
         public void ChangeFromRequestString(string str)

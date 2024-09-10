@@ -2,6 +2,7 @@
 using DoMCLib.DB;
 using DoMCLib.Tools;
 using DoMCModuleControl;
+using DoMCModuleControl.Commands;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
 using System;
@@ -26,12 +27,14 @@ namespace DoMCLib.Classes.Model.DB
         Observer ObserverForDataStorage;
         ConcurrentQueue<CycleImagesCCD> cycleDatas = new ConcurrentQueue<CycleImagesCCD>();
         ConcurrentQueue<Box> BoxDatas = new ConcurrentQueue<Box>();
+        Observer ExternalObserver;
         public DBModule(IMainController MainController) : base(MainController)
         {
             errorNotifier = new ThrottledErrorNotifier(MainController.GetObserver(), 300, 5);
             WorkingLog = MainController.GetLogger($"{this.GetType().Name}");
             ObserverForDataStorage = new Observer(WorkingLog);
             ObserverForDataStorage.NotificationReceived += ObserverForDataStorage_NotificationReceived;
+            ExternalObserver = MainController.GetObserver();
         }
         private void ObserverForDataStorage_NotificationReceived(string Name, object? data)
         {
@@ -109,9 +112,10 @@ namespace DoMCLib.Classes.Model.DB
                     catch (Exception ex)
                     {
                         WorkingLog.Add(LoggerLevel.Critical, $"Съем {cycle.CycleCCDDateTime}. Ошибка при сохранении данных цикла", ex);
-                        return;
+                        ExternalObserver.Notify(this, "CycleSave", "Error", ex);
                     }
                 });
+                ExternalObserver.Notify(this, "CycleSave", "NonSaved", cycleDatas.Count);
 
                 while (BoxDatas.Count > 0)
                 {
@@ -124,17 +128,45 @@ namespace DoMCLib.Classes.Model.DB
                     catch (Exception ex)
                     {
                         WorkingLog.Add(LoggerLevel.Critical, "Ошибка при сохранении данных короба. ", ex);
+                        ExternalObserver.Notify(this, "BoxSave", "Error", ex);
                     }
                     WorkingLog.Add(LoggerLevel.Information, $"Несохраненных коробов: {BoxDatas.Count}");
 
                 }
+                ExternalObserver.Notify(this, "BoxSave", "NonSaved", BoxDatas.Count);
                 Task.Delay(100).Wait();
             }
             IsStarted = false;
         }
 
+        public class SetConfigurationCommand : CommandBase
+        {
+            public SetConfigurationCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(string), null) { }
+            protected override void Executing() => ((DBModule)Module).SetConfiguration((string)InputData);
+        }
+        public class StartCommand : CommandBase
+        {
+            public StartCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            protected override void Executing() => ((DBModule)Module).Start();
+        }
+        public class StopCommand : CommandBase
+        {
+            public StopCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            protected override void Executing() => ((DBModule)Module).Stop();
+        }
+        public class EnqueueCycleDateCommand : CommandBase
+        {
+            public EnqueueCycleDateCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(CycleImagesCCD), null) { }
+            protected override void Executing() => ((DBModule)Module).EnqueueCycleDate((CycleImagesCCD)InputData);
+        }
+        public class EnqueueBoxDateCommand : CommandBase
+        {
+            public EnqueueBoxDateCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(Box), null) { }
+            protected override void Executing() => ((DBModule)Module).EnqueueBoxDate((Box)InputData);
+        }
+
 
     }
 
- 
+
 }

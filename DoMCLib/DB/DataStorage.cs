@@ -290,7 +290,7 @@ namespace DoMCLib.DB
                             catch (Exception ex)
                             {
                                 WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при записи в архив: " + ex.Message);
-                                Observer.Notify($"{this.GetType().Name}.DB.Remote.Write.Error", ex);
+                                Observer.Notify($"{this.GetType().Name}.DBRemoteWrite.Error", ex);
                             }
                         }
 
@@ -301,7 +301,7 @@ namespace DoMCLib.DB
                         catch (Exception ex)
                         {
                             WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при удалении из локальной базы: " + ex.Message);
-                            Observer.Notify($"{this.GetType().Name}.DB.Local.Delete.Error", ex);
+                            Observer.Notify($"{this.GetType().Name}.DBLocalDelete.Error", ex);
                         }
                     }
                 }
@@ -309,7 +309,7 @@ namespace DoMCLib.DB
                 {
 
                     WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при получении съема в локальной БД: " + ex.Message);
-                    Observer.Notify($"{this.GetType().Name}.DB.Local.Read.Error", ex);
+                    Observer.Notify($"{this.GetType().Name}.DBLocalRead.Error", ex);
 
                 }
             }
@@ -327,7 +327,7 @@ namespace DoMCLib.DB
                     catch (Exception ex)
                     {
                         WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при попытке переноса: " + ex.Message);
-                        Observer.Notify($"{this.GetType().Name}.BoxDB.Move.Error", ex);
+                        Observer.Notify($"{this.GetType().Name}.BoxDBMove.Error", ex);
 
                     }
                 }
@@ -335,7 +335,7 @@ namespace DoMCLib.DB
             catch (Exception ex)
             {
                 WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при чтении списка коробов: " + ex.Message);
-                Observer.Notify($"{this.GetType().Name}.BoxDB.Read.Error", ex);
+                Observer.Notify($"{this.GetType().Name}.BoxDBRead.Error", ex);
             }
             IsMovingToArchive = false;
             IsTerminatingMovingToArchive = false;

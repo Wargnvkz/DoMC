@@ -57,6 +57,13 @@ namespace DoMCModuleControl.Commands
 
         public IMainController Controller { get; private set; }
 
+        public enum Events
+        {
+            Started,
+            Suceeded,
+            Error
+        }
+
 
         /// <summary>
         /// Конструктор. Потомки сами определяют типы данных и передают их в этот конструктор
@@ -100,11 +107,11 @@ namespace DoMCModuleControl.Commands
             try
             {
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Начало выполнения {CommandName}.");
-                Controller.GetObserver().Notify($"{CommandName}.Start", InputData);
+                Controller.GetObserver().Notify($"{CommandName}.{Events.Started}", InputData);
                 if (InputType != null && InputData == null) throw new InvalidOperationException("Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
                 Executing();
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Команды {CommandName} выполнена");
-                Controller.GetObserver().Notify($"{CommandName}.Success", OutputData);
+                Controller.GetObserver().Notify($"{CommandName}.{Events.Suceeded}", OutputData);
             }
             catch (Exception ex)
             {
@@ -113,7 +120,7 @@ namespace DoMCModuleControl.Commands
                 IsError = true;
                 Error = ex;
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.Critical, $"Ошибка при выполнении команды {CommandName}. ", ex);
-                Controller.GetObserver().Notify($"{CommandName}.Error", ex);
+                Controller.GetObserver().Notify($"{CommandName}.{Events.Error}", ex);
             }
             finally
             {
@@ -177,10 +184,11 @@ namespace DoMCModuleControl.Commands
         /// Ждет завершения выполнения команды.
         /// Если команда не запущена, то запускает ее
         /// </summary>
-        public void Wait()
+        public object? Wait()
         {
-            if (!IsRunning) ExecuteCommand();
+            if (!IsRunning && !IsComplete) ExecuteCommand();
             while (!IsComplete && !IsError) Thread.Sleep(1);
+            return OutputData;
         }
     }
 

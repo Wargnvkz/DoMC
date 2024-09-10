@@ -1,5 +1,6 @@
 ﻿
 using DoMCModuleControl.Logging;
+using DoMCModuleControl.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,11 +52,7 @@ namespace DoMCModuleControl
                         }
                     });
                 }
-
             }
-
         }
     }
-
-
 }

@@ -194,8 +194,8 @@ namespace DoMCLib.Classes.Model.RDPB
                     if (CurrentStatus == null) CurrentStatus = new RDPBStatus();
                     var AnswerString = Encoding.ASCII.GetString(msgarr);
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получено от бракера: <{AnswerString.Trim()}>");
-                    CurrentStatus.ChangeFromString(AnswerString);
-                    mainController.GetObserver().Notify($"{this.GetType().Name}.StatusChanged", CurrentStatus);
+                    var result = CurrentStatus.ChangeFromString(AnswerString);
+                    mainController.GetObserver().Notify(this, "StatusChanged", result.ToString(), CurrentStatus);
                 }
                 while (buffer.Length > 0);
             }
