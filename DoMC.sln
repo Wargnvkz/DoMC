@@ -7,13 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMC", "DoMC\DoMC.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCModuleControl", "DoMCModuleControl\DoMCModuleControl.csproj", "{CB63A94F-EFAD-4795-BD1E-2B5C63838887}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMCLib", "DoMCLib\DoMCLib.csproj", "{8663B34B-343A-4EF8-90FB-6C53E22B8A53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCLib", "DoMCLib\DoMCLib.csproj", "{8663B34B-343A-4EF8-90FB-6C53E22B8A53}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserInterface", "UserInterface", "{86CA6DF1-2095-4E39-B27E-4674A66E43E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "TestApplication\TestApplication.csproj", "{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApplication", "TestApplication\TestApplication.csproj", "{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMCUserInterface", "DoMCUserInterface\DoMCUserInterface.csproj", "{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCUserInterface", "DoMCUserInterface\DoMCUserInterface.csproj", "{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{EA51A90A-86C0-4E18-9F50-F10AB289188B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA51A90A-86C0-4E18-9F50-F10AB289188B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA51A90A-86C0-4E18-9F50-F10AB289188B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA51A90A-86C0-4E18-9F50-F10AB289188B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA51A90A-86C0-4E18-9F50-F10AB289188B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

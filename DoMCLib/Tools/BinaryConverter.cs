@@ -1022,7 +1022,7 @@ namespace DoMCLib.Tools
                             if (res)
                             {
                                 e.TrueCounter++;
-                                var tsk = new Task(new Action(SortElements));
+                                var tsk = new Task(SortElements);
                                 tsk.Start();
                                 type = e.ObjectType;
                                 result = o;
@@ -1064,7 +1064,7 @@ namespace DoMCLib.Tools
                             if (res)
                             {
                                 e.TrueCounter++;
-                                var tsk = new Task(new Action(SortElements));
+                                var tsk = new Task(SortElements);
                                 tsk.Start();
                                 return len;
                             }

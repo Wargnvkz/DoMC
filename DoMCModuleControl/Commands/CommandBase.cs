@@ -94,6 +94,11 @@ namespace DoMCModuleControl.Commands
                 return $"{moduleName}.{commandName}";
             }
         }
+
+        public virtual void NotificationProcedure(string eventName, object? data)
+        {
+
+        }
         /// <summary>
         /// Метод запускающий команду в работу и регулирующий статусы и логирование
         /// </summary>
@@ -112,6 +117,9 @@ namespace DoMCModuleControl.Commands
                 Executing();
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Команды {CommandName} выполнена");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Suceeded}", OutputData);
+                IsRunning = false;
+                IsComplete = true;
+                IsError = false;
             }
             catch (Exception ex)
             {
@@ -124,8 +132,6 @@ namespace DoMCModuleControl.Commands
             }
             finally
             {
-                IsRunning = false;
-                IsComplete = true;
             }
         }
         /// <summary>
@@ -184,11 +190,11 @@ namespace DoMCModuleControl.Commands
         /// Ждет завершения выполнения команды.
         /// Если команда не запущена, то запускает ее
         /// </summary>
-        public object? Wait()
+        public virtual object? Wait()
         {
-            if (!IsRunning && !IsComplete) ExecuteCommand();
-            while (!IsComplete && !IsError) Thread.Sleep(1);
-            return OutputData;
+            // Если метод не реализован в потомке, генерируем исключение
+            throw new NotImplementedException("Метод Wait не реализован для этой команды.");
+
         }
     }
 

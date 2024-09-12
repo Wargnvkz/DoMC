@@ -1,5 +1,5 @@
-﻿using DoMCLib.Classes.Model.Configuration;
-using DoMCLib.Classes.Model.LCB;
+﻿using DoMCLib.Classes.Module.Configuration;
+using DoMCLib.Classes.Module.LCB;
 using DoMCLib.Tools;
 using System;
 using System.Collections.Generic;
