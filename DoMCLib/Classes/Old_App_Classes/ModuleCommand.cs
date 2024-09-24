@@ -1,16 +1,5 @@
 ﻿namespace DoMCLib.Classes
 {
-    /*public class ConfigurationLoadedStatus
-    {
-        public bool CCDNetworkSelected;
-        public bool CCDSocketNumberSet;
-        public bool CCDSocketNumberConfigurated;
-        public bool LEDParametersSet;
-
-        public bool CCDConfigurationLoaded;
-        public bool LEDConfigurationLoaded;
-    }*/
-
     //Команды 
     public enum ModuleCommand
     {

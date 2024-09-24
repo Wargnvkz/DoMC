@@ -2,7 +2,6 @@
 using DoMCLib.Tools;
 using DoMCModuleControl;
 using DoMCModuleControl.Logging;
-using DoMCModuleControl.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;

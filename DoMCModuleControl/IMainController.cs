@@ -1,5 +1,4 @@
 ﻿using DoMCModuleControl.Commands;
-using DoMCModuleControl.Configuration;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.UI;
 using System;

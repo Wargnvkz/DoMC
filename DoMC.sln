@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApplication", "TestAppl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCUserInterface", "DoMCUserInterface\DoMCUserInterface.csproj", "{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{EA51A90A-86C0-4E18-9F50-F10AB289188B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateCommands", "TestApp\CreateCommands.csproj", "{EA51A90A-86C0-4E18-9F50-F10AB289188B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

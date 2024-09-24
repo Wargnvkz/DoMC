@@ -11,7 +11,6 @@ using System.Text;
 using DoMCModuleControl.Modules;
 using DoMCModuleControl;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using DoMCModuleControl.Configuration;
 using DoMCLib.Classes.Module.LCB;
 using DoMCLib.Classes.Module.ArchiveDB;
 using Microsoft.Extensions.Configuration;
@@ -420,5 +419,5 @@ namespace DoMCLib.Classes.Module.LCB
         }
 
     }
-        
+
 }

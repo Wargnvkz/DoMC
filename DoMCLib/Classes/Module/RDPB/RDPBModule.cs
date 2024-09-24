@@ -1,4 +1,5 @@
-﻿using DoMCModuleControl;
+﻿using DoMCLib.Classes.Module.RDPB.Classes;
+using DoMCModuleControl;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
 using System;
@@ -17,7 +18,7 @@ namespace DoMCLib.Classes.Module.RDPB
     /// </summary>
     public partial class RDPBModule : ModuleBase
     {
-        public Configuration.RemoveDefectedPreformBlockConfig config;
+        public DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig config;
         private IMainController mainController;
         TcpClient client;
         IPEndPoint remoteIP;

@@ -3,7 +3,6 @@ using System.Data;
 using System;
 using System.Reflection;
 using System.Windows.Input;
-using DoMCModuleControl.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;// Для работы с JSON-файлами конфигурации
 using DoMCModuleControl.Commands;

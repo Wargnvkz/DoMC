@@ -10,6 +10,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using DoMCLib.Classes;
+using DoMCLib.Configuration;
 
 namespace DoMCLib.Tools
 {

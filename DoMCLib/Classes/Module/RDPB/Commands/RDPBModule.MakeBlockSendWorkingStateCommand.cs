@@ -1,4 +1,5 @@
-﻿using DoMCModuleControl;
+﻿using DoMCLib.Classes.Module.RDPB.Classes;
+using DoMCModuleControl;
 using DoMCModuleControl.Commands;
 using DoMCModuleControl.Modules;
 
@@ -10,7 +11,7 @@ namespace DoMCLib.Classes.Module.RDPB
         {
             public MakeBlockSendWorkingStateCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
 
-            protected override void Executing() => ((RDPBModule)Module).Send(RDPBCommandType.MakeBlockSendWorkingState);
+            protected override void Executing() => ((RDPBModule)Module).Send(RDPBCommandType.GetParameters);
 
         }
 
