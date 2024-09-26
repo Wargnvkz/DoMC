@@ -20,60 +20,27 @@ namespace DoMCLib.Configuration
 
         public int SocketQuantity = 96;
 
-        public bool[] SocketsToCheck;
+        public bool[] SocketsToCheck = new bool[96];
 
-        public DoMCStandardRecalculationSettings WorkModeSettings;
+        public DoMCStandardRecalculationSettings WorkModeSettings = new DoMCStandardRecalculationSettings();
 
-        public int DoMCPort;
+        public RemoveDefectedPreformBlockConfig RemoveDefectedPreformBlockConfig = new RemoveDefectedPreformBlockConfig();
 
+        public string LocalDataStoragePath = "";
 
-        public bool LogPackets;
-
-
-        public RemoveDefectedPreformBlockConfig RemoveDefectedPreformBlockConfig;
-
-
-        public string LocalDataStoragePath;
-
-
-        public string RemoteDataStoragePath;
-
+        public string RemoteDataStoragePath = "";
 
         public TimeoutOfActions Timeouts = new TimeoutOfActions();
-
-
-        public bool[] SocketsToSave;
-
-
-        public SocketsPositions SocketsPositions;
-
+        /// <summary>
+        /// [физическое гнездо по платам] = гнездо на меатрице
+        /// </summary>
+        public int[] CardSocket2EquipmentSocket = new int[96];
 
         public short ThresholdAverageToHaveImage = 200;
 
-
         public bool RegisterEmptyImages = false;
 
-        public bool LoggingDBRequests = false;
-
     }
-
-
-    public class SocketDoMCConfiguration
-    {
-
-        public int SocketQuantity = 96;
-
-
-        public bool[] SocketStatus;
-
-
-        public bool[] LEDOn;
-
-
-        public int[] SocketToRead;
-
-    }
-
 
 
 }

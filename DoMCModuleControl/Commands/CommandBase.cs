@@ -45,7 +45,7 @@ namespace DoMCModuleControl.Commands
         /// <summary>
         /// Статус: Команда завершена успешно
         /// </summary>
-        public bool IsComplete { get; private set; }
+        public bool IsCompleteSuccessfully { get; private set; }
         /// <summary>
         /// Статус: Команда завершена с ошибкой
         /// </summary>
@@ -106,7 +106,7 @@ namespace DoMCModuleControl.Commands
         {
             //TODO: добавить логирование
             IsRunning = true;
-            IsComplete = false;
+            IsCompleteSuccessfully = false;
             IsError = false;
             Error = null;
             try
@@ -118,13 +118,13 @@ namespace DoMCModuleControl.Commands
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Команды {CommandName} выполнена");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Suceeded}", OutputData);
                 IsRunning = false;
-                IsComplete = true;
+                IsCompleteSuccessfully = true;
                 IsError = false;
             }
             catch (Exception ex)
             {
                 IsRunning = false;
-                IsComplete = false;
+                IsCompleteSuccessfully = false;
                 IsError = true;
                 Error = ex;
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.Critical, $"Ошибка при выполнении команды {CommandName}. ", ex);
@@ -190,7 +190,8 @@ namespace DoMCModuleControl.Commands
         /// Ждет завершения выполнения команды.
         /// Если команда не запущена, то запускает ее
         /// </summary>
-        public virtual object? Wait()
+        /// <param name="TimeoutInSeconds">Таймаут в секундах, -1 без таймаута</param>
+        public virtual object? Wait(int TimeoutInSeconds)
         {
             // Если метод не реализован в потомке, генерируем исключение
             throw new NotImplementedException("Метод Wait не реализован для этой команды.");

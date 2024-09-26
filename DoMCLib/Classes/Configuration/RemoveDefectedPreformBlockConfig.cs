@@ -3,11 +3,11 @@
     public class RemoveDefectedPreformBlockConfig
     {
 
-        public string IP;
+        public string IP = "";
 
         public int Port = 4001;
 
-        public int CoolingBlocksQuantity;
+        public int CoolingBlocksQuantity = 4;
 
         public int MachineNumber = 11;
 

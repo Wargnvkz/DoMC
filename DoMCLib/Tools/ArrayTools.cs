@@ -11,7 +11,7 @@ namespace DoMCLib.Tools
         public static string BoolArrayToBase6xString(bool[] array)
         {
             var ba = BoolArray2ByteArray(array);
-            var res=Convert.ToBase64String(ba);
+            var res = Convert.ToBase64String(ba);
             res = res.Replace('/', '#');
             return res;
         }
@@ -36,7 +36,7 @@ namespace DoMCLib.Tools
         {
             if (bytes == null) return null;
             BitArray bitarray = new BitArray(bytes);
-            var bools = new bool[bytes.Length*8];
+            var bools = new bool[bytes.Length * 8];
             bitarray.CopyTo(bools, 0);
             return bools;
         }
@@ -63,6 +63,17 @@ namespace DoMCLib.Tools
                 sb.Insert(0, value.ToString("X2"));
             }
             return "0x" + sb.ToString();
+        }
+
+        public static bool[] BitwiseBoolArrayOperation(bool[] array1, bool[] array2, Func<bool, bool, bool> bitwiseOperation)
+        {
+            if (bitwiseOperation == null) throw new ArgumentNullException("Не задана bitwiseOperation");
+            var result = new bool[Math.Min(array1.Length, array2.Length)];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = bitwiseOperation(array1[i], array2[i]);
+            }
+            return result;
         }
     }
 }

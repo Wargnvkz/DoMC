@@ -18,11 +18,11 @@ namespace DoMCModuleControl
         /// <summary>
         /// Для подписчиков на событие. При наступлении события подписчики вызываются асинхронно
         /// </summary>
-        public event Action<string, object?> NotificationReceived;
+        public event Action<string, object?> NotificationReceivers;
         private readonly ILogger Logger;
         public Observer(ILogger logger)
         {
-            NotificationReceived = delegate { };
+            NotificationReceivers = delegate { };
             Logger = logger;
         }
 
@@ -34,9 +34,9 @@ namespace DoMCModuleControl
         public void Notify(string eventName, object? eventData)
         {
             // Сначала вызываем асинхронные события
-            if (NotificationReceived != null)
+            if (NotificationReceivers != null)
             {
-                var handlers = NotificationReceived.GetInvocationList();
+                var handlers = NotificationReceivers.GetInvocationList();
 
                 foreach (Func<string, object?, Task> handler in handlers.Cast<Func<string, object?, Task>>())
                 {

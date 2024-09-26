@@ -16,9 +16,9 @@ namespace DoMCLib.Configuration
     /// </summary>
     public class ApplicationConfiguration
     {
-        public HardwareSettings HardwareSettings { get; set; }
-        public ReadingSocketsSettings CurrentSettings { get; set; }
-        public ProcessingSettings ProcessingData { get; set; }
+        public HardwareSettings HardwareSettings { get; set; } = new HardwareSettings();
+        public ReadingSocketsSettings CurrentSettings { get; set; } = new ReadingSocketsSettings();
+        public ProcessingSettings ProcessingData { get; set; } = new ProcessingSettings();
 
         private readonly string ConfigurationFilePath;
         private const int CurrentFileVersion = 2;

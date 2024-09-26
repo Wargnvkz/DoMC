@@ -29,7 +29,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             errorNotifier = new ThrottledErrorNotifier(MainController.GetObserver(), 300, 5);
             WorkingLog = MainController.GetLogger($"{this.GetType().Name}");
             ObserverForDataStorage = new Observer(WorkingLog);
-            ObserverForDataStorage.NotificationReceived += ObserverForDataStorage_NotificationReceived;
+            ObserverForDataStorage.NotificationReceivers += ObserverForDataStorage_NotificationReceived;
         }
 
         private void ObserverForDataStorage_NotificationReceived(string Name, object? data)

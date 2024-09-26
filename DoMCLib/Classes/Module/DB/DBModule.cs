@@ -33,7 +33,7 @@ namespace DoMCLib.Classes.Module.DB
             errorNotifier = new ThrottledErrorNotifier(MainController.GetObserver(), 300, 5);
             WorkingLog = MainController.GetLogger($"{this.GetType().Name}");
             ObserverForDataStorage = new Observer(WorkingLog);
-            ObserverForDataStorage.NotificationReceived += ObserverForDataStorage_NotificationReceived;
+            ObserverForDataStorage.NotificationReceivers += ObserverForDataStorage_NotificationReceived;
             ExternalObserver = MainController.GetObserver();
         }
         private void ObserverForDataStorage_NotificationReceived(string Name, object? data)

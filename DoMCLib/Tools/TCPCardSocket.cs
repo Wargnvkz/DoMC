@@ -21,7 +21,7 @@ namespace DoMCLib.Tools
             InnerSocketNumber = sn;
         }
 
-        public int PhysicalSocket()
+        public int CardSocketNumber()
         {
             return CCDCardNumber * 8 + InnerSocketNumber;
         }

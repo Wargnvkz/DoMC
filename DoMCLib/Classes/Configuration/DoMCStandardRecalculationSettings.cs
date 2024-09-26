@@ -3,9 +3,9 @@
     public class DoMCStandardRecalculationSettings
     {
 
-        public int NCycle;
+        public int NCycle = 10;
 
-        public double StandardPercent;
+        public double StandardPercent = 10;
         public double Koefficient
         {
             get

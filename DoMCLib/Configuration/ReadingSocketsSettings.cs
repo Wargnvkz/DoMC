@@ -15,9 +15,13 @@ namespace DoMCLib.Configuration
     /// </summary>
     public class ReadingSocketsSettings
     {
-        public Dictionary<int, SocketReadParameters> CCDSocketReadParameters;
-        public Dictionary<int, ImageProcessParameters> ImageProcessParameters;
+        public SocketParameters[] CCDSocketParameters;
         public LCBSettings LCBSettings;
+        public ReadingSocketsSettings()
+        {
+            CCDSocketParameters = new SocketParameters[96];
+            LCBSettings = new LCBSettings();
+        }
 
     }
 }

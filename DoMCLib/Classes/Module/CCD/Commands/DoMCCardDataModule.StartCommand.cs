@@ -8,12 +8,12 @@ using DoMCModuleControl.Commands;
 namespace DoMCLib.Classes.Module.CCD
 {
 
-    public partial class DoMCCardDataModule
+    public partial class CCDCardDataModule
     {
         public class StartCommand : CommandBase
         {
             public StartCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
-            protected override void Executing() => ((DoMCCardDataModule)Module).Start();
+            protected override void Executing() => ((CCDCardDataModule)Module).Start();
         }
 
     }
