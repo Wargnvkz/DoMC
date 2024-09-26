@@ -21,14 +21,14 @@ namespace DoMCLib.Classes.Module.CCD
     /// <summary>
     /// Работа с одной платой по протоколу TCP/IP
     /// </summary>
-    public class DoMCCardTCPClient
+    public class CCDCardTCPClient
     {
         public int PortCommand = 200;
         public int PortData = 100;
         public int CardNumber { get; private set; }
         int SocketNumber = 8;
         //public SocketWorkStatus[] SocketsStatuses { get; private set; }
-        //SocketReadParameters[] SocketConfigurations;
+        //SocketReadingParameters[] SocketConfigurations;
         private CancellationTokenSource receiveCancellationTokenSource { get; set; }
         private Task ReceiveTask { get; set; }
 
@@ -62,7 +62,7 @@ namespace DoMCLib.Classes.Module.CCD
         /// <summary>
         /// </summary>
         /// <param name="DoMCCardNumber">Номер платы. от 1 до 12</param>
-        public DoMCCardTCPClient(int DoMCCardNumber, IMainController controller)
+        public CCDCardTCPClient(int DoMCCardNumber, IMainController controller)
         {
             IsCardNumberUsed = true;
             if (CardNumber < 1 && CardNumber > 12) throw new ArgumentOutOfRangeException("Номер платы должен быть от 1 до 12");
@@ -75,9 +75,9 @@ namespace DoMCLib.Classes.Module.CCD
             //WorkingLogSocketStatus = Controller.GetLogger("SocketStatus");
         }
 
-        /*public void SetSocketConfiguration(SocketReadParameters[] Configurations)
+        /*public void SetSocketConfiguration(SocketReadingParameters[] Configurations)
         {
-            SocketConfigurations = new SocketReadParameters[SocketNumber];
+            SocketConfigurations = new SocketReadingParameters[SocketNumber];
             for (int i = 0; i < Configurations.Length; i++)
             {
                 SocketConfigurations[i] = SocketConfigurations[i].Clone();
@@ -421,82 +421,42 @@ namespace DoMCLib.Classes.Module.CCD
                     {
                         case 1:
                             {
-                                {
-                                    byte result = packet[2];
-                                    var dtime = (packet[3] + packet[4] * 256) * 10;
+                                byte result = packet[2];
+                                var dtime = (packet[3] + packet[4] * 256) * 10;
 
-                                    //SocketsStatuses.SetStatus(CardAndSocketStatus.AnswerComplete);
-                                    //SocketsStatuses.LastCommandReceivedFromSocket = cmd;
-                                    //SocketsStatuses.CCDTimeSinceLastSynchrosignal = dtime;
-                                    Controller.GetObserver().Notify($"{this.GetType().Name}.Result.Response1", null);
-
-
-                                }
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseReadSocket", CardNumber);
                             }
                             break;
                         case 4:
                             {
-
-                                //SocketsStatuses.SetStatus(CardAndSocketStatus.AnswerComplete);
-                                //SocketsStatuses.LastCommandReceivedFromSocket = cmd;
-                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.Response4", null);
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseSetSocketsExpositionParameters", CardNumber);
 
                             }
                             break;
                         case 5:
                             {
-
-                                try
-                                {
-                                    //SocketsStatuses.SetStatus(CardAndSocketStatus.AnswerComplete);
-                                    //SocketsStatuses.LastCommandReceivedFromSocket = cmd;
-                                    Controller.GetObserver().Notify($"{this.GetType().Name}.Result.Response5", null);
-
-                                }
-                                catch { }
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseSetConfiguration", CardNumber);
 
                             }
                             break;
-                        case 7:
-                            {
-                                if (packet.Length >= 4)
-                                {
-                                    bool SocketIsGood;
-                                    var x = packet[2];
-                                    var y = packet[3];
-                                    if ((x & 2) == 0)
-                                        SocketIsGood = false;
-                                    else
-                                        SocketIsGood = y == 0;
-                                    Controller.GetObserver().Notify($"{this.GetType().Name}.Result.Response7.{socketnum}", SocketIsGood);
-                                }
-                            }
-                            break;
+
                         case 9:
                             {
 
-                                //SocketsStatuses.ImageIsNotReady = true;
-                                //SocketsStatuses.SetStatus(CardAndSocketStatus.AnswerComplete);
-                                //SocketsStatuses.LastCommandReceivedFromSocket = cmd;
-                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.Response9", null);
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseGetSocketsImages", CardNumber);
 
                             }
                             break;
                         case 11:
                             {
 
-                                //SocketsStatuses.SetStatus(CardAndSocketStatus.AnswerComplete);
-                                //SocketsStatuses.LastCommandReceivedFromSocket = cmd;
-                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseB", null);
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseSetReadingParametersConfiguration", CardNumber);
 
-
-                                //socket.SetStatus(CardAndSocketStatus.AnswerComplete);
                             }
                             break;
                         default:
                             break;
                     }
-                    //WriteSocketStatusLog("Статус гнезд после обработки полученного пакета");
 
                 }
 
@@ -530,30 +490,6 @@ namespace DoMCLib.Classes.Module.CCD
             }
             return ip;
         }
-
-        /*public void ResetSocketsStatistics()
-        {
-            lock (SocketsStatuses)
-            {
-                SocketsStatuses.ResetSocketStatistics();
-            }
-        }
-
-        public void SetSocketLastCommand(int SocketNumber, int Command)
-        {
-            SocketsStatuses.LastCommandForSocket = Command;
-            SocketsStatuses.LastCommandSendingTime = DateTime.Now;
-            SocketsStatuses.ActiveInLastCommand = true;
-        }
-        public void SetAllSocketLastCommand(int Command)
-        {
-            for (int SocketNumber = 0; SocketNumber < SocketNumber; SocketNumber++)
-            {
-                SocketsStatuses.LastCommandForSocket = Command;
-                SocketsStatuses.LastCommandSendingTime = DateTime.Now;
-                SocketsStatuses.ActiveInLastCommand = true;
-            }
-        }*/
 
         public static byte[] Command2Packet(byte[] b)
         {
@@ -639,19 +575,19 @@ namespace DoMCLib.Classes.Module.CCD
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             if (socketParameters == null || !socketParameters.IsSocketReading) return;
-            var cfg = socketParameters.ReadParameters.GetFrameExpositionConfiguration();
+            var cfg = socketParameters.ReadingParameters.GetFrameExpositionConfiguration();
             Send(0, BinaryConverter.ToBytes(cfg));
 
         }
         /// <summary>
         /// Command = 11, Загрузка основной конфигурации в гнезда по списку
         /// </summary>
-        public void SendCommandSetSocketProcessingParameters(SocketParameters socketParameters)
+        public void SendCommandSetSocketReadingParameters(SocketParameters socketParameters)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             if (socketParameters == null || !socketParameters.IsSocketReading) return;
-            var cfg = socketParameters.ReadParameters.GetMainConfiguration();
+            var cfg = socketParameters.ReadingParameters.GetReadingParametersConfiguration();
             Send(0, BinaryConverter.ToBytes(cfg));
 
         }

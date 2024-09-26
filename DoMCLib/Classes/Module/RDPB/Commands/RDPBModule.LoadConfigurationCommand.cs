@@ -1,4 +1,5 @@
-﻿using DoMCModuleControl;
+﻿using DoMCLib.Classes.Configuration;
+using DoMCModuleControl;
 using DoMCModuleControl.Commands;
 using DoMCModuleControl.Modules;
 

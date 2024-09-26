@@ -19,29 +19,11 @@ namespace DoMCLib.Classes.Module.CCD
     /// </summary>
     public partial class CCDCardDataModule : ModuleBase
     {
-        DoMCCardTCPClient[] tcpClients;
+        CCDCardTCPClient[] tcpClients;
         public CCDCardDataModule(IMainController MainController) : base(MainController)
         {
-            tcpClients = new DoMCCardTCPClient[12];
+            tcpClients = new CCDCardTCPClient[12];
         }
-
-
-        public void Start()
-        {
-            for (int i = 0; i < tcpClients.Length; i++)
-            {
-                if (tcpClients[i] == null) tcpClients[i] = new DoMCCardTCPClient(i + 1, MainController);
-                tcpClients[i].Start();
-            }
-        }
-        public void Stop()
-        {
-            for (int i = 0; i < tcpClients.Length; i++)
-            {
-                tcpClients[i]?.Stop();
-            }
-        }
-
 
 
         public class SetReadingParametersCommand : WaitCommandBase
@@ -57,7 +39,7 @@ namespace DoMCLib.Classes.Module.CCD
                     var cardParameters = context.GetCardParametersByCardList(workingCards);
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
-                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketProcessingParameters(cardParameters[i].Item2);
+                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketReadingParameters(cardParameters[i].Item2);
                     }
                 }
                 else
@@ -69,7 +51,10 @@ namespace DoMCLib.Classes.Module.CCD
 
             protected override void NotificationReceived(string NotificationName, object? data)
             {
-                throw new NotImplementedException();
+                if (NotificationName.Contains("ResponseSetReadingParametersConfiguration"))
+                {
+                    var card = (int)data;
+                }
             }
 
             protected override bool MakeDecisionIsCommandCompleteFunc()

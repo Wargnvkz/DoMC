@@ -15,7 +15,7 @@ namespace DoMCLib
 
 
         //public int SocketNumber;
-        public SocketReadParameters SocketConfig;
+        public SocketReadingParameters SocketConfig;
         public CardAndSocketStatus Status;
         public int LastCommandForSocket;
         public int LastCommandReceivedFromSocket;

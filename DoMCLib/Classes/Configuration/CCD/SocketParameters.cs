@@ -8,7 +8,7 @@ namespace DoMCLib.Classes.Configuration.CCD
 {
     public class SocketParameters
     {
-        public SocketReadParameters ReadParameters;
+        public SocketReadingParameters ReadingParameters;
         public ImageProcessParameters ImageProcess;
         public bool IsSocketReading;
     }

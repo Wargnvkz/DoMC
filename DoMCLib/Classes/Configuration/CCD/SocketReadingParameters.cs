@@ -8,7 +8,7 @@ using DoMCLib.Classes.Module.CCD.CCDCardDataExchangeCommandClasses;
 namespace DoMCLib.Classes.Configuration.CCD
 {
 
-    public class SocketReadParameters
+    public class SocketReadingParameters
     {
 
         public int FilterModule;
@@ -32,7 +32,7 @@ namespace DoMCLib.Classes.Configuration.CCD
         public bool AnswerAfterScanAutomaticly;
 
 
-        public CCDCardConfigRequestB GetMainConfiguration()
+        public CCDCardConfigRequestB GetReadingParametersConfiguration()
         {
             var conf = new CCDCardConfigRequestB()
             {
@@ -69,9 +69,9 @@ namespace DoMCLib.Classes.Configuration.CCD
 
         }
 
-        public SocketReadParameters Clone()
+        public SocketReadingParameters Clone()
         {
-            var cfg = new SocketReadParameters
+            var cfg = new SocketReadingParameters
             {
                 FilterModule = FilterModule,
                 CompareThreshold = CompareThreshold,
