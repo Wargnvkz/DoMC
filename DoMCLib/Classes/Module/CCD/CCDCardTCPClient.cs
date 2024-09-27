@@ -15,6 +15,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace DoMCLib.Classes.Module.CCD
 {
@@ -276,12 +277,14 @@ namespace DoMCLib.Classes.Module.CCD
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             ReceiveTask = new Task(ReceiveThreadProc);
             ReceiveTask.Start();
+            Controller.GetObserver().Notify($"{this.GetType().Name}.Module.Start", null);
         }
 
         public void Stop()
         {
             IsStarted = false;
             Disconnect();
+            Controller.GetObserver().Notify($"{this.GetType().Name}.Module.Stop", null);
         }
 
         public bool Send(byte[] data)
@@ -416,6 +419,7 @@ namespace DoMCLib.Classes.Module.CCD
                     //socket.LastCommandReceivingFromSocketTime = LastReceiveAt;
                     //socket.LastCommandReceivedFromSocket = cmd;
                     WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. В {LastReceiveAt:dd-MM-yyyy HH\\:mm\\:ss.fffff} получен ответ на команду {cmd} для гнезда {packet[0]}.");
+                    var CardAnswerResult = new CCDCardAnswerResults() { CardNumber = CardNumber };
 
                     switch (cmd)
                     {
@@ -423,19 +427,21 @@ namespace DoMCLib.Classes.Module.CCD
                             {
                                 byte result = packet[2];
                                 var dtime = (packet[3] + packet[4] * 256) * 10;
+                                CardAnswerResult.ReadingSocketsResult = result;
+                                CardAnswerResult.ReadingSocketsTime = dtime;
 
-                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseReadSocket", CardNumber);
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseReadSockets", CardAnswerResult);
                             }
                             break;
                         case 4:
                             {
-                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseSetSocketsExpositionParameters", CardNumber);
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseSetSocketsExpositionParameters", CardAnswerResult);
 
                             }
                             break;
                         case 5:
                             {
-                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseSetConfiguration", CardNumber);
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseSetConfiguration", CardAnswerResult);
 
                             }
                             break;
@@ -443,14 +449,14 @@ namespace DoMCLib.Classes.Module.CCD
                         case 9:
                             {
 
-                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseGetSocketsImages", CardNumber);
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseGetSocketsImages", CardAnswerResult);
 
                             }
                             break;
                         case 11:
                             {
 
-                                Controller.GetObserver().Notify($"{this.GetType().Name}.Result.ResponseSetReadingParametersConfiguration", CardNumber);
+                                Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseSetReadingParametersConfiguration", CardAnswerResult);
 
                             }
                             break;
@@ -657,19 +663,6 @@ namespace DoMCLib.Classes.Module.CCD
             var cfg = new CCDCardArrayRequest9();
             cfg.Address = 8;
             Send(BinaryConverter.ToBytes(cfg));
-
-        }
-        /// <summary>
-        /// Command = 9, получить прочитанные изображение указанного гнезда
-        /// </summary>
-
-        public void SendCommandGetSocketsImages(byte SocketNum)
-        {
-            if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
-
-            var cfg = new CCDCardArrayRequest9();
-            cfg.Address = SocketNum;
-            Send(SocketNum, BinaryConverter.ToBytes(cfg));
 
         }
 

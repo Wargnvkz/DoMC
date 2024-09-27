@@ -1112,32 +1112,32 @@ namespace DoMCLib.Tools
 
             //считаем среднее, на случай если отличается цвет, но дефектов нет
             var average = ImageTools.Average(diffImg, ipp.GetRectangle());
-            result.Average = average;
+            ReadResult.Average = average;
 
             //считаем отклонения по волокнам
             var deviationImg = ImageTools.DeviationByLine(diffImg, ipp.DeviationWindow);
-            result.ResultImage = deviationImg;
+            ReadResult.ResultImage = deviationImg;
 
             //определяем максимальное отклонение в изображении
             var maxImageDeviation = ImageTools.MaxDeviation(deviationImg, out Point pMaxDev, ipp.GetRectangle());
-            result.MaxDeviation = maxImageDeviation;
-            result.MaxDeviationPoint = pMaxDev;
+            ReadResult.MaxDeviation = maxImageDeviation;
+            ReadResult.MaxDeviationPoint = pMaxDev;
 
             //если максимальное отклонение больше допустимого, то ошибка в отклонении
             //если среднее отклоняется больше допустимого, то ошибка в среднем
             // иначе в этом гнезде хорошая преформа
-            result.SocketErrorType =
+            ReadResult.SocketErrorType =
                 (Math.Abs(average) < ipp.MaxAverage ? ImageErrorType.None : ImageErrorType.Average) |
                 (maxImageDeviation < ipp.MaxDeviation ? ImageErrorType.None : ImageErrorType.Deviation);
 
 
             //сохраняем данные о статусе преформы в этом гнезде
 
-            result.IsSocketGood = result.SocketErrorType == ImageErrorType.None;
+            ReadResult.IsSocketGood = ReadResult.SocketErrorType == ImageErrorType.None;
 
             //если преформа в гнезде хорошая, то обновляем эталон
 
-            return result;
+            return ReadResult;
             */
         }
 

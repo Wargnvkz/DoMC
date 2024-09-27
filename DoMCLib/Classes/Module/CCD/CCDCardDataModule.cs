@@ -7,6 +7,7 @@ using DoMCModuleControl;
 using DoMCLib.Classes.Configuration.CCD;
 using DoMCLib.Tools;
 using DoMCModuleControl.Commands;
+using DoMCLib.Classes.Module.CCD.Commands.Classes;
 
 /// <summary>
 /// Управление получением данных из платы и передача данных в плату
@@ -25,10 +26,10 @@ namespace DoMCLib.Classes.Module.CCD
             tcpClients = new CCDCardTCPClient[12];
         }
 
-
-        public class SetReadingParametersCommand : WaitCommandBase
+        public class SendGetSocketsImagesCommand : CommandBase
         {
-            public SetReadingParametersCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
+            public SendGetSocketsImagesCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
@@ -39,7 +40,8 @@ namespace DoMCLib.Classes.Module.CCD
                     var cardParameters = context.GetCardParametersByCardList(workingCards);
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
-                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketReadingParameters(cardParameters[i].Item2);
+                        result.SetCardRequested(i);
+                        module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages();
                     }
                 }
                 else
@@ -48,46 +50,60 @@ namespace DoMCLib.Classes.Module.CCD
                 }
 
             }
+            
+        }
 
+        public class GetSocketsImagesDataCommand : WaitCommandBase
+        {
+            CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
+            public GetSocketsImagesDataCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            protected override void Executing()
+            {
+                var module = (CCDCardDataModule)Module;
+                var context = (ApplicationContext)InputData;
+                if (context != null)
+                {
+                    var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
+                    var cardParameters = context.GetCardParametersByCardList(workingCards);
+                    for (int i = 0; i < cardParameters.Count; i++)
+                    {
+                        result.SetCardRequested(i);
+                        module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages();
+                    }
+                }
+                else
+                {
+
+                }
+
+            }
             protected override void NotificationReceived(string NotificationName, object? data)
             {
-                if (NotificationName.Contains("ResponseSetReadingParametersConfiguration"))
+                if (NotificationName.Contains("ResponseGetSocketsImages"))
                 {
-                    var card = (int)data;
+                    var CardAnswerResults = (CCDCardAnswerResults)data;
+                    if (CardAnswerResults == null) return;
+                    result.SetCardAnswered(CardAnswerResults.CardNumber);
                 }
+            }
+            protected List<int> CardsAnswered()
+            {
+                return Enumerable.Range(0, 12).Where(i => result.answered[i] && result.requested[i]).ToList();
             }
 
             protected override bool MakeDecisionIsCommandCompleteFunc()
             {
-                throw new NotImplementedException();
+                return result.CardsNotAnswered().Count() > 0;
             }
 
-
-        }
-        public class SetExpositionParametersCommand : CommandBase
-        {
-            public SetExpositionParametersCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
-            protected override void Executing()
+            protected override void PrepareOutputData()
             {
-                var module = (CCDCardDataModule)Module;
-                var context = (ApplicationContext)InputData;
-                if (context != null)
-                {
-                    var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
-                    var cardParameters = context.GetCardParametersByCardList(workingCards);
-                    for (int i = 0; i < cardParameters.Count; i++)
-                    {
-                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketsExpositionParameters(cardParameters[i].Item2);
-                    }
-
-                }
-                else
-                {
-
-                }
+                OutputData = result;
 
             }
         }
+
+
 
     }
 

@@ -44,7 +44,9 @@ namespace DoMCModuleControl
                     {
                         try
                         {
+                            Logger.Add(LoggerLevel.FullDetailedInformation, $"Событие {eventName} передано в {handler.GetType().Name}");
                             await handler.Invoke(eventName, eventData);
+                            Logger.Add(LoggerLevel.FullDetailedInformation, $"Событие {eventName} в {handler.GetType().Name} завершено");
                         }
                         catch (Exception ex)
                         {
