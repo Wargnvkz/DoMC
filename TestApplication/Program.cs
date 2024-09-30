@@ -8,6 +8,16 @@ namespace TestApplication
     {
         static void Main(string[] args)
         {
+            var a = 1;
+            var b = 1;
+            var c = 1;
+            var d = 1;
+            var e = 1;
+            var f = 1;
+            var g = 1;
+            var h = 1;
+            var i = 1;
+            var j = 1;
             var class2 = new Class2() { Data = [1, 2, 3, 4, 5, 6, 7, 8], Volume = 0.01d };
             var class1 = new Class1() { ID = -1, Name = "Test", Data = class2 };
 
@@ -20,6 +30,47 @@ namespace TestApplication
             Console.WriteLine($"dto1.VolumeData = {String.Join(", ", dto1.VolumeData)}");
             Console.WriteLine($"dto2.NewName = {dto2.NewName}");
             Console.WriteLine($"dto3.Data = {String.Join(", ", dto3.Data)}");
+            int k;
+            switch (a)
+            {
+                case 1:
+                    switch (b)
+                    {
+                        case 1:
+                            k = c * d + e * f + g * h + i * j;
+                            break;
+                        default:
+                            k = c * d + e * f + g * h + i * j + 1;
+                            break;
+                    }
+                    break;
+                case 2:
+                    switch (c)
+                    {
+                        case 1:
+                            k = a * b + e * f + g * h + i * j;
+                            break;
+                        default:
+                            k = a * b + e * f + g * h + i * j + 1;
+                            break;
+                    }
+                    break;
+                default:
+                    switch (c)
+                    {
+                        case 1:
+                            k = a * b + e * f + g * h + i * j;
+                            break;
+                        default:
+                            k = a * b + e * f + g * h + i * j + 1;
+                            break;
+                    }
+                    break;
+
+
+            }
+            k = k + a * b + c * d + e * f + g * h + i * j;
+            Console.WriteLine(k);
             Console.ReadKey();
         }
 

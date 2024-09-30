@@ -140,6 +140,7 @@ namespace DoMCLib.Classes.Module.CCD
         /// </summary>
         /// <param name="Socket"></param>
         /// <param name="msTimeout"></param>
+        /// <returns>Завершено ли чтение</returns>
         public bool GetImageDataFromSocketSync(int Socket, int msTimeout, CancellationTokenSource cancellationTokenSource, out SocketReadData socketReadData)
         {
             socketReadData = new SocketReadData();
@@ -233,7 +234,7 @@ namespace DoMCLib.Classes.Module.CCD
                                 sb.Append($"{StepToTick[i].Item1}:{StepToTick[i].Item2};");
                             }
                         var stepsTimings = sb.ToString();
-                        WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Времена выполнения шагов (шаг:мс): {stepsTimings}");
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Плата: {CardNumber}. Гнездо: {Socket}. Времена выполнения шагов (шаг:мс): {stepsTimings}");
                         throw new Exception($"Прочитано {socketReadData.ImageDataRead} байт");
                     }
                 }

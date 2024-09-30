@@ -8,6 +8,7 @@ using DoMCLib.Classes.Configuration.CCD;
 using DoMCLib.Tools;
 using DoMCModuleControl.Commands;
 using DoMCLib.Classes.Module.CCD.Commands.Classes;
+using System.Threading;
 
 /// <summary>
 /// Управление получением данных из платы и передача данных в плату
@@ -26,37 +27,14 @@ namespace DoMCLib.Classes.Module.CCD
             tcpClients = new CCDCardTCPClient[12];
         }
 
-        public class SendGetSocketsImagesCommand : CommandBase
-        {
-            CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public SendGetSocketsImagesCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
-            protected override void Executing()
-            {
-                var module = (CCDCardDataModule)Module;
-                var context = (ApplicationContext)InputData;
-                if (context != null)
-                {
-                    var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
-                    var cardParameters = context.GetCardParametersByCardList(workingCards);
-                    for (int i = 0; i < cardParameters.Count; i++)
-                    {
-                        result.SetCardRequested(i);
-                        module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages();
-                    }
-                }
-                else
-                {
-
-                }
-
-            }
-            
-        }
-
+        /// <summary>
+        /// послыка команды плате на передачу данных об изображении и подключение к плате для получения данных изображения гнезд
+        /// </summary>
         public class GetSocketsImagesDataCommand : WaitCommandBase
         {
-            CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public GetSocketsImagesDataCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            GetImageDataCommandResponse result = new GetImageDataCommandResponse();
+            CancellationTokenSource[] cancellationTokenSources = new CancellationTokenSource[12];
+            public GetSocketsImagesDataCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(GetImageDataCommandResponse)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
@@ -69,6 +47,27 @@ namespace DoMCLib.Classes.Module.CCD
                     {
                         result.SetCardRequested(i);
                         module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages();
+                        cancellationTokenSources[i] = new CancellationTokenSource();
+                        var task = new Task((i) =>
+                        {
+                            var cardnumber = (int)i;
+                            for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
+                            {
+                                var ReadResult = module.tcpClients[cardParameters[cardnumber].Item1].GetImageDataFromSocketSync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, cancellationTokenSources[cardnumber], out SocketReadData data);
+                                if (ReadResult)
+                                {
+                                    TCPCardSocket cardSocket = new TCPCardSocket() { CCDCardNumber = cardnumber, InnerSocketNumber = socket };
+                                    var equipmentSocket = context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
+                                    result.SetSocketReadData(equipmentSocket - 1, data);
+                                }
+                                else
+                                {
+                                    result.SetCardError(cardnumber);
+                                }
+                            }
+                            result.SetCardCompleteSuccessfully(cardnumber);
+                        }, i, cancellationTokenSources[i].Token);
+                        task.Start();
                     }
                 }
                 else
@@ -84,16 +83,14 @@ namespace DoMCLib.Classes.Module.CCD
                     var CardAnswerResults = (CCDCardAnswerResults)data;
                     if (CardAnswerResults == null) return;
                     result.SetCardAnswered(CardAnswerResults.CardNumber);
+                    result.SetCardError(CardAnswerResults.CardNumber);
+                    cancellationTokenSources[CardAnswerResults.CardNumber].Cancel();
                 }
-            }
-            protected List<int> CardsAnswered()
-            {
-                return Enumerable.Range(0, 12).Where(i => result.answered[i] && result.requested[i]).ToList();
             }
 
             protected override bool MakeDecisionIsCommandCompleteFunc()
             {
-                return result.CardsNotAnswered().Count() > 0;
+                return result.GetCardsNotStopped().Count() == 0;
             }
 
             protected override void PrepareOutputData()

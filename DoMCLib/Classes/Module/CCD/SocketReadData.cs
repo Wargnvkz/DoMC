@@ -13,10 +13,11 @@ namespace DoMCLib.Classes.Module.CCD
         public long ImageTicksRead;
         public byte[] ImageData;
         private short[,] _Image;
-        public short[,] Image
+        public short[,]? Image
         {
             get
             {
+                if (ImageData == null) return null;
                 if (_Image == null)
                     _Image = ImageTools.ArrayToImage(ImageData);
                 return _Image;
