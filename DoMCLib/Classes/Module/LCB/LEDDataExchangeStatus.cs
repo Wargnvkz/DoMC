@@ -1,4 +1,4 @@
-﻿namespace DoMCLib.Classes
+﻿namespace DoMCLib.Classes.Module.LCB
 {
     public class LEDDataExchangeStatus
     {

@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApplication", "TestAppl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCUserInterface", "DoMCUserInterface\DoMCUserInterface.csproj", "{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateCommands", "TestApp\CreateCommands.csproj", "{EA51A90A-86C0-4E18-9F50-F10AB289188B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateCommands", "TestApp\CreateCommands.csproj", "{EA51A90A-86C0-4E18-9F50-F10AB289188B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{0E503F2A-9F5B-4675-A5CA-361F388639FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,7 +54,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024} = {0E503F2A-9F5B-4675-A5CA-361F388639FD}
 		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4} = {86CA6DF1-2095-4E39-B27E-4674A66E43E9}
+		{EA51A90A-86C0-4E18-9F50-F10AB289188B} = {0E503F2A-9F5B-4675-A5CA-361F388639FD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2EA11693-849C-4A59-832B-A350062E23A7}

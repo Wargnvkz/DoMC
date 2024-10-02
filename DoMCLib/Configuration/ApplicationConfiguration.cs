@@ -30,7 +30,7 @@ namespace DoMCLib.Configuration
 
         }
 
-        public void Load(string configurationFilePath)
+        public void Load()
         {
             if (File.Exists(ConfigurationFilePath))
             {

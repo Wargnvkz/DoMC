@@ -28,47 +28,42 @@ namespace DoMCLib.Classes.Module.CCD
         }
 
         /// <summary>
-        /// послыка команды плате на передачу данных об изображении и подключение к плате для получения данных изображения гнезд
+        /// Получить изображенрие одного гнезда
         /// </summary>
-        public class GetSocketsImagesDataCommand : WaitCommandBase
+        public class GetSocketImageDataCommand : WaitCommandBase
         {
-            GetImageDataCommandResponse result = new GetImageDataCommandResponse();
-            CancellationTokenSource[] cancellationTokenSources = new CancellationTokenSource[12];
-            public GetSocketsImagesDataCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(GetImageDataCommandResponse)) { }
+            SocketReadData? result = null;
+            CancellationTokenSource cancellationTokenSources = new CancellationTokenSource();
+            public GetSocketImageDataCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(GetSocketImageDataCommandData), typeof(SocketReadData)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
-                var context = (ApplicationContext)InputData;
-                if (context != null)
+                var Data = (GetSocketImageDataCommandData)InputData;
+                if (Data != null && Data.Context != null)
                 {
-                    var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
-                    var cardParameters = context.GetCardParametersByCardList(workingCards);
-                    for (int i = 0; i < cardParameters.Count; i++)
+                    var cardSocketParameters = Data.Context.GetSocketParametersByEquipmentSockets(new List<int>() { Data.EqipmentSocket });
+                    var cardSocket = cardSocketParameters[0].Item2;
+                    var SocketParameters = cardSocketParameters[0].Item3;
+
+                    cancellationTokenSources = new CancellationTokenSource();
+                    module.tcpClients[cardSocket.CCDCardNumber].SendCommandGetSocketImage(cardSocket.InnerSocketNumber);
+                    //var task = new Task(new Action<object?>((i) => { }), cardSocket.InnerSocketNumber,);
+                    var task = new Task(new Action<object?>((i) =>
                     {
-                        result.SetCardRequested(i);
-                        module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages();
-                        cancellationTokenSources[i] = new CancellationTokenSource();
-                        var task = new Task((i) =>
+                        var cardnumber = (int)i;
+                        var ReadResult = module.tcpClients[cardSocket.CCDCardNumber].GetImageDataFromSocketSync(cardSocket.InnerSocketNumber, Data.Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, cancellationTokenSources, out SocketReadData data);
+                        if (ReadResult)
                         {
-                            var cardnumber = (int)i;
-                            for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
-                            {
-                                var ReadResult = module.tcpClients[cardParameters[cardnumber].Item1].GetImageDataFromSocketSync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, cancellationTokenSources[cardnumber], out SocketReadData data);
-                                if (ReadResult)
-                                {
-                                    TCPCardSocket cardSocket = new TCPCardSocket() { CCDCardNumber = cardnumber, InnerSocketNumber = socket };
-                                    var equipmentSocket = context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
-                                    result.SetSocketReadData(equipmentSocket - 1, data);
-                                }
-                                else
-                                {
-                                    result.SetCardError(cardnumber);
-                                }
-                            }
-                            result.SetCardCompleteSuccessfully(cardnumber);
-                        }, i, cancellationTokenSources[i].Token);
-                        task.Start();
-                    }
+                            var equipmentSocket = Data.Context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
+                            result = data;
+                        }
+                        else
+                        {
+                            result = null;
+                        }
+
+                    }), cardSocket.InnerSocketNumber, cancellationTokenSources.Token);
+                    task.Start();
                 }
                 else
                 {
@@ -82,15 +77,13 @@ namespace DoMCLib.Classes.Module.CCD
                 {
                     var CardAnswerResults = (CCDCardAnswerResults)data;
                     if (CardAnswerResults == null) return;
-                    result.SetCardAnswered(CardAnswerResults.CardNumber);
-                    result.SetCardError(CardAnswerResults.CardNumber);
-                    cancellationTokenSources[CardAnswerResults.CardNumber].Cancel();
+                    cancellationTokenSources.Cancel();
                 }
             }
 
             protected override bool MakeDecisionIsCommandCompleteFunc()
             {
-                return result.GetCardsNotStopped().Count() == 0;
+                return result != null;
             }
 
             protected override void PrepareOutputData()
@@ -100,7 +93,11 @@ namespace DoMCLib.Classes.Module.CCD
             }
         }
 
-
+        public class GetSocketImageDataCommandData
+        {
+            public ApplicationContext Context;
+            public int EqipmentSocket;
+        }
 
     }
 

@@ -666,7 +666,20 @@ namespace DoMCLib.Classes.Module.CCD
             Send(BinaryConverter.ToBytes(cfg));
 
         }
+        /// <summary>
+        /// Command = 9, получить прочитанное изображение по одному гнезду
+        /// </summary>
 
+        public void SendCommandGetSocketImage(int socket)
+        {
+
+            if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
+
+            var cfg = new CCDCardArrayRequest9();
+            cfg.Address = (byte)socket;
+            Send(BinaryConverter.ToBytes(cfg));
+
+        }
         #endregion
 
         #region Logging

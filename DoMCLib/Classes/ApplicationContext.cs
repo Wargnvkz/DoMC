@@ -65,15 +65,20 @@ namespace DoMCLib.Classes
             }
             return result;
         }
-        public List<(TCPCardSocket, SocketParameters)> GetSocketParametersByEquipmentSockets(List<int> EquipmentSockets)
+        /// <summary>
+        /// Получает список гнезщд на плате и их параметров из физических гнезд
+        /// </summary>
+        /// <param name="EquipmentSockets">Список номеров физических гнезд матрицы начиная с 1</param>
+        /// <returns>(номер гнезда матрицы, плата и гнездо, параметры гнезда</returns>
+        public List<(int,TCPCardSocket, SocketParameters)> GetSocketParametersByEquipmentSockets(List<int> EquipmentSockets)
         {
             FillEquipmentSocket2CardSocket();
-            var result = new List<(TCPCardSocket, SocketParameters)>();
+            var result = new List<(int,TCPCardSocket, SocketParameters)>();
             for (int eqSocket = 0; eqSocket < EquipmentSockets.Count; eqSocket++)
             {
                 var cSocket = EquipmentSocket2CardSocket[eqSocket - 1];
                 var CardSocket = new TCPCardSocket(cSocket);
-                result.Add((CardSocket, Configuration.CurrentSettings.CCDSocketParameters[eqSocket - 1]));
+                result.Add((eqSocket,CardSocket, Configuration.CurrentSettings.CCDSocketParameters[eqSocket - 1]));
             }
             return result;
         }

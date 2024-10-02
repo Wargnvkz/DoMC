@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DoMCLib.Classes;
+using DoMCLib.Classes.Configuration.CCD;
 using DoMCLib.Classes.Module.RDPB.Classes;
 using DoMCLib.Configuration;
 

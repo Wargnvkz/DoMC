@@ -301,6 +301,27 @@ namespace DoMCModuleControl
             throw new ArgumentException($"Команда \"{commandName}\" не зарегистрирована.");
         }
 
+        /// <summary>
+        /// Создание команды по имени (из списка известных команд создается экземпляр команды, который выполняет код)
+        /// </summary>
+        /// <param name="commandName">Текстовое имя команды</param>
+        /// <returns>Созданная команда</returns>
+        /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
+        /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
+        public CommandBase? CreateCommand(Type commandType, object? data = null)
+        {
+            var commandInfo = _commands.Where(c => c.Value.CommandClass == commandType).FirstOrDefault().Value;
+            if (commandInfo != null)
+            {
+                if (commandInfo.CommandClass != null)
+                {
+                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType, data);
+                }
+                throw new ArgumentNullException($"В команде \"{commandInfo.CommandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
+            }
+            throw new ArgumentException($"Команда \"{commandType.Name}\" не найдена.");
+        }
+
         public Observer GetObserver()
         {
             return Observer;
