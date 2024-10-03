@@ -20,7 +20,7 @@ namespace DoMCModuleControl
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
         public CommandBase? CreateCommand(string commandName, object? data = null);
-        public CommandBase? CreateCommand(Type commandType, object? data = null)
+        public CommandBase? CreateCommand(Type commandType, object? data = null);
         /// <summary>
         /// Регистрация команды в контроллере
         /// </summary>

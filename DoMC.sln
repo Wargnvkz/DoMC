@@ -3,21 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMC", "DoMC\DoMC.csproj", "{34206362-833E-4020-80CF-C4B78E990D85}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCModuleControl", "DoMCModuleControl\DoMCModuleControl.csproj", "{CB63A94F-EFAD-4795-BD1E-2B5C63838887}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCLib", "DoMCLib\DoMCLib.csproj", "{8663B34B-343A-4EF8-90FB-6C53E22B8A53}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserInterface", "UserInterface", "{86CA6DF1-2095-4E39-B27E-4674A66E43E9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApplication", "TestApplication\TestApplication.csproj", "{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCUserInterface", "DoMCUserInterface\DoMCUserInterface.csproj", "{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateCommands", "TestApp\CreateCommands.csproj", "{EA51A90A-86C0-4E18-9F50-F10AB289188B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{0E503F2A-9F5B-4675-A5CA-361F388639FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMC", "DoMC\DoMC.csproj", "{C78D4114-28DA-407F-980B-AE4463A3E21C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{34206362-833E-4020-80CF-C4B78E990D85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34206362-833E-4020-80CF-C4B78E990D85}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34206362-833E-4020-80CF-C4B78E990D85}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34206362-833E-4020-80CF-C4B78E990D85}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CB63A94F-EFAD-4795-BD1E-2B5C63838887}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CB63A94F-EFAD-4795-BD1E-2B5C63838887}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB63A94F-EFAD-4795-BD1E-2B5C63838887}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,21 +33,20 @@ Global
 		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EA51A90A-86C0-4E18-9F50-F10AB289188B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA51A90A-86C0-4E18-9F50-F10AB289188B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA51A90A-86C0-4E18-9F50-F10AB289188B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA51A90A-86C0-4E18-9F50-F10AB289188B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C78D4114-28DA-407F-980B-AE4463A3E21C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C78D4114-28DA-407F-980B-AE4463A3E21C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C78D4114-28DA-407F-980B-AE4463A3E21C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C78D4114-28DA-407F-980B-AE4463A3E21C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B2BDF4CF-F6AF-47B5-A7AA-604C17090024} = {0E503F2A-9F5B-4675-A5CA-361F388639FD}
-		{A659E8B4-76EF-442C-AEF1-CF8E5BACF9E4} = {86CA6DF1-2095-4E39-B27E-4674A66E43E9}
 		{EA51A90A-86C0-4E18-9F50-F10AB289188B} = {0E503F2A-9F5B-4675-A5CA-361F388639FD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
