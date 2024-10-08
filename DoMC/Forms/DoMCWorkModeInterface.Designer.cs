@@ -1,4 +1,4 @@
-﻿namespace DoMCInterface
+﻿namespace DoMC
 {
     partial class DoMCWorkModeInterface
     {
@@ -71,12 +71,12 @@
             this.tbpArchive = new System.Windows.Forms.TabPage();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.miSocketsSettings = new System.Windows.Forms.ToolStripMenuItem();
-            this.pbStartStop = new DoMCInterface.PressButton();
-            this.pbLCB = new DoMCInterface.PressButton();
-            this.pbLocalDB = new DoMCInterface.PressButton();
-            this.pbRemoteDB = new DoMCInterface.PressButton();
-            this.pbRDPB = new DoMCInterface.PressButton();
-            this.pbCurrentShowStatistics = new DoMCInterface.PressButton();
+            this.pbStartStop = new DoMC.PressButton();
+            this.pbLCB = new DoMC.PressButton();
+            this.pbLocalDB = new DoMC.PressButton();
+            this.pbRemoteDB = new DoMC.PressButton();
+            this.pbRDPB = new DoMC.PressButton();
+            this.pbCurrentShowStatistics = new DoMC.PressButton();
             this.msWorkingModeMenu.SuspendLayout();
             this.tabWorkAndArchive.SuspendLayout();
             this.tbpCurrent.SuspendLayout();

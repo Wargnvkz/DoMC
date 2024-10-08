@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
 
-namespace DoMCInterface
+namespace DoMC
 {
     public partial class DoMCArchiveForm : Form
     {

@@ -288,13 +288,13 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public CommandBase? CreateCommand(string commandName, object? data = null)
+        public CommandBase? CreateCommand(string commandName)
         {
             if (_commands.TryGetValue(commandName, out var commandInfo))
             {
                 if (commandInfo.CommandClass != null)
                 {
-                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType, data);
+                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
                 }
                 throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
             }
@@ -308,14 +308,14 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public CommandBase? CreateCommand(Type commandType, object? data = null)
+        public CommandBase? CreateCommand(Type commandType)
         {
             var commandInfo = _commands.Where(c => c.Value.CommandClass == commandType).FirstOrDefault().Value;
             if (commandInfo != null)
             {
                 if (commandInfo.CommandClass != null)
                 {
-                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType, data);
+                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
                 }
                 throw new ArgumentNullException($"В команде \"{commandInfo.CommandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
             }

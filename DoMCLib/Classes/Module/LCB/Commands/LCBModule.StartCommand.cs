@@ -11,10 +11,5 @@ namespace DoMCLib.Classes.Module.LCB
             public StartCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
             protected override void Executing() => ((LCBModule)Module).Start();
         }
-
-
     }
-
-   
-
 }

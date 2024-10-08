@@ -5,7 +5,7 @@ using DoMCLib.Configuration;
 using DoMCLib.Tools;
 using DoMCLib.DB;
 using DoMCLib.Exceptions;
-using DoMCInterface;
+using DoMC;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace DoMCInterface
+namespace DoMC
 {
     public partial class DoMCWorkModeInterface : Form, IUserKernelInterface
     {
@@ -1161,7 +1161,7 @@ namespace DoMCInterface
             var socketnumber = (int)ctrl.Tag;
             if (InterfaceDataExchange.CurrentCycleCCD != null)
             {
-                var sf = new DoMCInterface.ShowFrameForm();
+                var sf = new DoMC.ShowFrameForm();
                 sf.Text = "Цикл: " + InterfaceDataExchange.CurrentCycleCCD.CycleCCDDateTime.ToString() + " Номер гнезда: " + socketnumber;
                 sf.Image = InterfaceDataExchange.CurrentCycleCCD.Differences[socketnumber - 1];
                 sf.Show();
@@ -1601,7 +1601,7 @@ namespace DoMCInterface
                         StopWork();
                     }
                     catch { }
-                    var wmf = new DoMCInterface.DoMCSettingsInterface();
+                    var wmf = new DoMC.DoMCSettingsInterface();
                     wmf.SetMemoryReference(globalMemory);
                     this.Hide();
                     try
@@ -1625,7 +1625,7 @@ namespace DoMCInterface
                 MessageBox.Show("ПМК запущено. Для создания эталонов нужно остановить работу ПМК", "Создание эталонов");
                 return;
             }
-            var frm = new DoMCInterface.DoMCStandardCreateInterface();
+            var frm = new DoMC.DoMCStandardCreateInterface();
             frm.SetMemoryReference(globalMemory);
             this.Enabled = false;
             try

@@ -1,6 +1,6 @@
 ﻿using DataExchangeKernel.ACS_Core;
 using DataExchangeKernel.Interface;
-using DoMCInterface;
+using DoMC;
 using DoMCLib.Classes;
 using DoMCLib.Configuration;
 using DoMCLib.Tools;
@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace DoMCInterface
+namespace DoMC
 {
     public partial class DoMCStandardCreateInterface : Form, IUserKernelInterface
     {

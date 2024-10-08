@@ -1,4 +1,4 @@
-﻿namespace DoMCInterface
+﻿namespace DoMC
 {
     partial class DoMCArchiveForm
     {

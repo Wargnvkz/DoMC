@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
 
-namespace DoMCInterface
+namespace DoMC
 {
     public class PressButton : Button
     {

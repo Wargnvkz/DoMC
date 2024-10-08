@@ -1,4 +1,5 @@
 ﻿using DoMCLib.Classes.Configuration.CCD;
+using DoMCLib.Classes.Module.LCB;
 using DoMCLib.Configuration;
 using DoMCLib.Tools;
 using System;
@@ -70,15 +71,15 @@ namespace DoMCLib.Classes
         /// </summary>
         /// <param name="EquipmentSockets">Список номеров физических гнезд матрицы начиная с 1</param>
         /// <returns>(номер гнезда матрицы, плата и гнездо, параметры гнезда</returns>
-        public List<(int,TCPCardSocket, SocketParameters)> GetSocketParametersByEquipmentSockets(List<int> EquipmentSockets)
+        public List<(int, TCPCardSocket, SocketParameters)> GetSocketParametersByEquipmentSockets(List<int> EquipmentSockets)
         {
             FillEquipmentSocket2CardSocket();
-            var result = new List<(int,TCPCardSocket, SocketParameters)>();
+            var result = new List<(int, TCPCardSocket, SocketParameters)>();
             for (int eqSocket = 0; eqSocket < EquipmentSockets.Count; eqSocket++)
             {
                 var cSocket = EquipmentSocket2CardSocket[eqSocket - 1];
                 var CardSocket = new TCPCardSocket(cSocket);
-                result.Add((eqSocket,CardSocket, Configuration.CurrentSettings.CCDSocketParameters[eqSocket - 1]));
+                result.Add((eqSocket, CardSocket, Configuration.CurrentSettings.CCDSocketParameters[eqSocket - 1]));
             }
             return result;
         }

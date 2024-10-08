@@ -113,7 +113,7 @@ namespace DoMCModuleControl.Commands
             {
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Начало выполнения {CommandName}.");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Started}", InputData);
-                if (InputType != null && InputData == null) throw new InvalidOperationException("Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
+                if (InputType != null && InputData == null) throw new InvalidOperationException($"Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
                 Executing();
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Команды {CommandName} выполнена");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Suceeded}", OutputData);
@@ -150,6 +150,25 @@ namespace DoMCModuleControl.Commands
             SetInputData(InputData);
             var task = new Task(ExecuteCommandBase);
             task.Start();
+        }
+        /// <summary>
+        /// Запуск команды на асинхронное выполнение
+        /// </summary>
+        public async Task<bool> ExecuteCommandAsync()
+        {
+            var task = new Task(ExecuteCommandBase);
+            await task;
+            return IsCompleteSuccessfully;
+        }
+        /// <summary>
+        /// Запуск команды на асинхронное выполнение с передачей входных данный
+        /// </summary>
+        public async Task ExecuteCommandAsync(object? InputData)
+        {
+            SetInputData(InputData);
+            var task = new Task(ExecuteCommandBase);
+            await task;
+            return IsCompleteSuccessfully;
         }
         /// <summary>
         /// Метод описываемый в потомках, то есть в конкретной команде и выполняющий сам код команды. Классам реализующим этот метод не нужно заботиться о логировании или ошибках. Все это сделано в базовом классе, чтобы соблюсти стандартизацию

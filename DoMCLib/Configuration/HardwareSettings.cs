@@ -22,7 +22,7 @@ namespace DoMCLib.Configuration
 
         public bool[] SocketsToCheck = new bool[96];
 
-        public DoMCStandardRecalculationSettings WorkModeSettings = new DoMCStandardRecalculationSettings();
+        public DoMCStandardRecalculationSettings StandardRecalculationParameters = new DoMCStandardRecalculationSettings();
 
         public RemoveDefectedPreformBlockConfig RemoveDefectedPreformBlockConfig = new RemoveDefectedPreformBlockConfig();
 

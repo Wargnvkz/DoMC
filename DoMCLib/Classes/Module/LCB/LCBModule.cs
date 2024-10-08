@@ -400,6 +400,10 @@ namespace DoMCLib.Classes.Module.LCB
                 Task.Delay(10).Wait();
             }
         }
+        public LEDDataExchangeStatus GetLEDDataExchangeStatus()
+        {
+            return Status.Clone();
+        }
 
 
         public enum Operations

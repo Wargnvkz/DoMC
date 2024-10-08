@@ -25,7 +25,7 @@ namespace DoMCLib.Classes.Module.CCD
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
                         result.SetCardRequested(i);
-                        module.tcpClients[cardParameters[i].Item1].Start();
+                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketReadingParameters(false, false, false, true);
                     }
                 }
                 else

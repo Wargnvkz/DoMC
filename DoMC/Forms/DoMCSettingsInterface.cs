@@ -1,8 +1,5 @@
-﻿using DataExchangeKernel.ACS_Core;
-using DataExchangeKernel.Interface;
-using DoMCLib.Tools;
+﻿using DoMCLib.Tools;
 using DoMCLib.Configuration;
-using DoMCLib.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,30 +11,24 @@ using System.Threading;
 using System.Windows.Forms;
 using DoMCLib.Classes;
 using System.Collections.Concurrent;
-using System.Management;
 using System.IO;
-using DoMCInterface;
+using DoMC;
 using System.Threading.Tasks;
 using System.Net;
 using DoMCLib.Exceptions;
 using System.Data.SqlClient;
+using DoMCModuleControl;
+using DoMCModuleControl.Logging;
+using DoMC.Tools;
+using DoMCLib.Classes.Module.LCB;
+using DoMCLib.Classes.Module.RDPB;
+using DoMCLib.Classes.Module.CCD;
+using DoMC.Classes;
 
-namespace DoMCInterface
+namespace DoMC
 {
-    public partial class DoMCSettingsInterface : Form, IUserKernelInterface
+    public partial class DoMCSettingsInterface : Form
     {
-
-        GlobalMemory globalMemory;
-        //bool guidFound = false;
-        //int InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout = 30000;
-        Log WorkingLog = new Log(Log.LogModules.Settings);
-
-        //Configurations
-        /*DoMC.DoMCCardData.Configuration.CardConnectionConfiguration NetCardConfig;
-        List<DoMCClasses.DoMCCardListSettingsForm.DoMCCardListSetting> CardListSettings;*/
-        //FullDoMCConfiguration Configuration;
-
-        DoMCInterfaceDataExchange InterfaceDataExchange = null;
 
         DoMCLib.Forms.ShowPreformImages checkpreformalgorithmsForm;
 
@@ -50,36 +41,37 @@ namespace DoMCInterface
         bool LCBSettingsPreformLengthGotFromConfig = false;
         bool LCBSettingsDelayLengthGotFromConfig = false;
 
+        IMainController Controller;
+        ILogger WorkingLog;
+        Observer observer;
+        DoMCLib.Classes.ApplicationContext Context;
+
         SettingsPageSocketsStatus SettingsPageSocketsStatusShow = SettingsPageSocketsStatus.IsSocketSettingsOk;
 
         Bitmap bmpCheckSign = new Bitmap(512, 512);
-        DoMCLib.Forms.DoMCArchiveForm archiveForm = null;
+        DoMCArchiveForm archiveForm = null;
 
-        public DoMCSettingsInterface()
+        ModelCommandProcessor contextProcessor;
+
+        public DoMCSettingsInterface(IMainController controller, DoMCLib.Classes.ApplicationContext context)
         {
             InitializeComponent();
+            WorkingLog = controller.GetLogger("SettingInterface");
+            observer = controller.GetObserver();
+            Context = context;
+            WorkingLog.Add(LoggerLevel.Critical, "Запускт интерфейса настройки");
+            //observer.NotificationReceivers += Observer_NotificationReceived;
             //CreateDataExchange();
-
-        }
-
-        private void CreateDataExchange()
-        {
-            WorkingLog.Add("Старт");
-            WorkingLog.Add("Создание InterfaceDataExchange");
-            InterfaceDataExchange = new DoMCInterfaceDataExchange();
-
-            WorkingLog.Add("Загрузка конфигурации");
-            InterfaceDataExchange.Configuration = new FullDoMCConfiguration();
-            InterfaceDataExchange.Configuration.Load();
-            //InterfaceDataExchange.Configuration = Configuration;
+            contextProcessor = new ModelCommandProcessor(controller, Context);
+            InitControls();
 
         }
 
         private void InitControls()
         {
-            WorkingLog.Add("SetFormSchema");
+            WorkingLog.Add(LoggerLevel.Critical, "SetFormSchema");
             SetFormSchema();
-            WorkingLog.Add("FillSettingPage");
+            WorkingLog.Add(LoggerLevel.Critical, "FillSettingPage");
             FillSettingPage();
             TestLCBOutputs = new CheckBox[] { cbTestLCBOutput0, cbTestLCBOutput1, cbTestLCBOutput2, cbTestLCBOutput3, cbTestLCBOutput4, cbTestLCBOutput5 };
             TestLCBInputs = new CheckBox[] { cbTestLCBInput0, cbTestLCBInput1, cbTestLCBInput2, cbTestLCBInput3, cbTestLCBInput4, cbTestLCBInput5, cbTestLCBInput6, cbTestLCBInput7 };
@@ -134,26 +126,7 @@ namespace DoMCInterface
             }
         }
 
-        public void SetMemoryReference(GlobalMemory memory)
-        {
-            globalMemory = memory;
-            InterfaceDataExchange = globalMemory?.OverallMemory[ApplicationCardParameters.DoMCCardControlInstance] as DoMCInterfaceDataExchange;
-            if (InterfaceDataExchange == null)
-            {
-                DoMCNotFoundErrorMessage();
-                return;
-            }
-            //InterfaceDataExchange.Configuration = InterfaceDataExchange.Configuration;
-            InitControls();
-
-        }
         #region Settings
-
-        private void CheckForDoMCModule()
-        {
-            if (InterfaceDataExchange == null)
-                DoMCNotFoundErrorMessage();
-        }
 
         private void DoMCNotFoundErrorMessage()
         {
@@ -206,8 +179,8 @@ namespace DoMCInterface
 
         private void FillSettingPage()
         {
-            if (InterfaceDataExchange.Configuration == null) return;
-            var q = InterfaceDataExchange.Configuration.SocketQuantity;
+            /*var q = Context.Configuration.HardwareSettings.SocketQuantity;
+            //var q = Context.Configuration.HardwareSettings.SocketQuantity;
             lvDoMCCards.Items.Clear();
             var cardsWorking = InterfaceDataExchange.GetIsCardsWorking();
             for (int i = 0; i < CCDCardMAC.LastCardNumber(q); i++)
@@ -229,10 +202,10 @@ namespace DoMCInterface
                 var lvi = new ListViewItem(new string[] { (i + 1).ToString(), "🗸", UserInterfaceControls.MacToString(CCDCardMAC.ToMAC((byte)(i + 1))), f.ToString(), (f + sq - 1).ToString() });
                 lvi.BackColor = color;
                 lvDoMCCards.Items.Add(lvi);
-            }
+            }*/
 
-            SettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(InterfaceDataExchange.Configuration.SocketQuantity, ref pnlSockets);
-            UserInterfaceControls.SetSocketStatuses(SettingsSocketsPanelList, UserInterfaceControls.GetListOfSetSocketConfiguration(InterfaceDataExchange.Configuration.SocketQuantity, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations), Color.Green, Color.DarkGray);
+            SettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Context.Configuration.HardwareSettings.SocketQuantity, ref pnlSockets);
+            //UserInterfaceControls.SetSocketStatuses(SettingsSocketsPanelList, UserInterfaceControls.GetListOfSetSocketConfiguration(Context.Configuration.HardwareSettings.SocketQuantity, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations), Color.Green, Color.DarkGray);
             /*switch (SettingsPageSocketsStatusShow)
             {
                 case SettingsPageSocketsStatus.IsSocketSettingsOk:
@@ -242,13 +215,13 @@ namespace DoMCInterface
                     UserInterfaceControls.SetSocketStatuses(SettingsSocketsPanelList, InterfaceDataExchange.GetIsCardWorking(), Color.Green, Color.OrangeRed);
                     break;
             }*/
-            StandardSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(InterfaceDataExchange.Configuration.SocketQuantity, ref pnlGetStandardSockets, GetStandard_Click);
-            UserInterfaceControls.SetSocketStatuses(StandardSettingsSocketsPanelList, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.Select(s => s.Value.StandardImage != null).ToArray(), Color.Green, Color.DarkGray);
+            StandardSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Context.Configuration.HardwareSettings.SocketQuantity, ref pnlGetStandardSockets, GetStandard_Click);
+            //UserInterfaceControls.SetSocketStatuses(StandardSettingsSocketsPanelList, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.Select(s => s.Value.StandardImage != null).ToArray(), Color.Green, Color.DarkGray);
 
             /*WorkModeStandardSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Configuration.SocketQuantity, ref pnlWorkSockets, GetWorkModeStandard_Click);
             UserInterfaceControls.SetSocketStatuses(WorkModeStandardSettingsSocketsPanelList, UserInterfaceControls.GetListOfSetSocketConfiguration(Configuration.SocketQuantity, Configuration.SocketToCardSocketConfigurations), Color.Green, Color.DarkGray);*/
 
-            SetTestCCDSocketStatuses();
+            //SetTestCCDSocketStatuses();
             CreateTestCCDPanelSocketStatuses();
             SetTestCCDPanelSocketStatuses();
 
@@ -257,12 +230,12 @@ namespace DoMCInterface
 
         private void SetTestCCDSocketStatuses()
         {
-            TestCCDSocketStatuses = UserInterfaceControls.GetIntListOfSetSocketConfiguration(InterfaceDataExchange.Configuration.SocketQuantity, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations);
+            //TestCCDSocketStatuses = UserInterfaceControls.GetIntListOfSetSocketConfiguration(Context.Configuration.HardwareSettings.SocketQuantity, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations);
         }
 
         private void CreateTestCCDPanelSocketStatuses()
         {
-            TestSocketsSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(InterfaceDataExchange.Configuration.SocketQuantity, ref pnlTestSockets, TestShowSocketImages_Click);
+            TestSocketsSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Context.Configuration.HardwareSettings.SocketQuantity, ref pnlTestSockets, TestShowSocketImages_Click);
         }
         private void SetTestCCDPanelSocketStatuses()
         {
@@ -271,31 +244,31 @@ namespace DoMCInterface
 
         private void SetFormSchema()
         {
-            WorkingLog.Add("Maximize window");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Maximize window");
             this.WindowState = FormWindowState.Maximized;
 
             Application.DoEvents();
 
             #region Test tab
-            WorkingLog.Add("Screen.FromControl");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Screen.FromControl");
             var screen = Screen.FromControl(this);
             var swidth = screen.WorkingArea.Width;
             var sheight = screen.WorkingArea.Height - tabControl1.Top - SystemInformation.CaptionHeight - ssFooter.Height;
-            WorkingLog.Add($"WxH={swidth}x{sheight}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"WxH={swidth}x{sheight}");
 
             var pbtotalwidth = swidth - tabControl1.Left - btnCycleStop.Width;// - 300;
-            WorkingLog.Add($"pbtotalwidth ={pbtotalwidth}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"pbtotalwidth ={pbtotalwidth}");
             var pbwidth = pbtotalwidth / 3.2 - 18;
-            WorkingLog.Add($"pbwidth={pbwidth}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"pbwidth={pbwidth}");
             var pbheight = sheight / 2 - 20;
             var socketButtonsHeight = 380;// sheight / 2 - 100;
             double kwidth = (double)pbwidth / 512;
             double kheight = (double)pbheight / 512;
-            WorkingLog.Add($"KW x KH= {kwidth} x {kheight}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"KW x KH= {kwidth} x {kheight}");
             if (kwidth > 1) kwidth = 1;
             if (kheight > 1) kheight = 1;
             var wd = (int)(screen.WorkingArea.Width - 520 * kwidth * 3 - 50);
-            WorkingLog.Add($"wd={wd}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"wd={wd}");
             pnlTestSockets.Size = new Size(wd, socketButtonsHeight);//new Size(wd, (int)(512*kheight));
 
             pbTestReadImage.Location = new Point(wd + 10, pbTestReadImage.Location.Y);
@@ -334,8 +307,8 @@ namespace DoMCInterface
             var topchart = pbTestReadImage.Location.Y + pbTestReadImage.Size.Height;
             var graphHeight = sheight - topchart - 20;
             if (graphHeight < 1) graphHeight = 1;
-            WorkingLog.Add($"topchart={topchart}");
-            WorkingLog.Add($"graphHeight ={graphHeight }");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"topchart={topchart}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"graphHeight ={graphHeight}");
 
             chTestReadLine.Location = new Point(pbTestReadImage.Location.X, topchart + 10);
             chTestReadLine.Size = new Size((int)(512 * kwidth), graphHeight);
@@ -364,16 +337,24 @@ namespace DoMCInterface
 
         private void SetConfigurationIsNotLoaded()
         {
-            InterfaceDataExchange.CCDDataEchangeStatuses.IsConfigurationLoaded = false;
+            /*InterfaceDataExchange.CCDDataEchangeStatuses.IsConfigurationLoaded = false;
             //InterfaceDataExchange.Configuration = InterfaceDataExchange.Configuration;
             if ((InterfaceDataExchange?.CardsConnection ?? null) != null)
             {
                 InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
-            }
+            }*/
         }
 
+        public bool StartLCB()
+        {
+            var startCmd = Controller.CreateCommand(typeof(LCBModule.StartCommand));
+            if (startCmd == null) return false;
+            startCmd.ExecuteCommandAsync().Wait();
+        }
         private bool LoadConfiguration(bool WorkingMode, bool LoadCCD = true, bool LoadLCB = true, int[] Sockets = null, bool ShowMessages = true)
         {
+
+
             bool res = false;
             //InterfaceDataExchange.Configuration = InterfaceDataExchange.Configuration;
             InterfaceDataExchange.CCDDataEchangeStatuses.IsConfigurationLoaded = false;
@@ -391,7 +372,7 @@ namespace DoMCInterface
 
             if (LoadCCD)
             {
-                WorkingLog.Add("Передача настроек гнезд в модуль плат ПЗС");
+                WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек гнезд в модуль плат ПЗС");
 
                 InterfaceDataExchange.SendCommand(ModuleCommand.SetAllCardsAndSocketsConfiguration);
                 res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.SetAllCardsAndSocketsConfiguration && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
@@ -473,23 +454,19 @@ namespace DoMCInterface
             return res;
         }
 
-        private void StopCCDWork()
+        /*private void StopCCDWork()
         {
             InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
-        }
+        }*/
 
 
         private void SetCheckedMenuItems()
         {
-            if (InterfaceDataExchange.Configuration != null)
+            /*if (InterfaceDataExchange.Configuration != null)
             {
-                /*if ((Configuration.CardListSettings?.Count ?? 0) > 0)
-                    miCardsList.Checked = true;
-                else
-                    miCardsList.Checked = false;*/
                 if (InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations != null)
                 {
-                    if (InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.Keys.Count == InterfaceDataExchange.Configuration.SocketQuantity)
+                    if (InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.Keys.Count == Context.Configuration.HardwareSettings.SocketQuantity)
                         miReadParameters.Checked = true;
                     else
                         miReadParameters.Checked = false;
@@ -520,31 +497,9 @@ namespace DoMCInterface
                 {
                     miPhysicToDisplaySocket.Checked = false;
                 }
-            }
+            }*/
         }
 
-        /*private bool IsConfigurationReady()
-        {
-            bool result = true;
-            if (Configuration != null)
-            {
-                if (!String.IsNullOrEmpty(Configuration.NetCardConfig?.SelectedNetworkDeviceName ?? string.Empty)) result &= true; else result &= false;
-                //if ((Configuration.CardListSettings?.Count ?? 0) > 0) result &= true; else result &= false;
-                if (Configuration.SocketToCardSocketConfigurations != null)
-                {
-                    if (Configuration.SocketToCardSocketConfigurations.Keys.Count == Configuration.SocketQuantity) result &= true; else result &= false;
-                }
-                else
-                {
-                    result &= false;
-                }
-            }
-            else
-            {
-                result &= false;
-            }
-            return result;
-        }*/
         #endregion Settings
 
 
@@ -625,15 +580,15 @@ namespace DoMCInterface
             InterfaceDataExchange.SendResetToCCDCards();
             Thread.Sleep(50);
             InterfaceDataExchange.CurrentCycleCCD = new CycleImagesCCD();
-            InterfaceDataExchange.CurrentCycleCCD.Differences = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[InterfaceDataExchange.Configuration.SocketQuantity];
+            InterfaceDataExchange.CurrentCycleCCD.Differences = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+            InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+            InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+            InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
             if (InterfaceDataExchange.CCDDataEchangeStatuses.SocketsToSave != null)
                 InterfaceDataExchange.CurrentCycleCCD.SocketsToSave =
-                    new bool[InterfaceDataExchange.Configuration.SocketQuantity].Select((s, i) => InterfaceDataExchange.CCDDataEchangeStatuses.SocketsToSave.Contains(i + 1)).ToArray();
+                    new bool[Context.Configuration.HardwareSettings.SocketQuantity].Select((s, i) => InterfaceDataExchange.CCDDataEchangeStatuses.SocketsToSave.Contains(i + 1)).ToArray();
             else
-                InterfaceDataExchange.CurrentCycleCCD.SocketsToSave = new bool[InterfaceDataExchange.Configuration.SocketQuantity];
+                InterfaceDataExchange.CurrentCycleCCD.SocketsToSave = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
 
             InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Processing;
 
@@ -655,7 +610,7 @@ namespace DoMCInterface
                     InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
                     WorkingLog.Add("Платы не смогли вовремя получить данные");
                     WorkingLog.Add($"Статус модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus}");
-                    WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep }");
+                    WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep}");
                     InterfaceDataExchange.CardsConnection.WriteSocketStatusLog(WorkingLog, "Статусы гнезд после ошибки");
                     return false;
                 }
@@ -677,7 +632,7 @@ namespace DoMCInterface
                     InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
                     WorkingLog.Add("Платы не смогли вовремя получить данные");
                     WorkingLog.Add($"Статус модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus}");
-                    WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep }");
+                    WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep}");
                     InterfaceDataExchange.CardsConnection.WriteSocketStatusLog(WorkingLog, "Статусы гнезд после ошибки");
                     return false;
                 }
@@ -689,7 +644,7 @@ namespace DoMCInterface
                 WorkingLog.Add($"Время начала чтения: {startReading:dd-MM-yyyy HH\\:mm\\:ss.fff}");
                 WorkingLog.Add($"Время завершения чтения: {CCDEndTime:dd-MM-yyyy HH\\:mm\\:ss.fff}");
                 WorkingLog.Add($"Статус модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus}");
-                WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep }");
+                WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep}");
                 InterfaceDataExchange.CardsConnection.WriteSocketStatusLog(WorkingLog, "Статусы гнезд после ошибки");
             }
             WorkingLog.Add("Получение изображения");
@@ -730,7 +685,7 @@ namespace DoMCInterface
 
             /*if (System.Diagnostics.Debugger.IsAttached)
             {
-                for (int i = 0; i < InterfaceDataExchange.Configuration.SocketQuantity; i++)
+                for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
                 {
                     InterfaceDataExchange.CheckIfSocketGood(i + 1);
                 }
@@ -741,7 +696,7 @@ namespace DoMCInterface
             InterfaceDataExchange.CheckIfAllSocketsGood();
             //}
 
-            for (int i = 0; i < InterfaceDataExchange.Configuration.SocketQuantity; i++)
+            for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
             {
                 TestCCDSocketStatuses[i] = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[i + 1] != null ? (InterfaceDataExchange.CurrentCycleCCD.IsSocketGood[i] ? 1 : 2) : 0;
             }
@@ -782,7 +737,7 @@ namespace DoMCInterface
         private void btnReadSelectedSocket_Click(object sender, EventArgs e)
         {
             if (TestCCDIsReading) return;
-            if (TestSocketNumberSelected < 1 || TestSocketNumberSelected > InterfaceDataExchange.Configuration.SocketQuantity) return;
+            if (TestSocketNumberSelected < 1 || TestSocketNumberSelected > Context.Configuration.HardwareSettings.SocketQuantity) return;
             AbleForRead(true);
             TestCCDIsReading = true;
             try
@@ -828,10 +783,10 @@ namespace DoMCInterface
             InterfaceDataExchange.SendResetToCCDCards();
             Thread.Sleep(50);
             InterfaceDataExchange.CurrentCycleCCD = new CycleImagesCCD();
-            InterfaceDataExchange.CurrentCycleCCD.Differences = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[InterfaceDataExchange.Configuration.SocketQuantity];
+            InterfaceDataExchange.CurrentCycleCCD.Differences = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+            InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+            InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+            InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
 
             //UserInterfaceControls.SetSocketStatuses(WorkModeStandardSettingsSocketsPanelList, new bool[WorkModeStandardSettingsSocketsPanelList.Length], Color.Green, Color.DarkGray);
             //if (!IsAbleToWork) return false;
@@ -936,7 +891,7 @@ namespace DoMCInterface
             InterfaceDataExchange.CCDDataEchangeStatuses.StartDecisionImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                for (int i = 0; i < InterfaceDataExchange.Configuration.SocketQuantity; i++)
+                for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
                 {
                     InterfaceDataExchange.CheckIfSocketGood(i + 1);
                 }
@@ -947,7 +902,7 @@ namespace DoMCInterface
             }
             InterfaceDataExchange.CCDDataEchangeStatuses.StopDecisionImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
 
-            for (int i = 0; i < InterfaceDataExchange.Configuration.SocketQuantity; i++)
+            for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
             {
                 TestCCDSocketStatuses[i] = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[i + 1] != null ? (InterfaceDataExchange.CurrentCycleCCD.IsSocketGood[i] ? 1 : 2) : 0;
             }
@@ -1347,7 +1302,7 @@ namespace DoMCInterface
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (InterfaceDataExchange == null) return;
+            /*if (InterfaceDataExchange == null) return;
             string text;
             switch (InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus)
             {
@@ -1400,7 +1355,7 @@ namespace DoMCInterface
                 default:
                     overallText = InterfaceDataExchange.OperationOverallStatus.ToString();
                     break;
-            }
+            }*/
             var fulltext = $"{text}: {stepText} ({overallText})";
             lblStatus.Text = fulltext;
             tslTestCCDCardReadStatus.Text = "Статус: " + fulltext;
@@ -1659,11 +1614,6 @@ namespace DoMCInterface
                 }
                 InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus = ModuleCommand.StartIdle;
 
-                /*var dev = ImageTools.CalculateDeviation(socket.TempImages,0,511);
-                socket.TempDeviations = dev;
-                lblDeviation1.Text = dev[0].ToString("F3");
-                lblDeviation2.Text = dev[1].ToString("F3");
-                lblDeviation3.Text = dev[2].ToString("F3");*/
 
                 var dev = ImageTools.CalculateDeviationFull(socket.TempImages, socket.ImageProcessParameters.GetRectangle());
                 socket.TempDeviations = dev;
@@ -1729,7 +1679,7 @@ namespace DoMCInterface
             try
             {
                 InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Start;
-                WorkingLog.Add("--------------- Получение эталонов по всем гнездам ---------------");
+                WorkingLog.Add(LoggerLevel.Information, "--------------- Получение эталонов по всем гнездам ---------------");
                 InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
 
                 CheckForDoMCModule();
@@ -1739,10 +1689,10 @@ namespace DoMCInterface
                     socket.Value.DataType = 0;
                     socket.Value.TempImages = new short[3][,];
                 }
-                WorkingLog.Add("Начало загрузки конфигурации");
+                WorkingLog.Add(LoggerLevel.Information, "Начало загрузки конфигурации");
                 if (!LoadConfiguration(false, true, false)) return;
                 InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Processing;
-                WorkingLog.Add("Сброс гнезд");
+                WorkingLog.Add(LoggerLevel.Information, "Сброс гнезд");
                 InterfaceDataExchange.SendResetToCCDCards();
                 Thread.Sleep(200);
 
@@ -1758,11 +1708,11 @@ namespace DoMCInterface
                 for (int repeat = 0; repeat < 3; repeat++)
                 {
                     DataExchangeKernel.Log.Add(new Guid(), $"Начало чтения гнезда", true);
-                    WorkingLog.Add("Начало чтения гнезда");
+                    WorkingLog.Add(LoggerLevel.Information, "Начало чтения гнезда");
                     bool rc = true;
                     if (InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart)
                     {
-                        WorkingLog.Add("Запуск чтения по внешнему сигналу");
+                        WorkingLog.Add(LoggerLevel.Information, "Запуск чтения по внешнему сигналу");
                         InterfaceDataExchange.SendCommand(ModuleCommand.StartReadExternal);
                         rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
                         {
@@ -1778,7 +1728,7 @@ namespace DoMCInterface
                     }
                     else
                     {
-                        WorkingLog.Add("Запуск чтения");
+                        WorkingLog.Add(LoggerLevel.Information, "Запуск чтения");
                         InterfaceDataExchange.SendCommand(ModuleCommand.StartRead);
                         rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
                         {
@@ -1819,14 +1769,14 @@ namespace DoMCInterface
                         DoMCNotAbleToReadSocketErrorMessage();
                         break;
                     }
-                    for (int i = 0; i < InterfaceDataExchange.Configuration.SocketQuantity; i++)
+                    for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
                     {
                         var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[i + 1];
                         socket.TempImages[repeat] = images[i];
                     }
                     StandardPictures[repeat].Image = bmpCheckSign;
                 }
-                for (int s = 0; s < InterfaceDataExchange.Configuration.SocketQuantity; s++)
+                for (int s = 0; s < Context.Configuration.HardwareSettings.SocketQuantity; s++)
                 {
                     var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[s + 1];
 
@@ -1869,11 +1819,11 @@ namespace DoMCInterface
         {
             CheckForDoMCModule();
             var ssf = new DoMCLib.Forms.DoMCSocketSettingsListForm();
-            ssf.SocketQuantity = InterfaceDataExchange.Configuration.SocketQuantity;
+            ssf.SocketQuantity = Context.Configuration.HardwareSettings.SocketQuantity;
             ssf.SocketConfigurations = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations;
             if (ssf.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.SocketQuantity = ssf.SocketQuantity;
+                Context.Configuration.HardwareSettings.SocketQuantity = ssf.SocketQuantity;
                 InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations = ssf.SocketConfigurations;
                 if (InterfaceDataExchange.Configuration.SocketsToCheck == null || InterfaceDataExchange.Configuration.SocketsToCheck.Length != ssf.SocketQuantity)
                 {
@@ -2414,10 +2364,10 @@ namespace DoMCInterface
                 //IsAbleToWork = true;
 
                 InterfaceDataExchange.CurrentCycleCCD = new CycleImagesCCD();
-                InterfaceDataExchange.CurrentCycleCCD.Differences = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-                InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-                InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[InterfaceDataExchange.Configuration.SocketQuantity][,];
-                InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[InterfaceDataExchange.Configuration.SocketQuantity];
+                InterfaceDataExchange.CurrentCycleCCD.Differences = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+                InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+                InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+                InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
 
                 //UserInterfaceControls.SetSocketStatuses(WorkModeStandardSettingsSocketsPanelList, new bool[WorkModeStandardSettingsSocketsPanelList.Length], Color.Green, Color.DarkGray);
                 //if (!IsAbleToWork) return;
@@ -2557,7 +2507,7 @@ namespace DoMCInterface
         {
             if (InterfaceDataExchange != null && InterfaceDataExchange.Configuration != null)
             {
-                if (InterfaceDataExchange.Configuration.SocketsToCheck == null) InterfaceDataExchange.Configuration.SocketsToCheck = new bool[InterfaceDataExchange.Configuration.SocketQuantity];
+                if (InterfaceDataExchange.Configuration.SocketsToCheck == null) InterfaceDataExchange.Configuration.SocketsToCheck = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
                 var scf = new DoMCSocketOnOffForm();
                 scf.SocketIsOn = InterfaceDataExchange.Configuration.SocketsToCheck;
                 scf.Text = "Включение проверки данных по гнездам";
@@ -2598,8 +2548,8 @@ namespace DoMCInterface
         {
             if (InterfaceDataExchange != null && InterfaceDataExchange.Configuration != null)
             {
-                if (InterfaceDataExchange.Configuration.SocketsToSave == null|| InterfaceDataExchange.Configuration.SocketsToSave.Length!= InterfaceDataExchange.Configuration.SocketQuantity) 
-                    InterfaceDataExchange.Configuration.SocketsToSave = new bool[InterfaceDataExchange.Configuration.SocketQuantity];
+                if (InterfaceDataExchange.Configuration.SocketsToSave == null || InterfaceDataExchange.Configuration.SocketsToSave.Length != Context.Configuration.HardwareSettings.SocketQuantity)
+                    InterfaceDataExchange.Configuration.SocketsToSave = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
                 var scf = new DoMCSocketOnOffForm();
                 scf.SocketIsOn = InterfaceDataExchange.Configuration.SocketsToSave;
                 scf.Text = "Включение сохранения данных по гнездам";
@@ -3047,10 +2997,10 @@ namespace DoMCInterface
         private void соответствиеГнездToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var psf = new DoMCLib.Forms.PhysicalSocketsForm();
-            if (InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets == null || InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets.GetSocketQuantity()!= InterfaceDataExchange.Configuration.SocketQuantity)
+            if (InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets == null || InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets.GetSocketQuantity() != Context.Configuration.HardwareSettings.SocketQuantity)
             {
                 InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets = new DisplaySockets2PhysicalSockets();
-                InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets.SetDefaultMatrix(InterfaceDataExchange.Configuration.SocketQuantity);
+                InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets.SetDefaultMatrix(Context.Configuration.HardwareSettings.SocketQuantity);
             }
             psf.DisplaySockets2PhysicalSockets = InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets;
             if (psf.ShowDialog() == DialogResult.OK)
@@ -3221,7 +3171,7 @@ namespace DoMCInterface
             if (archiveForm != null) return;
             tbArchive.Font = new Font(tbArchive.Font.FontFamily, 8f);
             tbArchive.Scale(new SizeF(1, 1));
-            archiveForm = new DoMCLib.Forms.DoMCArchiveForm(InterfaceDataExchange.Configuration.LocalDataStorageConnectionString, InterfaceDataExchange.Configuration.RemoteDataStorageConnectionString);
+            archiveForm = new DoMCArchiveForm(Controller, Context.Configuration.HardwareSettings.LocalDataStoragePath, Context.Configuration.HardwareSettings.RemoteDataStoragePath);
             archiveForm.Visible = true;
             archiveForm.TopLevel = false;
             archiveForm.Parent = tbArchive;

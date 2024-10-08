@@ -15,7 +15,7 @@ namespace DoMCLib.Configuration
     /// </summary>
     public class ProcessingSettings
     {
-        public Dictionary<int, SocketStandardsImage> CCDSocketStandardsImage;
+        public SocketStandardsImage[] CCDSocketStandardsImage;
 
     }
 

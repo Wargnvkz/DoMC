@@ -1,4 +1,4 @@
-﻿namespace DoMCInterface
+﻿namespace DoMC
 {
     partial class DoMCSettingsInterface
     {
@@ -28,2693 +28,2637 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series19 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series20 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series21 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series22 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series23 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series24 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series25 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series26 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series27 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.miSettings = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLEDSettings = new System.Windows.Forms.ToolStripMenuItem();
-            this.miReadParameters = new System.Windows.Forms.ToolStripMenuItem();
-            this.miStandardSavingModeSetting = new System.Windows.Forms.ToolStripMenuItem();
-            this.miSetCheckSockets = new System.Windows.Forms.ToolStripMenuItem();
-            this.miDBSettings = new System.Windows.Forms.ToolStripMenuItem();
-            this.miSaveSockets = new System.Windows.Forms.ToolStripMenuItem();
-            this.miRDPSettings = new System.Windows.Forms.ToolStripMenuItem();
-            this.miPhysicToDisplaySocket = new System.Windows.Forms.ToolStripMenuItem();
-            this.дополнительныеПараметрыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.эталонToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.miSaveStandard = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLoadStandard = new System.Windows.Forms.ToolStripMenuItem();
-            this.miWorkInterfaceStart = new System.Windows.Forms.ToolStripMenuItem();
-            this.конфигурацияToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.сохранитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.загрузитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiLogs = new System.Windows.Forms.ToolStripMenuItem();
-            this.miInterfaceLogs = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLCBLogs = new System.Windows.Forms.ToolStripMenuItem();
-            this.miRDPBLogs = new System.Windows.Forms.ToolStripMenuItem();
-            this.miDBLogs = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiLogsArchive = new System.Windows.Forms.ToolStripMenuItem();
-            this.miMainInterfaceLogsArchive = new System.Windows.Forms.ToolStripMenuItem();
-            this.miLCBLogsArchive = new System.Windows.Forms.ToolStripMenuItem();
-            this.miRDPBLogsArchive = new System.Windows.Forms.ToolStripMenuItem();
-            this.miDBLogsArchive = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiTechnicalData = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiReadImageStatistics = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tbSettingsStatus = new System.Windows.Forms.TabPage();
-            this.btnCheckSettings = new System.Windows.Forms.Button();
-            this.btnSettingsCheckCardStatus = new System.Windows.Forms.Button();
-            this.lblSocketSettings = new System.Windows.Forms.Label();
-            this.pnlSockets = new System.Windows.Forms.Panel();
-            this.lblCaptionDoMCCards = new System.Windows.Forms.Label();
-            this.lvDoMCCards = new System.Windows.Forms.ListView();
-            this.chN = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.chIsActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.chMac = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.chFirstSocket = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.chLastSocket = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.tbGetStandard = new System.Windows.Forms.TabPage();
-            this.btnStandardSettings = new System.Windows.Forms.Button();
-            this.lblRange = new System.Windows.Forms.Label();
-            this.lblTotalAverage = new System.Windows.Forms.Label();
-            this.lblTotalAverageText = new System.Windows.Forms.Label();
-            this.lblDeviationTotal = new System.Windows.Forms.Label();
-            this.lblDeviationTotalText = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.btnReadImagesForStandard = new System.Windows.Forms.Button();
-            this.lblGetStandardWorkStatus = new System.Windows.Forms.Label();
-            this.lblStandardSocketNumber = new System.Windows.Forms.Label();
-            this.lblStandardStatusText = new System.Windows.Forms.Label();
-            this.lblSocketNumberText = new System.Windows.Forms.Label();
-            this.btnMakeAverage = new System.Windows.Forms.Button();
-            this.nudStandardLevel = new System.Windows.Forms.NumericUpDown();
-            this.lblDeviation3 = new System.Windows.Forms.Label();
-            this.lblImageStandardText = new System.Windows.Forms.Label();
-            this.lblDeviation3Text = new System.Windows.Forms.Label();
-            this.lblDeviation2 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.lblDeviation1 = new System.Windows.Forms.Label();
-            this.lblDeviation2Text = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.lblImage1Text = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.lblDeviation1Text = new System.Windows.Forms.Label();
-            this.pbAverage = new System.Windows.Forms.PictureBox();
-            this.pbStandard3 = new System.Windows.Forms.PictureBox();
-            this.pbStandard2 = new System.Windows.Forms.PictureBox();
-            this.pbStandard1 = new System.Windows.Forms.PictureBox();
-            this.cbExternalSignalForStandard = new System.Windows.Forms.CheckBox();
-            this.pnlGetStandardSockets = new System.Windows.Forms.Panel();
-            this.tbTest = new System.Windows.Forms.TabPage();
-            this.cbTestCCDMaxPointShow = new System.Windows.Forms.CheckBox();
-            this.ssFooter = new System.Windows.Forms.StatusStrip();
-            this.tslTestCCDCardReadStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.lblTimeImageProcess = new System.Windows.Forms.Label();
-            this.cbInvertColors = new System.Windows.Forms.CheckBox();
-            this.btnCycleStop = new System.Windows.Forms.Button();
-            this.btnCycleStart = new System.Windows.Forms.Button();
-            this.chTestStandard = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chTestDiff = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.lblNumLineCaption = new System.Windows.Forms.Label();
-            this.cbFullMax = new System.Windows.Forms.CheckBox();
-            this.cbVertical = new System.Windows.Forms.CheckBox();
-            this.numFrame = new System.Windows.Forms.NumericUpDown();
-            this.chTestReadLine = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.lblTestStandard = new System.Windows.Forms.Label();
-            this.lblTestDifference = new System.Windows.Forms.Label();
-            this.lblTestRead = new System.Windows.Forms.Label();
-            this.pbTestStandard = new System.Windows.Forms.PictureBox();
-            this.pbTestDifference = new System.Windows.Forms.PictureBox();
-            this.pbTestReadImage = new System.Windows.Forms.PictureBox();
-            this.btnTest_ReadSelectedSocket = new System.Windows.Forms.Button();
-            this.lblTestSelectedSocket = new System.Windows.Forms.Label();
-            this.lblTestSelectedSocketLabel = new System.Windows.Forms.Label();
-            this.pnlTestSockets = new System.Windows.Forms.Panel();
-            this.lblStatus = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.cbTest_ExternalStart = new System.Windows.Forms.CheckBox();
-            this.btnTest_ReadAllSocket = new System.Windows.Forms.Button();
-            this.tbLEDControl = new System.Windows.Forms.TabPage();
-            this.btnTestLCBStop = new System.Windows.Forms.Button();
-            this.pnlTestLCBSetWorkMode = new System.Windows.Forms.Panel();
-            this.chbTestLCBWorkMode = new System.Windows.Forms.CheckBox();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm = new System.Windows.Forms.Label();
-            this.txbTestLCBCurrentHorizontalStrokeMm = new System.Windows.Forms.TextBox();
-            this.lblTestLCBCurrentHorizontalStrokeUnit = new System.Windows.Forms.Label();
-            this.btnTestLCBGetCurrentPosition = new System.Windows.Forms.Button();
-            this.txbTestLCBCurrentHorizontalStroke = new System.Windows.Forms.TextBox();
-            this.lblTestLCBCurrentHorizontalStroke = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm = new System.Windows.Forms.Label();
-            this.txbTestLCBMaximumHorizontalStrokeMm = new System.Windows.Forms.TextBox();
-            this.lblTestLCBMaximumHorizontalStrokeUnit = new System.Windows.Forms.Label();
-            this.btnTestLCBGetMaxPosition = new System.Windows.Forms.Button();
-            this.txbTestLCBMaximumHorizontalStroke = new System.Windows.Forms.TextBox();
-            this.lblTestLCBMaximumHorizontalStroke = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.lblTestLCBDelayLengthValueMm = new System.Windows.Forms.Label();
-            this.lblTestLCBPreformLengthValueMm = new System.Windows.Forms.Label();
-            this.txbTestLCBDelayLengthMm = new System.Windows.Forms.TextBox();
-            this.txbTestLCBPreformLengthMm = new System.Windows.Forms.TextBox();
-            this.lblTestLCBDelayLengthValue = new System.Windows.Forms.Label();
-            this.lblTestLCBPreformLengthValue = new System.Windows.Forms.Label();
-            this.txbTestLCBDelayLength = new System.Windows.Forms.TextBox();
-            this.lblTestLCBDelayLength = new System.Windows.Forms.Label();
-            this.btnTestLCBGetMovementParameters = new System.Windows.Forms.Button();
-            this.btnTestLCBSetMovementParameters = new System.Windows.Forms.Button();
-            this.txbTestLCBPreformLength = new System.Windows.Forms.TextBox();
-            this.lblTestLCBPreformLength = new System.Windows.Forms.Label();
-            this.pnlTestLCBCurrent = new System.Windows.Forms.Panel();
-            this.lblTestLCBCurrentUnit = new System.Windows.Forms.Label();
-            this.btnTestLCBGetCurrent = new System.Windows.Forms.Button();
-            this.btnTestLCBSetCurrent = new System.Windows.Forms.Button();
-            this.txbTestLCBCurrent = new System.Windows.Forms.TextBox();
-            this.lblTestLCBCurrent = new System.Windows.Forms.Label();
-            this.pnlTestLCBStatus = new System.Windows.Forms.Panel();
-            this.btnTestLCBFullTest = new System.Windows.Forms.Button();
-            this.btnTestLCBWriteStatuses = new System.Windows.Forms.Button();
-            this.gbLEDs = new System.Windows.Forms.GroupBox();
-            this.cbTestLCBLED11 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED10 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED9 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED8 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED7 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED6 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED5 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED4 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED3 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED2 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED1 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBLED0 = new System.Windows.Forms.CheckBox();
-            this.btnTestLCBReadStatuses = new System.Windows.Forms.Button();
-            this.gbTestLCBInputs = new System.Windows.Forms.GroupBox();
-            this.cbTestLCBInput7 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBInput6 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBInput5 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBInput4 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBInput3 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBInput2 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBInput1 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBInput0 = new System.Windows.Forms.CheckBox();
-            this.gbTestLCBOutputs = new System.Windows.Forms.GroupBox();
-            this.cbTestLCBOutput5 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBOutput4 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBOutput3 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBOutput2 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBOutput1 = new System.Windows.Forms.CheckBox();
-            this.cbTestLCBOutput0 = new System.Windows.Forms.CheckBox();
-            this.btnTestLCBClearAll = new System.Windows.Forms.Button();
-            this.btnTestLCBSetAll = new System.Windows.Forms.Button();
-            this.btnTestLCBInit = new System.Windows.Forms.Button();
-            this.cbTestLCBSyncrosignal = new System.Windows.Forms.CheckBox();
-            this.tbTestImages = new System.Windows.Forms.TabPage();
-            this.tbRDP = new System.Windows.Forms.TabPage();
-            this.lblTestRDPBStatus = new System.Windows.Forms.Label();
-            this.lvTestRDPBStatuses = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.btnTestRDPBSendCommand = new System.Windows.Forms.Button();
-            this.txbTestRDPBManualCommand = new System.Windows.Forms.TextBox();
-            this.lblTestRDPBCommand = new System.Windows.Forms.Label();
-            this.txbTestRDPBCoolingBlocksStatus = new System.Windows.Forms.TextBox();
-            this.cbTestRDPBCoolingBlocksQuantity = new System.Windows.Forms.ComboBox();
-            this.lblCoolingBlockQuantity = new System.Windows.Forms.Label();
-            this.btnTestRDPBN90 = new System.Windows.Forms.Button();
-            this.btnTestRDPBN83 = new System.Windows.Forms.Button();
-            this.btnTestRDPBN82 = new System.Windows.Forms.Button();
-            this.btnTestRDPBN81 = new System.Windows.Forms.Button();
-            this.btnTestRDPBN80 = new System.Windows.Forms.Button();
-            this.btnRDPBTestConnect = new System.Windows.Forms.Button();
-            this.tbDB = new System.Windows.Forms.TabPage();
-            this.btnRestoreRemoteDB = new System.Windows.Forms.Button();
-            this.btnRestoreLocalDB = new System.Windows.Forms.Button();
-            this.btnMoveToArchive = new System.Windows.Forms.Button();
-            this.btnTestDBRemoteRecreate = new System.Windows.Forms.Button();
-            this.btnTestDBLocalRecreate = new System.Windows.Forms.Button();
-            this.btnTestDBRemote = new System.Windows.Forms.Button();
-            this.btnTestDBLocal = new System.Windows.Forms.Button();
-            this.tbArchive = new System.Windows.Forms.TabPage();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.panel4 = new System.Windows.Forms.Panel();
-            this.btnLCBSaveToConfig = new System.Windows.Forms.Button();
-            this.btnLCBLoadFromConfig = new System.Windows.Forms.Button();
-            this.menuStrip1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
-            this.tbSettingsStatus.SuspendLayout();
-            this.tbGetStandard.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudStandardLevel)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbAverage)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard1)).BeginInit();
-            this.tbTest.SuspendLayout();
-            this.ssFooter.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chTestStandard)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chTestDiff)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numFrame)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chTestReadLine)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTestStandard)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTestDifference)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTestReadImage)).BeginInit();
-            this.tbLEDControl.SuspendLayout();
-            this.pnlTestLCBSetWorkMode.SuspendLayout();
-            this.panel3.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.panel1.SuspendLayout();
-            this.pnlTestLCBCurrent.SuspendLayout();
-            this.pnlTestLCBStatus.SuspendLayout();
-            this.gbLEDs.SuspendLayout();
-            this.gbTestLCBInputs.SuspendLayout();
-            this.gbTestLCBOutputs.SuspendLayout();
-            this.tbRDP.SuspendLayout();
-            this.tbDB.SuspendLayout();
-            this.panel4.SuspendLayout();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            menuStrip1 = new MenuStrip();
+            miSettings = new ToolStripMenuItem();
+            miLEDSettings = new ToolStripMenuItem();
+            miReadParameters = new ToolStripMenuItem();
+            miStandardSavingModeSetting = new ToolStripMenuItem();
+            miSetCheckSockets = new ToolStripMenuItem();
+            miDBSettings = new ToolStripMenuItem();
+            miSaveSockets = new ToolStripMenuItem();
+            miRDPSettings = new ToolStripMenuItem();
+            miPhysicToDisplaySocket = new ToolStripMenuItem();
+            дополнительныеПараметрыToolStripMenuItem = new ToolStripMenuItem();
+            эталонToolStripMenuItem = new ToolStripMenuItem();
+            miSaveStandard = new ToolStripMenuItem();
+            miLoadStandard = new ToolStripMenuItem();
+            miWorkInterfaceStart = new ToolStripMenuItem();
+            конфигурацияToolStripMenuItem = new ToolStripMenuItem();
+            сохранитьToolStripMenuItem = new ToolStripMenuItem();
+            загрузитьToolStripMenuItem = new ToolStripMenuItem();
+            tsmiLogs = new ToolStripMenuItem();
+            miInterfaceLogs = new ToolStripMenuItem();
+            miLCBLogs = new ToolStripMenuItem();
+            miRDPBLogs = new ToolStripMenuItem();
+            miDBLogs = new ToolStripMenuItem();
+            tsmiLogsArchive = new ToolStripMenuItem();
+            miMainInterfaceLogsArchive = new ToolStripMenuItem();
+            miLCBLogsArchive = new ToolStripMenuItem();
+            miRDPBLogsArchive = new ToolStripMenuItem();
+            miDBLogsArchive = new ToolStripMenuItem();
+            tsmiTechnicalData = new ToolStripMenuItem();
+            tsmiReadImageStatistics = new ToolStripMenuItem();
+            tabControl1 = new TabControl();
+            tbSettingsStatus = new TabPage();
+            btnCheckSettings = new Button();
+            btnSettingsCheckCardStatus = new Button();
+            lblSocketSettings = new Label();
+            pnlSockets = new Panel();
+            lblCaptionDoMCCards = new Label();
+            lvDoMCCards = new ListView();
+            chN = new ColumnHeader();
+            chIsActive = new ColumnHeader();
+            chMac = new ColumnHeader();
+            chFirstSocket = new ColumnHeader();
+            chLastSocket = new ColumnHeader();
+            tbGetStandard = new TabPage();
+            btnStandardSettings = new Button();
+            lblRange = new Label();
+            lblTotalAverage = new Label();
+            lblTotalAverageText = new Label();
+            lblDeviationTotal = new Label();
+            lblDeviationTotalText = new Label();
+            label3 = new Label();
+            btnReadImagesForStandard = new Button();
+            lblGetStandardWorkStatus = new Label();
+            lblStandardSocketNumber = new Label();
+            lblStandardStatusText = new Label();
+            lblSocketNumberText = new Label();
+            btnMakeAverage = new Button();
+            nudStandardLevel = new NumericUpDown();
+            lblDeviation3 = new Label();
+            lblImageStandardText = new Label();
+            lblDeviation3Text = new Label();
+            lblDeviation2 = new Label();
+            label6 = new Label();
+            lblDeviation1 = new Label();
+            lblDeviation2Text = new Label();
+            label5 = new Label();
+            lblImage1Text = new Label();
+            label4 = new Label();
+            lblDeviation1Text = new Label();
+            pbAverage = new PictureBox();
+            pbStandard3 = new PictureBox();
+            pbStandard2 = new PictureBox();
+            pbStandard1 = new PictureBox();
+            cbExternalSignalForStandard = new CheckBox();
+            pnlGetStandardSockets = new Panel();
+            tbTest = new TabPage();
+            cbTestCCDMaxPointShow = new CheckBox();
+            ssFooter = new StatusStrip();
+            tslTestCCDCardReadStatus = new ToolStripStatusLabel();
+            lblTimeImageProcess = new Label();
+            cbInvertColors = new CheckBox();
+            btnCycleStop = new Button();
+            btnCycleStart = new Button();
+            chTestStandard = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            chTestDiff = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            lblNumLineCaption = new Label();
+            cbFullMax = new CheckBox();
+            cbVertical = new CheckBox();
+            numFrame = new NumericUpDown();
+            chTestReadLine = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            lblTestStandard = new Label();
+            lblTestDifference = new Label();
+            lblTestRead = new Label();
+            pbTestStandard = new PictureBox();
+            pbTestDifference = new PictureBox();
+            pbTestReadImage = new PictureBox();
+            btnTest_ReadSelectedSocket = new Button();
+            lblTestSelectedSocket = new Label();
+            lblTestSelectedSocketLabel = new Label();
+            pnlTestSockets = new Panel();
+            lblStatus = new Label();
+            label1 = new Label();
+            cbTest_ExternalStart = new CheckBox();
+            btnTest_ReadAllSocket = new Button();
+            tbLEDControl = new TabPage();
+            panel4 = new Panel();
+            btnLCBSaveToConfig = new Button();
+            btnLCBLoadFromConfig = new Button();
+            btnTestLCBStop = new Button();
+            pnlTestLCBSetWorkMode = new Panel();
+            chbTestLCBWorkMode = new CheckBox();
+            panel3 = new Panel();
+            lblTestLCBCurrentHorizontalStrokeUnitMm = new Label();
+            txbTestLCBCurrentHorizontalStrokeMm = new TextBox();
+            lblTestLCBCurrentHorizontalStrokeUnit = new Label();
+            btnTestLCBGetCurrentPosition = new Button();
+            txbTestLCBCurrentHorizontalStroke = new TextBox();
+            lblTestLCBCurrentHorizontalStroke = new Label();
+            panel2 = new Panel();
+            lblTestLCBMaximumHorizontalStrokeUnitMm = new Label();
+            txbTestLCBMaximumHorizontalStrokeMm = new TextBox();
+            lblTestLCBMaximumHorizontalStrokeUnit = new Label();
+            btnTestLCBGetMaxPosition = new Button();
+            txbTestLCBMaximumHorizontalStroke = new TextBox();
+            lblTestLCBMaximumHorizontalStroke = new Label();
+            panel1 = new Panel();
+            lblTestLCBDelayLengthValueMm = new Label();
+            lblTestLCBPreformLengthValueMm = new Label();
+            txbTestLCBDelayLengthMm = new TextBox();
+            txbTestLCBPreformLengthMm = new TextBox();
+            lblTestLCBDelayLengthValue = new Label();
+            lblTestLCBPreformLengthValue = new Label();
+            txbTestLCBDelayLength = new TextBox();
+            lblTestLCBDelayLength = new Label();
+            btnTestLCBGetMovementParameters = new Button();
+            btnTestLCBSetMovementParameters = new Button();
+            txbTestLCBPreformLength = new TextBox();
+            lblTestLCBPreformLength = new Label();
+            pnlTestLCBCurrent = new Panel();
+            lblTestLCBCurrentUnit = new Label();
+            btnTestLCBGetCurrent = new Button();
+            btnTestLCBSetCurrent = new Button();
+            txbTestLCBCurrent = new TextBox();
+            lblTestLCBCurrent = new Label();
+            pnlTestLCBStatus = new Panel();
+            btnTestLCBFullTest = new Button();
+            btnTestLCBWriteStatuses = new Button();
+            gbLEDs = new GroupBox();
+            cbTestLCBLED11 = new CheckBox();
+            cbTestLCBLED10 = new CheckBox();
+            cbTestLCBLED9 = new CheckBox();
+            cbTestLCBLED8 = new CheckBox();
+            cbTestLCBLED7 = new CheckBox();
+            cbTestLCBLED6 = new CheckBox();
+            cbTestLCBLED5 = new CheckBox();
+            cbTestLCBLED4 = new CheckBox();
+            cbTestLCBLED3 = new CheckBox();
+            cbTestLCBLED2 = new CheckBox();
+            cbTestLCBLED1 = new CheckBox();
+            cbTestLCBLED0 = new CheckBox();
+            btnTestLCBReadStatuses = new Button();
+            gbTestLCBInputs = new GroupBox();
+            cbTestLCBInput7 = new CheckBox();
+            cbTestLCBInput6 = new CheckBox();
+            cbTestLCBInput5 = new CheckBox();
+            cbTestLCBInput4 = new CheckBox();
+            cbTestLCBInput3 = new CheckBox();
+            cbTestLCBInput2 = new CheckBox();
+            cbTestLCBInput1 = new CheckBox();
+            cbTestLCBInput0 = new CheckBox();
+            gbTestLCBOutputs = new GroupBox();
+            cbTestLCBOutput5 = new CheckBox();
+            cbTestLCBOutput4 = new CheckBox();
+            cbTestLCBOutput3 = new CheckBox();
+            cbTestLCBOutput2 = new CheckBox();
+            cbTestLCBOutput1 = new CheckBox();
+            cbTestLCBOutput0 = new CheckBox();
+            btnTestLCBClearAll = new Button();
+            btnTestLCBSetAll = new Button();
+            btnTestLCBInit = new Button();
+            cbTestLCBSyncrosignal = new CheckBox();
+            tbTestImages = new TabPage();
+            tbRDP = new TabPage();
+            lblTestRDPBStatus = new Label();
+            lvTestRDPBStatuses = new ListView();
+            columnHeader1 = new ColumnHeader();
+            columnHeader2 = new ColumnHeader();
+            btnTestRDPBSendCommand = new Button();
+            txbTestRDPBManualCommand = new TextBox();
+            lblTestRDPBCommand = new Label();
+            txbTestRDPBCoolingBlocksStatus = new TextBox();
+            cbTestRDPBCoolingBlocksQuantity = new ComboBox();
+            lblCoolingBlockQuantity = new Label();
+            btnTestRDPBN90 = new Button();
+            btnTestRDPBN83 = new Button();
+            btnTestRDPBN82 = new Button();
+            btnTestRDPBN81 = new Button();
+            btnTestRDPBN80 = new Button();
+            btnRDPBTestConnect = new Button();
+            tbDB = new TabPage();
+            btnRestoreRemoteDB = new Button();
+            btnRestoreLocalDB = new Button();
+            btnMoveToArchive = new Button();
+            btnTestDBRemoteRecreate = new Button();
+            btnTestDBLocalRecreate = new Button();
+            btnTestDBRemote = new Button();
+            btnTestDBLocal = new Button();
+            tbArchive = new TabPage();
+            timer1 = new System.Windows.Forms.Timer(components);
+            menuStrip1.SuspendLayout();
+            tabControl1.SuspendLayout();
+            tbSettingsStatus.SuspendLayout();
+            tbGetStandard.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudStandardLevel).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbAverage).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard1).BeginInit();
+            tbTest.SuspendLayout();
+            ssFooter.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)chTestStandard).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)chTestDiff).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numFrame).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)chTestReadLine).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbTestStandard).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbTestDifference).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbTestReadImage).BeginInit();
+            tbLEDControl.SuspendLayout();
+            panel4.SuspendLayout();
+            pnlTestLCBSetWorkMode.SuspendLayout();
+            panel3.SuspendLayout();
+            panel2.SuspendLayout();
+            panel1.SuspendLayout();
+            pnlTestLCBCurrent.SuspendLayout();
+            pnlTestLCBStatus.SuspendLayout();
+            gbLEDs.SuspendLayout();
+            gbTestLCBInputs.SuspendLayout();
+            gbTestLCBOutputs.SuspendLayout();
+            tbRDP.SuspendLayout();
+            tbDB.SuspendLayout();
+            SuspendLayout();
             // 
             // menuStrip1
             // 
-            this.menuStrip1.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.menuStrip1.Font = new System.Drawing.Font("Segoe UI", 14F);
-            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miSettings,
-            this.эталонToolStripMenuItem,
-            this.miWorkInterfaceStart,
-            this.конфигурацияToolStripMenuItem,
-            this.tsmiLogs,
-            this.tsmiLogsArchive,
-            this.tsmiTechnicalData});
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(9, 3, 0, 3);
-            this.menuStrip1.Size = new System.Drawing.Size(1820, 35);
-            this.menuStrip1.TabIndex = 1;
-            this.menuStrip1.Text = "menuStrip1";
+            menuStrip1.BackColor = SystemColors.ControlDark;
+            menuStrip1.Font = new Font("Segoe UI", 14F);
+            menuStrip1.Items.AddRange(new ToolStripItem[] { miSettings, эталонToolStripMenuItem, miWorkInterfaceStart, конфигурацияToolStripMenuItem, tsmiLogs, tsmiLogsArchive, tsmiTechnicalData });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Padding = new Padding(9, 3, 0, 3);
+            menuStrip1.Size = new Size(1820, 35);
+            menuStrip1.TabIndex = 1;
+            menuStrip1.Text = "menuStrip1";
             // 
             // miSettings
             // 
-            this.miSettings.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miLEDSettings,
-            this.miReadParameters,
-            this.miStandardSavingModeSetting,
-            this.miSetCheckSockets,
-            this.miDBSettings,
-            this.miSaveSockets,
-            this.miRDPSettings,
-            this.miPhysicToDisplaySocket,
-            this.дополнительныеПараметрыToolStripMenuItem});
-            this.miSettings.Name = "miSettings";
-            this.miSettings.Size = new System.Drawing.Size(117, 29);
-            this.miSettings.Text = "Настройки";
+            miSettings.DropDownItems.AddRange(new ToolStripItem[] { miLEDSettings, miReadParameters, miStandardSavingModeSetting, miSetCheckSockets, miDBSettings, miSaveSockets, miRDPSettings, miPhysicToDisplaySocket, дополнительныеПараметрыToolStripMenuItem });
+            miSettings.Name = "miSettings";
+            miSettings.Size = new Size(117, 29);
+            miSettings.Text = "Настройки";
             // 
             // miLEDSettings
             // 
-            this.miLEDSettings.Checked = true;
-            this.miLEDSettings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.miLEDSettings.Name = "miLEDSettings";
-            this.miLEDSettings.Size = new System.Drawing.Size(535, 30);
-            this.miLEDSettings.Text = "Настройка режима работы БУС...";
-            this.miLEDSettings.Click += new System.EventHandler(this.miLEDSettings_Click);
+            miLEDSettings.Checked = true;
+            miLEDSettings.CheckState = CheckState.Checked;
+            miLEDSettings.Name = "miLEDSettings";
+            miLEDSettings.Size = new Size(535, 30);
+            miLEDSettings.Text = "Настройка режима работы БУС...";
+            miLEDSettings.Click += miLEDSettings_Click;
             // 
             // miReadParameters
             // 
-            this.miReadParameters.Name = "miReadParameters";
-            this.miReadParameters.Size = new System.Drawing.Size(535, 30);
-            this.miReadParameters.Text = "Настройки параметров чтения гнезд платами ПЗС...";
-            this.miReadParameters.Click += new System.EventHandler(this.miReadParameters_Click);
+            miReadParameters.Name = "miReadParameters";
+            miReadParameters.Size = new Size(535, 30);
+            miReadParameters.Text = "Настройки параметров чтения гнезд платами ПЗС...";
+            miReadParameters.Click += miReadParameters_Click;
             // 
             // miStandardSavingModeSetting
             // 
-            this.miStandardSavingModeSetting.Name = "miStandardSavingModeSetting";
-            this.miStandardSavingModeSetting.Size = new System.Drawing.Size(535, 30);
-            this.miStandardSavingModeSetting.Text = "Настройки обновления эталона...";
-            this.miStandardSavingModeSetting.Click += new System.EventHandler(this.miWorkModeSettings_Click);
+            miStandardSavingModeSetting.Name = "miStandardSavingModeSetting";
+            miStandardSavingModeSetting.Size = new Size(535, 30);
+            miStandardSavingModeSetting.Text = "Настройки обновления эталона...";
+            miStandardSavingModeSetting.Click += miWorkModeSettings_Click;
             // 
             // miSetCheckSockets
             // 
-            this.miSetCheckSockets.Name = "miSetCheckSockets";
-            this.miSetCheckSockets.Size = new System.Drawing.Size(535, 30);
-            this.miSetCheckSockets.Text = "Включение проверки гнезд...";
-            this.miSetCheckSockets.Click += new System.EventHandler(this.miSetCheckSockets_Click);
+            miSetCheckSockets.Name = "miSetCheckSockets";
+            miSetCheckSockets.Size = new Size(535, 30);
+            miSetCheckSockets.Text = "Включение проверки гнезд...";
+            miSetCheckSockets.Click += miSetCheckSockets_Click;
             // 
             // miDBSettings
             // 
-            this.miDBSettings.Name = "miDBSettings";
-            this.miDBSettings.Size = new System.Drawing.Size(535, 30);
-            this.miDBSettings.Text = "Настройка БД...";
-            this.miDBSettings.Click += new System.EventHandler(this.miDBSettings_Click);
+            miDBSettings.Name = "miDBSettings";
+            miDBSettings.Size = new Size(535, 30);
+            miDBSettings.Text = "Настройка БД...";
+            miDBSettings.Click += miDBSettings_Click;
             // 
             // miSaveSockets
             // 
-            this.miSaveSockets.Name = "miSaveSockets";
-            this.miSaveSockets.Size = new System.Drawing.Size(535, 30);
-            this.miSaveSockets.Text = "Включение сохранения гнезд...";
-            this.miSaveSockets.Click += new System.EventHandler(this.miSaveSockets_Click);
+            miSaveSockets.Name = "miSaveSockets";
+            miSaveSockets.Size = new Size(535, 30);
+            miSaveSockets.Text = "Включение сохранения гнезд...";
+            miSaveSockets.Click += miSaveSockets_Click;
             // 
             // miRDPSettings
             // 
-            this.miRDPSettings.Name = "miRDPSettings";
-            this.miRDPSettings.Size = new System.Drawing.Size(535, 30);
-            this.miRDPSettings.Text = "Параметры бракера...";
-            this.miRDPSettings.Click += new System.EventHandler(this.miRDPSettings_Click);
+            miRDPSettings.Name = "miRDPSettings";
+            miRDPSettings.Size = new Size(535, 30);
+            miRDPSettings.Text = "Параметры бракера...";
+            miRDPSettings.Click += miRDPSettings_Click;
             // 
             // miPhysicToDisplaySocket
             // 
-            this.miPhysicToDisplaySocket.Name = "miPhysicToDisplaySocket";
-            this.miPhysicToDisplaySocket.Size = new System.Drawing.Size(535, 30);
-            this.miPhysicToDisplaySocket.Text = "Соответствие отображаемых и физических гнезд...";
-            this.miPhysicToDisplaySocket.Click += new System.EventHandler(this.соответствиеГнездToolStripMenuItem_Click);
+            miPhysicToDisplaySocket.Name = "miPhysicToDisplaySocket";
+            miPhysicToDisplaySocket.Size = new Size(535, 30);
+            miPhysicToDisplaySocket.Text = "Соответствие отображаемых и физических гнезд...";
+            miPhysicToDisplaySocket.Click += соответствиеГнездToolStripMenuItem_Click;
             // 
             // дополнительныеПараметрыToolStripMenuItem
             // 
-            this.дополнительныеПараметрыToolStripMenuItem.Name = "дополнительныеПараметрыToolStripMenuItem";
-            this.дополнительныеПараметрыToolStripMenuItem.Size = new System.Drawing.Size(535, 30);
-            this.дополнительныеПараметрыToolStripMenuItem.Text = "Дополнительные параметры...";
-            this.дополнительныеПараметрыToolStripMenuItem.Click += new System.EventHandler(this.дополнительныеПараметрыToolStripMenuItem_Click);
+            дополнительныеПараметрыToolStripMenuItem.Name = "дополнительныеПараметрыToolStripMenuItem";
+            дополнительныеПараметрыToolStripMenuItem.Size = new Size(535, 30);
+            дополнительныеПараметрыToolStripMenuItem.Text = "Дополнительные параметры...";
+            дополнительныеПараметрыToolStripMenuItem.Click += дополнительныеПараметрыToolStripMenuItem_Click;
             // 
             // эталонToolStripMenuItem
             // 
-            this.эталонToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miSaveStandard,
-            this.miLoadStandard});
-            this.эталонToolStripMenuItem.Name = "эталонToolStripMenuItem";
-            this.эталонToolStripMenuItem.Size = new System.Drawing.Size(86, 29);
-            this.эталонToolStripMenuItem.Text = "Эталон";
+            эталонToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { miSaveStandard, miLoadStandard });
+            эталонToolStripMenuItem.Name = "эталонToolStripMenuItem";
+            эталонToolStripMenuItem.Size = new Size(86, 29);
+            эталонToolStripMenuItem.Text = "Эталон";
             // 
             // miSaveStandard
             // 
-            this.miSaveStandard.Name = "miSaveStandard";
-            this.miSaveStandard.Size = new System.Drawing.Size(189, 30);
-            this.miSaveStandard.Text = "Сохранить...";
-            this.miSaveStandard.Click += new System.EventHandler(this.miSaveStandard_Click);
+            miSaveStandard.Name = "miSaveStandard";
+            miSaveStandard.Size = new Size(189, 30);
+            miSaveStandard.Text = "Сохранить...";
+            miSaveStandard.Click += miSaveStandard_Click;
             // 
             // miLoadStandard
             // 
-            this.miLoadStandard.Name = "miLoadStandard";
-            this.miLoadStandard.Size = new System.Drawing.Size(189, 30);
-            this.miLoadStandard.Text = "Загрузить...";
-            this.miLoadStandard.Click += new System.EventHandler(this.miLoadStandard_Click);
+            miLoadStandard.Name = "miLoadStandard";
+            miLoadStandard.Size = new Size(189, 30);
+            miLoadStandard.Text = "Загрузить...";
+            miLoadStandard.Click += miLoadStandard_Click;
             // 
             // miWorkInterfaceStart
             // 
-            this.miWorkInterfaceStart.Name = "miWorkInterfaceStart";
-            this.miWorkInterfaceStart.Size = new System.Drawing.Size(164, 29);
-            this.miWorkInterfaceStart.Text = "Рабочий режим";
-            this.miWorkInterfaceStart.Visible = false;
-            this.miWorkInterfaceStart.Click += new System.EventHandler(this.miWorkInterfaceStart_Click);
+            miWorkInterfaceStart.Name = "miWorkInterfaceStart";
+            miWorkInterfaceStart.Size = new Size(164, 29);
+            miWorkInterfaceStart.Text = "Рабочий режим";
+            miWorkInterfaceStart.Visible = false;
+            miWorkInterfaceStart.Click += miWorkInterfaceStart_Click;
             // 
             // конфигурацияToolStripMenuItem
             // 
-            this.конфигурацияToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.сохранитьToolStripMenuItem,
-            this.загрузитьToolStripMenuItem});
-            this.конфигурацияToolStripMenuItem.Name = "конфигурацияToolStripMenuItem";
-            this.конфигурацияToolStripMenuItem.Size = new System.Drawing.Size(150, 29);
-            this.конфигурацияToolStripMenuItem.Text = "Конфигурация";
+            конфигурацияToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { сохранитьToolStripMenuItem, загрузитьToolStripMenuItem });
+            конфигурацияToolStripMenuItem.Name = "конфигурацияToolStripMenuItem";
+            конфигурацияToolStripMenuItem.Size = new Size(150, 29);
+            конфигурацияToolStripMenuItem.Text = "Конфигурация";
             // 
             // сохранитьToolStripMenuItem
             // 
-            this.сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
-            this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(189, 30);
-            this.сохранитьToolStripMenuItem.Text = "Сохранить...";
-            this.сохранитьToolStripMenuItem.Click += new System.EventHandler(this.сохранитьToolStripMenuItem_Click);
+            сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
+            сохранитьToolStripMenuItem.Size = new Size(189, 30);
+            сохранитьToolStripMenuItem.Text = "Сохранить...";
+            сохранитьToolStripMenuItem.Click += сохранитьToolStripMenuItem_Click;
             // 
             // загрузитьToolStripMenuItem
             // 
-            this.загрузитьToolStripMenuItem.Name = "загрузитьToolStripMenuItem";
-            this.загрузитьToolStripMenuItem.Size = new System.Drawing.Size(189, 30);
-            this.загрузитьToolStripMenuItem.Text = "Загрузить...";
-            this.загрузитьToolStripMenuItem.Click += new System.EventHandler(this.загрузитьToolStripMenuItem_Click);
+            загрузитьToolStripMenuItem.Name = "загрузитьToolStripMenuItem";
+            загрузитьToolStripMenuItem.Size = new Size(189, 30);
+            загрузитьToolStripMenuItem.Text = "Загрузить...";
+            загрузитьToolStripMenuItem.Click += загрузитьToolStripMenuItem_Click;
             // 
             // tsmiLogs
             // 
-            this.tsmiLogs.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miInterfaceLogs,
-            this.miLCBLogs,
-            this.miRDPBLogs,
-            this.miDBLogs});
-            this.tsmiLogs.Name = "tsmiLogs";
-            this.tsmiLogs.Size = new System.Drawing.Size(104, 29);
-            this.tsmiLogs.Text = "Журналы";
+            tsmiLogs.DropDownItems.AddRange(new ToolStripItem[] { miInterfaceLogs, miLCBLogs, miRDPBLogs, miDBLogs });
+            tsmiLogs.Name = "tsmiLogs";
+            tsmiLogs.Size = new Size(104, 29);
+            tsmiLogs.Text = "Журналы";
             // 
             // miInterfaceLogs
             // 
-            this.miInterfaceLogs.Name = "miInterfaceLogs";
-            this.miInterfaceLogs.Size = new System.Drawing.Size(343, 30);
-            this.miInterfaceLogs.Text = "Работа программы";
-            this.miInterfaceLogs.Click += new System.EventHandler(this.miInterfaceLogs_Click);
+            miInterfaceLogs.Name = "miInterfaceLogs";
+            miInterfaceLogs.Size = new Size(343, 30);
+            miInterfaceLogs.Text = "Работа программы";
+            miInterfaceLogs.Click += miInterfaceLogs_Click;
             // 
             // miLCBLogs
             // 
-            this.miLCBLogs.Name = "miLCBLogs";
-            this.miLCBLogs.Size = new System.Drawing.Size(343, 30);
-            this.miLCBLogs.Text = "Работы БУС";
-            this.miLCBLogs.Click += new System.EventHandler(this.miLCBLogs_Click);
+            miLCBLogs.Name = "miLCBLogs";
+            miLCBLogs.Size = new Size(343, 30);
+            miLCBLogs.Text = "Работы БУС";
+            miLCBLogs.Click += miLCBLogs_Click;
             // 
             // miRDPBLogs
             // 
-            this.miRDPBLogs.Name = "miRDPBLogs";
-            this.miRDPBLogs.Size = new System.Drawing.Size(343, 30);
-            this.miRDPBLogs.Text = "Работа бракёра";
-            this.miRDPBLogs.Click += new System.EventHandler(this.miRDPBLogs_Click);
+            miRDPBLogs.Name = "miRDPBLogs";
+            miRDPBLogs.Size = new Size(343, 30);
+            miRDPBLogs.Text = "Работа бракёра";
+            miRDPBLogs.Click += miRDPBLogs_Click;
             // 
             // miDBLogs
             // 
-            this.miDBLogs.Name = "miDBLogs";
-            this.miDBLogs.Size = new System.Drawing.Size(343, 30);
-            this.miDBLogs.Text = "Работа базы данных и архива";
-            this.miDBLogs.Click += new System.EventHandler(this.miDBLogs_Click);
+            miDBLogs.Name = "miDBLogs";
+            miDBLogs.Size = new Size(343, 30);
+            miDBLogs.Text = "Работа базы данных и архива";
+            miDBLogs.Click += miDBLogs_Click;
             // 
             // tsmiLogsArchive
             // 
-            this.tsmiLogsArchive.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miMainInterfaceLogsArchive,
-            this.miLCBLogsArchive,
-            this.miRDPBLogsArchive,
-            this.miDBLogsArchive});
-            this.tsmiLogsArchive.Name = "tsmiLogsArchive";
-            this.tsmiLogsArchive.Size = new System.Drawing.Size(181, 29);
-            this.tsmiLogsArchive.Text = "Архивы журналов";
+            tsmiLogsArchive.DropDownItems.AddRange(new ToolStripItem[] { miMainInterfaceLogsArchive, miLCBLogsArchive, miRDPBLogsArchive, miDBLogsArchive });
+            tsmiLogsArchive.Name = "tsmiLogsArchive";
+            tsmiLogsArchive.Size = new Size(181, 29);
+            tsmiLogsArchive.Text = "Архивы журналов";
             // 
             // miMainInterfaceLogsArchive
             // 
-            this.miMainInterfaceLogsArchive.Name = "miMainInterfaceLogsArchive";
-            this.miMainInterfaceLogsArchive.Size = new System.Drawing.Size(427, 30);
-            this.miMainInterfaceLogsArchive.Text = "Папка журналов работы программы";
-            this.miMainInterfaceLogsArchive.Click += new System.EventHandler(this.miMainInterfaceLogsArchive_Click);
+            miMainInterfaceLogsArchive.Name = "miMainInterfaceLogsArchive";
+            miMainInterfaceLogsArchive.Size = new Size(427, 30);
+            miMainInterfaceLogsArchive.Text = "Папка журналов работы программы";
+            miMainInterfaceLogsArchive.Click += miMainInterfaceLogsArchive_Click;
             // 
             // miLCBLogsArchive
             // 
-            this.miLCBLogsArchive.Name = "miLCBLogsArchive";
-            this.miLCBLogsArchive.Size = new System.Drawing.Size(427, 30);
-            this.miLCBLogsArchive.Text = "Папка журналов БУС";
-            this.miLCBLogsArchive.Click += new System.EventHandler(this.miLCBLogsArchive_Click);
+            miLCBLogsArchive.Name = "miLCBLogsArchive";
+            miLCBLogsArchive.Size = new Size(427, 30);
+            miLCBLogsArchive.Text = "Папка журналов БУС";
+            miLCBLogsArchive.Click += miLCBLogsArchive_Click;
             // 
             // miRDPBLogsArchive
             // 
-            this.miRDPBLogsArchive.Name = "miRDPBLogsArchive";
-            this.miRDPBLogsArchive.Size = new System.Drawing.Size(427, 30);
-            this.miRDPBLogsArchive.Text = "Папка журналов бракёра";
-            this.miRDPBLogsArchive.Click += new System.EventHandler(this.miRDPBLogsArchive_Click);
+            miRDPBLogsArchive.Name = "miRDPBLogsArchive";
+            miRDPBLogsArchive.Size = new Size(427, 30);
+            miRDPBLogsArchive.Text = "Папка журналов бракёра";
+            miRDPBLogsArchive.Click += miRDPBLogsArchive_Click;
             // 
             // miDBLogsArchive
             // 
-            this.miDBLogsArchive.Name = "miDBLogsArchive";
-            this.miDBLogsArchive.Size = new System.Drawing.Size(427, 30);
-            this.miDBLogsArchive.Text = "Папка журналов базы данных и архива";
-            this.miDBLogsArchive.Click += new System.EventHandler(this.miDBLogsArchive_Click);
+            miDBLogsArchive.Name = "miDBLogsArchive";
+            miDBLogsArchive.Size = new Size(427, 30);
+            miDBLogsArchive.Text = "Папка журналов базы данных и архива";
+            miDBLogsArchive.Click += miDBLogsArchive_Click;
             // 
             // tsmiTechnicalData
             // 
-            this.tsmiTechnicalData.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsmiReadImageStatistics});
-            this.tsmiTechnicalData.Name = "tsmiTechnicalData";
-            this.tsmiTechnicalData.Size = new System.Drawing.Size(205, 29);
-            this.tsmiTechnicalData.Text = "Технические данные";
+            tsmiTechnicalData.DropDownItems.AddRange(new ToolStripItem[] { tsmiReadImageStatistics });
+            tsmiTechnicalData.Name = "tsmiTechnicalData";
+            tsmiTechnicalData.Size = new Size(205, 29);
+            tsmiTechnicalData.Text = "Технические данные";
             // 
             // tsmiReadImageStatistics
             // 
-            this.tsmiReadImageStatistics.Name = "tsmiReadImageStatistics";
-            this.tsmiReadImageStatistics.Size = new System.Drawing.Size(430, 30);
-            this.tsmiReadImageStatistics.Text = "Окно статистики чтения изображений...";
-            this.tsmiReadImageStatistics.Click += new System.EventHandler(this.tsmiReadImageStatistics_Click);
+            tsmiReadImageStatistics.Name = "tsmiReadImageStatistics";
+            tsmiReadImageStatistics.Size = new Size(430, 30);
+            tsmiReadImageStatistics.Text = "Окно статистики чтения изображений...";
+            tsmiReadImageStatistics.Click += tsmiReadImageStatistics_Click;
             // 
             // tabControl1
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl1.Controls.Add(this.tbSettingsStatus);
-            this.tabControl1.Controls.Add(this.tbGetStandard);
-            this.tabControl1.Controls.Add(this.tbTest);
-            this.tabControl1.Controls.Add(this.tbLEDControl);
-            this.tabControl1.Controls.Add(this.tbTestImages);
-            this.tabControl1.Controls.Add(this.tbRDP);
-            this.tabControl1.Controls.Add(this.tbDB);
-            this.tabControl1.Controls.Add(this.tbArchive);
-            this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.tabControl1.Location = new System.Drawing.Point(0, 42);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(5);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1816, 986);
-            this.tabControl1.TabIndex = 2;
-            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            tabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tabControl1.Controls.Add(tbSettingsStatus);
+            tabControl1.Controls.Add(tbGetStandard);
+            tabControl1.Controls.Add(tbTest);
+            tabControl1.Controls.Add(tbLEDControl);
+            tabControl1.Controls.Add(tbTestImages);
+            tabControl1.Controls.Add(tbRDP);
+            tabControl1.Controls.Add(tbDB);
+            tabControl1.Controls.Add(tbArchive);
+            tabControl1.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            tabControl1.Location = new Point(0, 42);
+            tabControl1.Margin = new Padding(5);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(1816, 1015);
+            tabControl1.TabIndex = 2;
+            tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
             // 
             // tbSettingsStatus
             // 
-            this.tbSettingsStatus.Controls.Add(this.btnCheckSettings);
-            this.tbSettingsStatus.Controls.Add(this.btnSettingsCheckCardStatus);
-            this.tbSettingsStatus.Controls.Add(this.lblSocketSettings);
-            this.tbSettingsStatus.Controls.Add(this.pnlSockets);
-            this.tbSettingsStatus.Controls.Add(this.lblCaptionDoMCCards);
-            this.tbSettingsStatus.Controls.Add(this.lvDoMCCards);
-            this.tbSettingsStatus.Location = new System.Drawing.Point(4, 29);
-            this.tbSettingsStatus.Margin = new System.Windows.Forms.Padding(5);
-            this.tbSettingsStatus.Name = "tbSettingsStatus";
-            this.tbSettingsStatus.Padding = new System.Windows.Forms.Padding(5);
-            this.tbSettingsStatus.Size = new System.Drawing.Size(1808, 953);
-            this.tbSettingsStatus.TabIndex = 0;
-            this.tbSettingsStatus.Text = "Состояние настроек";
-            this.tbSettingsStatus.UseVisualStyleBackColor = true;
+            tbSettingsStatus.Controls.Add(btnCheckSettings);
+            tbSettingsStatus.Controls.Add(btnSettingsCheckCardStatus);
+            tbSettingsStatus.Controls.Add(lblSocketSettings);
+            tbSettingsStatus.Controls.Add(pnlSockets);
+            tbSettingsStatus.Controls.Add(lblCaptionDoMCCards);
+            tbSettingsStatus.Controls.Add(lvDoMCCards);
+            tbSettingsStatus.Location = new Point(4, 29);
+            tbSettingsStatus.Margin = new Padding(5);
+            tbSettingsStatus.Name = "tbSettingsStatus";
+            tbSettingsStatus.Padding = new Padding(5);
+            tbSettingsStatus.Size = new Size(1808, 982);
+            tbSettingsStatus.TabIndex = 0;
+            tbSettingsStatus.Text = "Состояние настроек";
+            tbSettingsStatus.UseVisualStyleBackColor = true;
             // 
             // btnCheckSettings
             // 
-            this.btnCheckSettings.Location = new System.Drawing.Point(918, 546);
-            this.btnCheckSettings.Name = "btnCheckSettings";
-            this.btnCheckSettings.Size = new System.Drawing.Size(232, 60);
-            this.btnCheckSettings.TabIndex = 7;
-            this.btnCheckSettings.Text = "Проверить настройки";
-            this.btnCheckSettings.UseVisualStyleBackColor = true;
-            this.btnCheckSettings.Click += new System.EventHandler(this.btnCheckSettings_Click);
+            btnCheckSettings.Location = new Point(918, 546);
+            btnCheckSettings.Name = "btnCheckSettings";
+            btnCheckSettings.Size = new Size(232, 60);
+            btnCheckSettings.TabIndex = 7;
+            btnCheckSettings.Text = "Проверить настройки";
+            btnCheckSettings.UseVisualStyleBackColor = true;
+            btnCheckSettings.Click += btnCheckSettings_Click;
             // 
             // btnSettingsCheckCardStatus
             // 
-            this.btnSettingsCheckCardStatus.Location = new System.Drawing.Point(14, 546);
-            this.btnSettingsCheckCardStatus.Name = "btnSettingsCheckCardStatus";
-            this.btnSettingsCheckCardStatus.Size = new System.Drawing.Size(308, 60);
-            this.btnSettingsCheckCardStatus.TabIndex = 6;
-            this.btnSettingsCheckCardStatus.Text = "Проверка работы плат";
-            this.btnSettingsCheckCardStatus.UseVisualStyleBackColor = true;
-            this.btnSettingsCheckCardStatus.Click += new System.EventHandler(this.btnSettingsCheckCardStatus_Click);
+            btnSettingsCheckCardStatus.Location = new Point(14, 546);
+            btnSettingsCheckCardStatus.Name = "btnSettingsCheckCardStatus";
+            btnSettingsCheckCardStatus.Size = new Size(308, 60);
+            btnSettingsCheckCardStatus.TabIndex = 6;
+            btnSettingsCheckCardStatus.Text = "Проверка работы плат";
+            btnSettingsCheckCardStatus.UseVisualStyleBackColor = true;
+            btnSettingsCheckCardStatus.Click += btnSettingsCheckCardStatus_Click;
             // 
             // lblSocketSettings
             // 
-            this.lblSocketSettings.AutoSize = true;
-            this.lblSocketSettings.Location = new System.Drawing.Point(914, 5);
-            this.lblSocketSettings.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblSocketSettings.Name = "lblSocketSettings";
-            this.lblSocketSettings.Size = new System.Drawing.Size(145, 20);
-            this.lblSocketSettings.TabIndex = 5;
-            this.lblSocketSettings.Text = "Параметры гнезд";
+            lblSocketSettings.AutoSize = true;
+            lblSocketSettings.Location = new Point(914, 5);
+            lblSocketSettings.Margin = new Padding(5, 0, 5, 0);
+            lblSocketSettings.Name = "lblSocketSettings";
+            lblSocketSettings.Size = new Size(145, 20);
+            lblSocketSettings.TabIndex = 5;
+            lblSocketSettings.Text = "Параметры гнезд";
             // 
             // pnlSockets
             // 
-            this.pnlSockets.Location = new System.Drawing.Point(919, 37);
-            this.pnlSockets.Margin = new System.Windows.Forms.Padding(5);
-            this.pnlSockets.Name = "pnlSockets";
-            this.pnlSockets.Size = new System.Drawing.Size(393, 503);
-            this.pnlSockets.TabIndex = 4;
+            pnlSockets.Location = new Point(919, 37);
+            pnlSockets.Margin = new Padding(5);
+            pnlSockets.Name = "pnlSockets";
+            pnlSockets.Size = new Size(393, 503);
+            pnlSockets.TabIndex = 4;
             // 
             // lblCaptionDoMCCards
             // 
-            this.lblCaptionDoMCCards.AutoSize = true;
-            this.lblCaptionDoMCCards.Location = new System.Drawing.Point(10, 5);
-            this.lblCaptionDoMCCards.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblCaptionDoMCCards.Name = "lblCaptionDoMCCards";
-            this.lblCaptionDoMCCards.Size = new System.Drawing.Size(225, 20);
-            this.lblCaptionDoMCCards.TabIndex = 3;
-            this.lblCaptionDoMCCards.Text = "Используемы платы чтения:";
+            lblCaptionDoMCCards.AutoSize = true;
+            lblCaptionDoMCCards.Location = new Point(10, 5);
+            lblCaptionDoMCCards.Margin = new Padding(5, 0, 5, 0);
+            lblCaptionDoMCCards.Name = "lblCaptionDoMCCards";
+            lblCaptionDoMCCards.Size = new Size(225, 20);
+            lblCaptionDoMCCards.TabIndex = 3;
+            lblCaptionDoMCCards.Text = "Используемы платы чтения:";
             // 
             // lvDoMCCards
             // 
-            this.lvDoMCCards.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.chN,
-            this.chIsActive,
-            this.chMac,
-            this.chFirstSocket,
-            this.chLastSocket});
-            this.lvDoMCCards.HideSelection = false;
-            this.lvDoMCCards.Location = new System.Drawing.Point(14, 37);
-            this.lvDoMCCards.Margin = new System.Windows.Forms.Padding(5);
-            this.lvDoMCCards.Name = "lvDoMCCards";
-            this.lvDoMCCards.Size = new System.Drawing.Size(893, 501);
-            this.lvDoMCCards.TabIndex = 2;
-            this.lvDoMCCards.UseCompatibleStateImageBehavior = false;
-            this.lvDoMCCards.View = System.Windows.Forms.View.Details;
+            lvDoMCCards.Columns.AddRange(new ColumnHeader[] { chN, chIsActive, chMac, chFirstSocket, chLastSocket });
+            lvDoMCCards.Location = new Point(14, 37);
+            lvDoMCCards.Margin = new Padding(5);
+            lvDoMCCards.Name = "lvDoMCCards";
+            lvDoMCCards.Size = new Size(893, 501);
+            lvDoMCCards.TabIndex = 2;
+            lvDoMCCards.UseCompatibleStateImageBehavior = false;
+            lvDoMCCards.View = View.Details;
             // 
             // chN
             // 
-            this.chN.Text = "№ платы";
-            this.chN.Width = 80;
+            chN.Text = "№ платы";
+            chN.Width = 80;
             // 
             // chIsActive
             // 
-            this.chIsActive.Text = "Активно";
-            this.chIsActive.Width = 100;
+            chIsActive.Text = "Активно";
+            chIsActive.Width = 100;
             // 
             // chMac
             // 
-            this.chMac.Text = "Физический адрес";
-            this.chMac.Width = 160;
+            chMac.Text = "Физический адрес";
+            chMac.Width = 160;
             // 
             // chFirstSocket
             // 
-            this.chFirstSocket.Text = "Первое гнездо";
-            this.chFirstSocket.Width = 120;
+            chFirstSocket.Text = "Первое гнездо";
+            chFirstSocket.Width = 120;
             // 
             // chLastSocket
             // 
-            this.chLastSocket.Text = "Последнее гнездо";
-            this.chLastSocket.Width = 120;
+            chLastSocket.Text = "Последнее гнездо";
+            chLastSocket.Width = 120;
             // 
             // tbGetStandard
             // 
-            this.tbGetStandard.Controls.Add(this.btnStandardSettings);
-            this.tbGetStandard.Controls.Add(this.lblRange);
-            this.tbGetStandard.Controls.Add(this.lblTotalAverage);
-            this.tbGetStandard.Controls.Add(this.lblTotalAverageText);
-            this.tbGetStandard.Controls.Add(this.lblDeviationTotal);
-            this.tbGetStandard.Controls.Add(this.lblDeviationTotalText);
-            this.tbGetStandard.Controls.Add(this.label3);
-            this.tbGetStandard.Controls.Add(this.btnReadImagesForStandard);
-            this.tbGetStandard.Controls.Add(this.lblGetStandardWorkStatus);
-            this.tbGetStandard.Controls.Add(this.lblStandardSocketNumber);
-            this.tbGetStandard.Controls.Add(this.lblStandardStatusText);
-            this.tbGetStandard.Controls.Add(this.lblSocketNumberText);
-            this.tbGetStandard.Controls.Add(this.btnMakeAverage);
-            this.tbGetStandard.Controls.Add(this.nudStandardLevel);
-            this.tbGetStandard.Controls.Add(this.lblDeviation3);
-            this.tbGetStandard.Controls.Add(this.lblImageStandardText);
-            this.tbGetStandard.Controls.Add(this.lblDeviation3Text);
-            this.tbGetStandard.Controls.Add(this.lblDeviation2);
-            this.tbGetStandard.Controls.Add(this.label6);
-            this.tbGetStandard.Controls.Add(this.lblDeviation1);
-            this.tbGetStandard.Controls.Add(this.lblDeviation2Text);
-            this.tbGetStandard.Controls.Add(this.label5);
-            this.tbGetStandard.Controls.Add(this.lblImage1Text);
-            this.tbGetStandard.Controls.Add(this.label4);
-            this.tbGetStandard.Controls.Add(this.lblDeviation1Text);
-            this.tbGetStandard.Controls.Add(this.pbAverage);
-            this.tbGetStandard.Controls.Add(this.pbStandard3);
-            this.tbGetStandard.Controls.Add(this.pbStandard2);
-            this.tbGetStandard.Controls.Add(this.pbStandard1);
-            this.tbGetStandard.Controls.Add(this.cbExternalSignalForStandard);
-            this.tbGetStandard.Controls.Add(this.pnlGetStandardSockets);
-            this.tbGetStandard.Location = new System.Drawing.Point(4, 29);
-            this.tbGetStandard.Margin = new System.Windows.Forms.Padding(5);
-            this.tbGetStandard.Name = "tbGetStandard";
-            this.tbGetStandard.Padding = new System.Windows.Forms.Padding(5);
-            this.tbGetStandard.Size = new System.Drawing.Size(1808, 953);
-            this.tbGetStandard.TabIndex = 1;
-            this.tbGetStandard.Text = "Настройка эталона";
-            this.tbGetStandard.UseVisualStyleBackColor = true;
+            tbGetStandard.Controls.Add(btnStandardSettings);
+            tbGetStandard.Controls.Add(lblRange);
+            tbGetStandard.Controls.Add(lblTotalAverage);
+            tbGetStandard.Controls.Add(lblTotalAverageText);
+            tbGetStandard.Controls.Add(lblDeviationTotal);
+            tbGetStandard.Controls.Add(lblDeviationTotalText);
+            tbGetStandard.Controls.Add(label3);
+            tbGetStandard.Controls.Add(btnReadImagesForStandard);
+            tbGetStandard.Controls.Add(lblGetStandardWorkStatus);
+            tbGetStandard.Controls.Add(lblStandardSocketNumber);
+            tbGetStandard.Controls.Add(lblStandardStatusText);
+            tbGetStandard.Controls.Add(lblSocketNumberText);
+            tbGetStandard.Controls.Add(btnMakeAverage);
+            tbGetStandard.Controls.Add(nudStandardLevel);
+            tbGetStandard.Controls.Add(lblDeviation3);
+            tbGetStandard.Controls.Add(lblImageStandardText);
+            tbGetStandard.Controls.Add(lblDeviation3Text);
+            tbGetStandard.Controls.Add(lblDeviation2);
+            tbGetStandard.Controls.Add(label6);
+            tbGetStandard.Controls.Add(lblDeviation1);
+            tbGetStandard.Controls.Add(lblDeviation2Text);
+            tbGetStandard.Controls.Add(label5);
+            tbGetStandard.Controls.Add(lblImage1Text);
+            tbGetStandard.Controls.Add(label4);
+            tbGetStandard.Controls.Add(lblDeviation1Text);
+            tbGetStandard.Controls.Add(pbAverage);
+            tbGetStandard.Controls.Add(pbStandard3);
+            tbGetStandard.Controls.Add(pbStandard2);
+            tbGetStandard.Controls.Add(pbStandard1);
+            tbGetStandard.Controls.Add(cbExternalSignalForStandard);
+            tbGetStandard.Controls.Add(pnlGetStandardSockets);
+            tbGetStandard.Location = new Point(4, 29);
+            tbGetStandard.Margin = new Padding(5);
+            tbGetStandard.Name = "tbGetStandard";
+            tbGetStandard.Padding = new Padding(5);
+            tbGetStandard.Size = new Size(1808, 982);
+            tbGetStandard.TabIndex = 1;
+            tbGetStandard.Text = "Настройка эталона";
+            tbGetStandard.UseVisualStyleBackColor = true;
             // 
             // btnStandardSettings
             // 
-            this.btnStandardSettings.Location = new System.Drawing.Point(407, 51);
-            this.btnStandardSettings.Margin = new System.Windows.Forms.Padding(5);
-            this.btnStandardSettings.Name = "btnStandardSettings";
-            this.btnStandardSettings.Size = new System.Drawing.Size(450, 38);
-            this.btnStandardSettings.TabIndex = 30;
-            this.btnStandardSettings.Text = "Получение эталонов по всем гнездам";
-            this.btnStandardSettings.UseVisualStyleBackColor = true;
-            this.btnStandardSettings.Click += new System.EventHandler(this.btnStandardSettings_Click);
+            btnStandardSettings.Location = new Point(407, 51);
+            btnStandardSettings.Margin = new Padding(5);
+            btnStandardSettings.Name = "btnStandardSettings";
+            btnStandardSettings.Size = new Size(450, 38);
+            btnStandardSettings.TabIndex = 30;
+            btnStandardSettings.Text = "Получение эталонов по всем гнездам";
+            btnStandardSettings.UseVisualStyleBackColor = true;
+            btnStandardSettings.Click += btnStandardSettings_Click;
             // 
             // lblRange
             // 
-            this.lblRange.AutoSize = true;
-            this.lblRange.Location = new System.Drawing.Point(1118, 198);
-            this.lblRange.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblRange.Name = "lblRange";
-            this.lblRange.Size = new System.Drawing.Size(32, 20);
-            this.lblRange.TabIndex = 29;
-            this.lblRange.Text = "0-0";
+            lblRange.AutoSize = true;
+            lblRange.Location = new Point(1118, 198);
+            lblRange.Margin = new Padding(5, 0, 5, 0);
+            lblRange.Name = "lblRange";
+            lblRange.Size = new Size(32, 20);
+            lblRange.TabIndex = 29;
+            lblRange.Text = "0-0";
             // 
             // lblTotalAverage
             // 
-            this.lblTotalAverage.AutoSize = true;
-            this.lblTotalAverage.Location = new System.Drawing.Point(1134, 129);
-            this.lblTotalAverage.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTotalAverage.Name = "lblTotalAverage";
-            this.lblTotalAverage.Size = new System.Drawing.Size(18, 20);
-            this.lblTotalAverage.TabIndex = 28;
-            this.lblTotalAverage.Text = "0";
+            lblTotalAverage.AutoSize = true;
+            lblTotalAverage.Location = new Point(1134, 129);
+            lblTotalAverage.Margin = new Padding(5, 0, 5, 0);
+            lblTotalAverage.Name = "lblTotalAverage";
+            lblTotalAverage.Size = new Size(18, 20);
+            lblTotalAverage.TabIndex = 28;
+            lblTotalAverage.Text = "0";
             // 
             // lblTotalAverageText
             // 
-            this.lblTotalAverageText.AutoSize = true;
-            this.lblTotalAverageText.Location = new System.Drawing.Point(960, 126);
-            this.lblTotalAverageText.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTotalAverageText.Name = "lblTotalAverageText";
-            this.lblTotalAverageText.Size = new System.Drawing.Size(133, 20);
-            this.lblTotalAverageText.TabIndex = 27;
-            this.lblTotalAverageText.Text = "Общее среднее:";
+            lblTotalAverageText.AutoSize = true;
+            lblTotalAverageText.Location = new Point(960, 126);
+            lblTotalAverageText.Margin = new Padding(5, 0, 5, 0);
+            lblTotalAverageText.Name = "lblTotalAverageText";
+            lblTotalAverageText.Size = new Size(133, 20);
+            lblTotalAverageText.TabIndex = 27;
+            lblTotalAverageText.Text = "Общее среднее:";
             // 
             // lblDeviationTotal
             // 
-            this.lblDeviationTotal.AutoSize = true;
-            this.lblDeviationTotal.Location = new System.Drawing.Point(992, 158);
-            this.lblDeviationTotal.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblDeviationTotal.Name = "lblDeviationTotal";
-            this.lblDeviationTotal.Size = new System.Drawing.Size(18, 20);
-            this.lblDeviationTotal.TabIndex = 26;
-            this.lblDeviationTotal.Text = "0";
+            lblDeviationTotal.AutoSize = true;
+            lblDeviationTotal.Location = new Point(992, 158);
+            lblDeviationTotal.Margin = new Padding(5, 0, 5, 0);
+            lblDeviationTotal.Name = "lblDeviationTotal";
+            lblDeviationTotal.Size = new Size(18, 20);
+            lblDeviationTotal.TabIndex = 26;
+            lblDeviationTotal.Text = "0";
             // 
             // lblDeviationTotalText
             // 
-            this.lblDeviationTotalText.AutoSize = true;
-            this.lblDeviationTotalText.Location = new System.Drawing.Point(960, 158);
-            this.lblDeviationTotalText.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblDeviationTotalText.Name = "lblDeviationTotalText";
-            this.lblDeviationTotalText.Size = new System.Drawing.Size(26, 20);
-            this.lblDeviationTotalText.TabIndex = 25;
-            this.lblDeviationTotalText.Text = "σ :";
+            lblDeviationTotalText.AutoSize = true;
+            lblDeviationTotalText.Location = new Point(960, 158);
+            lblDeviationTotalText.Margin = new Padding(5, 0, 5, 0);
+            lblDeviationTotalText.Name = "lblDeviationTotalText";
+            lblDeviationTotalText.Size = new Size(26, 20);
+            lblDeviationTotalText.TabIndex = 25;
+            lblDeviationTotalText.Text = "σ :";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1042, 198);
-            this.label3.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(62, 20);
-            this.label3.TabIndex = 24;
-            this.label3.Text = "% от σ:";
+            label3.AutoSize = true;
+            label3.Location = new Point(1042, 198);
+            label3.Margin = new Padding(5, 0, 5, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(62, 20);
+            label3.TabIndex = 24;
+            label3.Text = "% от σ:";
             // 
             // btnReadImagesForStandard
             // 
-            this.btnReadImagesForStandard.Location = new System.Drawing.Point(411, 172);
-            this.btnReadImagesForStandard.Margin = new System.Windows.Forms.Padding(5);
-            this.btnReadImagesForStandard.Name = "btnReadImagesForStandard";
-            this.btnReadImagesForStandard.Size = new System.Drawing.Size(264, 38);
-            this.btnReadImagesForStandard.TabIndex = 23;
-            this.btnReadImagesForStandard.Text = "Чтение 3х изображений";
-            this.btnReadImagesForStandard.UseVisualStyleBackColor = true;
-            this.btnReadImagesForStandard.Click += new System.EventHandler(this.btnReadImagesForStandard_Click);
+            btnReadImagesForStandard.Location = new Point(411, 172);
+            btnReadImagesForStandard.Margin = new Padding(5);
+            btnReadImagesForStandard.Name = "btnReadImagesForStandard";
+            btnReadImagesForStandard.Size = new Size(264, 38);
+            btnReadImagesForStandard.TabIndex = 23;
+            btnReadImagesForStandard.Text = "Чтение 3х изображений";
+            btnReadImagesForStandard.UseVisualStyleBackColor = true;
+            btnReadImagesForStandard.Click += btnReadImagesForStandard_Click;
             // 
             // lblGetStandardWorkStatus
             // 
-            this.lblGetStandardWorkStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblGetStandardWorkStatus.AutoSize = true;
-            this.lblGetStandardWorkStatus.Location = new System.Drawing.Point(138, 840);
-            this.lblGetStandardWorkStatus.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblGetStandardWorkStatus.Name = "lblGetStandardWorkStatus";
-            this.lblGetStandardWorkStatus.Size = new System.Drawing.Size(14, 20);
-            this.lblGetStandardWorkStatus.TabIndex = 22;
-            this.lblGetStandardWorkStatus.Text = "-";
+            lblGetStandardWorkStatus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lblGetStandardWorkStatus.AutoSize = true;
+            lblGetStandardWorkStatus.Location = new Point(138, 869);
+            lblGetStandardWorkStatus.Margin = new Padding(5, 0, 5, 0);
+            lblGetStandardWorkStatus.Name = "lblGetStandardWorkStatus";
+            lblGetStandardWorkStatus.Size = new Size(14, 20);
+            lblGetStandardWorkStatus.TabIndex = 22;
+            lblGetStandardWorkStatus.Text = "-";
             // 
             // lblStandardSocketNumber
             // 
-            this.lblStandardSocketNumber.AutoSize = true;
-            this.lblStandardSocketNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblStandardSocketNumber.Location = new System.Drawing.Point(617, 137);
-            this.lblStandardSocketNumber.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblStandardSocketNumber.Name = "lblStandardSocketNumber";
-            this.lblStandardSocketNumber.Size = new System.Drawing.Size(14, 17);
-            this.lblStandardSocketNumber.TabIndex = 21;
-            this.lblStandardSocketNumber.Text = "-";
+            lblStandardSocketNumber.AutoSize = true;
+            lblStandardSocketNumber.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            lblStandardSocketNumber.Location = new Point(617, 137);
+            lblStandardSocketNumber.Margin = new Padding(5, 0, 5, 0);
+            lblStandardSocketNumber.Name = "lblStandardSocketNumber";
+            lblStandardSocketNumber.Size = new Size(14, 17);
+            lblStandardSocketNumber.TabIndex = 21;
+            lblStandardSocketNumber.Text = "-";
             // 
             // lblStandardStatusText
             // 
-            this.lblStandardStatusText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblStandardStatusText.AutoSize = true;
-            this.lblStandardStatusText.Location = new System.Drawing.Point(5, 840);
-            this.lblStandardStatusText.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblStandardStatusText.Name = "lblStandardStatusText";
-            this.lblStandardStatusText.Size = new System.Drawing.Size(95, 20);
-            this.lblStandardStatusText.TabIndex = 20;
-            this.lblStandardStatusText.Text = "Состояние:";
+            lblStandardStatusText.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lblStandardStatusText.AutoSize = true;
+            lblStandardStatusText.Location = new Point(5, 869);
+            lblStandardStatusText.Margin = new Padding(5, 0, 5, 0);
+            lblStandardStatusText.Name = "lblStandardStatusText";
+            lblStandardStatusText.Size = new Size(95, 20);
+            lblStandardStatusText.TabIndex = 20;
+            lblStandardStatusText.Text = "Состояние:";
             // 
             // lblSocketNumberText
             // 
-            this.lblSocketNumberText.AutoSize = true;
-            this.lblSocketNumberText.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblSocketNumberText.Location = new System.Drawing.Point(407, 137);
-            this.lblSocketNumberText.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblSocketNumberText.Name = "lblSocketNumberText";
-            this.lblSocketNumberText.Size = new System.Drawing.Size(134, 17);
-            this.lblSocketNumberText.TabIndex = 19;
-            this.lblSocketNumberText.Text = "Выбрано гнездо:";
+            lblSocketNumberText.AutoSize = true;
+            lblSocketNumberText.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            lblSocketNumberText.Location = new Point(407, 137);
+            lblSocketNumberText.Margin = new Padding(5, 0, 5, 0);
+            lblSocketNumberText.Name = "lblSocketNumberText";
+            lblSocketNumberText.Size = new Size(134, 17);
+            lblSocketNumberText.TabIndex = 19;
+            lblSocketNumberText.Text = "Выбрано гнездо:";
             // 
             // btnMakeAverage
             // 
-            this.btnMakeAverage.Location = new System.Drawing.Point(957, 240);
-            this.btnMakeAverage.Margin = new System.Windows.Forms.Padding(5);
-            this.btnMakeAverage.Name = "btnMakeAverage";
-            this.btnMakeAverage.Size = new System.Drawing.Size(168, 38);
-            this.btnMakeAverage.TabIndex = 18;
-            this.btnMakeAverage.Text = "Усреднить";
-            this.btnMakeAverage.UseVisualStyleBackColor = true;
-            this.btnMakeAverage.Click += new System.EventHandler(this.btnMakeAverage_Click);
+            btnMakeAverage.Location = new Point(957, 240);
+            btnMakeAverage.Margin = new Padding(5);
+            btnMakeAverage.Name = "btnMakeAverage";
+            btnMakeAverage.Size = new Size(168, 38);
+            btnMakeAverage.TabIndex = 18;
+            btnMakeAverage.Text = "Усреднить";
+            btnMakeAverage.UseVisualStyleBackColor = true;
+            btnMakeAverage.Click += btnMakeAverage_Click;
             // 
             // nudStandardLevel
             // 
-            this.nudStandardLevel.Location = new System.Drawing.Point(957, 195);
-            this.nudStandardLevel.Margin = new System.Windows.Forms.Padding(5);
-            this.nudStandardLevel.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.nudStandardLevel.Name = "nudStandardLevel";
-            this.nudStandardLevel.Size = new System.Drawing.Size(84, 26);
-            this.nudStandardLevel.TabIndex = 17;
-            this.nudStandardLevel.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.nudStandardLevel.ValueChanged += new System.EventHandler(this.nudStandardLevel_ValueChanged);
+            nudStandardLevel.Location = new Point(957, 195);
+            nudStandardLevel.Margin = new Padding(5);
+            nudStandardLevel.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            nudStandardLevel.Name = "nudStandardLevel";
+            nudStandardLevel.Size = new Size(84, 26);
+            nudStandardLevel.TabIndex = 17;
+            nudStandardLevel.Value = new decimal(new int[] { 100, 0, 0, 0 });
+            nudStandardLevel.ValueChanged += nudStandardLevel_ValueChanged;
             // 
             // lblDeviation3
             // 
-            this.lblDeviation3.AutoSize = true;
-            this.lblDeviation3.Location = new System.Drawing.Point(504, 660);
-            this.lblDeviation3.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblDeviation3.Name = "lblDeviation3";
-            this.lblDeviation3.Size = new System.Drawing.Size(18, 20);
-            this.lblDeviation3.TabIndex = 6;
-            this.lblDeviation3.Text = "0";
+            lblDeviation3.AutoSize = true;
+            lblDeviation3.Location = new Point(504, 660);
+            lblDeviation3.Margin = new Padding(5, 0, 5, 0);
+            lblDeviation3.Name = "lblDeviation3";
+            lblDeviation3.Size = new Size(18, 20);
+            lblDeviation3.TabIndex = 6;
+            lblDeviation3.Text = "0";
             // 
             // lblImageStandardText
             // 
-            this.lblImageStandardText.AutoSize = true;
-            this.lblImageStandardText.Location = new System.Drawing.Point(945, 297);
-            this.lblImageStandardText.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblImageStandardText.Name = "lblImageStandardText";
-            this.lblImageStandardText.Size = new System.Drawing.Size(171, 20);
-            this.lblImageStandardText.TabIndex = 16;
-            this.lblImageStandardText.Text = "Усредненный эталон";
+            lblImageStandardText.AutoSize = true;
+            lblImageStandardText.Location = new Point(945, 297);
+            lblImageStandardText.Margin = new Padding(5, 0, 5, 0);
+            lblImageStandardText.Name = "lblImageStandardText";
+            lblImageStandardText.Size = new Size(171, 20);
+            lblImageStandardText.TabIndex = 16;
+            lblImageStandardText.Text = "Усредненный эталон";
             // 
             // lblDeviation3Text
             // 
-            this.lblDeviation3Text.AutoSize = true;
-            this.lblDeviation3Text.Location = new System.Drawing.Point(407, 660);
-            this.lblDeviation3Text.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblDeviation3Text.Name = "lblDeviation3Text";
-            this.lblDeviation3Text.Size = new System.Drawing.Size(80, 20);
-            this.lblDeviation3Text.TabIndex = 3;
-            this.lblDeviation3Text.Text = "Среднее:";
+            lblDeviation3Text.AutoSize = true;
+            lblDeviation3Text.Location = new Point(407, 660);
+            lblDeviation3Text.Margin = new Padding(5, 0, 5, 0);
+            lblDeviation3Text.Name = "lblDeviation3Text";
+            lblDeviation3Text.Size = new Size(80, 20);
+            lblDeviation3Text.TabIndex = 3;
+            lblDeviation3Text.Text = "Среднее:";
             // 
             // lblDeviation2
             // 
-            this.lblDeviation2.AutoSize = true;
-            this.lblDeviation2.Location = new System.Drawing.Point(504, 455);
-            this.lblDeviation2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblDeviation2.Name = "lblDeviation2";
-            this.lblDeviation2.Size = new System.Drawing.Size(18, 20);
-            this.lblDeviation2.TabIndex = 5;
-            this.lblDeviation2.Text = "0";
+            lblDeviation2.AutoSize = true;
+            lblDeviation2.Location = new Point(504, 455);
+            lblDeviation2.Margin = new Padding(5, 0, 5, 0);
+            lblDeviation2.Name = "lblDeviation2";
+            lblDeviation2.Size = new Size(18, 20);
+            lblDeviation2.TabIndex = 5;
+            lblDeviation2.Text = "0";
             // 
             // label6
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(407, 634);
-            this.label6.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(124, 20);
-            this.label6.TabIndex = 15;
-            this.label6.Text = "Изображение 3";
+            label6.AutoSize = true;
+            label6.Location = new Point(407, 634);
+            label6.Margin = new Padding(5, 0, 5, 0);
+            label6.Name = "label6";
+            label6.Size = new Size(124, 20);
+            label6.TabIndex = 15;
+            label6.Text = "Изображение 3";
             // 
             // lblDeviation1
             // 
-            this.lblDeviation1.AutoSize = true;
-            this.lblDeviation1.Location = new System.Drawing.Point(504, 254);
-            this.lblDeviation1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblDeviation1.Name = "lblDeviation1";
-            this.lblDeviation1.Size = new System.Drawing.Size(18, 20);
-            this.lblDeviation1.TabIndex = 4;
-            this.lblDeviation1.Text = "0";
+            lblDeviation1.AutoSize = true;
+            lblDeviation1.Location = new Point(504, 254);
+            lblDeviation1.Margin = new Padding(5, 0, 5, 0);
+            lblDeviation1.Name = "lblDeviation1";
+            lblDeviation1.Size = new Size(18, 20);
+            lblDeviation1.TabIndex = 4;
+            lblDeviation1.Text = "0";
             // 
             // lblDeviation2Text
             // 
-            this.lblDeviation2Text.AutoSize = true;
-            this.lblDeviation2Text.Location = new System.Drawing.Point(407, 455);
-            this.lblDeviation2Text.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblDeviation2Text.Name = "lblDeviation2Text";
-            this.lblDeviation2Text.Size = new System.Drawing.Size(80, 20);
-            this.lblDeviation2Text.TabIndex = 2;
-            this.lblDeviation2Text.Text = "Среднее:";
+            lblDeviation2Text.AutoSize = true;
+            lblDeviation2Text.Location = new Point(407, 455);
+            lblDeviation2Text.Margin = new Padding(5, 0, 5, 0);
+            lblDeviation2Text.Name = "lblDeviation2Text";
+            lblDeviation2Text.Size = new Size(80, 20);
+            lblDeviation2Text.TabIndex = 2;
+            lblDeviation2Text.Text = "Среднее:";
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(407, 427);
-            this.label5.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(124, 20);
-            this.label5.TabIndex = 14;
-            this.label5.Text = "Изображение 2";
+            label5.AutoSize = true;
+            label5.Location = new Point(407, 427);
+            label5.Margin = new Padding(5, 0, 5, 0);
+            label5.Name = "label5";
+            label5.Size = new Size(124, 20);
+            label5.TabIndex = 14;
+            label5.Text = "Изображение 2";
             // 
             // lblImage1Text
             // 
-            this.lblImage1Text.AutoSize = true;
-            this.lblImage1Text.Location = new System.Drawing.Point(407, 226);
-            this.lblImage1Text.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblImage1Text.Name = "lblImage1Text";
-            this.lblImage1Text.Size = new System.Drawing.Size(124, 20);
-            this.lblImage1Text.TabIndex = 13;
-            this.lblImage1Text.Text = "Изображение 1";
+            lblImage1Text.AutoSize = true;
+            lblImage1Text.Location = new Point(407, 226);
+            lblImage1Text.Margin = new Padding(5, 0, 5, 0);
+            lblImage1Text.Name = "lblImage1Text";
+            lblImage1Text.Size = new Size(124, 20);
+            lblImage1Text.TabIndex = 13;
+            lblImage1Text.Text = "Изображение 1";
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(869, 495);
-            this.label4.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(24, 25);
-            this.label4.TabIndex = 12;
-            this.label4.Text = "=";
+            label4.AutoSize = true;
+            label4.Font = new Font("Microsoft Sans Serif", 15F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label4.Location = new Point(869, 495);
+            label4.Margin = new Padding(5, 0, 5, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(24, 25);
+            label4.TabIndex = 12;
+            label4.Text = "=";
             // 
             // lblDeviation1Text
             // 
-            this.lblDeviation1Text.AutoSize = true;
-            this.lblDeviation1Text.Location = new System.Drawing.Point(407, 254);
-            this.lblDeviation1Text.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblDeviation1Text.Name = "lblDeviation1Text";
-            this.lblDeviation1Text.Size = new System.Drawing.Size(80, 20);
-            this.lblDeviation1Text.TabIndex = 1;
-            this.lblDeviation1Text.Text = "Среднее:";
+            lblDeviation1Text.AutoSize = true;
+            lblDeviation1Text.Location = new Point(407, 254);
+            lblDeviation1Text.Margin = new Padding(5, 0, 5, 0);
+            lblDeviation1Text.Name = "lblDeviation1Text";
+            lblDeviation1Text.Size = new Size(80, 20);
+            lblDeviation1Text.TabIndex = 1;
+            lblDeviation1Text.Text = "Среднее:";
             // 
             // pbAverage
             // 
-            this.pbAverage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbAverage.Location = new System.Drawing.Point(950, 327);
-            this.pbAverage.Margin = new System.Windows.Forms.Padding(5);
-            this.pbAverage.Name = "pbAverage";
-            this.pbAverage.Size = new System.Drawing.Size(383, 393);
-            this.pbAverage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbAverage.TabIndex = 11;
-            this.pbAverage.TabStop = false;
-            this.pbAverage.DoubleClick += new System.EventHandler(this.pbAverage_DoubleClick);
+            pbAverage.BorderStyle = BorderStyle.FixedSingle;
+            pbAverage.Location = new Point(950, 327);
+            pbAverage.Margin = new Padding(5);
+            pbAverage.Name = "pbAverage";
+            pbAverage.Size = new Size(383, 393);
+            pbAverage.SizeMode = PictureBoxSizeMode.Zoom;
+            pbAverage.TabIndex = 11;
+            pbAverage.TabStop = false;
+            pbAverage.DoubleClick += pbAverage_DoubleClick;
             // 
             // pbStandard3
             // 
-            this.pbStandard3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbStandard3.Location = new System.Drawing.Point(617, 634);
-            this.pbStandard3.Margin = new System.Windows.Forms.Padding(5);
-            this.pbStandard3.Name = "pbStandard3";
-            this.pbStandard3.Size = new System.Drawing.Size(191, 196);
-            this.pbStandard3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbStandard3.TabIndex = 9;
-            this.pbStandard3.TabStop = false;
-            this.pbStandard3.DoubleClick += new System.EventHandler(this.pbStandard3_DoubleClick);
+            pbStandard3.BorderStyle = BorderStyle.FixedSingle;
+            pbStandard3.Location = new Point(617, 634);
+            pbStandard3.Margin = new Padding(5);
+            pbStandard3.Name = "pbStandard3";
+            pbStandard3.Size = new Size(191, 196);
+            pbStandard3.SizeMode = PictureBoxSizeMode.Zoom;
+            pbStandard3.TabIndex = 9;
+            pbStandard3.TabStop = false;
+            pbStandard3.DoubleClick += pbStandard3_DoubleClick;
             // 
             // pbStandard2
             // 
-            this.pbStandard2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbStandard2.Location = new System.Drawing.Point(617, 427);
-            this.pbStandard2.Margin = new System.Windows.Forms.Padding(5);
-            this.pbStandard2.Name = "pbStandard2";
-            this.pbStandard2.Size = new System.Drawing.Size(191, 196);
-            this.pbStandard2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbStandard2.TabIndex = 8;
-            this.pbStandard2.TabStop = false;
-            this.pbStandard2.DoubleClick += new System.EventHandler(this.pbStandard2_DoubleClick);
+            pbStandard2.BorderStyle = BorderStyle.FixedSingle;
+            pbStandard2.Location = new Point(617, 427);
+            pbStandard2.Margin = new Padding(5);
+            pbStandard2.Name = "pbStandard2";
+            pbStandard2.Size = new Size(191, 196);
+            pbStandard2.SizeMode = PictureBoxSizeMode.Zoom;
+            pbStandard2.TabIndex = 8;
+            pbStandard2.TabStop = false;
+            pbStandard2.DoubleClick += pbStandard2_DoubleClick;
             // 
             // pbStandard1
             // 
-            this.pbStandard1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbStandard1.Location = new System.Drawing.Point(617, 222);
-            this.pbStandard1.Margin = new System.Windows.Forms.Padding(5);
-            this.pbStandard1.Name = "pbStandard1";
-            this.pbStandard1.Size = new System.Drawing.Size(191, 196);
-            this.pbStandard1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbStandard1.TabIndex = 7;
-            this.pbStandard1.TabStop = false;
-            this.pbStandard1.DoubleClick += new System.EventHandler(this.pbStandard1_DoubleClick);
+            pbStandard1.BorderStyle = BorderStyle.FixedSingle;
+            pbStandard1.Location = new Point(617, 222);
+            pbStandard1.Margin = new Padding(5);
+            pbStandard1.Name = "pbStandard1";
+            pbStandard1.Size = new Size(191, 196);
+            pbStandard1.SizeMode = PictureBoxSizeMode.Zoom;
+            pbStandard1.TabIndex = 7;
+            pbStandard1.TabStop = false;
+            pbStandard1.DoubleClick += pbStandard1_DoubleClick;
             // 
             // cbExternalSignalForStandard
             // 
-            this.cbExternalSignalForStandard.AutoSize = true;
-            this.cbExternalSignalForStandard.Location = new System.Drawing.Point(411, 9);
-            this.cbExternalSignalForStandard.Margin = new System.Windows.Forms.Padding(5);
-            this.cbExternalSignalForStandard.Name = "cbExternalSignalForStandard";
-            this.cbExternalSignalForStandard.Size = new System.Drawing.Size(250, 24);
-            this.cbExternalSignalForStandard.TabIndex = 6;
-            this.cbExternalSignalForStandard.Text = "Читать по внешнему сигналу";
-            this.cbExternalSignalForStandard.UseVisualStyleBackColor = true;
+            cbExternalSignalForStandard.AutoSize = true;
+            cbExternalSignalForStandard.Location = new Point(411, 9);
+            cbExternalSignalForStandard.Margin = new Padding(5);
+            cbExternalSignalForStandard.Name = "cbExternalSignalForStandard";
+            cbExternalSignalForStandard.Size = new Size(250, 24);
+            cbExternalSignalForStandard.TabIndex = 6;
+            cbExternalSignalForStandard.Text = "Читать по внешнему сигналу";
+            cbExternalSignalForStandard.UseVisualStyleBackColor = true;
             // 
             // pnlGetStandardSockets
             // 
-            this.pnlGetStandardSockets.Location = new System.Drawing.Point(5, 5);
-            this.pnlGetStandardSockets.Margin = new System.Windows.Forms.Padding(5);
-            this.pnlGetStandardSockets.Name = "pnlGetStandardSockets";
-            this.pnlGetStandardSockets.Size = new System.Drawing.Size(393, 503);
-            this.pnlGetStandardSockets.TabIndex = 5;
+            pnlGetStandardSockets.Location = new Point(5, 5);
+            pnlGetStandardSockets.Margin = new Padding(5);
+            pnlGetStandardSockets.Name = "pnlGetStandardSockets";
+            pnlGetStandardSockets.Size = new Size(393, 503);
+            pnlGetStandardSockets.TabIndex = 5;
             // 
             // tbTest
             // 
-            this.tbTest.Controls.Add(this.cbTestCCDMaxPointShow);
-            this.tbTest.Controls.Add(this.ssFooter);
-            this.tbTest.Controls.Add(this.lblTimeImageProcess);
-            this.tbTest.Controls.Add(this.cbInvertColors);
-            this.tbTest.Controls.Add(this.btnCycleStop);
-            this.tbTest.Controls.Add(this.btnCycleStart);
-            this.tbTest.Controls.Add(this.chTestStandard);
-            this.tbTest.Controls.Add(this.chTestDiff);
-            this.tbTest.Controls.Add(this.lblNumLineCaption);
-            this.tbTest.Controls.Add(this.cbFullMax);
-            this.tbTest.Controls.Add(this.cbVertical);
-            this.tbTest.Controls.Add(this.numFrame);
-            this.tbTest.Controls.Add(this.chTestReadLine);
-            this.tbTest.Controls.Add(this.lblTestStandard);
-            this.tbTest.Controls.Add(this.lblTestDifference);
-            this.tbTest.Controls.Add(this.lblTestRead);
-            this.tbTest.Controls.Add(this.pbTestStandard);
-            this.tbTest.Controls.Add(this.pbTestDifference);
-            this.tbTest.Controls.Add(this.pbTestReadImage);
-            this.tbTest.Controls.Add(this.btnTest_ReadSelectedSocket);
-            this.tbTest.Controls.Add(this.lblTestSelectedSocket);
-            this.tbTest.Controls.Add(this.lblTestSelectedSocketLabel);
-            this.tbTest.Controls.Add(this.pnlTestSockets);
-            this.tbTest.Controls.Add(this.lblStatus);
-            this.tbTest.Controls.Add(this.label1);
-            this.tbTest.Controls.Add(this.cbTest_ExternalStart);
-            this.tbTest.Controls.Add(this.btnTest_ReadAllSocket);
-            this.tbTest.Location = new System.Drawing.Point(4, 29);
-            this.tbTest.Margin = new System.Windows.Forms.Padding(5);
-            this.tbTest.Name = "tbTest";
-            this.tbTest.Size = new System.Drawing.Size(1808, 953);
-            this.tbTest.TabIndex = 2;
-            this.tbTest.Text = "Тест ПЗС";
-            this.tbTest.UseVisualStyleBackColor = true;
+            tbTest.Controls.Add(cbTestCCDMaxPointShow);
+            tbTest.Controls.Add(ssFooter);
+            tbTest.Controls.Add(lblTimeImageProcess);
+            tbTest.Controls.Add(cbInvertColors);
+            tbTest.Controls.Add(btnCycleStop);
+            tbTest.Controls.Add(btnCycleStart);
+            tbTest.Controls.Add(chTestStandard);
+            tbTest.Controls.Add(chTestDiff);
+            tbTest.Controls.Add(lblNumLineCaption);
+            tbTest.Controls.Add(cbFullMax);
+            tbTest.Controls.Add(cbVertical);
+            tbTest.Controls.Add(numFrame);
+            tbTest.Controls.Add(chTestReadLine);
+            tbTest.Controls.Add(lblTestStandard);
+            tbTest.Controls.Add(lblTestDifference);
+            tbTest.Controls.Add(lblTestRead);
+            tbTest.Controls.Add(pbTestStandard);
+            tbTest.Controls.Add(pbTestDifference);
+            tbTest.Controls.Add(pbTestReadImage);
+            tbTest.Controls.Add(btnTest_ReadSelectedSocket);
+            tbTest.Controls.Add(lblTestSelectedSocket);
+            tbTest.Controls.Add(lblTestSelectedSocketLabel);
+            tbTest.Controls.Add(pnlTestSockets);
+            tbTest.Controls.Add(lblStatus);
+            tbTest.Controls.Add(label1);
+            tbTest.Controls.Add(cbTest_ExternalStart);
+            tbTest.Controls.Add(btnTest_ReadAllSocket);
+            tbTest.Location = new Point(4, 29);
+            tbTest.Margin = new Padding(5);
+            tbTest.Name = "tbTest";
+            tbTest.Size = new Size(1808, 982);
+            tbTest.TabIndex = 2;
+            tbTest.Text = "Тест ПЗС";
+            tbTest.UseVisualStyleBackColor = true;
             // 
             // cbTestCCDMaxPointShow
             // 
-            this.cbTestCCDMaxPointShow.AutoSize = true;
-            this.cbTestCCDMaxPointShow.Location = new System.Drawing.Point(1570, 9);
-            this.cbTestCCDMaxPointShow.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestCCDMaxPointShow.Name = "cbTestCCDMaxPointShow";
-            this.cbTestCCDMaxPointShow.Size = new System.Drawing.Size(263, 24);
-            this.cbTestCCDMaxPointShow.TabIndex = 73;
-            this.cbTestCCDMaxPointShow.Text = "Показать максимальную точку";
-            this.cbTestCCDMaxPointShow.UseVisualStyleBackColor = true;
-            this.cbTestCCDMaxPointShow.CheckedChanged += new System.EventHandler(this.cbTestCCDMaxPointShow_CheckedChanged);
+            cbTestCCDMaxPointShow.AutoSize = true;
+            cbTestCCDMaxPointShow.Location = new Point(1570, 9);
+            cbTestCCDMaxPointShow.Margin = new Padding(5);
+            cbTestCCDMaxPointShow.Name = "cbTestCCDMaxPointShow";
+            cbTestCCDMaxPointShow.Size = new Size(263, 24);
+            cbTestCCDMaxPointShow.TabIndex = 73;
+            cbTestCCDMaxPointShow.Text = "Показать максимальную точку";
+            cbTestCCDMaxPointShow.UseVisualStyleBackColor = true;
+            cbTestCCDMaxPointShow.CheckedChanged += cbTestCCDMaxPointShow_CheckedChanged;
             // 
             // ssFooter
             // 
-            this.ssFooter.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tslTestCCDCardReadStatus});
-            this.ssFooter.Location = new System.Drawing.Point(0, 931);
-            this.ssFooter.Name = "ssFooter";
-            this.ssFooter.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
-            this.ssFooter.Size = new System.Drawing.Size(1808, 22);
-            this.ssFooter.TabIndex = 72;
-            this.ssFooter.Text = "statusStrip1";
+            ssFooter.Items.AddRange(new ToolStripItem[] { tslTestCCDCardReadStatus });
+            ssFooter.Location = new Point(0, 960);
+            ssFooter.Name = "ssFooter";
+            ssFooter.Padding = new Padding(2, 0, 21, 0);
+            ssFooter.Size = new Size(1808, 22);
+            ssFooter.TabIndex = 72;
+            ssFooter.Text = "statusStrip1";
             // 
             // tslTestCCDCardReadStatus
             // 
-            this.tslTestCCDCardReadStatus.Name = "tslTestCCDCardReadStatus";
-            this.tslTestCCDCardReadStatus.Size = new System.Drawing.Size(118, 17);
-            this.tslTestCCDCardReadStatus.Text = "toolStripStatusLabel1";
+            tslTestCCDCardReadStatus.Name = "tslTestCCDCardReadStatus";
+            tslTestCCDCardReadStatus.Size = new Size(118, 17);
+            tslTestCCDCardReadStatus.Text = "toolStripStatusLabel1";
             // 
             // lblTimeImageProcess
             // 
-            this.lblTimeImageProcess.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblTimeImageProcess.AutoSize = true;
-            this.lblTimeImageProcess.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTimeImageProcess.Location = new System.Drawing.Point(10, 918);
-            this.lblTimeImageProcess.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTimeImageProcess.Name = "lblTimeImageProcess";
-            this.lblTimeImageProcess.Size = new System.Drawing.Size(10, 13);
-            this.lblTimeImageProcess.TabIndex = 71;
-            this.lblTimeImageProcess.Text = "-";
+            lblTimeImageProcess.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lblTimeImageProcess.AutoSize = true;
+            lblTimeImageProcess.Font = new Font("Microsoft Sans Serif", 8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTimeImageProcess.Location = new Point(10, 947);
+            lblTimeImageProcess.Margin = new Padding(5, 0, 5, 0);
+            lblTimeImageProcess.Name = "lblTimeImageProcess";
+            lblTimeImageProcess.Size = new Size(10, 13);
+            lblTimeImageProcess.TabIndex = 71;
+            lblTimeImageProcess.Text = "-";
             // 
             // cbInvertColors
             // 
-            this.cbInvertColors.AutoSize = true;
-            this.cbInvertColors.Location = new System.Drawing.Point(1387, 11);
-            this.cbInvertColors.Margin = new System.Windows.Forms.Padding(5);
-            this.cbInvertColors.Name = "cbInvertColors";
-            this.cbInvertColors.Size = new System.Drawing.Size(159, 24);
-            this.cbInvertColors.TabIndex = 70;
-            this.cbInvertColors.Text = "Инверсия цветов";
-            this.cbInvertColors.UseVisualStyleBackColor = true;
-            this.cbInvertColors.CheckedChanged += new System.EventHandler(this.cbInvertColors_CheckedChanged);
+            cbInvertColors.AutoSize = true;
+            cbInvertColors.Location = new Point(1387, 11);
+            cbInvertColors.Margin = new Padding(5);
+            cbInvertColors.Name = "cbInvertColors";
+            cbInvertColors.Size = new Size(159, 24);
+            cbInvertColors.TabIndex = 70;
+            cbInvertColors.Text = "Инверсия цветов";
+            cbInvertColors.UseVisualStyleBackColor = true;
+            cbInvertColors.CheckedChanged += cbInvertColors_CheckedChanged;
             // 
             // btnCycleStop
             // 
-            this.btnCycleStop.Location = new System.Drawing.Point(230, 591);
-            this.btnCycleStop.Margin = new System.Windows.Forms.Padding(5);
-            this.btnCycleStop.Name = "btnCycleStop";
-            this.btnCycleStop.Size = new System.Drawing.Size(212, 46);
-            this.btnCycleStop.TabIndex = 40;
-            this.btnCycleStop.Text = " Остановка цикла";
-            this.btnCycleStop.UseVisualStyleBackColor = true;
-            this.btnCycleStop.Click += new System.EventHandler(this.btnCycleStop_Click);
+            btnCycleStop.Location = new Point(230, 591);
+            btnCycleStop.Margin = new Padding(5);
+            btnCycleStop.Name = "btnCycleStop";
+            btnCycleStop.Size = new Size(212, 46);
+            btnCycleStop.TabIndex = 40;
+            btnCycleStop.Text = " Остановка цикла";
+            btnCycleStop.UseVisualStyleBackColor = true;
+            btnCycleStop.Click += btnCycleStop_Click;
             // 
             // btnCycleStart
             // 
-            this.btnCycleStart.Location = new System.Drawing.Point(11, 591);
-            this.btnCycleStart.Margin = new System.Windows.Forms.Padding(5);
-            this.btnCycleStart.Name = "btnCycleStart";
-            this.btnCycleStart.Size = new System.Drawing.Size(165, 46);
-            this.btnCycleStart.TabIndex = 39;
-            this.btnCycleStart.Text = "Запуск цикла";
-            this.btnCycleStart.UseVisualStyleBackColor = true;
-            this.btnCycleStart.Click += new System.EventHandler(this.btnCycleStartStop_Click);
+            btnCycleStart.Location = new Point(11, 591);
+            btnCycleStart.Margin = new Padding(5);
+            btnCycleStart.Name = "btnCycleStart";
+            btnCycleStart.Size = new Size(165, 46);
+            btnCycleStart.TabIndex = 39;
+            btnCycleStart.Text = "Запуск цикла";
+            btnCycleStart.UseVisualStyleBackColor = true;
+            btnCycleStart.Click += btnCycleStartStop_Click;
             // 
             // chTestStandard
             // 
-            chartArea7.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea7.Name = "ChartArea1";
-            this.chTestStandard.ChartAreas.Add(chartArea7);
-            this.chTestStandard.Location = new System.Drawing.Point(1260, 587);
-            this.chTestStandard.Margin = new System.Windows.Forms.Padding(5);
-            this.chTestStandard.Name = "chTestStandard";
-            this.chTestStandard.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series19.ChartArea = "ChartArea1";
-            series19.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series19.Name = "Series1";
-            series20.ChartArea = "ChartArea1";
-            series20.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series20.Name = "Series2";
-            series21.ChartArea = "ChartArea1";
-            series21.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series21.Name = "Series3";
-            series21.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            this.chTestStandard.Series.Add(series19);
-            this.chTestStandard.Series.Add(series20);
-            this.chTestStandard.Series.Add(series21);
-            this.chTestStandard.Size = new System.Drawing.Size(398, 287);
-            this.chTestStandard.TabIndex = 38;
-            this.chTestStandard.Text = "chart1";
+            chartArea1.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea1.Name = "ChartArea1";
+            chTestStandard.ChartAreas.Add(chartArea1);
+            chTestStandard.Location = new Point(1260, 587);
+            chTestStandard.Margin = new Padding(5);
+            chTestStandard.Name = "chTestStandard";
+            chTestStandard.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Name = "Series1";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Name = "Series2";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series3.Name = "Series3";
+            series3.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestStandard.Series.Add(series1);
+            chTestStandard.Series.Add(series2);
+            chTestStandard.Series.Add(series3);
+            chTestStandard.Size = new Size(398, 287);
+            chTestStandard.TabIndex = 38;
+            chTestStandard.Text = "chart1";
             // 
             // chTestDiff
             // 
-            chartArea8.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea8.Name = "ChartArea1";
-            this.chTestDiff.ChartAreas.Add(chartArea8);
-            this.chTestDiff.Location = new System.Drawing.Point(876, 591);
-            this.chTestDiff.Margin = new System.Windows.Forms.Padding(5);
-            this.chTestDiff.Name = "chTestDiff";
-            this.chTestDiff.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series22.ChartArea = "ChartArea1";
-            series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series22.Name = "Series1";
-            series23.ChartArea = "ChartArea1";
-            series23.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series23.Name = "Series2";
-            series24.ChartArea = "ChartArea1";
-            series24.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series24.Name = "Series3";
-            series24.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            this.chTestDiff.Series.Add(series22);
-            this.chTestDiff.Series.Add(series23);
-            this.chTestDiff.Series.Add(series24);
-            this.chTestDiff.Size = new System.Drawing.Size(392, 287);
-            this.chTestDiff.TabIndex = 37;
-            this.chTestDiff.Text = "chart1";
+            chartArea2.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea2.Name = "ChartArea1";
+            chTestDiff.ChartAreas.Add(chartArea2);
+            chTestDiff.Location = new Point(876, 591);
+            chTestDiff.Margin = new Padding(5);
+            chTestDiff.Name = "chTestDiff";
+            chTestDiff.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series4.Name = "Series1";
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series5.Name = "Series2";
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series6.Name = "Series3";
+            series6.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestDiff.Series.Add(series4);
+            chTestDiff.Series.Add(series5);
+            chTestDiff.Series.Add(series6);
+            chTestDiff.Size = new Size(392, 287);
+            chTestDiff.TabIndex = 37;
+            chTestDiff.Text = "chart1";
             // 
             // lblNumLineCaption
             // 
-            this.lblNumLineCaption.AutoSize = true;
-            this.lblNumLineCaption.Location = new System.Drawing.Point(930, 12);
-            this.lblNumLineCaption.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblNumLineCaption.Name = "lblNumLineCaption";
-            this.lblNumLineCaption.Size = new System.Drawing.Size(113, 20);
-            this.lblNumLineCaption.TabIndex = 35;
-            this.lblNumLineCaption.Text = "Номер линии:";
+            lblNumLineCaption.AutoSize = true;
+            lblNumLineCaption.Location = new Point(930, 12);
+            lblNumLineCaption.Margin = new Padding(5, 0, 5, 0);
+            lblNumLineCaption.Name = "lblNumLineCaption";
+            lblNumLineCaption.Size = new Size(113, 20);
+            lblNumLineCaption.TabIndex = 35;
+            lblNumLineCaption.Text = "Номер линии:";
             // 
             // cbFullMax
             // 
-            this.cbFullMax.AutoSize = true;
-            this.cbFullMax.Location = new System.Drawing.Point(647, 11);
-            this.cbFullMax.Margin = new System.Windows.Forms.Padding(5);
-            this.cbFullMax.Name = "cbFullMax";
-            this.cbFullMax.Size = new System.Drawing.Size(211, 24);
-            this.cbFullMax.TabIndex = 34;
-            this.cbFullMax.Text = "Максимальное по кадру";
-            this.cbFullMax.UseVisualStyleBackColor = true;
-            this.cbFullMax.CheckedChanged += new System.EventHandler(this.cbFullMax_CheckedChanged);
+            cbFullMax.AutoSize = true;
+            cbFullMax.Location = new Point(647, 11);
+            cbFullMax.Margin = new Padding(5);
+            cbFullMax.Name = "cbFullMax";
+            cbFullMax.Size = new Size(211, 24);
+            cbFullMax.TabIndex = 34;
+            cbFullMax.Text = "Максимальное по кадру";
+            cbFullMax.UseVisualStyleBackColor = true;
+            cbFullMax.CheckedChanged += cbFullMax_CheckedChanged;
             // 
             // cbVertical
             // 
-            this.cbVertical.AutoSize = true;
-            this.cbVertical.Location = new System.Drawing.Point(1168, 11);
-            this.cbVertical.Margin = new System.Windows.Forms.Padding(5);
-            this.cbVertical.Name = "cbVertical";
-            this.cbVertical.Size = new System.Drawing.Size(188, 24);
-            this.cbVertical.TabIndex = 33;
-            this.cbVertical.Text = "Вертикальная линия";
-            this.cbVertical.UseVisualStyleBackColor = true;
+            cbVertical.AutoSize = true;
+            cbVertical.Location = new Point(1168, 11);
+            cbVertical.Margin = new Padding(5);
+            cbVertical.Name = "cbVertical";
+            cbVertical.Size = new Size(188, 24);
+            cbVertical.TabIndex = 33;
+            cbVertical.Text = "Вертикальная линия";
+            cbVertical.UseVisualStyleBackColor = true;
             // 
             // numFrame
             // 
-            this.numFrame.Location = new System.Drawing.Point(1053, 8);
-            this.numFrame.Margin = new System.Windows.Forms.Padding(5);
-            this.numFrame.Maximum = new decimal(new int[] {
-            511,
-            0,
-            0,
-            0});
-            this.numFrame.Name = "numFrame";
-            this.numFrame.Size = new System.Drawing.Size(105, 26);
-            this.numFrame.TabIndex = 32;
-            this.numFrame.ValueChanged += new System.EventHandler(this.numFrame_ValueChanged);
-            this.numFrame.DoubleClick += new System.EventHandler(this.numFrame_DoubleClick);
+            numFrame.Location = new Point(1053, 8);
+            numFrame.Margin = new Padding(5);
+            numFrame.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
+            numFrame.Name = "numFrame";
+            numFrame.Size = new Size(105, 26);
+            numFrame.TabIndex = 32;
+            numFrame.ValueChanged += numFrame_ValueChanged;
+            numFrame.DoubleClick += numFrame_DoubleClick;
             // 
             // chTestReadLine
             // 
-            chartArea9.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea9.Name = "ChartArea1";
-            this.chTestReadLine.ChartAreas.Add(chartArea9);
-            this.chTestReadLine.Location = new System.Drawing.Point(437, 587);
-            this.chTestReadLine.Margin = new System.Windows.Forms.Padding(5);
-            this.chTestReadLine.Name = "chTestReadLine";
-            this.chTestReadLine.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series25.ChartArea = "ChartArea1";
-            series25.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series25.Name = "Series1";
-            series26.ChartArea = "ChartArea1";
-            series26.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series26.Name = "Series2";
-            series27.ChartArea = "ChartArea1";
-            series27.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series27.Name = "Series3";
-            series27.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            this.chTestReadLine.Series.Add(series25);
-            this.chTestReadLine.Series.Add(series26);
-            this.chTestReadLine.Series.Add(series27);
-            this.chTestReadLine.Size = new System.Drawing.Size(468, 287);
-            this.chTestReadLine.TabIndex = 31;
-            this.chTestReadLine.Text = "chart1";
+            chartArea3.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea3.Name = "ChartArea1";
+            chTestReadLine.ChartAreas.Add(chartArea3);
+            chTestReadLine.Location = new Point(437, 587);
+            chTestReadLine.Margin = new Padding(5);
+            chTestReadLine.Name = "chTestReadLine";
+            chTestReadLine.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
+            series7.ChartArea = "ChartArea1";
+            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series7.Name = "Series1";
+            series8.ChartArea = "ChartArea1";
+            series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series8.Name = "Series2";
+            series9.ChartArea = "ChartArea1";
+            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series9.Name = "Series3";
+            series9.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestReadLine.Series.Add(series7);
+            chTestReadLine.Series.Add(series8);
+            chTestReadLine.Series.Add(series9);
+            chTestReadLine.Size = new Size(468, 287);
+            chTestReadLine.TabIndex = 31;
+            chTestReadLine.Text = "chart1";
             // 
             // lblTestStandard
             // 
-            this.lblTestStandard.AutoSize = true;
-            this.lblTestStandard.Location = new System.Drawing.Point(771, 80);
-            this.lblTestStandard.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestStandard.Name = "lblTestStandard";
-            this.lblTestStandard.Size = new System.Drawing.Size(51, 20);
-            this.lblTestStandard.TabIndex = 30;
-            this.lblTestStandard.Text = "label8";
+            lblTestStandard.AutoSize = true;
+            lblTestStandard.Location = new Point(771, 80);
+            lblTestStandard.Margin = new Padding(5, 0, 5, 0);
+            lblTestStandard.Name = "lblTestStandard";
+            lblTestStandard.Size = new Size(51, 20);
+            lblTestStandard.TabIndex = 30;
+            lblTestStandard.Text = "label8";
             // 
             // lblTestDifference
             // 
-            this.lblTestDifference.AutoSize = true;
-            this.lblTestDifference.Location = new System.Drawing.Point(612, 80);
-            this.lblTestDifference.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestDifference.Name = "lblTestDifference";
-            this.lblTestDifference.Size = new System.Drawing.Size(51, 20);
-            this.lblTestDifference.TabIndex = 29;
-            this.lblTestDifference.Text = "label7";
+            lblTestDifference.AutoSize = true;
+            lblTestDifference.Location = new Point(612, 80);
+            lblTestDifference.Margin = new Padding(5, 0, 5, 0);
+            lblTestDifference.Name = "lblTestDifference";
+            lblTestDifference.Size = new Size(51, 20);
+            lblTestDifference.TabIndex = 29;
+            lblTestDifference.Text = "label7";
             // 
             // lblTestRead
             // 
-            this.lblTestRead.AutoSize = true;
-            this.lblTestRead.Location = new System.Drawing.Point(448, 80);
-            this.lblTestRead.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestRead.Name = "lblTestRead";
-            this.lblTestRead.Size = new System.Drawing.Size(51, 20);
-            this.lblTestRead.TabIndex = 28;
-            this.lblTestRead.Text = "label2";
+            lblTestRead.AutoSize = true;
+            lblTestRead.Location = new Point(448, 80);
+            lblTestRead.Margin = new Padding(5, 0, 5, 0);
+            lblTestRead.Name = "lblTestRead";
+            lblTestRead.Size = new Size(51, 20);
+            lblTestRead.TabIndex = 28;
+            lblTestRead.Text = "label2";
             // 
             // pbTestStandard
             // 
-            this.pbTestStandard.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbTestStandard.Location = new System.Drawing.Point(771, 112);
-            this.pbTestStandard.Margin = new System.Windows.Forms.Padding(5);
-            this.pbTestStandard.Name = "pbTestStandard";
-            this.pbTestStandard.Size = new System.Drawing.Size(149, 76);
-            this.pbTestStandard.TabIndex = 27;
-            this.pbTestStandard.TabStop = false;
-            this.pbTestStandard.Paint += new System.Windows.Forms.PaintEventHandler(this.pbTestStandard_Paint);
-            this.pbTestStandard.DoubleClick += new System.EventHandler(this.pbTestStandard_DoubleClick);
-            this.pbTestStandard.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbTestStandard_MouseUp);
+            pbTestStandard.BorderStyle = BorderStyle.FixedSingle;
+            pbTestStandard.Location = new Point(771, 112);
+            pbTestStandard.Margin = new Padding(5);
+            pbTestStandard.Name = "pbTestStandard";
+            pbTestStandard.Size = new Size(149, 76);
+            pbTestStandard.TabIndex = 27;
+            pbTestStandard.TabStop = false;
+            pbTestStandard.Paint += pbTestStandard_Paint;
+            pbTestStandard.DoubleClick += pbTestStandard_DoubleClick;
+            pbTestStandard.MouseUp += pbTestStandard_MouseUp;
             // 
             // pbTestDifference
             // 
-            this.pbTestDifference.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbTestDifference.Location = new System.Drawing.Point(612, 112);
-            this.pbTestDifference.Margin = new System.Windows.Forms.Padding(5);
-            this.pbTestDifference.Name = "pbTestDifference";
-            this.pbTestDifference.Size = new System.Drawing.Size(149, 76);
-            this.pbTestDifference.TabIndex = 26;
-            this.pbTestDifference.TabStop = false;
-            this.pbTestDifference.Paint += new System.Windows.Forms.PaintEventHandler(this.pbTestDifference_Paint);
-            this.pbTestDifference.DoubleClick += new System.EventHandler(this.pbTestDifference_DoubleClick);
-            this.pbTestDifference.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbTestDifference_MouseUp);
+            pbTestDifference.BorderStyle = BorderStyle.FixedSingle;
+            pbTestDifference.Location = new Point(612, 112);
+            pbTestDifference.Margin = new Padding(5);
+            pbTestDifference.Name = "pbTestDifference";
+            pbTestDifference.Size = new Size(149, 76);
+            pbTestDifference.TabIndex = 26;
+            pbTestDifference.TabStop = false;
+            pbTestDifference.Paint += pbTestDifference_Paint;
+            pbTestDifference.DoubleClick += pbTestDifference_DoubleClick;
+            pbTestDifference.MouseUp += pbTestDifference_MouseUp;
             // 
             // pbTestReadImage
             // 
-            this.pbTestReadImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbTestReadImage.Location = new System.Drawing.Point(453, 112);
-            this.pbTestReadImage.Margin = new System.Windows.Forms.Padding(5);
-            this.pbTestReadImage.Name = "pbTestReadImage";
-            this.pbTestReadImage.Size = new System.Drawing.Size(149, 76);
-            this.pbTestReadImage.TabIndex = 25;
-            this.pbTestReadImage.TabStop = false;
-            this.pbTestReadImage.Paint += new System.Windows.Forms.PaintEventHandler(this.pbTestReadImage_Paint);
-            this.pbTestReadImage.DoubleClick += new System.EventHandler(this.pbTestReadImage_DoubleClick);
-            this.pbTestReadImage.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbTestReadImage_MouseUp);
+            pbTestReadImage.BorderStyle = BorderStyle.FixedSingle;
+            pbTestReadImage.Location = new Point(453, 112);
+            pbTestReadImage.Margin = new Padding(5);
+            pbTestReadImage.Name = "pbTestReadImage";
+            pbTestReadImage.Size = new Size(149, 76);
+            pbTestReadImage.TabIndex = 25;
+            pbTestReadImage.TabStop = false;
+            pbTestReadImage.Paint += pbTestReadImage_Paint;
+            pbTestReadImage.DoubleClick += pbTestReadImage_DoubleClick;
+            pbTestReadImage.MouseUp += pbTestReadImage_MouseUp;
             // 
             // btnTest_ReadSelectedSocket
             // 
-            this.btnTest_ReadSelectedSocket.Location = new System.Drawing.Point(252, 11);
-            this.btnTest_ReadSelectedSocket.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTest_ReadSelectedSocket.Name = "btnTest_ReadSelectedSocket";
-            this.btnTest_ReadSelectedSocket.Size = new System.Drawing.Size(189, 66);
-            this.btnTest_ReadSelectedSocket.TabIndex = 24;
-            this.btnTest_ReadSelectedSocket.Text = "Читать выбранное гнездо";
-            this.btnTest_ReadSelectedSocket.UseVisualStyleBackColor = true;
-            this.btnTest_ReadSelectedSocket.Click += new System.EventHandler(this.btnReadSelectedSocket_Click);
+            btnTest_ReadSelectedSocket.Location = new Point(252, 11);
+            btnTest_ReadSelectedSocket.Margin = new Padding(5);
+            btnTest_ReadSelectedSocket.Name = "btnTest_ReadSelectedSocket";
+            btnTest_ReadSelectedSocket.Size = new Size(189, 66);
+            btnTest_ReadSelectedSocket.TabIndex = 24;
+            btnTest_ReadSelectedSocket.Text = "Читать выбранное гнездо";
+            btnTest_ReadSelectedSocket.UseVisualStyleBackColor = true;
+            btnTest_ReadSelectedSocket.Click += btnReadSelectedSocket_Click;
             // 
             // lblTestSelectedSocket
             // 
-            this.lblTestSelectedSocket.AutoSize = true;
-            this.lblTestSelectedSocket.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestSelectedSocket.Location = new System.Drawing.Point(587, 12);
-            this.lblTestSelectedSocket.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestSelectedSocket.Name = "lblTestSelectedSocket";
-            this.lblTestSelectedSocket.Size = new System.Drawing.Size(15, 20);
-            this.lblTestSelectedSocket.TabIndex = 23;
-            this.lblTestSelectedSocket.Text = "-";
+            lblTestSelectedSocket.AutoSize = true;
+            lblTestSelectedSocket.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            lblTestSelectedSocket.Location = new Point(587, 12);
+            lblTestSelectedSocket.Margin = new Padding(5, 0, 5, 0);
+            lblTestSelectedSocket.Name = "lblTestSelectedSocket";
+            lblTestSelectedSocket.Size = new Size(15, 20);
+            lblTestSelectedSocket.TabIndex = 23;
+            lblTestSelectedSocket.Text = "-";
             // 
             // lblTestSelectedSocketLabel
             // 
-            this.lblTestSelectedSocketLabel.AutoSize = true;
-            this.lblTestSelectedSocketLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestSelectedSocketLabel.Location = new System.Drawing.Point(440, 12);
-            this.lblTestSelectedSocketLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestSelectedSocketLabel.Name = "lblTestSelectedSocketLabel";
-            this.lblTestSelectedSocketLabel.Size = new System.Drawing.Size(137, 20);
-            this.lblTestSelectedSocketLabel.TabIndex = 22;
-            this.lblTestSelectedSocketLabel.Text = "Выбрано гнездо:";
+            lblTestSelectedSocketLabel.AutoSize = true;
+            lblTestSelectedSocketLabel.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestSelectedSocketLabel.Location = new Point(440, 12);
+            lblTestSelectedSocketLabel.Margin = new Padding(5, 0, 5, 0);
+            lblTestSelectedSocketLabel.Name = "lblTestSelectedSocketLabel";
+            lblTestSelectedSocketLabel.Size = new Size(137, 20);
+            lblTestSelectedSocketLabel.TabIndex = 22;
+            lblTestSelectedSocketLabel.Text = "Выбрано гнездо:";
             // 
             // pnlTestSockets
             // 
-            this.pnlTestSockets.Location = new System.Drawing.Point(11, 112);
-            this.pnlTestSockets.Margin = new System.Windows.Forms.Padding(5);
-            this.pnlTestSockets.Name = "pnlTestSockets";
-            this.pnlTestSockets.Size = new System.Drawing.Size(429, 469);
-            this.pnlTestSockets.TabIndex = 8;
+            pnlTestSockets.Location = new Point(11, 112);
+            pnlTestSockets.Margin = new Padding(5);
+            pnlTestSockets.Name = "pnlTestSockets";
+            pnlTestSockets.Size = new Size(429, 469);
+            pnlTestSockets.TabIndex = 8;
             // 
             // lblStatus
             // 
-            this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(542, 49);
-            this.lblStatus.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(14, 20);
-            this.lblStatus.TabIndex = 4;
-            this.lblStatus.Text = "-";
+            lblStatus.AutoSize = true;
+            lblStatus.Location = new Point(542, 49);
+            lblStatus.Margin = new Padding(5, 0, 5, 0);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(14, 20);
+            lblStatus.TabIndex = 4;
+            lblStatus.Text = "-";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(448, 47);
-            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(66, 20);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Статус:";
+            label1.AutoSize = true;
+            label1.Location = new Point(448, 47);
+            label1.Margin = new Padding(5, 0, 5, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(66, 20);
+            label1.TabIndex = 3;
+            label1.Text = "Статус:";
             // 
             // cbTest_ExternalStart
             // 
-            this.cbTest_ExternalStart.AutoSize = true;
-            this.cbTest_ExternalStart.Location = new System.Drawing.Point(12, 5);
-            this.cbTest_ExternalStart.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTest_ExternalStart.Name = "cbTest_ExternalStart";
-            this.cbTest_ExternalStart.Size = new System.Drawing.Size(150, 24);
-            this.cbTest_ExternalStart.TabIndex = 1;
-            this.cbTest_ExternalStart.Text = "Внешний запуск";
-            this.cbTest_ExternalStart.UseVisualStyleBackColor = true;
+            cbTest_ExternalStart.AutoSize = true;
+            cbTest_ExternalStart.Location = new Point(12, 5);
+            cbTest_ExternalStart.Margin = new Padding(5);
+            cbTest_ExternalStart.Name = "cbTest_ExternalStart";
+            cbTest_ExternalStart.Size = new Size(150, 24);
+            cbTest_ExternalStart.TabIndex = 1;
+            cbTest_ExternalStart.Text = "Внешний запуск";
+            cbTest_ExternalStart.UseVisualStyleBackColor = true;
             // 
             // btnTest_ReadAllSocket
             // 
-            this.btnTest_ReadAllSocket.Location = new System.Drawing.Point(11, 37);
-            this.btnTest_ReadAllSocket.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTest_ReadAllSocket.Name = "btnTest_ReadAllSocket";
-            this.btnTest_ReadAllSocket.Size = new System.Drawing.Size(165, 40);
-            this.btnTest_ReadAllSocket.TabIndex = 0;
-            this.btnTest_ReadAllSocket.Text = "Читать все гнезда";
-            this.btnTest_ReadAllSocket.UseVisualStyleBackColor = true;
-            this.btnTest_ReadAllSocket.Click += new System.EventHandler(this.btnTest_ReadAllSockets_Click);
+            btnTest_ReadAllSocket.Location = new Point(11, 37);
+            btnTest_ReadAllSocket.Margin = new Padding(5);
+            btnTest_ReadAllSocket.Name = "btnTest_ReadAllSocket";
+            btnTest_ReadAllSocket.Size = new Size(165, 40);
+            btnTest_ReadAllSocket.TabIndex = 0;
+            btnTest_ReadAllSocket.Text = "Читать все гнезда";
+            btnTest_ReadAllSocket.UseVisualStyleBackColor = true;
+            btnTest_ReadAllSocket.Click += btnTest_ReadAllSockets_Click;
             // 
             // tbLEDControl
             // 
-            this.tbLEDControl.Controls.Add(this.panel4);
-            this.tbLEDControl.Controls.Add(this.btnTestLCBStop);
-            this.tbLEDControl.Controls.Add(this.pnlTestLCBSetWorkMode);
-            this.tbLEDControl.Controls.Add(this.panel3);
-            this.tbLEDControl.Controls.Add(this.panel2);
-            this.tbLEDControl.Controls.Add(this.panel1);
-            this.tbLEDControl.Controls.Add(this.pnlTestLCBCurrent);
-            this.tbLEDControl.Controls.Add(this.pnlTestLCBStatus);
-            this.tbLEDControl.Controls.Add(this.btnTestLCBInit);
-            this.tbLEDControl.Controls.Add(this.cbTestLCBSyncrosignal);
-            this.tbLEDControl.Location = new System.Drawing.Point(4, 29);
-            this.tbLEDControl.Margin = new System.Windows.Forms.Padding(5);
-            this.tbLEDControl.Name = "tbLEDControl";
-            this.tbLEDControl.Size = new System.Drawing.Size(1808, 953);
-            this.tbLEDControl.TabIndex = 4;
-            this.tbLEDControl.Text = "Тест БУС";
-            this.tbLEDControl.UseVisualStyleBackColor = true;
-            // 
-            // btnTestLCBStop
-            // 
-            this.btnTestLCBStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBStop.Location = new System.Drawing.Point(1172, 5);
-            this.btnTestLCBStop.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBStop.Name = "btnTestLCBStop";
-            this.btnTestLCBStop.Size = new System.Drawing.Size(263, 77);
-            this.btnTestLCBStop.TabIndex = 40;
-            this.btnTestLCBStop.Text = "Отключить связь";
-            this.btnTestLCBStop.UseVisualStyleBackColor = true;
-            this.btnTestLCBStop.Click += new System.EventHandler(this.btnTestLCBStop_Click);
-            // 
-            // pnlTestLCBSetWorkMode
-            // 
-            this.pnlTestLCBSetWorkMode.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlTestLCBSetWorkMode.Controls.Add(this.chbTestLCBWorkMode);
-            this.pnlTestLCBSetWorkMode.Location = new System.Drawing.Point(691, 697);
-            this.pnlTestLCBSetWorkMode.Margin = new System.Windows.Forms.Padding(5);
-            this.pnlTestLCBSetWorkMode.Name = "pnlTestLCBSetWorkMode";
-            this.pnlTestLCBSetWorkMode.Size = new System.Drawing.Size(742, 108);
-            this.pnlTestLCBSetWorkMode.TabIndex = 39;
-            // 
-            // chbTestLCBWorkMode
-            // 
-            this.chbTestLCBWorkMode.Appearance = System.Windows.Forms.Appearance.Button;
-            this.chbTestLCBWorkMode.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.chbTestLCBWorkMode.Location = new System.Drawing.Point(9, 6);
-            this.chbTestLCBWorkMode.Margin = new System.Windows.Forms.Padding(5);
-            this.chbTestLCBWorkMode.Name = "chbTestLCBWorkMode";
-            this.chbTestLCBWorkMode.Size = new System.Drawing.Size(263, 91);
-            this.chbTestLCBWorkMode.TabIndex = 31;
-            this.chbTestLCBWorkMode.Text = "Рабочий режим";
-            this.chbTestLCBWorkMode.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.chbTestLCBWorkMode.UseVisualStyleBackColor = true;
-            this.chbTestLCBWorkMode.CheckedChanged += new System.EventHandler(this.chbTestLCBWorkMode_CheckedChanged);
-            // 
-            // panel3
-            // 
-            this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel3.Controls.Add(this.lblTestLCBCurrentHorizontalStrokeUnitMm);
-            this.panel3.Controls.Add(this.txbTestLCBCurrentHorizontalStrokeMm);
-            this.panel3.Controls.Add(this.lblTestLCBCurrentHorizontalStrokeUnit);
-            this.panel3.Controls.Add(this.btnTestLCBGetCurrentPosition);
-            this.panel3.Controls.Add(this.txbTestLCBCurrentHorizontalStroke);
-            this.panel3.Controls.Add(this.lblTestLCBCurrentHorizontalStroke);
-            this.panel3.Location = new System.Drawing.Point(12, 815);
-            this.panel3.Margin = new System.Windows.Forms.Padding(5);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(674, 109);
-            this.panel3.TabIndex = 38;
-            // 
-            // lblTestLCBCurrentHorizontalStrokeUnitMm
-            // 
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm.AutoSize = true;
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm.Location = new System.Drawing.Point(627, 38);
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm.Name = "lblTestLCBCurrentHorizontalStrokeUnitMm";
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm.Size = new System.Drawing.Size(26, 17);
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm.TabIndex = 47;
-            this.lblTestLCBCurrentHorizontalStrokeUnitMm.Text = "мм";
-            // 
-            // txbTestLCBCurrentHorizontalStrokeMm
-            // 
-            this.txbTestLCBCurrentHorizontalStrokeMm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBCurrentHorizontalStrokeMm.Location = new System.Drawing.Point(542, 34);
-            this.txbTestLCBCurrentHorizontalStrokeMm.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBCurrentHorizontalStrokeMm.Name = "txbTestLCBCurrentHorizontalStrokeMm";
-            this.txbTestLCBCurrentHorizontalStrokeMm.ReadOnly = true;
-            this.txbTestLCBCurrentHorizontalStrokeMm.Size = new System.Drawing.Size(75, 23);
-            this.txbTestLCBCurrentHorizontalStrokeMm.TabIndex = 46;
-            // 
-            // lblTestLCBCurrentHorizontalStrokeUnit
-            // 
-            this.lblTestLCBCurrentHorizontalStrokeUnit.AutoSize = true;
-            this.lblTestLCBCurrentHorizontalStrokeUnit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBCurrentHorizontalStrokeUnit.Location = new System.Drawing.Point(496, 39);
-            this.lblTestLCBCurrentHorizontalStrokeUnit.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBCurrentHorizontalStrokeUnit.Name = "lblTestLCBCurrentHorizontalStrokeUnit";
-            this.lblTestLCBCurrentHorizontalStrokeUnit.Size = new System.Drawing.Size(33, 17);
-            this.lblTestLCBCurrentHorizontalStrokeUnit.TabIndex = 45;
-            this.lblTestLCBCurrentHorizontalStrokeUnit.Text = "имп";
-            // 
-            // btnTestLCBGetCurrentPosition
-            // 
-            this.btnTestLCBGetCurrentPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBGetCurrentPosition.Location = new System.Drawing.Point(5, 7);
-            this.btnTestLCBGetCurrentPosition.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBGetCurrentPosition.Name = "btnTestLCBGetCurrentPosition";
-            this.btnTestLCBGetCurrentPosition.Size = new System.Drawing.Size(263, 91);
-            this.btnTestLCBGetCurrentPosition.TabIndex = 44;
-            this.btnTestLCBGetCurrentPosition.Text = "Прочитать текущий ход по горизонтали";
-            this.btnTestLCBGetCurrentPosition.UseVisualStyleBackColor = true;
-            this.btnTestLCBGetCurrentPosition.Click += new System.EventHandler(this.btnTestLCBGetCurrentPosition_Click);
-            // 
-            // txbTestLCBCurrentHorizontalStroke
-            // 
-            this.txbTestLCBCurrentHorizontalStroke.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBCurrentHorizontalStroke.Location = new System.Drawing.Point(411, 34);
-            this.txbTestLCBCurrentHorizontalStroke.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBCurrentHorizontalStroke.Name = "txbTestLCBCurrentHorizontalStroke";
-            this.txbTestLCBCurrentHorizontalStroke.ReadOnly = true;
-            this.txbTestLCBCurrentHorizontalStroke.Size = new System.Drawing.Size(75, 23);
-            this.txbTestLCBCurrentHorizontalStroke.TabIndex = 43;
-            // 
-            // lblTestLCBCurrentHorizontalStroke
-            // 
-            this.lblTestLCBCurrentHorizontalStroke.AutoSize = true;
-            this.lblTestLCBCurrentHorizontalStroke.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBCurrentHorizontalStroke.Location = new System.Drawing.Point(284, 40);
-            this.lblTestLCBCurrentHorizontalStroke.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBCurrentHorizontalStroke.Name = "lblTestLCBCurrentHorizontalStroke";
-            this.lblTestLCBCurrentHorizontalStroke.Size = new System.Drawing.Size(96, 17);
-            this.lblTestLCBCurrentHorizontalStroke.TabIndex = 42;
-            this.lblTestLCBCurrentHorizontalStroke.Text = "Текущий ход:";
-            // 
-            // panel2
-            // 
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.lblTestLCBMaximumHorizontalStrokeUnitMm);
-            this.panel2.Controls.Add(this.txbTestLCBMaximumHorizontalStrokeMm);
-            this.panel2.Controls.Add(this.lblTestLCBMaximumHorizontalStrokeUnit);
-            this.panel2.Controls.Add(this.btnTestLCBGetMaxPosition);
-            this.panel2.Controls.Add(this.txbTestLCBMaximumHorizontalStroke);
-            this.panel2.Controls.Add(this.lblTestLCBMaximumHorizontalStroke);
-            this.panel2.Location = new System.Drawing.Point(12, 697);
-            this.panel2.Margin = new System.Windows.Forms.Padding(5);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(674, 108);
-            this.panel2.TabIndex = 37;
-            // 
-            // lblTestLCBMaximumHorizontalStrokeUnitMm
-            // 
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm.AutoSize = true;
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm.Location = new System.Drawing.Point(627, 36);
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm.Name = "lblTestLCBMaximumHorizontalStrokeUnitMm";
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm.Size = new System.Drawing.Size(26, 17);
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm.TabIndex = 39;
-            this.lblTestLCBMaximumHorizontalStrokeUnitMm.Text = "мм";
-            // 
-            // txbTestLCBMaximumHorizontalStrokeMm
-            // 
-            this.txbTestLCBMaximumHorizontalStrokeMm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBMaximumHorizontalStrokeMm.Location = new System.Drawing.Point(542, 32);
-            this.txbTestLCBMaximumHorizontalStrokeMm.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBMaximumHorizontalStrokeMm.Name = "txbTestLCBMaximumHorizontalStrokeMm";
-            this.txbTestLCBMaximumHorizontalStrokeMm.ReadOnly = true;
-            this.txbTestLCBMaximumHorizontalStrokeMm.Size = new System.Drawing.Size(75, 23);
-            this.txbTestLCBMaximumHorizontalStrokeMm.TabIndex = 38;
-            // 
-            // lblTestLCBMaximumHorizontalStrokeUnit
-            // 
-            this.lblTestLCBMaximumHorizontalStrokeUnit.AutoSize = true;
-            this.lblTestLCBMaximumHorizontalStrokeUnit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBMaximumHorizontalStrokeUnit.Location = new System.Drawing.Point(496, 36);
-            this.lblTestLCBMaximumHorizontalStrokeUnit.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBMaximumHorizontalStrokeUnit.Name = "lblTestLCBMaximumHorizontalStrokeUnit";
-            this.lblTestLCBMaximumHorizontalStrokeUnit.Size = new System.Drawing.Size(33, 17);
-            this.lblTestLCBMaximumHorizontalStrokeUnit.TabIndex = 37;
-            this.lblTestLCBMaximumHorizontalStrokeUnit.Text = "имп";
-            // 
-            // btnTestLCBGetMaxPosition
-            // 
-            this.btnTestLCBGetMaxPosition.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBGetMaxPosition.Location = new System.Drawing.Point(6, 6);
-            this.btnTestLCBGetMaxPosition.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBGetMaxPosition.Name = "btnTestLCBGetMaxPosition";
-            this.btnTestLCBGetMaxPosition.Size = new System.Drawing.Size(263, 91);
-            this.btnTestLCBGetMaxPosition.TabIndex = 36;
-            this.btnTestLCBGetMaxPosition.Text = "Прочитать максимальный ход по горизонтали";
-            this.btnTestLCBGetMaxPosition.UseVisualStyleBackColor = true;
-            this.btnTestLCBGetMaxPosition.Click += new System.EventHandler(this.btnTestLCBGetMaxPosition_Click);
-            // 
-            // txbTestLCBMaximumHorizontalStroke
-            // 
-            this.txbTestLCBMaximumHorizontalStroke.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBMaximumHorizontalStroke.Location = new System.Drawing.Point(411, 32);
-            this.txbTestLCBMaximumHorizontalStroke.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBMaximumHorizontalStroke.Name = "txbTestLCBMaximumHorizontalStroke";
-            this.txbTestLCBMaximumHorizontalStroke.ReadOnly = true;
-            this.txbTestLCBMaximumHorizontalStroke.Size = new System.Drawing.Size(75, 23);
-            this.txbTestLCBMaximumHorizontalStroke.TabIndex = 35;
-            // 
-            // lblTestLCBMaximumHorizontalStroke
-            // 
-            this.lblTestLCBMaximumHorizontalStroke.AutoSize = true;
-            this.lblTestLCBMaximumHorizontalStroke.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBMaximumHorizontalStroke.Location = new System.Drawing.Point(285, 38);
-            this.lblTestLCBMaximumHorizontalStroke.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBMaximumHorizontalStroke.Name = "lblTestLCBMaximumHorizontalStroke";
-            this.lblTestLCBMaximumHorizontalStroke.Size = new System.Drawing.Size(75, 17);
-            this.lblTestLCBMaximumHorizontalStroke.TabIndex = 34;
-            this.lblTestLCBMaximumHorizontalStroke.Text = "Макс. ход:";
-            // 
-            // panel1
-            // 
-            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Controls.Add(this.lblTestLCBDelayLengthValueMm);
-            this.panel1.Controls.Add(this.lblTestLCBPreformLengthValueMm);
-            this.panel1.Controls.Add(this.txbTestLCBDelayLengthMm);
-            this.panel1.Controls.Add(this.txbTestLCBPreformLengthMm);
-            this.panel1.Controls.Add(this.lblTestLCBDelayLengthValue);
-            this.panel1.Controls.Add(this.lblTestLCBPreformLengthValue);
-            this.panel1.Controls.Add(this.txbTestLCBDelayLength);
-            this.panel1.Controls.Add(this.lblTestLCBDelayLength);
-            this.panel1.Controls.Add(this.btnTestLCBGetMovementParameters);
-            this.panel1.Controls.Add(this.btnTestLCBSetMovementParameters);
-            this.panel1.Controls.Add(this.txbTestLCBPreformLength);
-            this.panel1.Controls.Add(this.lblTestLCBPreformLength);
-            this.panel1.Location = new System.Drawing.Point(536, 575);
-            this.panel1.Margin = new System.Windows.Forms.Padding(5);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(613, 113);
-            this.panel1.TabIndex = 36;
-            // 
-            // lblTestLCBDelayLengthValueMm
-            // 
-            this.lblTestLCBDelayLengthValueMm.AutoSize = true;
-            this.lblTestLCBDelayLengthValueMm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBDelayLengthValueMm.Location = new System.Drawing.Point(579, 64);
-            this.lblTestLCBDelayLengthValueMm.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBDelayLengthValueMm.Name = "lblTestLCBDelayLengthValueMm";
-            this.lblTestLCBDelayLengthValueMm.Size = new System.Drawing.Size(26, 17);
-            this.lblTestLCBDelayLengthValueMm.TabIndex = 36;
-            this.lblTestLCBDelayLengthValueMm.Text = "мм";
-            // 
-            // lblTestLCBPreformLengthValueMm
-            // 
-            this.lblTestLCBPreformLengthValueMm.AutoSize = true;
-            this.lblTestLCBPreformLengthValueMm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBPreformLengthValueMm.Location = new System.Drawing.Point(579, 22);
-            this.lblTestLCBPreformLengthValueMm.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBPreformLengthValueMm.Name = "lblTestLCBPreformLengthValueMm";
-            this.lblTestLCBPreformLengthValueMm.Size = new System.Drawing.Size(26, 17);
-            this.lblTestLCBPreformLengthValueMm.TabIndex = 35;
-            this.lblTestLCBPreformLengthValueMm.Text = "мм";
-            // 
-            // txbTestLCBDelayLengthMm
-            // 
-            this.txbTestLCBDelayLengthMm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBDelayLengthMm.Location = new System.Drawing.Point(490, 61);
-            this.txbTestLCBDelayLengthMm.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBDelayLengthMm.Name = "txbTestLCBDelayLengthMm";
-            this.txbTestLCBDelayLengthMm.Size = new System.Drawing.Size(79, 23);
-            this.txbTestLCBDelayLengthMm.TabIndex = 34;
-            this.txbTestLCBDelayLengthMm.TextChanged += new System.EventHandler(this.txbTestLCBDelayLengthMm_TextChanged);
-            this.txbTestLCBDelayLengthMm.DoubleClick += new System.EventHandler(this.txbInput_DoubleClick);
-            // 
-            // txbTestLCBPreformLengthMm
-            // 
-            this.txbTestLCBPreformLengthMm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBPreformLengthMm.Location = new System.Drawing.Point(490, 19);
-            this.txbTestLCBPreformLengthMm.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBPreformLengthMm.Name = "txbTestLCBPreformLengthMm";
-            this.txbTestLCBPreformLengthMm.Size = new System.Drawing.Size(79, 23);
-            this.txbTestLCBPreformLengthMm.TabIndex = 33;
-            this.txbTestLCBPreformLengthMm.TextChanged += new System.EventHandler(this.txbTestLCBPreformLengthMm_TextChanged);
-            this.txbTestLCBPreformLengthMm.DoubleClick += new System.EventHandler(this.txbInput_DoubleClick);
-            // 
-            // lblTestLCBDelayLengthValue
-            // 
-            this.lblTestLCBDelayLengthValue.AutoSize = true;
-            this.lblTestLCBDelayLengthValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBDelayLengthValue.Location = new System.Drawing.Point(457, 64);
-            this.lblTestLCBDelayLengthValue.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBDelayLengthValue.Name = "lblTestLCBDelayLengthValue";
-            this.lblTestLCBDelayLengthValue.Size = new System.Drawing.Size(33, 17);
-            this.lblTestLCBDelayLengthValue.TabIndex = 32;
-            this.lblTestLCBDelayLengthValue.Text = "имп";
-            // 
-            // lblTestLCBPreformLengthValue
-            // 
-            this.lblTestLCBPreformLengthValue.AutoSize = true;
-            this.lblTestLCBPreformLengthValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBPreformLengthValue.Location = new System.Drawing.Point(447, 22);
-            this.lblTestLCBPreformLengthValue.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBPreformLengthValue.Name = "lblTestLCBPreformLengthValue";
-            this.lblTestLCBPreformLengthValue.Size = new System.Drawing.Size(33, 17);
-            this.lblTestLCBPreformLengthValue.TabIndex = 31;
-            this.lblTestLCBPreformLengthValue.Text = "имп";
-            // 
-            // txbTestLCBDelayLength
-            // 
-            this.txbTestLCBDelayLength.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBDelayLength.Location = new System.Drawing.Point(375, 61);
-            this.txbTestLCBDelayLength.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBDelayLength.Name = "txbTestLCBDelayLength";
-            this.txbTestLCBDelayLength.Size = new System.Drawing.Size(79, 23);
-            this.txbTestLCBDelayLength.TabIndex = 30;
-            this.txbTestLCBDelayLength.TextChanged += new System.EventHandler(this.txbTestLCBDelayLength_TextChanged);
-            this.txbTestLCBDelayLength.DoubleClick += new System.EventHandler(this.txbInput_DoubleClick);
-            // 
-            // lblTestLCBDelayLength
-            // 
-            this.lblTestLCBDelayLength.AutoSize = true;
-            this.lblTestLCBDelayLength.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBDelayLength.Location = new System.Drawing.Point(219, 64);
-            this.lblTestLCBDelayLength.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBDelayLength.Name = "lblTestLCBDelayLength";
-            this.lblTestLCBDelayLength.Size = new System.Drawing.Size(157, 17);
-            this.lblTestLCBDelayLength.TabIndex = 29;
-            this.lblTestLCBDelayLength.Text = "Расстояние задержки:";
-            // 
-            // btnTestLCBGetMovementParameters
-            // 
-            this.btnTestLCBGetMovementParameters.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBGetMovementParameters.Location = new System.Drawing.Point(9, 11);
-            this.btnTestLCBGetMovementParameters.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBGetMovementParameters.Name = "btnTestLCBGetMovementParameters";
-            this.btnTestLCBGetMovementParameters.Size = new System.Drawing.Size(200, 42);
-            this.btnTestLCBGetMovementParameters.TabIndex = 28;
-            this.btnTestLCBGetMovementParameters.Text = "Прочитать параметры";
-            this.btnTestLCBGetMovementParameters.UseVisualStyleBackColor = true;
-            this.btnTestLCBGetMovementParameters.Click += new System.EventHandler(this.btnTestLCBGetMovementParameters_Click);
-            // 
-            // btnTestLCBSetMovementParameters
-            // 
-            this.btnTestLCBSetMovementParameters.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBSetMovementParameters.Location = new System.Drawing.Point(9, 62);
-            this.btnTestLCBSetMovementParameters.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBSetMovementParameters.Name = "btnTestLCBSetMovementParameters";
-            this.btnTestLCBSetMovementParameters.Size = new System.Drawing.Size(200, 42);
-            this.btnTestLCBSetMovementParameters.TabIndex = 27;
-            this.btnTestLCBSetMovementParameters.Text = "Установить параметры";
-            this.btnTestLCBSetMovementParameters.UseVisualStyleBackColor = true;
-            this.btnTestLCBSetMovementParameters.Click += new System.EventHandler(this.btnTestLCBSetMovementParameters_Click);
-            // 
-            // txbTestLCBPreformLength
-            // 
-            this.txbTestLCBPreformLength.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBPreformLength.Location = new System.Drawing.Point(358, 19);
-            this.txbTestLCBPreformLength.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBPreformLength.Name = "txbTestLCBPreformLength";
-            this.txbTestLCBPreformLength.Size = new System.Drawing.Size(79, 23);
-            this.txbTestLCBPreformLength.TabIndex = 26;
-            this.txbTestLCBPreformLength.TextChanged += new System.EventHandler(this.txbTestLCBPreformLength_TextChanged);
-            this.txbTestLCBPreformLength.DoubleClick += new System.EventHandler(this.txbInput_DoubleClick);
-            // 
-            // lblTestLCBPreformLength
-            // 
-            this.lblTestLCBPreformLength.AutoSize = true;
-            this.lblTestLCBPreformLength.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBPreformLength.Location = new System.Drawing.Point(219, 22);
-            this.lblTestLCBPreformLength.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBPreformLength.Name = "lblTestLCBPreformLength";
-            this.lblTestLCBPreformLength.Size = new System.Drawing.Size(129, 17);
-            this.lblTestLCBPreformLength.TabIndex = 25;
-            this.lblTestLCBPreformLength.Text = "Длина преформы:";
-            // 
-            // pnlTestLCBCurrent
-            // 
-            this.pnlTestLCBCurrent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlTestLCBCurrent.Controls.Add(this.lblTestLCBCurrentUnit);
-            this.pnlTestLCBCurrent.Controls.Add(this.btnTestLCBGetCurrent);
-            this.pnlTestLCBCurrent.Controls.Add(this.btnTestLCBSetCurrent);
-            this.pnlTestLCBCurrent.Controls.Add(this.txbTestLCBCurrent);
-            this.pnlTestLCBCurrent.Controls.Add(this.lblTestLCBCurrent);
-            this.pnlTestLCBCurrent.Location = new System.Drawing.Point(14, 575);
-            this.pnlTestLCBCurrent.Margin = new System.Windows.Forms.Padding(5);
-            this.pnlTestLCBCurrent.Name = "pnlTestLCBCurrent";
-            this.pnlTestLCBCurrent.Size = new System.Drawing.Size(517, 113);
-            this.pnlTestLCBCurrent.TabIndex = 35;
-            // 
-            // lblTestLCBCurrentUnit
-            // 
-            this.lblTestLCBCurrentUnit.AutoSize = true;
-            this.lblTestLCBCurrentUnit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBCurrentUnit.Location = new System.Drawing.Point(484, 40);
-            this.lblTestLCBCurrentUnit.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBCurrentUnit.Name = "lblTestLCBCurrentUnit";
-            this.lblTestLCBCurrentUnit.Size = new System.Drawing.Size(26, 17);
-            this.lblTestLCBCurrentUnit.TabIndex = 27;
-            this.lblTestLCBCurrentUnit.Text = "мА";
-            // 
-            // btnTestLCBGetCurrent
-            // 
-            this.btnTestLCBGetCurrent.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBGetCurrent.Location = new System.Drawing.Point(5, 11);
-            this.btnTestLCBGetCurrent.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBGetCurrent.Name = "btnTestLCBGetCurrent";
-            this.btnTestLCBGetCurrent.Size = new System.Drawing.Size(263, 42);
-            this.btnTestLCBGetCurrent.TabIndex = 26;
-            this.btnTestLCBGetCurrent.Text = "Прочитать ток";
-            this.btnTestLCBGetCurrent.UseVisualStyleBackColor = true;
-            this.btnTestLCBGetCurrent.Click += new System.EventHandler(this.btnTestLCBGetCurrent_Click);
-            // 
-            // btnTestLCBSetCurrent
-            // 
-            this.btnTestLCBSetCurrent.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBSetCurrent.Location = new System.Drawing.Point(5, 62);
-            this.btnTestLCBSetCurrent.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBSetCurrent.Name = "btnTestLCBSetCurrent";
-            this.btnTestLCBSetCurrent.Size = new System.Drawing.Size(263, 42);
-            this.btnTestLCBSetCurrent.TabIndex = 25;
-            this.btnTestLCBSetCurrent.Text = "Установить ток";
-            this.btnTestLCBSetCurrent.UseVisualStyleBackColor = true;
-            this.btnTestLCBSetCurrent.Click += new System.EventHandler(this.btnTestLCBSetCurrent_Click);
-            // 
-            // txbTestLCBCurrent
-            // 
-            this.txbTestLCBCurrent.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.txbTestLCBCurrent.Location = new System.Drawing.Point(408, 37);
-            this.txbTestLCBCurrent.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestLCBCurrent.Name = "txbTestLCBCurrent";
-            this.txbTestLCBCurrent.Size = new System.Drawing.Size(76, 23);
-            this.txbTestLCBCurrent.TabIndex = 24;
-            this.txbTestLCBCurrent.DoubleClick += new System.EventHandler(this.txbInput_DoubleClick);
-            // 
-            // lblTestLCBCurrent
-            // 
-            this.lblTestLCBCurrent.AutoSize = true;
-            this.lblTestLCBCurrent.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblTestLCBCurrent.Location = new System.Drawing.Point(274, 40);
-            this.lblTestLCBCurrent.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestLCBCurrent.Name = "lblTestLCBCurrent";
-            this.lblTestLCBCurrent.Size = new System.Drawing.Size(124, 17);
-            this.lblTestLCBCurrent.TabIndex = 23;
-            this.lblTestLCBCurrent.Text = "Ток светодиодов:";
-            // 
-            // pnlTestLCBStatus
-            // 
-            this.pnlTestLCBStatus.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlTestLCBStatus.Controls.Add(this.btnTestLCBFullTest);
-            this.pnlTestLCBStatus.Controls.Add(this.btnTestLCBWriteStatuses);
-            this.pnlTestLCBStatus.Controls.Add(this.gbLEDs);
-            this.pnlTestLCBStatus.Controls.Add(this.btnTestLCBReadStatuses);
-            this.pnlTestLCBStatus.Controls.Add(this.gbTestLCBInputs);
-            this.pnlTestLCBStatus.Controls.Add(this.gbTestLCBOutputs);
-            this.pnlTestLCBStatus.Controls.Add(this.btnTestLCBClearAll);
-            this.pnlTestLCBStatus.Controls.Add(this.btnTestLCBSetAll);
-            this.pnlTestLCBStatus.Location = new System.Drawing.Point(12, 87);
-            this.pnlTestLCBStatus.Margin = new System.Windows.Forms.Padding(5);
-            this.pnlTestLCBStatus.Name = "pnlTestLCBStatus";
-            this.pnlTestLCBStatus.Size = new System.Drawing.Size(1421, 480);
-            this.pnlTestLCBStatus.TabIndex = 34;
-            // 
-            // btnTestLCBFullTest
-            // 
-            this.btnTestLCBFullTest.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBFullTest.Location = new System.Drawing.Point(5, 387);
-            this.btnTestLCBFullTest.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBFullTest.Name = "btnTestLCBFullTest";
-            this.btnTestLCBFullTest.Size = new System.Drawing.Size(263, 77);
-            this.btnTestLCBFullTest.TabIndex = 16;
-            this.btnTestLCBFullTest.Text = "Полная проверка";
-            this.btnTestLCBFullTest.UseVisualStyleBackColor = true;
-            this.btnTestLCBFullTest.Click += new System.EventHandler(this.btnTestLCBFullTest_Click);
-            // 
-            // btnTestLCBWriteStatuses
-            // 
-            this.btnTestLCBWriteStatuses.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBWriteStatuses.Location = new System.Drawing.Point(5, 177);
-            this.btnTestLCBWriteStatuses.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBWriteStatuses.Name = "btnTestLCBWriteStatuses";
-            this.btnTestLCBWriteStatuses.Size = new System.Drawing.Size(263, 77);
-            this.btnTestLCBWriteStatuses.TabIndex = 15;
-            this.btnTestLCBWriteStatuses.Text = "Установить состояние";
-            this.btnTestLCBWriteStatuses.UseVisualStyleBackColor = true;
-            this.btnTestLCBWriteStatuses.Click += new System.EventHandler(this.btnTestLCBWriteStatuses_Click);
-            // 
-            // gbLEDs
-            // 
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED11);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED10);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED9);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED8);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED7);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED6);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED5);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED4);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED3);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED2);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED1);
-            this.gbLEDs.Controls.Add(this.cbTestLCBLED0);
-            this.gbLEDs.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.gbLEDs.Location = new System.Drawing.Point(281, 6);
-            this.gbLEDs.Margin = new System.Windows.Forms.Padding(5);
-            this.gbLEDs.Name = "gbLEDs";
-            this.gbLEDs.Padding = new System.Windows.Forms.Padding(5);
-            this.gbLEDs.Size = new System.Drawing.Size(336, 463);
-            this.gbLEDs.TabIndex = 14;
-            this.gbLEDs.TabStop = false;
-            this.gbLEDs.Text = "Светодиоды";
-            // 
-            // cbTestLCBLED11
-            // 
-            this.cbTestLCBLED11.AutoSize = true;
-            this.cbTestLCBLED11.Location = new System.Drawing.Point(9, 417);
-            this.cbTestLCBLED11.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED11.Name = "cbTestLCBLED11";
-            this.cbTestLCBLED11.Size = new System.Drawing.Size(118, 21);
-            this.cbTestLCBLED11.TabIndex = 11;
-            this.cbTestLCBLED11.Text = "Светодиод 12";
-            this.cbTestLCBLED11.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED10
-            // 
-            this.cbTestLCBLED10.AutoSize = true;
-            this.cbTestLCBLED10.Location = new System.Drawing.Point(9, 382);
-            this.cbTestLCBLED10.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED10.Name = "cbTestLCBLED10";
-            this.cbTestLCBLED10.Size = new System.Drawing.Size(118, 21);
-            this.cbTestLCBLED10.TabIndex = 10;
-            this.cbTestLCBLED10.Text = "Светодиод 11";
-            this.cbTestLCBLED10.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED9
-            // 
-            this.cbTestLCBLED9.AutoSize = true;
-            this.cbTestLCBLED9.Location = new System.Drawing.Point(9, 346);
-            this.cbTestLCBLED9.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED9.Name = "cbTestLCBLED9";
-            this.cbTestLCBLED9.Size = new System.Drawing.Size(118, 21);
-            this.cbTestLCBLED9.TabIndex = 9;
-            this.cbTestLCBLED9.Text = "Светодиод 10";
-            this.cbTestLCBLED9.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED8
-            // 
-            this.cbTestLCBLED8.AutoSize = true;
-            this.cbTestLCBLED8.Location = new System.Drawing.Point(9, 311);
-            this.cbTestLCBLED8.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED8.Name = "cbTestLCBLED8";
-            this.cbTestLCBLED8.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED8.TabIndex = 8;
-            this.cbTestLCBLED8.Text = "Светодиод 9";
-            this.cbTestLCBLED8.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED7
-            // 
-            this.cbTestLCBLED7.AutoSize = true;
-            this.cbTestLCBLED7.Location = new System.Drawing.Point(9, 277);
-            this.cbTestLCBLED7.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED7.Name = "cbTestLCBLED7";
-            this.cbTestLCBLED7.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED7.TabIndex = 7;
-            this.cbTestLCBLED7.Text = "Светодиод 8";
-            this.cbTestLCBLED7.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED6
-            // 
-            this.cbTestLCBLED6.AutoSize = true;
-            this.cbTestLCBLED6.Location = new System.Drawing.Point(9, 242);
-            this.cbTestLCBLED6.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED6.Name = "cbTestLCBLED6";
-            this.cbTestLCBLED6.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED6.TabIndex = 6;
-            this.cbTestLCBLED6.Text = "Светодиод 7";
-            this.cbTestLCBLED6.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED5
-            // 
-            this.cbTestLCBLED5.AutoSize = true;
-            this.cbTestLCBLED5.Location = new System.Drawing.Point(9, 206);
-            this.cbTestLCBLED5.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED5.Name = "cbTestLCBLED5";
-            this.cbTestLCBLED5.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED5.TabIndex = 5;
-            this.cbTestLCBLED5.Text = "Светодиод 6";
-            this.cbTestLCBLED5.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED4
-            // 
-            this.cbTestLCBLED4.AutoSize = true;
-            this.cbTestLCBLED4.Location = new System.Drawing.Point(9, 171);
-            this.cbTestLCBLED4.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED4.Name = "cbTestLCBLED4";
-            this.cbTestLCBLED4.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED4.TabIndex = 4;
-            this.cbTestLCBLED4.Text = "Светодиод 5";
-            this.cbTestLCBLED4.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED3
-            // 
-            this.cbTestLCBLED3.AutoSize = true;
-            this.cbTestLCBLED3.Location = new System.Drawing.Point(9, 135);
-            this.cbTestLCBLED3.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED3.Name = "cbTestLCBLED3";
-            this.cbTestLCBLED3.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED3.TabIndex = 3;
-            this.cbTestLCBLED3.Text = "Светодиод 4";
-            this.cbTestLCBLED3.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED2
-            // 
-            this.cbTestLCBLED2.AutoSize = true;
-            this.cbTestLCBLED2.Location = new System.Drawing.Point(9, 100);
-            this.cbTestLCBLED2.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED2.Name = "cbTestLCBLED2";
-            this.cbTestLCBLED2.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED2.TabIndex = 2;
-            this.cbTestLCBLED2.Text = "Светодиод 3";
-            this.cbTestLCBLED2.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED1
-            // 
-            this.cbTestLCBLED1.AutoSize = true;
-            this.cbTestLCBLED1.Location = new System.Drawing.Point(9, 65);
-            this.cbTestLCBLED1.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED1.Name = "cbTestLCBLED1";
-            this.cbTestLCBLED1.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED1.TabIndex = 1;
-            this.cbTestLCBLED1.Text = "Светодиод 2";
-            this.cbTestLCBLED1.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBLED0
-            // 
-            this.cbTestLCBLED0.AutoSize = true;
-            this.cbTestLCBLED0.Location = new System.Drawing.Point(9, 29);
-            this.cbTestLCBLED0.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBLED0.Name = "cbTestLCBLED0";
-            this.cbTestLCBLED0.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBLED0.TabIndex = 0;
-            this.cbTestLCBLED0.Text = "Светодиод 1";
-            this.cbTestLCBLED0.UseVisualStyleBackColor = true;
-            // 
-            // btnTestLCBReadStatuses
-            // 
-            this.btnTestLCBReadStatuses.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBReadStatuses.Location = new System.Drawing.Point(5, 62);
-            this.btnTestLCBReadStatuses.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBReadStatuses.Name = "btnTestLCBReadStatuses";
-            this.btnTestLCBReadStatuses.Size = new System.Drawing.Size(263, 77);
-            this.btnTestLCBReadStatuses.TabIndex = 13;
-            this.btnTestLCBReadStatuses.Text = "Читать состояние";
-            this.btnTestLCBReadStatuses.UseVisualStyleBackColor = true;
-            this.btnTestLCBReadStatuses.Click += new System.EventHandler(this.btnTestLCBReadStatuses_Click);
-            // 
-            // gbTestLCBInputs
-            // 
-            this.gbTestLCBInputs.Controls.Add(this.cbTestLCBInput7);
-            this.gbTestLCBInputs.Controls.Add(this.cbTestLCBInput6);
-            this.gbTestLCBInputs.Controls.Add(this.cbTestLCBInput5);
-            this.gbTestLCBInputs.Controls.Add(this.cbTestLCBInput4);
-            this.gbTestLCBInputs.Controls.Add(this.cbTestLCBInput3);
-            this.gbTestLCBInputs.Controls.Add(this.cbTestLCBInput2);
-            this.gbTestLCBInputs.Controls.Add(this.cbTestLCBInput1);
-            this.gbTestLCBInputs.Controls.Add(this.cbTestLCBInput0);
-            this.gbTestLCBInputs.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.gbTestLCBInputs.Location = new System.Drawing.Point(970, 6);
-            this.gbTestLCBInputs.Margin = new System.Windows.Forms.Padding(5);
-            this.gbTestLCBInputs.Name = "gbTestLCBInputs";
-            this.gbTestLCBInputs.Padding = new System.Windows.Forms.Padding(5);
-            this.gbTestLCBInputs.Size = new System.Drawing.Size(441, 338);
-            this.gbTestLCBInputs.TabIndex = 12;
-            this.gbTestLCBInputs.TabStop = false;
-            this.gbTestLCBInputs.Text = "Входы";
-            // 
-            // cbTestLCBInput7
-            // 
-            this.cbTestLCBInput7.AutoSize = true;
-            this.cbTestLCBInput7.Location = new System.Drawing.Point(9, 277);
-            this.cbTestLCBInput7.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBInput7.Name = "cbTestLCBInput7";
-            this.cbTestLCBInput7.Size = new System.Drawing.Size(153, 21);
-            this.cbTestLCBInput7.TabIndex = 7;
-            this.cbTestLCBInput7.Text = "Маячки выдвинуты";
-            this.cbTestLCBInput7.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBInput6
-            // 
-            this.cbTestLCBInput6.AutoSize = true;
-            this.cbTestLCBInput6.Location = new System.Drawing.Point(9, 242);
-            this.cbTestLCBInput6.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBInput6.Name = "cbTestLCBInput6";
-            this.cbTestLCBInput6.Size = new System.Drawing.Size(145, 21);
-            this.cbTestLCBInput6.TabIndex = 6;
-            this.cbTestLCBInput6.Text = "Маячки спрятаны";
-            this.cbTestLCBInput6.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBInput5
-            // 
-            this.cbTestLCBInput5.AutoSize = true;
-            this.cbTestLCBInput5.Location = new System.Drawing.Point(9, 206);
-            this.cbTestLCBInput5.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBInput5.Name = "cbTestLCBInput5";
-            this.cbTestLCBInput5.Size = new System.Drawing.Size(99, 21);
-            this.cbTestLCBInput5.TabIndex = 5;
-            this.cbTestLCBInput5.Text = "Запас PG1";
-            this.cbTestLCBInput5.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBInput4
-            // 
-            this.cbTestLCBInput4.AutoSize = true;
-            this.cbTestLCBInput4.Location = new System.Drawing.Point(9, 171);
-            this.cbTestLCBInput4.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBInput4.Name = "cbTestLCBInput4";
-            this.cbTestLCBInput4.Size = new System.Drawing.Size(208, 21);
-            this.cbTestLCBInput4.TabIndex = 4;
-            this.cbTestLCBInput4.Text = "Датчик положения захвата";
-            this.cbTestLCBInput4.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBInput3
-            // 
-            this.cbTestLCBInput3.AutoSize = true;
-            this.cbTestLCBInput3.Location = new System.Drawing.Point(9, 135);
-            this.cbTestLCBInput3.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBInput3.Name = "cbTestLCBInput3";
-            this.cbTestLCBInput3.Size = new System.Drawing.Size(189, 21);
-            this.cbTestLCBInput3.TabIndex = 3;
-            this.cbTestLCBInput3.Text = "Блокировка работы БУС";
-            this.cbTestLCBInput3.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBInput2
-            // 
-            this.cbTestLCBInput2.AutoSize = true;
-            this.cbTestLCBInput2.Location = new System.Drawing.Point(9, 100);
-            this.cbTestLCBInput2.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBInput2.Name = "cbTestLCBInput2";
-            this.cbTestLCBInput2.Size = new System.Drawing.Size(96, 21);
-            this.cbTestLCBInput2.TabIndex = 2;
-            this.cbTestLCBInput2.Text = "Энкодер B";
-            this.cbTestLCBInput2.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBInput1
-            // 
-            this.cbTestLCBInput1.AutoSize = true;
-            this.cbTestLCBInput1.Location = new System.Drawing.Point(9, 65);
-            this.cbTestLCBInput1.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBInput1.Name = "cbTestLCBInput1";
-            this.cbTestLCBInput1.Size = new System.Drawing.Size(96, 21);
-            this.cbTestLCBInput1.TabIndex = 1;
-            this.cbTestLCBInput1.Text = "Энкодер A";
-            this.cbTestLCBInput1.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBInput0
-            // 
-            this.cbTestLCBInput0.AutoSize = true;
-            this.cbTestLCBInput0.Location = new System.Drawing.Point(9, 29);
-            this.cbTestLCBInput0.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBInput0.Name = "cbTestLCBInput0";
-            this.cbTestLCBInput0.Size = new System.Drawing.Size(49, 21);
-            this.cbTestLCBInput0.TabIndex = 0;
-            this.cbTestLCBInput0.Text = "AiN";
-            this.cbTestLCBInput0.UseVisualStyleBackColor = true;
-            // 
-            // gbTestLCBOutputs
-            // 
-            this.gbTestLCBOutputs.Controls.Add(this.cbTestLCBOutput5);
-            this.gbTestLCBOutputs.Controls.Add(this.cbTestLCBOutput4);
-            this.gbTestLCBOutputs.Controls.Add(this.cbTestLCBOutput3);
-            this.gbTestLCBOutputs.Controls.Add(this.cbTestLCBOutput2);
-            this.gbTestLCBOutputs.Controls.Add(this.cbTestLCBOutput1);
-            this.gbTestLCBOutputs.Controls.Add(this.cbTestLCBOutput0);
-            this.gbTestLCBOutputs.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.gbTestLCBOutputs.Location = new System.Drawing.Point(626, 6);
-            this.gbTestLCBOutputs.Margin = new System.Windows.Forms.Padding(5);
-            this.gbTestLCBOutputs.Name = "gbTestLCBOutputs";
-            this.gbTestLCBOutputs.Padding = new System.Windows.Forms.Padding(5);
-            this.gbTestLCBOutputs.Size = new System.Drawing.Size(336, 338);
-            this.gbTestLCBOutputs.TabIndex = 11;
-            this.gbTestLCBOutputs.TabStop = false;
-            this.gbTestLCBOutputs.Text = "Выходы";
-            // 
-            // cbTestLCBOutput5
-            // 
-            this.cbTestLCBOutput5.AutoSize = true;
-            this.cbTestLCBOutput5.Location = new System.Drawing.Point(9, 206);
-            this.cbTestLCBOutput5.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBOutput5.Name = "cbTestLCBOutput5";
-            this.cbTestLCBOutput5.Size = new System.Drawing.Size(105, 21);
-            this.cbTestLCBOutput5.TabIndex = 5;
-            this.cbTestLCBOutput5.Text = "Запас PC12";
-            this.cbTestLCBOutput5.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBOutput4
-            // 
-            this.cbTestLCBOutput4.AutoSize = true;
-            this.cbTestLCBOutput4.Location = new System.Drawing.Point(9, 171);
-            this.cbTestLCBOutput4.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBOutput4.Name = "cbTestLCBOutput4";
-            this.cbTestLCBOutput4.Size = new System.Drawing.Size(129, 21);
-            this.cbTestLCBOutput4.TabIndex = 4;
-            this.cbTestLCBOutput4.Text = "Синхронизация";
-            this.cbTestLCBOutput4.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBOutput3
-            // 
-            this.cbTestLCBOutput3.AutoSize = true;
-            this.cbTestLCBOutput3.Location = new System.Drawing.Point(9, 135);
-            this.cbTestLCBOutput3.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBOutput3.Name = "cbTestLCBOutput3";
-            this.cbTestLCBOutput3.Size = new System.Drawing.Size(110, 21);
-            this.cbTestLCBOutput3.TabIndex = 3;
-            this.cbTestLCBOutput3.Text = "Авария БУС ";
-            this.cbTestLCBOutput3.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBOutput2
-            // 
-            this.cbTestLCBOutput2.AutoSize = true;
-            this.cbTestLCBOutput2.Location = new System.Drawing.Point(9, 100);
-            this.cbTestLCBOutput2.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBOutput2.Name = "cbTestLCBOutput2";
-            this.cbTestLCBOutput2.Size = new System.Drawing.Size(127, 21);
-            this.cbTestLCBOutput2.TabIndex = 2;
-            this.cbTestLCBOutput2.Text = "Электромагнит";
-            this.cbTestLCBOutput2.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBOutput1
-            // 
-            this.cbTestLCBOutput1.AutoSize = true;
-            this.cbTestLCBOutput1.Location = new System.Drawing.Point(9, 65);
-            this.cbTestLCBOutput1.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBOutput1.Name = "cbTestLCBOutput1";
-            this.cbTestLCBOutput1.Size = new System.Drawing.Size(101, 21);
-            this.cbTestLCBOutput1.TabIndex = 1;
-            this.cbTestLCBOutput1.Text = "Клапан ПЦ";
-            this.cbTestLCBOutput1.UseVisualStyleBackColor = true;
-            // 
-            // cbTestLCBOutput0
-            // 
-            this.cbTestLCBOutput0.AutoSize = true;
-            this.cbTestLCBOutput0.Location = new System.Drawing.Point(9, 29);
-            this.cbTestLCBOutput0.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBOutput0.Name = "cbTestLCBOutput0";
-            this.cbTestLCBOutput0.Size = new System.Drawing.Size(156, 21);
-            this.cbTestLCBOutput0.TabIndex = 0;
-            this.cbTestLCBOutput0.Text = "HL5 - LED на плате";
-            this.cbTestLCBOutput0.UseVisualStyleBackColor = true;
-            // 
-            // btnTestLCBClearAll
-            // 
-            this.btnTestLCBClearAll.Location = new System.Drawing.Point(1299, 429);
-            this.btnTestLCBClearAll.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBClearAll.Name = "btnTestLCBClearAll";
-            this.btnTestLCBClearAll.Size = new System.Drawing.Size(113, 35);
-            this.btnTestLCBClearAll.TabIndex = 9;
-            this.btnTestLCBClearAll.Text = "Очистить";
-            this.btnTestLCBClearAll.UseVisualStyleBackColor = true;
-            this.btnTestLCBClearAll.Click += new System.EventHandler(this.btnTestLCBClearAll_Click);
-            // 
-            // btnTestLCBSetAll
-            // 
-            this.btnTestLCBSetAll.Location = new System.Drawing.Point(1176, 429);
-            this.btnTestLCBSetAll.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBSetAll.Name = "btnTestLCBSetAll";
-            this.btnTestLCBSetAll.Size = new System.Drawing.Size(113, 35);
-            this.btnTestLCBSetAll.TabIndex = 11;
-            this.btnTestLCBSetAll.Text = "Установить все";
-            this.btnTestLCBSetAll.UseVisualStyleBackColor = true;
-            this.btnTestLCBSetAll.Click += new System.EventHandler(this.btnTestLCBSetAll_Click);
-            // 
-            // btnTestLCBInit
-            // 
-            this.btnTestLCBInit.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTestLCBInit.Location = new System.Drawing.Point(12, 5);
-            this.btnTestLCBInit.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestLCBInit.Name = "btnTestLCBInit";
-            this.btnTestLCBInit.Size = new System.Drawing.Size(263, 77);
-            this.btnTestLCBInit.TabIndex = 8;
-            this.btnTestLCBInit.Text = "Инициализация связи";
-            this.btnTestLCBInit.UseVisualStyleBackColor = true;
-            this.btnTestLCBInit.Click += new System.EventHandler(this.btnTestLCBInit_Click);
-            // 
-            // cbTestLCBSyncrosignal
-            // 
-            this.cbTestLCBSyncrosignal.AutoSize = true;
-            this.cbTestLCBSyncrosignal.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.cbTestLCBSyncrosignal.Location = new System.Drawing.Point(297, 29);
-            this.cbTestLCBSyncrosignal.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestLCBSyncrosignal.Name = "cbTestLCBSyncrosignal";
-            this.cbTestLCBSyncrosignal.Size = new System.Drawing.Size(118, 21);
-            this.cbTestLCBSyncrosignal.TabIndex = 7;
-            this.cbTestLCBSyncrosignal.Text = "Синхросигнал";
-            this.cbTestLCBSyncrosignal.UseVisualStyleBackColor = true;
-            // 
-            // tbTestImages
-            // 
-            this.tbTestImages.Location = new System.Drawing.Point(4, 29);
-            this.tbTestImages.Margin = new System.Windows.Forms.Padding(5);
-            this.tbTestImages.Name = "tbTestImages";
-            this.tbTestImages.Size = new System.Drawing.Size(1808, 953);
-            this.tbTestImages.TabIndex = 5;
-            this.tbTestImages.Text = "Тест изображений";
-            this.tbTestImages.UseVisualStyleBackColor = true;
-            // 
-            // tbRDP
-            // 
-            this.tbRDP.Controls.Add(this.lblTestRDPBStatus);
-            this.tbRDP.Controls.Add(this.lvTestRDPBStatuses);
-            this.tbRDP.Controls.Add(this.btnTestRDPBSendCommand);
-            this.tbRDP.Controls.Add(this.txbTestRDPBManualCommand);
-            this.tbRDP.Controls.Add(this.lblTestRDPBCommand);
-            this.tbRDP.Controls.Add(this.txbTestRDPBCoolingBlocksStatus);
-            this.tbRDP.Controls.Add(this.cbTestRDPBCoolingBlocksQuantity);
-            this.tbRDP.Controls.Add(this.lblCoolingBlockQuantity);
-            this.tbRDP.Controls.Add(this.btnTestRDPBN90);
-            this.tbRDP.Controls.Add(this.btnTestRDPBN83);
-            this.tbRDP.Controls.Add(this.btnTestRDPBN82);
-            this.tbRDP.Controls.Add(this.btnTestRDPBN81);
-            this.tbRDP.Controls.Add(this.btnTestRDPBN80);
-            this.tbRDP.Controls.Add(this.btnRDPBTestConnect);
-            this.tbRDP.Location = new System.Drawing.Point(4, 29);
-            this.tbRDP.Margin = new System.Windows.Forms.Padding(5);
-            this.tbRDP.Name = "tbRDP";
-            this.tbRDP.Size = new System.Drawing.Size(1808, 953);
-            this.tbRDP.TabIndex = 6;
-            this.tbRDP.Text = "Тест бракера";
-            this.tbRDP.UseVisualStyleBackColor = true;
-            // 
-            // lblTestRDPBStatus
-            // 
-            this.lblTestRDPBStatus.AutoSize = true;
-            this.lblTestRDPBStatus.Location = new System.Drawing.Point(666, 15);
-            this.lblTestRDPBStatus.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestRDPBStatus.Name = "lblTestRDPBStatus";
-            this.lblTestRDPBStatus.Size = new System.Drawing.Size(143, 20);
-            this.lblTestRDPBStatus.TabIndex = 13;
-            this.lblTestRDPBStatus.Text = "Статусы бракера:";
-            // 
-            // lvTestRDPBStatuses
-            // 
-            this.lvTestRDPBStatuses.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
-            this.lvTestRDPBStatuses.HideSelection = false;
-            this.lvTestRDPBStatuses.Location = new System.Drawing.Point(671, 46);
-            this.lvTestRDPBStatuses.Margin = new System.Windows.Forms.Padding(5);
-            this.lvTestRDPBStatuses.Name = "lvTestRDPBStatuses";
-            this.lvTestRDPBStatuses.Size = new System.Drawing.Size(708, 416);
-            this.lvTestRDPBStatuses.TabIndex = 12;
-            this.lvTestRDPBStatuses.UseCompatibleStateImageBehavior = false;
-            this.lvTestRDPBStatuses.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Параметр";
-            this.columnHeader1.Width = 200;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Значение";
-            this.columnHeader2.Width = 289;
-            // 
-            // btnTestRDPBSendCommand
-            // 
-            this.btnTestRDPBSendCommand.Location = new System.Drawing.Point(432, 580);
-            this.btnTestRDPBSendCommand.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestRDPBSendCommand.Name = "btnTestRDPBSendCommand";
-            this.btnTestRDPBSendCommand.Size = new System.Drawing.Size(123, 49);
-            this.btnTestRDPBSendCommand.TabIndex = 11;
-            this.btnTestRDPBSendCommand.Text = "Послать";
-            this.btnTestRDPBSendCommand.UseVisualStyleBackColor = true;
-            this.btnTestRDPBSendCommand.Click += new System.EventHandler(this.btnTestRDPBSendCommand_Click);
-            // 
-            // txbTestRDPBManualCommand
-            // 
-            this.txbTestRDPBManualCommand.Location = new System.Drawing.Point(12, 587);
-            this.txbTestRDPBManualCommand.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestRDPBManualCommand.Name = "txbTestRDPBManualCommand";
-            this.txbTestRDPBManualCommand.Size = new System.Drawing.Size(409, 26);
-            this.txbTestRDPBManualCommand.TabIndex = 10;
-            // 
-            // lblTestRDPBCommand
-            // 
-            this.lblTestRDPBCommand.AutoSize = true;
-            this.lblTestRDPBCommand.Location = new System.Drawing.Point(12, 557);
-            this.lblTestRDPBCommand.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblTestRDPBCommand.Name = "lblTestRDPBCommand";
-            this.lblTestRDPBCommand.Size = new System.Drawing.Size(147, 20);
-            this.lblTestRDPBCommand.TabIndex = 9;
-            this.lblTestRDPBCommand.Text = "Команда в бракер";
-            // 
-            // txbTestRDPBCoolingBlocksStatus
-            // 
-            this.txbTestRDPBCoolingBlocksStatus.BackColor = System.Drawing.SystemColors.Control;
-            this.txbTestRDPBCoolingBlocksStatus.Enabled = false;
-            this.txbTestRDPBCoolingBlocksStatus.Location = new System.Drawing.Point(146, 485);
-            this.txbTestRDPBCoolingBlocksStatus.Margin = new System.Windows.Forms.Padding(5);
-            this.txbTestRDPBCoolingBlocksStatus.Name = "txbTestRDPBCoolingBlocksStatus";
-            this.txbTestRDPBCoolingBlocksStatus.Size = new System.Drawing.Size(70, 26);
-            this.txbTestRDPBCoolingBlocksStatus.TabIndex = 8;
-            // 
-            // cbTestRDPBCoolingBlocksQuantity
-            // 
-            this.cbTestRDPBCoolingBlocksQuantity.FormattingEnabled = true;
-            this.cbTestRDPBCoolingBlocksQuantity.Items.AddRange(new object[] {
-            "3",
-            "4"});
-            this.cbTestRDPBCoolingBlocksQuantity.Location = new System.Drawing.Point(12, 485);
-            this.cbTestRDPBCoolingBlocksQuantity.Margin = new System.Windows.Forms.Padding(5);
-            this.cbTestRDPBCoolingBlocksQuantity.Name = "cbTestRDPBCoolingBlocksQuantity";
-            this.cbTestRDPBCoolingBlocksQuantity.Size = new System.Drawing.Size(124, 28);
-            this.cbTestRDPBCoolingBlocksQuantity.TabIndex = 7;
-            this.cbTestRDPBCoolingBlocksQuantity.SelectedIndexChanged += new System.EventHandler(this.cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged);
-            // 
-            // lblCoolingBlockQuantity
-            // 
-            this.lblCoolingBlockQuantity.AutoSize = true;
-            this.lblCoolingBlockQuantity.Location = new System.Drawing.Point(12, 460);
-            this.lblCoolingBlockQuantity.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.lblCoolingBlockQuantity.Name = "lblCoolingBlockQuantity";
-            this.lblCoolingBlockQuantity.Size = new System.Drawing.Size(292, 20);
-            this.lblCoolingBlockQuantity.TabIndex = 6;
-            this.lblCoolingBlockQuantity.Text = "Число позиций охлаждающего блока";
-            // 
-            // btnTestRDPBN90
-            // 
-            this.btnTestRDPBN90.Location = new System.Drawing.Point(12, 383);
-            this.btnTestRDPBN90.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestRDPBN90.Name = "btnTestRDPBN90";
-            this.btnTestRDPBN90.Size = new System.Drawing.Size(204, 51);
-            this.btnTestRDPBN90.TabIndex = 5;
-            this.btnTestRDPBN90.Text = "(Получить статистику) N90->";
-            this.btnTestRDPBN90.UseVisualStyleBackColor = true;
-            this.btnTestRDPBN90.Click += new System.EventHandler(this.btnTestRDPBN90_Click);
-            // 
-            // btnTestRDPBN83
-            // 
-            this.btnTestRDPBN83.Location = new System.Drawing.Point(12, 323);
-            this.btnTestRDPBN83.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestRDPBN83.Name = "btnTestRDPBN83";
-            this.btnTestRDPBN83.Size = new System.Drawing.Size(204, 51);
-            this.btnTestRDPBN83.TabIndex = 4;
-            this.btnTestRDPBN83.Text = "(Выключить бракер) N83->";
-            this.btnTestRDPBN83.UseVisualStyleBackColor = true;
-            this.btnTestRDPBN83.Click += new System.EventHandler(this.btnTestRDPBN83_Click);
-            // 
-            // btnTestRDPBN82
-            // 
-            this.btnTestRDPBN82.Location = new System.Drawing.Point(12, 263);
-            this.btnTestRDPBN82.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestRDPBN82.Name = "btnTestRDPBN82";
-            this.btnTestRDPBN82.Size = new System.Drawing.Size(204, 51);
-            this.btnTestRDPBN82.TabIndex = 3;
-            this.btnTestRDPBN82.Text = "(Включить бракер) N82->";
-            this.btnTestRDPBN82.UseVisualStyleBackColor = true;
-            this.btnTestRDPBN82.Click += new System.EventHandler(this.btnTestRDPBN82_Click);
-            // 
-            // btnTestRDPBN81
-            // 
-            this.btnTestRDPBN81.Location = new System.Drawing.Point(12, 203);
-            this.btnTestRDPBN81.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestRDPBN81.Name = "btnTestRDPBN81";
-            this.btnTestRDPBN81.Size = new System.Drawing.Size(204, 51);
-            this.btnTestRDPBN81.TabIndex = 2;
-            this.btnTestRDPBN81.Text = "(Съем плохой) N81->";
-            this.btnTestRDPBN81.UseVisualStyleBackColor = true;
-            this.btnTestRDPBN81.Click += new System.EventHandler(this.btnTestRDPBN81_Click);
-            // 
-            // btnTestRDPBN80
-            // 
-            this.btnTestRDPBN80.Location = new System.Drawing.Point(12, 143);
-            this.btnTestRDPBN80.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestRDPBN80.Name = "btnTestRDPBN80";
-            this.btnTestRDPBN80.Size = new System.Drawing.Size(204, 51);
-            this.btnTestRDPBN80.TabIndex = 1;
-            this.btnTestRDPBN80.Text = "(Съем ОК) N80->";
-            this.btnTestRDPBN80.UseVisualStyleBackColor = true;
-            this.btnTestRDPBN80.Click += new System.EventHandler(this.btnTestRDPBN80_Click);
-            // 
-            // btnRDPBTestConnect
-            // 
-            this.btnRDPBTestConnect.Location = new System.Drawing.Point(12, 5);
-            this.btnRDPBTestConnect.Margin = new System.Windows.Forms.Padding(5);
-            this.btnRDPBTestConnect.Name = "btnRDPBTestConnect";
-            this.btnRDPBTestConnect.Size = new System.Drawing.Size(204, 89);
-            this.btnRDPBTestConnect.TabIndex = 0;
-            this.btnRDPBTestConnect.Text = "Подключение";
-            this.btnRDPBTestConnect.UseVisualStyleBackColor = true;
-            this.btnRDPBTestConnect.Click += new System.EventHandler(this.btnRDPBTestConnect_Click);
-            // 
-            // tbDB
-            // 
-            this.tbDB.Controls.Add(this.btnRestoreRemoteDB);
-            this.tbDB.Controls.Add(this.btnRestoreLocalDB);
-            this.tbDB.Controls.Add(this.btnMoveToArchive);
-            this.tbDB.Controls.Add(this.btnTestDBRemoteRecreate);
-            this.tbDB.Controls.Add(this.btnTestDBLocalRecreate);
-            this.tbDB.Controls.Add(this.btnTestDBRemote);
-            this.tbDB.Controls.Add(this.btnTestDBLocal);
-            this.tbDB.Location = new System.Drawing.Point(4, 29);
-            this.tbDB.Margin = new System.Windows.Forms.Padding(5);
-            this.tbDB.Name = "tbDB";
-            this.tbDB.Size = new System.Drawing.Size(1808, 953);
-            this.tbDB.TabIndex = 7;
-            this.tbDB.Text = "База данных";
-            this.tbDB.UseVisualStyleBackColor = true;
-            // 
-            // btnRestoreRemoteDB
-            // 
-            this.btnRestoreRemoteDB.Location = new System.Drawing.Point(632, 146);
-            this.btnRestoreRemoteDB.Margin = new System.Windows.Forms.Padding(5);
-            this.btnRestoreRemoteDB.Name = "btnRestoreRemoteDB";
-            this.btnRestoreRemoteDB.Size = new System.Drawing.Size(290, 92);
-            this.btnRestoreRemoteDB.TabIndex = 6;
-            this.btnRestoreRemoteDB.Text = "Восстановить удаленную базу данных";
-            this.btnRestoreRemoteDB.UseVisualStyleBackColor = true;
-            this.btnRestoreRemoteDB.Click += new System.EventHandler(this.btnRestoreRemoteDB_Click);
-            // 
-            // btnRestoreLocalDB
-            // 
-            this.btnRestoreLocalDB.Location = new System.Drawing.Point(632, 20);
-            this.btnRestoreLocalDB.Margin = new System.Windows.Forms.Padding(5);
-            this.btnRestoreLocalDB.Name = "btnRestoreLocalDB";
-            this.btnRestoreLocalDB.Size = new System.Drawing.Size(290, 92);
-            this.btnRestoreLocalDB.TabIndex = 5;
-            this.btnRestoreLocalDB.Text = "Восстановить локальную базу данных";
-            this.btnRestoreLocalDB.UseVisualStyleBackColor = true;
-            this.btnRestoreLocalDB.Click += new System.EventHandler(this.btnRestoreLocalDB_Click);
-            // 
-            // btnMoveToArchive
-            // 
-            this.btnMoveToArchive.Location = new System.Drawing.Point(972, 89);
-            this.btnMoveToArchive.Margin = new System.Windows.Forms.Padding(5);
-            this.btnMoveToArchive.Name = "btnMoveToArchive";
-            this.btnMoveToArchive.Size = new System.Drawing.Size(290, 92);
-            this.btnMoveToArchive.TabIndex = 4;
-            this.btnMoveToArchive.Text = "Переместить данные в архив";
-            this.btnMoveToArchive.UseVisualStyleBackColor = true;
-            this.btnMoveToArchive.Click += new System.EventHandler(this.btnMoveToArchive_Click);
-            // 
-            // btnTestDBRemoteRecreate
-            // 
-            this.btnTestDBRemoteRecreate.Location = new System.Drawing.Point(332, 146);
-            this.btnTestDBRemoteRecreate.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestDBRemoteRecreate.Name = "btnTestDBRemoteRecreate";
-            this.btnTestDBRemoteRecreate.Size = new System.Drawing.Size(290, 92);
-            this.btnTestDBRemoteRecreate.TabIndex = 3;
-            this.btnTestDBRemoteRecreate.Text = "Пересоздать удаленную базу данных";
-            this.btnTestDBRemoteRecreate.UseVisualStyleBackColor = true;
-            this.btnTestDBRemoteRecreate.Click += new System.EventHandler(this.btnTestDBRemoteRecreate_Click);
-            // 
-            // btnTestDBLocalRecreate
-            // 
-            this.btnTestDBLocalRecreate.Location = new System.Drawing.Point(332, 20);
-            this.btnTestDBLocalRecreate.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestDBLocalRecreate.Name = "btnTestDBLocalRecreate";
-            this.btnTestDBLocalRecreate.Size = new System.Drawing.Size(290, 92);
-            this.btnTestDBLocalRecreate.TabIndex = 2;
-            this.btnTestDBLocalRecreate.Text = "Пересоздать локальную базу данных";
-            this.btnTestDBLocalRecreate.UseVisualStyleBackColor = true;
-            this.btnTestDBLocalRecreate.Click += new System.EventHandler(this.btnTestDBLocalRecreate_Click);
-            // 
-            // btnTestDBRemote
-            // 
-            this.btnTestDBRemote.Location = new System.Drawing.Point(32, 146);
-            this.btnTestDBRemote.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestDBRemote.Name = "btnTestDBRemote";
-            this.btnTestDBRemote.Size = new System.Drawing.Size(290, 92);
-            this.btnTestDBRemote.TabIndex = 1;
-            this.btnTestDBRemote.Text = "Проверить базу данных архива";
-            this.btnTestDBRemote.UseVisualStyleBackColor = true;
-            this.btnTestDBRemote.Click += new System.EventHandler(this.btnTestDBRemote_Click);
-            // 
-            // btnTestDBLocal
-            // 
-            this.btnTestDBLocal.Location = new System.Drawing.Point(32, 20);
-            this.btnTestDBLocal.Margin = new System.Windows.Forms.Padding(5);
-            this.btnTestDBLocal.Name = "btnTestDBLocal";
-            this.btnTestDBLocal.Size = new System.Drawing.Size(290, 92);
-            this.btnTestDBLocal.TabIndex = 0;
-            this.btnTestDBLocal.Text = "Проверить локальную базу данных";
-            this.btnTestDBLocal.UseVisualStyleBackColor = true;
-            this.btnTestDBLocal.Click += new System.EventHandler(this.btnTestDBLocal_Click);
-            // 
-            // tbArchive
-            // 
-            this.tbArchive.Location = new System.Drawing.Point(4, 29);
-            this.tbArchive.Name = "tbArchive";
-            this.tbArchive.Size = new System.Drawing.Size(1808, 953);
-            this.tbArchive.TabIndex = 8;
-            this.tbArchive.Text = "Архив съемов";
-            this.tbArchive.UseVisualStyleBackColor = true;
-            // 
-            // timer1
-            // 
-            this.timer1.Enabled = true;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            tbLEDControl.Controls.Add(panel4);
+            tbLEDControl.Controls.Add(btnTestLCBStop);
+            tbLEDControl.Controls.Add(pnlTestLCBSetWorkMode);
+            tbLEDControl.Controls.Add(panel3);
+            tbLEDControl.Controls.Add(panel2);
+            tbLEDControl.Controls.Add(panel1);
+            tbLEDControl.Controls.Add(pnlTestLCBCurrent);
+            tbLEDControl.Controls.Add(pnlTestLCBStatus);
+            tbLEDControl.Controls.Add(btnTestLCBInit);
+            tbLEDControl.Controls.Add(cbTestLCBSyncrosignal);
+            tbLEDControl.Location = new Point(4, 29);
+            tbLEDControl.Margin = new Padding(5);
+            tbLEDControl.Name = "tbLEDControl";
+            tbLEDControl.Size = new Size(1808, 982);
+            tbLEDControl.TabIndex = 4;
+            tbLEDControl.Text = "Тест БУС";
+            tbLEDControl.UseVisualStyleBackColor = true;
             // 
             // panel4
             // 
-            this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel4.Controls.Add(this.btnLCBSaveToConfig);
-            this.panel4.Controls.Add(this.btnLCBLoadFromConfig);
-            this.panel4.Location = new System.Drawing.Point(1156, 575);
-            this.panel4.Margin = new System.Windows.Forms.Padding(5);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(277, 113);
-            this.panel4.TabIndex = 41;
+            panel4.BorderStyle = BorderStyle.FixedSingle;
+            panel4.Controls.Add(btnLCBSaveToConfig);
+            panel4.Controls.Add(btnLCBLoadFromConfig);
+            panel4.Location = new Point(1156, 575);
+            panel4.Margin = new Padding(5);
+            panel4.Name = "panel4";
+            panel4.Size = new Size(277, 113);
+            panel4.TabIndex = 41;
             // 
             // btnLCBSaveToConfig
             // 
-            this.btnLCBSaveToConfig.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnLCBSaveToConfig.Location = new System.Drawing.Point(7, 5);
-            this.btnLCBSaveToConfig.Margin = new System.Windows.Forms.Padding(5);
-            this.btnLCBSaveToConfig.Name = "btnLCBSaveToConfig";
-            this.btnLCBSaveToConfig.Size = new System.Drawing.Size(263, 42);
-            this.btnLCBSaveToConfig.TabIndex = 28;
-            this.btnLCBSaveToConfig.Text = "Сохранить параметры преформы в конфигурацию";
-            this.btnLCBSaveToConfig.UseVisualStyleBackColor = true;
-            this.btnLCBSaveToConfig.Click += new System.EventHandler(this.btnLCBSaveToConfig_Click);
+            btnLCBSaveToConfig.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnLCBSaveToConfig.Location = new Point(7, 5);
+            btnLCBSaveToConfig.Margin = new Padding(5);
+            btnLCBSaveToConfig.Name = "btnLCBSaveToConfig";
+            btnLCBSaveToConfig.Size = new Size(263, 42);
+            btnLCBSaveToConfig.TabIndex = 28;
+            btnLCBSaveToConfig.Text = "Сохранить параметры преформы в конфигурацию";
+            btnLCBSaveToConfig.UseVisualStyleBackColor = true;
+            btnLCBSaveToConfig.Click += btnLCBSaveToConfig_Click;
             // 
             // btnLCBLoadFromConfig
             // 
-            this.btnLCBLoadFromConfig.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnLCBLoadFromConfig.Location = new System.Drawing.Point(7, 57);
-            this.btnLCBLoadFromConfig.Margin = new System.Windows.Forms.Padding(5);
-            this.btnLCBLoadFromConfig.Name = "btnLCBLoadFromConfig";
-            this.btnLCBLoadFromConfig.Size = new System.Drawing.Size(263, 42);
-            this.btnLCBLoadFromConfig.TabIndex = 27;
-            this.btnLCBLoadFromConfig.Text = "Прочитать параметры преформы из конфигурации";
-            this.btnLCBLoadFromConfig.UseVisualStyleBackColor = true;
-            this.btnLCBLoadFromConfig.Click += new System.EventHandler(this.btnLCBLoadFromConfig_Click);
+            btnLCBLoadFromConfig.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnLCBLoadFromConfig.Location = new Point(7, 57);
+            btnLCBLoadFromConfig.Margin = new Padding(5);
+            btnLCBLoadFromConfig.Name = "btnLCBLoadFromConfig";
+            btnLCBLoadFromConfig.Size = new Size(263, 42);
+            btnLCBLoadFromConfig.TabIndex = 27;
+            btnLCBLoadFromConfig.Text = "Прочитать параметры преформы из конфигурации";
+            btnLCBLoadFromConfig.UseVisualStyleBackColor = true;
+            btnLCBLoadFromConfig.Click += btnLCBLoadFromConfig_Click;
+            // 
+            // btnTestLCBStop
+            // 
+            btnTestLCBStop.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBStop.Location = new Point(1172, 5);
+            btnTestLCBStop.Margin = new Padding(5);
+            btnTestLCBStop.Name = "btnTestLCBStop";
+            btnTestLCBStop.Size = new Size(263, 77);
+            btnTestLCBStop.TabIndex = 40;
+            btnTestLCBStop.Text = "Отключить связь";
+            btnTestLCBStop.UseVisualStyleBackColor = true;
+            btnTestLCBStop.Click += btnTestLCBStop_Click;
+            // 
+            // pnlTestLCBSetWorkMode
+            // 
+            pnlTestLCBSetWorkMode.BorderStyle = BorderStyle.FixedSingle;
+            pnlTestLCBSetWorkMode.Controls.Add(chbTestLCBWorkMode);
+            pnlTestLCBSetWorkMode.Location = new Point(691, 697);
+            pnlTestLCBSetWorkMode.Margin = new Padding(5);
+            pnlTestLCBSetWorkMode.Name = "pnlTestLCBSetWorkMode";
+            pnlTestLCBSetWorkMode.Size = new Size(742, 108);
+            pnlTestLCBSetWorkMode.TabIndex = 39;
+            // 
+            // chbTestLCBWorkMode
+            // 
+            chbTestLCBWorkMode.Appearance = Appearance.Button;
+            chbTestLCBWorkMode.CheckAlign = ContentAlignment.MiddleCenter;
+            chbTestLCBWorkMode.Location = new Point(9, 6);
+            chbTestLCBWorkMode.Margin = new Padding(5);
+            chbTestLCBWorkMode.Name = "chbTestLCBWorkMode";
+            chbTestLCBWorkMode.Size = new Size(263, 91);
+            chbTestLCBWorkMode.TabIndex = 31;
+            chbTestLCBWorkMode.Text = "Рабочий режим";
+            chbTestLCBWorkMode.TextAlign = ContentAlignment.MiddleCenter;
+            chbTestLCBWorkMode.UseVisualStyleBackColor = true;
+            chbTestLCBWorkMode.CheckedChanged += chbTestLCBWorkMode_CheckedChanged;
+            // 
+            // panel3
+            // 
+            panel3.BorderStyle = BorderStyle.FixedSingle;
+            panel3.Controls.Add(lblTestLCBCurrentHorizontalStrokeUnitMm);
+            panel3.Controls.Add(txbTestLCBCurrentHorizontalStrokeMm);
+            panel3.Controls.Add(lblTestLCBCurrentHorizontalStrokeUnit);
+            panel3.Controls.Add(btnTestLCBGetCurrentPosition);
+            panel3.Controls.Add(txbTestLCBCurrentHorizontalStroke);
+            panel3.Controls.Add(lblTestLCBCurrentHorizontalStroke);
+            panel3.Location = new Point(12, 815);
+            panel3.Margin = new Padding(5);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(674, 109);
+            panel3.TabIndex = 38;
+            // 
+            // lblTestLCBCurrentHorizontalStrokeUnitMm
+            // 
+            lblTestLCBCurrentHorizontalStrokeUnitMm.AutoSize = true;
+            lblTestLCBCurrentHorizontalStrokeUnitMm.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBCurrentHorizontalStrokeUnitMm.Location = new Point(627, 38);
+            lblTestLCBCurrentHorizontalStrokeUnitMm.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBCurrentHorizontalStrokeUnitMm.Name = "lblTestLCBCurrentHorizontalStrokeUnitMm";
+            lblTestLCBCurrentHorizontalStrokeUnitMm.Size = new Size(26, 17);
+            lblTestLCBCurrentHorizontalStrokeUnitMm.TabIndex = 47;
+            lblTestLCBCurrentHorizontalStrokeUnitMm.Text = "мм";
+            // 
+            // txbTestLCBCurrentHorizontalStrokeMm
+            // 
+            txbTestLCBCurrentHorizontalStrokeMm.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBCurrentHorizontalStrokeMm.Location = new Point(542, 34);
+            txbTestLCBCurrentHorizontalStrokeMm.Margin = new Padding(5);
+            txbTestLCBCurrentHorizontalStrokeMm.Name = "txbTestLCBCurrentHorizontalStrokeMm";
+            txbTestLCBCurrentHorizontalStrokeMm.ReadOnly = true;
+            txbTestLCBCurrentHorizontalStrokeMm.Size = new Size(75, 23);
+            txbTestLCBCurrentHorizontalStrokeMm.TabIndex = 46;
+            // 
+            // lblTestLCBCurrentHorizontalStrokeUnit
+            // 
+            lblTestLCBCurrentHorizontalStrokeUnit.AutoSize = true;
+            lblTestLCBCurrentHorizontalStrokeUnit.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBCurrentHorizontalStrokeUnit.Location = new Point(496, 39);
+            lblTestLCBCurrentHorizontalStrokeUnit.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBCurrentHorizontalStrokeUnit.Name = "lblTestLCBCurrentHorizontalStrokeUnit";
+            lblTestLCBCurrentHorizontalStrokeUnit.Size = new Size(33, 17);
+            lblTestLCBCurrentHorizontalStrokeUnit.TabIndex = 45;
+            lblTestLCBCurrentHorizontalStrokeUnit.Text = "имп";
+            // 
+            // btnTestLCBGetCurrentPosition
+            // 
+            btnTestLCBGetCurrentPosition.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBGetCurrentPosition.Location = new Point(5, 7);
+            btnTestLCBGetCurrentPosition.Margin = new Padding(5);
+            btnTestLCBGetCurrentPosition.Name = "btnTestLCBGetCurrentPosition";
+            btnTestLCBGetCurrentPosition.Size = new Size(263, 91);
+            btnTestLCBGetCurrentPosition.TabIndex = 44;
+            btnTestLCBGetCurrentPosition.Text = "Прочитать текущий ход по горизонтали";
+            btnTestLCBGetCurrentPosition.UseVisualStyleBackColor = true;
+            btnTestLCBGetCurrentPosition.Click += btnTestLCBGetCurrentPosition_Click;
+            // 
+            // txbTestLCBCurrentHorizontalStroke
+            // 
+            txbTestLCBCurrentHorizontalStroke.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBCurrentHorizontalStroke.Location = new Point(411, 34);
+            txbTestLCBCurrentHorizontalStroke.Margin = new Padding(5);
+            txbTestLCBCurrentHorizontalStroke.Name = "txbTestLCBCurrentHorizontalStroke";
+            txbTestLCBCurrentHorizontalStroke.ReadOnly = true;
+            txbTestLCBCurrentHorizontalStroke.Size = new Size(75, 23);
+            txbTestLCBCurrentHorizontalStroke.TabIndex = 43;
+            // 
+            // lblTestLCBCurrentHorizontalStroke
+            // 
+            lblTestLCBCurrentHorizontalStroke.AutoSize = true;
+            lblTestLCBCurrentHorizontalStroke.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBCurrentHorizontalStroke.Location = new Point(284, 40);
+            lblTestLCBCurrentHorizontalStroke.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBCurrentHorizontalStroke.Name = "lblTestLCBCurrentHorizontalStroke";
+            lblTestLCBCurrentHorizontalStroke.Size = new Size(96, 17);
+            lblTestLCBCurrentHorizontalStroke.TabIndex = 42;
+            lblTestLCBCurrentHorizontalStroke.Text = "Текущий ход:";
+            // 
+            // panel2
+            // 
+            panel2.BorderStyle = BorderStyle.FixedSingle;
+            panel2.Controls.Add(lblTestLCBMaximumHorizontalStrokeUnitMm);
+            panel2.Controls.Add(txbTestLCBMaximumHorizontalStrokeMm);
+            panel2.Controls.Add(lblTestLCBMaximumHorizontalStrokeUnit);
+            panel2.Controls.Add(btnTestLCBGetMaxPosition);
+            panel2.Controls.Add(txbTestLCBMaximumHorizontalStroke);
+            panel2.Controls.Add(lblTestLCBMaximumHorizontalStroke);
+            panel2.Location = new Point(12, 697);
+            panel2.Margin = new Padding(5);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(674, 108);
+            panel2.TabIndex = 37;
+            // 
+            // lblTestLCBMaximumHorizontalStrokeUnitMm
+            // 
+            lblTestLCBMaximumHorizontalStrokeUnitMm.AutoSize = true;
+            lblTestLCBMaximumHorizontalStrokeUnitMm.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBMaximumHorizontalStrokeUnitMm.Location = new Point(627, 36);
+            lblTestLCBMaximumHorizontalStrokeUnitMm.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBMaximumHorizontalStrokeUnitMm.Name = "lblTestLCBMaximumHorizontalStrokeUnitMm";
+            lblTestLCBMaximumHorizontalStrokeUnitMm.Size = new Size(26, 17);
+            lblTestLCBMaximumHorizontalStrokeUnitMm.TabIndex = 39;
+            lblTestLCBMaximumHorizontalStrokeUnitMm.Text = "мм";
+            // 
+            // txbTestLCBMaximumHorizontalStrokeMm
+            // 
+            txbTestLCBMaximumHorizontalStrokeMm.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBMaximumHorizontalStrokeMm.Location = new Point(542, 32);
+            txbTestLCBMaximumHorizontalStrokeMm.Margin = new Padding(5);
+            txbTestLCBMaximumHorizontalStrokeMm.Name = "txbTestLCBMaximumHorizontalStrokeMm";
+            txbTestLCBMaximumHorizontalStrokeMm.ReadOnly = true;
+            txbTestLCBMaximumHorizontalStrokeMm.Size = new Size(75, 23);
+            txbTestLCBMaximumHorizontalStrokeMm.TabIndex = 38;
+            // 
+            // lblTestLCBMaximumHorizontalStrokeUnit
+            // 
+            lblTestLCBMaximumHorizontalStrokeUnit.AutoSize = true;
+            lblTestLCBMaximumHorizontalStrokeUnit.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBMaximumHorizontalStrokeUnit.Location = new Point(496, 36);
+            lblTestLCBMaximumHorizontalStrokeUnit.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBMaximumHorizontalStrokeUnit.Name = "lblTestLCBMaximumHorizontalStrokeUnit";
+            lblTestLCBMaximumHorizontalStrokeUnit.Size = new Size(33, 17);
+            lblTestLCBMaximumHorizontalStrokeUnit.TabIndex = 37;
+            lblTestLCBMaximumHorizontalStrokeUnit.Text = "имп";
+            // 
+            // btnTestLCBGetMaxPosition
+            // 
+            btnTestLCBGetMaxPosition.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBGetMaxPosition.Location = new Point(6, 6);
+            btnTestLCBGetMaxPosition.Margin = new Padding(5);
+            btnTestLCBGetMaxPosition.Name = "btnTestLCBGetMaxPosition";
+            btnTestLCBGetMaxPosition.Size = new Size(263, 91);
+            btnTestLCBGetMaxPosition.TabIndex = 36;
+            btnTestLCBGetMaxPosition.Text = "Прочитать максимальный ход по горизонтали";
+            btnTestLCBGetMaxPosition.UseVisualStyleBackColor = true;
+            btnTestLCBGetMaxPosition.Click += btnTestLCBGetMaxPosition_Click;
+            // 
+            // txbTestLCBMaximumHorizontalStroke
+            // 
+            txbTestLCBMaximumHorizontalStroke.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBMaximumHorizontalStroke.Location = new Point(411, 32);
+            txbTestLCBMaximumHorizontalStroke.Margin = new Padding(5);
+            txbTestLCBMaximumHorizontalStroke.Name = "txbTestLCBMaximumHorizontalStroke";
+            txbTestLCBMaximumHorizontalStroke.ReadOnly = true;
+            txbTestLCBMaximumHorizontalStroke.Size = new Size(75, 23);
+            txbTestLCBMaximumHorizontalStroke.TabIndex = 35;
+            // 
+            // lblTestLCBMaximumHorizontalStroke
+            // 
+            lblTestLCBMaximumHorizontalStroke.AutoSize = true;
+            lblTestLCBMaximumHorizontalStroke.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBMaximumHorizontalStroke.Location = new Point(285, 38);
+            lblTestLCBMaximumHorizontalStroke.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBMaximumHorizontalStroke.Name = "lblTestLCBMaximumHorizontalStroke";
+            lblTestLCBMaximumHorizontalStroke.Size = new Size(75, 17);
+            lblTestLCBMaximumHorizontalStroke.TabIndex = 34;
+            lblTestLCBMaximumHorizontalStroke.Text = "Макс. ход:";
+            // 
+            // panel1
+            // 
+            panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Controls.Add(lblTestLCBDelayLengthValueMm);
+            panel1.Controls.Add(lblTestLCBPreformLengthValueMm);
+            panel1.Controls.Add(txbTestLCBDelayLengthMm);
+            panel1.Controls.Add(txbTestLCBPreformLengthMm);
+            panel1.Controls.Add(lblTestLCBDelayLengthValue);
+            panel1.Controls.Add(lblTestLCBPreformLengthValue);
+            panel1.Controls.Add(txbTestLCBDelayLength);
+            panel1.Controls.Add(lblTestLCBDelayLength);
+            panel1.Controls.Add(btnTestLCBGetMovementParameters);
+            panel1.Controls.Add(btnTestLCBSetMovementParameters);
+            panel1.Controls.Add(txbTestLCBPreformLength);
+            panel1.Controls.Add(lblTestLCBPreformLength);
+            panel1.Location = new Point(536, 575);
+            panel1.Margin = new Padding(5);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(613, 113);
+            panel1.TabIndex = 36;
+            // 
+            // lblTestLCBDelayLengthValueMm
+            // 
+            lblTestLCBDelayLengthValueMm.AutoSize = true;
+            lblTestLCBDelayLengthValueMm.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBDelayLengthValueMm.Location = new Point(579, 64);
+            lblTestLCBDelayLengthValueMm.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBDelayLengthValueMm.Name = "lblTestLCBDelayLengthValueMm";
+            lblTestLCBDelayLengthValueMm.Size = new Size(26, 17);
+            lblTestLCBDelayLengthValueMm.TabIndex = 36;
+            lblTestLCBDelayLengthValueMm.Text = "мм";
+            // 
+            // lblTestLCBPreformLengthValueMm
+            // 
+            lblTestLCBPreformLengthValueMm.AutoSize = true;
+            lblTestLCBPreformLengthValueMm.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBPreformLengthValueMm.Location = new Point(579, 22);
+            lblTestLCBPreformLengthValueMm.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBPreformLengthValueMm.Name = "lblTestLCBPreformLengthValueMm";
+            lblTestLCBPreformLengthValueMm.Size = new Size(26, 17);
+            lblTestLCBPreformLengthValueMm.TabIndex = 35;
+            lblTestLCBPreformLengthValueMm.Text = "мм";
+            // 
+            // txbTestLCBDelayLengthMm
+            // 
+            txbTestLCBDelayLengthMm.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBDelayLengthMm.Location = new Point(490, 61);
+            txbTestLCBDelayLengthMm.Margin = new Padding(5);
+            txbTestLCBDelayLengthMm.Name = "txbTestLCBDelayLengthMm";
+            txbTestLCBDelayLengthMm.Size = new Size(79, 23);
+            txbTestLCBDelayLengthMm.TabIndex = 34;
+            txbTestLCBDelayLengthMm.TextChanged += txbTestLCBDelayLengthMm_TextChanged;
+            txbTestLCBDelayLengthMm.DoubleClick += txbInput_DoubleClick;
+            // 
+            // txbTestLCBPreformLengthMm
+            // 
+            txbTestLCBPreformLengthMm.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBPreformLengthMm.Location = new Point(490, 19);
+            txbTestLCBPreformLengthMm.Margin = new Padding(5);
+            txbTestLCBPreformLengthMm.Name = "txbTestLCBPreformLengthMm";
+            txbTestLCBPreformLengthMm.Size = new Size(79, 23);
+            txbTestLCBPreformLengthMm.TabIndex = 33;
+            txbTestLCBPreformLengthMm.TextChanged += txbTestLCBPreformLengthMm_TextChanged;
+            txbTestLCBPreformLengthMm.DoubleClick += txbInput_DoubleClick;
+            // 
+            // lblTestLCBDelayLengthValue
+            // 
+            lblTestLCBDelayLengthValue.AutoSize = true;
+            lblTestLCBDelayLengthValue.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBDelayLengthValue.Location = new Point(457, 64);
+            lblTestLCBDelayLengthValue.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBDelayLengthValue.Name = "lblTestLCBDelayLengthValue";
+            lblTestLCBDelayLengthValue.Size = new Size(33, 17);
+            lblTestLCBDelayLengthValue.TabIndex = 32;
+            lblTestLCBDelayLengthValue.Text = "имп";
+            // 
+            // lblTestLCBPreformLengthValue
+            // 
+            lblTestLCBPreformLengthValue.AutoSize = true;
+            lblTestLCBPreformLengthValue.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBPreformLengthValue.Location = new Point(447, 22);
+            lblTestLCBPreformLengthValue.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBPreformLengthValue.Name = "lblTestLCBPreformLengthValue";
+            lblTestLCBPreformLengthValue.Size = new Size(33, 17);
+            lblTestLCBPreformLengthValue.TabIndex = 31;
+            lblTestLCBPreformLengthValue.Text = "имп";
+            // 
+            // txbTestLCBDelayLength
+            // 
+            txbTestLCBDelayLength.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBDelayLength.Location = new Point(375, 61);
+            txbTestLCBDelayLength.Margin = new Padding(5);
+            txbTestLCBDelayLength.Name = "txbTestLCBDelayLength";
+            txbTestLCBDelayLength.Size = new Size(79, 23);
+            txbTestLCBDelayLength.TabIndex = 30;
+            txbTestLCBDelayLength.TextChanged += txbTestLCBDelayLength_TextChanged;
+            txbTestLCBDelayLength.DoubleClick += txbInput_DoubleClick;
+            // 
+            // lblTestLCBDelayLength
+            // 
+            lblTestLCBDelayLength.AutoSize = true;
+            lblTestLCBDelayLength.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBDelayLength.Location = new Point(219, 64);
+            lblTestLCBDelayLength.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBDelayLength.Name = "lblTestLCBDelayLength";
+            lblTestLCBDelayLength.Size = new Size(157, 17);
+            lblTestLCBDelayLength.TabIndex = 29;
+            lblTestLCBDelayLength.Text = "Расстояние задержки:";
+            // 
+            // btnTestLCBGetMovementParameters
+            // 
+            btnTestLCBGetMovementParameters.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBGetMovementParameters.Location = new Point(9, 11);
+            btnTestLCBGetMovementParameters.Margin = new Padding(5);
+            btnTestLCBGetMovementParameters.Name = "btnTestLCBGetMovementParameters";
+            btnTestLCBGetMovementParameters.Size = new Size(200, 42);
+            btnTestLCBGetMovementParameters.TabIndex = 28;
+            btnTestLCBGetMovementParameters.Text = "Прочитать параметры";
+            btnTestLCBGetMovementParameters.UseVisualStyleBackColor = true;
+            btnTestLCBGetMovementParameters.Click += btnTestLCBGetMovementParameters_Click;
+            // 
+            // btnTestLCBSetMovementParameters
+            // 
+            btnTestLCBSetMovementParameters.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBSetMovementParameters.Location = new Point(9, 62);
+            btnTestLCBSetMovementParameters.Margin = new Padding(5);
+            btnTestLCBSetMovementParameters.Name = "btnTestLCBSetMovementParameters";
+            btnTestLCBSetMovementParameters.Size = new Size(200, 42);
+            btnTestLCBSetMovementParameters.TabIndex = 27;
+            btnTestLCBSetMovementParameters.Text = "Установить параметры";
+            btnTestLCBSetMovementParameters.UseVisualStyleBackColor = true;
+            btnTestLCBSetMovementParameters.Click += btnTestLCBSetMovementParameters_Click;
+            // 
+            // txbTestLCBPreformLength
+            // 
+            txbTestLCBPreformLength.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBPreformLength.Location = new Point(358, 19);
+            txbTestLCBPreformLength.Margin = new Padding(5);
+            txbTestLCBPreformLength.Name = "txbTestLCBPreformLength";
+            txbTestLCBPreformLength.Size = new Size(79, 23);
+            txbTestLCBPreformLength.TabIndex = 26;
+            txbTestLCBPreformLength.TextChanged += txbTestLCBPreformLength_TextChanged;
+            txbTestLCBPreformLength.DoubleClick += txbInput_DoubleClick;
+            // 
+            // lblTestLCBPreformLength
+            // 
+            lblTestLCBPreformLength.AutoSize = true;
+            lblTestLCBPreformLength.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBPreformLength.Location = new Point(219, 22);
+            lblTestLCBPreformLength.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBPreformLength.Name = "lblTestLCBPreformLength";
+            lblTestLCBPreformLength.Size = new Size(129, 17);
+            lblTestLCBPreformLength.TabIndex = 25;
+            lblTestLCBPreformLength.Text = "Длина преформы:";
+            // 
+            // pnlTestLCBCurrent
+            // 
+            pnlTestLCBCurrent.BorderStyle = BorderStyle.FixedSingle;
+            pnlTestLCBCurrent.Controls.Add(lblTestLCBCurrentUnit);
+            pnlTestLCBCurrent.Controls.Add(btnTestLCBGetCurrent);
+            pnlTestLCBCurrent.Controls.Add(btnTestLCBSetCurrent);
+            pnlTestLCBCurrent.Controls.Add(txbTestLCBCurrent);
+            pnlTestLCBCurrent.Controls.Add(lblTestLCBCurrent);
+            pnlTestLCBCurrent.Location = new Point(14, 575);
+            pnlTestLCBCurrent.Margin = new Padding(5);
+            pnlTestLCBCurrent.Name = "pnlTestLCBCurrent";
+            pnlTestLCBCurrent.Size = new Size(517, 113);
+            pnlTestLCBCurrent.TabIndex = 35;
+            // 
+            // lblTestLCBCurrentUnit
+            // 
+            lblTestLCBCurrentUnit.AutoSize = true;
+            lblTestLCBCurrentUnit.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBCurrentUnit.Location = new Point(484, 40);
+            lblTestLCBCurrentUnit.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBCurrentUnit.Name = "lblTestLCBCurrentUnit";
+            lblTestLCBCurrentUnit.Size = new Size(26, 17);
+            lblTestLCBCurrentUnit.TabIndex = 27;
+            lblTestLCBCurrentUnit.Text = "мА";
+            // 
+            // btnTestLCBGetCurrent
+            // 
+            btnTestLCBGetCurrent.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBGetCurrent.Location = new Point(5, 11);
+            btnTestLCBGetCurrent.Margin = new Padding(5);
+            btnTestLCBGetCurrent.Name = "btnTestLCBGetCurrent";
+            btnTestLCBGetCurrent.Size = new Size(263, 42);
+            btnTestLCBGetCurrent.TabIndex = 26;
+            btnTestLCBGetCurrent.Text = "Прочитать ток";
+            btnTestLCBGetCurrent.UseVisualStyleBackColor = true;
+            btnTestLCBGetCurrent.Click += btnTestLCBGetCurrent_Click;
+            // 
+            // btnTestLCBSetCurrent
+            // 
+            btnTestLCBSetCurrent.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBSetCurrent.Location = new Point(5, 62);
+            btnTestLCBSetCurrent.Margin = new Padding(5);
+            btnTestLCBSetCurrent.Name = "btnTestLCBSetCurrent";
+            btnTestLCBSetCurrent.Size = new Size(263, 42);
+            btnTestLCBSetCurrent.TabIndex = 25;
+            btnTestLCBSetCurrent.Text = "Установить ток";
+            btnTestLCBSetCurrent.UseVisualStyleBackColor = true;
+            btnTestLCBSetCurrent.Click += btnTestLCBSetCurrent_Click;
+            // 
+            // txbTestLCBCurrent
+            // 
+            txbTestLCBCurrent.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            txbTestLCBCurrent.Location = new Point(408, 37);
+            txbTestLCBCurrent.Margin = new Padding(5);
+            txbTestLCBCurrent.Name = "txbTestLCBCurrent";
+            txbTestLCBCurrent.Size = new Size(76, 23);
+            txbTestLCBCurrent.TabIndex = 24;
+            txbTestLCBCurrent.DoubleClick += txbInput_DoubleClick;
+            // 
+            // lblTestLCBCurrent
+            // 
+            lblTestLCBCurrent.AutoSize = true;
+            lblTestLCBCurrent.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lblTestLCBCurrent.Location = new Point(274, 40);
+            lblTestLCBCurrent.Margin = new Padding(5, 0, 5, 0);
+            lblTestLCBCurrent.Name = "lblTestLCBCurrent";
+            lblTestLCBCurrent.Size = new Size(124, 17);
+            lblTestLCBCurrent.TabIndex = 23;
+            lblTestLCBCurrent.Text = "Ток светодиодов:";
+            // 
+            // pnlTestLCBStatus
+            // 
+            pnlTestLCBStatus.BorderStyle = BorderStyle.FixedSingle;
+            pnlTestLCBStatus.Controls.Add(btnTestLCBFullTest);
+            pnlTestLCBStatus.Controls.Add(btnTestLCBWriteStatuses);
+            pnlTestLCBStatus.Controls.Add(gbLEDs);
+            pnlTestLCBStatus.Controls.Add(btnTestLCBReadStatuses);
+            pnlTestLCBStatus.Controls.Add(gbTestLCBInputs);
+            pnlTestLCBStatus.Controls.Add(gbTestLCBOutputs);
+            pnlTestLCBStatus.Controls.Add(btnTestLCBClearAll);
+            pnlTestLCBStatus.Controls.Add(btnTestLCBSetAll);
+            pnlTestLCBStatus.Location = new Point(12, 87);
+            pnlTestLCBStatus.Margin = new Padding(5);
+            pnlTestLCBStatus.Name = "pnlTestLCBStatus";
+            pnlTestLCBStatus.Size = new Size(1421, 480);
+            pnlTestLCBStatus.TabIndex = 34;
+            // 
+            // btnTestLCBFullTest
+            // 
+            btnTestLCBFullTest.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBFullTest.Location = new Point(5, 387);
+            btnTestLCBFullTest.Margin = new Padding(5);
+            btnTestLCBFullTest.Name = "btnTestLCBFullTest";
+            btnTestLCBFullTest.Size = new Size(263, 77);
+            btnTestLCBFullTest.TabIndex = 16;
+            btnTestLCBFullTest.Text = "Полная проверка";
+            btnTestLCBFullTest.UseVisualStyleBackColor = true;
+            btnTestLCBFullTest.Click += btnTestLCBFullTest_Click;
+            // 
+            // btnTestLCBWriteStatuses
+            // 
+            btnTestLCBWriteStatuses.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBWriteStatuses.Location = new Point(5, 177);
+            btnTestLCBWriteStatuses.Margin = new Padding(5);
+            btnTestLCBWriteStatuses.Name = "btnTestLCBWriteStatuses";
+            btnTestLCBWriteStatuses.Size = new Size(263, 77);
+            btnTestLCBWriteStatuses.TabIndex = 15;
+            btnTestLCBWriteStatuses.Text = "Установить состояние";
+            btnTestLCBWriteStatuses.UseVisualStyleBackColor = true;
+            btnTestLCBWriteStatuses.Click += btnTestLCBWriteStatuses_Click;
+            // 
+            // gbLEDs
+            // 
+            gbLEDs.Controls.Add(cbTestLCBLED11);
+            gbLEDs.Controls.Add(cbTestLCBLED10);
+            gbLEDs.Controls.Add(cbTestLCBLED9);
+            gbLEDs.Controls.Add(cbTestLCBLED8);
+            gbLEDs.Controls.Add(cbTestLCBLED7);
+            gbLEDs.Controls.Add(cbTestLCBLED6);
+            gbLEDs.Controls.Add(cbTestLCBLED5);
+            gbLEDs.Controls.Add(cbTestLCBLED4);
+            gbLEDs.Controls.Add(cbTestLCBLED3);
+            gbLEDs.Controls.Add(cbTestLCBLED2);
+            gbLEDs.Controls.Add(cbTestLCBLED1);
+            gbLEDs.Controls.Add(cbTestLCBLED0);
+            gbLEDs.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            gbLEDs.Location = new Point(281, 6);
+            gbLEDs.Margin = new Padding(5);
+            gbLEDs.Name = "gbLEDs";
+            gbLEDs.Padding = new Padding(5);
+            gbLEDs.Size = new Size(336, 463);
+            gbLEDs.TabIndex = 14;
+            gbLEDs.TabStop = false;
+            gbLEDs.Text = "Светодиоды";
+            // 
+            // cbTestLCBLED11
+            // 
+            cbTestLCBLED11.AutoSize = true;
+            cbTestLCBLED11.Location = new Point(9, 417);
+            cbTestLCBLED11.Margin = new Padding(5);
+            cbTestLCBLED11.Name = "cbTestLCBLED11";
+            cbTestLCBLED11.Size = new Size(118, 21);
+            cbTestLCBLED11.TabIndex = 11;
+            cbTestLCBLED11.Text = "Светодиод 12";
+            cbTestLCBLED11.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED10
+            // 
+            cbTestLCBLED10.AutoSize = true;
+            cbTestLCBLED10.Location = new Point(9, 382);
+            cbTestLCBLED10.Margin = new Padding(5);
+            cbTestLCBLED10.Name = "cbTestLCBLED10";
+            cbTestLCBLED10.Size = new Size(118, 21);
+            cbTestLCBLED10.TabIndex = 10;
+            cbTestLCBLED10.Text = "Светодиод 11";
+            cbTestLCBLED10.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED9
+            // 
+            cbTestLCBLED9.AutoSize = true;
+            cbTestLCBLED9.Location = new Point(9, 346);
+            cbTestLCBLED9.Margin = new Padding(5);
+            cbTestLCBLED9.Name = "cbTestLCBLED9";
+            cbTestLCBLED9.Size = new Size(118, 21);
+            cbTestLCBLED9.TabIndex = 9;
+            cbTestLCBLED9.Text = "Светодиод 10";
+            cbTestLCBLED9.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED8
+            // 
+            cbTestLCBLED8.AutoSize = true;
+            cbTestLCBLED8.Location = new Point(9, 311);
+            cbTestLCBLED8.Margin = new Padding(5);
+            cbTestLCBLED8.Name = "cbTestLCBLED8";
+            cbTestLCBLED8.Size = new Size(110, 21);
+            cbTestLCBLED8.TabIndex = 8;
+            cbTestLCBLED8.Text = "Светодиод 9";
+            cbTestLCBLED8.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED7
+            // 
+            cbTestLCBLED7.AutoSize = true;
+            cbTestLCBLED7.Location = new Point(9, 277);
+            cbTestLCBLED7.Margin = new Padding(5);
+            cbTestLCBLED7.Name = "cbTestLCBLED7";
+            cbTestLCBLED7.Size = new Size(110, 21);
+            cbTestLCBLED7.TabIndex = 7;
+            cbTestLCBLED7.Text = "Светодиод 8";
+            cbTestLCBLED7.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED6
+            // 
+            cbTestLCBLED6.AutoSize = true;
+            cbTestLCBLED6.Location = new Point(9, 242);
+            cbTestLCBLED6.Margin = new Padding(5);
+            cbTestLCBLED6.Name = "cbTestLCBLED6";
+            cbTestLCBLED6.Size = new Size(110, 21);
+            cbTestLCBLED6.TabIndex = 6;
+            cbTestLCBLED6.Text = "Светодиод 7";
+            cbTestLCBLED6.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED5
+            // 
+            cbTestLCBLED5.AutoSize = true;
+            cbTestLCBLED5.Location = new Point(9, 206);
+            cbTestLCBLED5.Margin = new Padding(5);
+            cbTestLCBLED5.Name = "cbTestLCBLED5";
+            cbTestLCBLED5.Size = new Size(110, 21);
+            cbTestLCBLED5.TabIndex = 5;
+            cbTestLCBLED5.Text = "Светодиод 6";
+            cbTestLCBLED5.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED4
+            // 
+            cbTestLCBLED4.AutoSize = true;
+            cbTestLCBLED4.Location = new Point(9, 171);
+            cbTestLCBLED4.Margin = new Padding(5);
+            cbTestLCBLED4.Name = "cbTestLCBLED4";
+            cbTestLCBLED4.Size = new Size(110, 21);
+            cbTestLCBLED4.TabIndex = 4;
+            cbTestLCBLED4.Text = "Светодиод 5";
+            cbTestLCBLED4.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED3
+            // 
+            cbTestLCBLED3.AutoSize = true;
+            cbTestLCBLED3.Location = new Point(9, 135);
+            cbTestLCBLED3.Margin = new Padding(5);
+            cbTestLCBLED3.Name = "cbTestLCBLED3";
+            cbTestLCBLED3.Size = new Size(110, 21);
+            cbTestLCBLED3.TabIndex = 3;
+            cbTestLCBLED3.Text = "Светодиод 4";
+            cbTestLCBLED3.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED2
+            // 
+            cbTestLCBLED2.AutoSize = true;
+            cbTestLCBLED2.Location = new Point(9, 100);
+            cbTestLCBLED2.Margin = new Padding(5);
+            cbTestLCBLED2.Name = "cbTestLCBLED2";
+            cbTestLCBLED2.Size = new Size(110, 21);
+            cbTestLCBLED2.TabIndex = 2;
+            cbTestLCBLED2.Text = "Светодиод 3";
+            cbTestLCBLED2.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED1
+            // 
+            cbTestLCBLED1.AutoSize = true;
+            cbTestLCBLED1.Location = new Point(9, 65);
+            cbTestLCBLED1.Margin = new Padding(5);
+            cbTestLCBLED1.Name = "cbTestLCBLED1";
+            cbTestLCBLED1.Size = new Size(110, 21);
+            cbTestLCBLED1.TabIndex = 1;
+            cbTestLCBLED1.Text = "Светодиод 2";
+            cbTestLCBLED1.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBLED0
+            // 
+            cbTestLCBLED0.AutoSize = true;
+            cbTestLCBLED0.Location = new Point(9, 29);
+            cbTestLCBLED0.Margin = new Padding(5);
+            cbTestLCBLED0.Name = "cbTestLCBLED0";
+            cbTestLCBLED0.Size = new Size(110, 21);
+            cbTestLCBLED0.TabIndex = 0;
+            cbTestLCBLED0.Text = "Светодиод 1";
+            cbTestLCBLED0.UseVisualStyleBackColor = true;
+            // 
+            // btnTestLCBReadStatuses
+            // 
+            btnTestLCBReadStatuses.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBReadStatuses.Location = new Point(5, 62);
+            btnTestLCBReadStatuses.Margin = new Padding(5);
+            btnTestLCBReadStatuses.Name = "btnTestLCBReadStatuses";
+            btnTestLCBReadStatuses.Size = new Size(263, 77);
+            btnTestLCBReadStatuses.TabIndex = 13;
+            btnTestLCBReadStatuses.Text = "Читать состояние";
+            btnTestLCBReadStatuses.UseVisualStyleBackColor = true;
+            btnTestLCBReadStatuses.Click += btnTestLCBReadStatuses_Click;
+            // 
+            // gbTestLCBInputs
+            // 
+            gbTestLCBInputs.Controls.Add(cbTestLCBInput7);
+            gbTestLCBInputs.Controls.Add(cbTestLCBInput6);
+            gbTestLCBInputs.Controls.Add(cbTestLCBInput5);
+            gbTestLCBInputs.Controls.Add(cbTestLCBInput4);
+            gbTestLCBInputs.Controls.Add(cbTestLCBInput3);
+            gbTestLCBInputs.Controls.Add(cbTestLCBInput2);
+            gbTestLCBInputs.Controls.Add(cbTestLCBInput1);
+            gbTestLCBInputs.Controls.Add(cbTestLCBInput0);
+            gbTestLCBInputs.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            gbTestLCBInputs.Location = new Point(970, 6);
+            gbTestLCBInputs.Margin = new Padding(5);
+            gbTestLCBInputs.Name = "gbTestLCBInputs";
+            gbTestLCBInputs.Padding = new Padding(5);
+            gbTestLCBInputs.Size = new Size(441, 338);
+            gbTestLCBInputs.TabIndex = 12;
+            gbTestLCBInputs.TabStop = false;
+            gbTestLCBInputs.Text = "Входы";
+            // 
+            // cbTestLCBInput7
+            // 
+            cbTestLCBInput7.AutoSize = true;
+            cbTestLCBInput7.Location = new Point(9, 277);
+            cbTestLCBInput7.Margin = new Padding(5);
+            cbTestLCBInput7.Name = "cbTestLCBInput7";
+            cbTestLCBInput7.Size = new Size(153, 21);
+            cbTestLCBInput7.TabIndex = 7;
+            cbTestLCBInput7.Text = "Маячки выдвинуты";
+            cbTestLCBInput7.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBInput6
+            // 
+            cbTestLCBInput6.AutoSize = true;
+            cbTestLCBInput6.Location = new Point(9, 242);
+            cbTestLCBInput6.Margin = new Padding(5);
+            cbTestLCBInput6.Name = "cbTestLCBInput6";
+            cbTestLCBInput6.Size = new Size(145, 21);
+            cbTestLCBInput6.TabIndex = 6;
+            cbTestLCBInput6.Text = "Маячки спрятаны";
+            cbTestLCBInput6.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBInput5
+            // 
+            cbTestLCBInput5.AutoSize = true;
+            cbTestLCBInput5.Location = new Point(9, 206);
+            cbTestLCBInput5.Margin = new Padding(5);
+            cbTestLCBInput5.Name = "cbTestLCBInput5";
+            cbTestLCBInput5.Size = new Size(99, 21);
+            cbTestLCBInput5.TabIndex = 5;
+            cbTestLCBInput5.Text = "Запас PG1";
+            cbTestLCBInput5.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBInput4
+            // 
+            cbTestLCBInput4.AutoSize = true;
+            cbTestLCBInput4.Location = new Point(9, 171);
+            cbTestLCBInput4.Margin = new Padding(5);
+            cbTestLCBInput4.Name = "cbTestLCBInput4";
+            cbTestLCBInput4.Size = new Size(208, 21);
+            cbTestLCBInput4.TabIndex = 4;
+            cbTestLCBInput4.Text = "Датчик положения захвата";
+            cbTestLCBInput4.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBInput3
+            // 
+            cbTestLCBInput3.AutoSize = true;
+            cbTestLCBInput3.Location = new Point(9, 135);
+            cbTestLCBInput3.Margin = new Padding(5);
+            cbTestLCBInput3.Name = "cbTestLCBInput3";
+            cbTestLCBInput3.Size = new Size(189, 21);
+            cbTestLCBInput3.TabIndex = 3;
+            cbTestLCBInput3.Text = "Блокировка работы БУС";
+            cbTestLCBInput3.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBInput2
+            // 
+            cbTestLCBInput2.AutoSize = true;
+            cbTestLCBInput2.Location = new Point(9, 100);
+            cbTestLCBInput2.Margin = new Padding(5);
+            cbTestLCBInput2.Name = "cbTestLCBInput2";
+            cbTestLCBInput2.Size = new Size(96, 21);
+            cbTestLCBInput2.TabIndex = 2;
+            cbTestLCBInput2.Text = "Энкодер B";
+            cbTestLCBInput2.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBInput1
+            // 
+            cbTestLCBInput1.AutoSize = true;
+            cbTestLCBInput1.Location = new Point(9, 65);
+            cbTestLCBInput1.Margin = new Padding(5);
+            cbTestLCBInput1.Name = "cbTestLCBInput1";
+            cbTestLCBInput1.Size = new Size(96, 21);
+            cbTestLCBInput1.TabIndex = 1;
+            cbTestLCBInput1.Text = "Энкодер A";
+            cbTestLCBInput1.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBInput0
+            // 
+            cbTestLCBInput0.AutoSize = true;
+            cbTestLCBInput0.Location = new Point(9, 29);
+            cbTestLCBInput0.Margin = new Padding(5);
+            cbTestLCBInput0.Name = "cbTestLCBInput0";
+            cbTestLCBInput0.Size = new Size(49, 21);
+            cbTestLCBInput0.TabIndex = 0;
+            cbTestLCBInput0.Text = "AiN";
+            cbTestLCBInput0.UseVisualStyleBackColor = true;
+            // 
+            // gbTestLCBOutputs
+            // 
+            gbTestLCBOutputs.Controls.Add(cbTestLCBOutput5);
+            gbTestLCBOutputs.Controls.Add(cbTestLCBOutput4);
+            gbTestLCBOutputs.Controls.Add(cbTestLCBOutput3);
+            gbTestLCBOutputs.Controls.Add(cbTestLCBOutput2);
+            gbTestLCBOutputs.Controls.Add(cbTestLCBOutput1);
+            gbTestLCBOutputs.Controls.Add(cbTestLCBOutput0);
+            gbTestLCBOutputs.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            gbTestLCBOutputs.Location = new Point(626, 6);
+            gbTestLCBOutputs.Margin = new Padding(5);
+            gbTestLCBOutputs.Name = "gbTestLCBOutputs";
+            gbTestLCBOutputs.Padding = new Padding(5);
+            gbTestLCBOutputs.Size = new Size(336, 338);
+            gbTestLCBOutputs.TabIndex = 11;
+            gbTestLCBOutputs.TabStop = false;
+            gbTestLCBOutputs.Text = "Выходы";
+            // 
+            // cbTestLCBOutput5
+            // 
+            cbTestLCBOutput5.AutoSize = true;
+            cbTestLCBOutput5.Location = new Point(9, 206);
+            cbTestLCBOutput5.Margin = new Padding(5);
+            cbTestLCBOutput5.Name = "cbTestLCBOutput5";
+            cbTestLCBOutput5.Size = new Size(105, 21);
+            cbTestLCBOutput5.TabIndex = 5;
+            cbTestLCBOutput5.Text = "Запас PC12";
+            cbTestLCBOutput5.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBOutput4
+            // 
+            cbTestLCBOutput4.AutoSize = true;
+            cbTestLCBOutput4.Location = new Point(9, 171);
+            cbTestLCBOutput4.Margin = new Padding(5);
+            cbTestLCBOutput4.Name = "cbTestLCBOutput4";
+            cbTestLCBOutput4.Size = new Size(129, 21);
+            cbTestLCBOutput4.TabIndex = 4;
+            cbTestLCBOutput4.Text = "Синхронизация";
+            cbTestLCBOutput4.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBOutput3
+            // 
+            cbTestLCBOutput3.AutoSize = true;
+            cbTestLCBOutput3.Location = new Point(9, 135);
+            cbTestLCBOutput3.Margin = new Padding(5);
+            cbTestLCBOutput3.Name = "cbTestLCBOutput3";
+            cbTestLCBOutput3.Size = new Size(110, 21);
+            cbTestLCBOutput3.TabIndex = 3;
+            cbTestLCBOutput3.Text = "Авария БУС ";
+            cbTestLCBOutput3.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBOutput2
+            // 
+            cbTestLCBOutput2.AutoSize = true;
+            cbTestLCBOutput2.Location = new Point(9, 100);
+            cbTestLCBOutput2.Margin = new Padding(5);
+            cbTestLCBOutput2.Name = "cbTestLCBOutput2";
+            cbTestLCBOutput2.Size = new Size(127, 21);
+            cbTestLCBOutput2.TabIndex = 2;
+            cbTestLCBOutput2.Text = "Электромагнит";
+            cbTestLCBOutput2.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBOutput1
+            // 
+            cbTestLCBOutput1.AutoSize = true;
+            cbTestLCBOutput1.Location = new Point(9, 65);
+            cbTestLCBOutput1.Margin = new Padding(5);
+            cbTestLCBOutput1.Name = "cbTestLCBOutput1";
+            cbTestLCBOutput1.Size = new Size(101, 21);
+            cbTestLCBOutput1.TabIndex = 1;
+            cbTestLCBOutput1.Text = "Клапан ПЦ";
+            cbTestLCBOutput1.UseVisualStyleBackColor = true;
+            // 
+            // cbTestLCBOutput0
+            // 
+            cbTestLCBOutput0.AutoSize = true;
+            cbTestLCBOutput0.Location = new Point(9, 29);
+            cbTestLCBOutput0.Margin = new Padding(5);
+            cbTestLCBOutput0.Name = "cbTestLCBOutput0";
+            cbTestLCBOutput0.Size = new Size(156, 21);
+            cbTestLCBOutput0.TabIndex = 0;
+            cbTestLCBOutput0.Text = "HL5 - LED на плате";
+            cbTestLCBOutput0.UseVisualStyleBackColor = true;
+            // 
+            // btnTestLCBClearAll
+            // 
+            btnTestLCBClearAll.Location = new Point(1299, 429);
+            btnTestLCBClearAll.Margin = new Padding(5);
+            btnTestLCBClearAll.Name = "btnTestLCBClearAll";
+            btnTestLCBClearAll.Size = new Size(113, 35);
+            btnTestLCBClearAll.TabIndex = 9;
+            btnTestLCBClearAll.Text = "Очистить";
+            btnTestLCBClearAll.UseVisualStyleBackColor = true;
+            btnTestLCBClearAll.Click += btnTestLCBClearAll_Click;
+            // 
+            // btnTestLCBSetAll
+            // 
+            btnTestLCBSetAll.Location = new Point(1176, 429);
+            btnTestLCBSetAll.Margin = new Padding(5);
+            btnTestLCBSetAll.Name = "btnTestLCBSetAll";
+            btnTestLCBSetAll.Size = new Size(113, 35);
+            btnTestLCBSetAll.TabIndex = 11;
+            btnTestLCBSetAll.Text = "Установить все";
+            btnTestLCBSetAll.UseVisualStyleBackColor = true;
+            btnTestLCBSetAll.Click += btnTestLCBSetAll_Click;
+            // 
+            // btnTestLCBInit
+            // 
+            btnTestLCBInit.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnTestLCBInit.Location = new Point(12, 5);
+            btnTestLCBInit.Margin = new Padding(5);
+            btnTestLCBInit.Name = "btnTestLCBInit";
+            btnTestLCBInit.Size = new Size(263, 77);
+            btnTestLCBInit.TabIndex = 8;
+            btnTestLCBInit.Text = "Инициализация связи";
+            btnTestLCBInit.UseVisualStyleBackColor = true;
+            btnTestLCBInit.Click += btnTestLCBInit_Click;
+            // 
+            // cbTestLCBSyncrosignal
+            // 
+            cbTestLCBSyncrosignal.AutoSize = true;
+            cbTestLCBSyncrosignal.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            cbTestLCBSyncrosignal.Location = new Point(297, 29);
+            cbTestLCBSyncrosignal.Margin = new Padding(5);
+            cbTestLCBSyncrosignal.Name = "cbTestLCBSyncrosignal";
+            cbTestLCBSyncrosignal.Size = new Size(118, 21);
+            cbTestLCBSyncrosignal.TabIndex = 7;
+            cbTestLCBSyncrosignal.Text = "Синхросигнал";
+            cbTestLCBSyncrosignal.UseVisualStyleBackColor = true;
+            // 
+            // tbTestImages
+            // 
+            tbTestImages.Location = new Point(4, 29);
+            tbTestImages.Margin = new Padding(5);
+            tbTestImages.Name = "tbTestImages";
+            tbTestImages.Size = new Size(1808, 982);
+            tbTestImages.TabIndex = 5;
+            tbTestImages.Text = "Тест изображений";
+            tbTestImages.UseVisualStyleBackColor = true;
+            // 
+            // tbRDP
+            // 
+            tbRDP.Controls.Add(lblTestRDPBStatus);
+            tbRDP.Controls.Add(lvTestRDPBStatuses);
+            tbRDP.Controls.Add(btnTestRDPBSendCommand);
+            tbRDP.Controls.Add(txbTestRDPBManualCommand);
+            tbRDP.Controls.Add(lblTestRDPBCommand);
+            tbRDP.Controls.Add(txbTestRDPBCoolingBlocksStatus);
+            tbRDP.Controls.Add(cbTestRDPBCoolingBlocksQuantity);
+            tbRDP.Controls.Add(lblCoolingBlockQuantity);
+            tbRDP.Controls.Add(btnTestRDPBN90);
+            tbRDP.Controls.Add(btnTestRDPBN83);
+            tbRDP.Controls.Add(btnTestRDPBN82);
+            tbRDP.Controls.Add(btnTestRDPBN81);
+            tbRDP.Controls.Add(btnTestRDPBN80);
+            tbRDP.Controls.Add(btnRDPBTestConnect);
+            tbRDP.Location = new Point(4, 29);
+            tbRDP.Margin = new Padding(5);
+            tbRDP.Name = "tbRDP";
+            tbRDP.Size = new Size(1808, 982);
+            tbRDP.TabIndex = 6;
+            tbRDP.Text = "Тест бракера";
+            tbRDP.UseVisualStyleBackColor = true;
+            // 
+            // lblTestRDPBStatus
+            // 
+            lblTestRDPBStatus.AutoSize = true;
+            lblTestRDPBStatus.Location = new Point(666, 15);
+            lblTestRDPBStatus.Margin = new Padding(5, 0, 5, 0);
+            lblTestRDPBStatus.Name = "lblTestRDPBStatus";
+            lblTestRDPBStatus.Size = new Size(143, 20);
+            lblTestRDPBStatus.TabIndex = 13;
+            lblTestRDPBStatus.Text = "Статусы бракера:";
+            // 
+            // lvTestRDPBStatuses
+            // 
+            lvTestRDPBStatuses.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
+            lvTestRDPBStatuses.Location = new Point(671, 46);
+            lvTestRDPBStatuses.Margin = new Padding(5);
+            lvTestRDPBStatuses.Name = "lvTestRDPBStatuses";
+            lvTestRDPBStatuses.Size = new Size(708, 416);
+            lvTestRDPBStatuses.TabIndex = 12;
+            lvTestRDPBStatuses.UseCompatibleStateImageBehavior = false;
+            lvTestRDPBStatuses.View = View.Details;
+            // 
+            // columnHeader1
+            // 
+            columnHeader1.Text = "Параметр";
+            columnHeader1.Width = 200;
+            // 
+            // columnHeader2
+            // 
+            columnHeader2.Text = "Значение";
+            columnHeader2.Width = 289;
+            // 
+            // btnTestRDPBSendCommand
+            // 
+            btnTestRDPBSendCommand.Location = new Point(432, 580);
+            btnTestRDPBSendCommand.Margin = new Padding(5);
+            btnTestRDPBSendCommand.Name = "btnTestRDPBSendCommand";
+            btnTestRDPBSendCommand.Size = new Size(123, 49);
+            btnTestRDPBSendCommand.TabIndex = 11;
+            btnTestRDPBSendCommand.Text = "Послать";
+            btnTestRDPBSendCommand.UseVisualStyleBackColor = true;
+            btnTestRDPBSendCommand.Click += btnTestRDPBSendCommand_Click;
+            // 
+            // txbTestRDPBManualCommand
+            // 
+            txbTestRDPBManualCommand.Location = new Point(12, 587);
+            txbTestRDPBManualCommand.Margin = new Padding(5);
+            txbTestRDPBManualCommand.Name = "txbTestRDPBManualCommand";
+            txbTestRDPBManualCommand.Size = new Size(409, 26);
+            txbTestRDPBManualCommand.TabIndex = 10;
+            // 
+            // lblTestRDPBCommand
+            // 
+            lblTestRDPBCommand.AutoSize = true;
+            lblTestRDPBCommand.Location = new Point(12, 557);
+            lblTestRDPBCommand.Margin = new Padding(5, 0, 5, 0);
+            lblTestRDPBCommand.Name = "lblTestRDPBCommand";
+            lblTestRDPBCommand.Size = new Size(147, 20);
+            lblTestRDPBCommand.TabIndex = 9;
+            lblTestRDPBCommand.Text = "Команда в бракер";
+            // 
+            // txbTestRDPBCoolingBlocksStatus
+            // 
+            txbTestRDPBCoolingBlocksStatus.BackColor = SystemColors.Control;
+            txbTestRDPBCoolingBlocksStatus.Enabled = false;
+            txbTestRDPBCoolingBlocksStatus.Location = new Point(146, 485);
+            txbTestRDPBCoolingBlocksStatus.Margin = new Padding(5);
+            txbTestRDPBCoolingBlocksStatus.Name = "txbTestRDPBCoolingBlocksStatus";
+            txbTestRDPBCoolingBlocksStatus.Size = new Size(70, 26);
+            txbTestRDPBCoolingBlocksStatus.TabIndex = 8;
+            // 
+            // cbTestRDPBCoolingBlocksQuantity
+            // 
+            cbTestRDPBCoolingBlocksQuantity.FormattingEnabled = true;
+            cbTestRDPBCoolingBlocksQuantity.Items.AddRange(new object[] { "3", "4" });
+            cbTestRDPBCoolingBlocksQuantity.Location = new Point(12, 485);
+            cbTestRDPBCoolingBlocksQuantity.Margin = new Padding(5);
+            cbTestRDPBCoolingBlocksQuantity.Name = "cbTestRDPBCoolingBlocksQuantity";
+            cbTestRDPBCoolingBlocksQuantity.Size = new Size(124, 28);
+            cbTestRDPBCoolingBlocksQuantity.TabIndex = 7;
+            cbTestRDPBCoolingBlocksQuantity.SelectedIndexChanged += cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged;
+            // 
+            // lblCoolingBlockQuantity
+            // 
+            lblCoolingBlockQuantity.AutoSize = true;
+            lblCoolingBlockQuantity.Location = new Point(12, 460);
+            lblCoolingBlockQuantity.Margin = new Padding(5, 0, 5, 0);
+            lblCoolingBlockQuantity.Name = "lblCoolingBlockQuantity";
+            lblCoolingBlockQuantity.Size = new Size(292, 20);
+            lblCoolingBlockQuantity.TabIndex = 6;
+            lblCoolingBlockQuantity.Text = "Число позиций охлаждающего блока";
+            // 
+            // btnTestRDPBN90
+            // 
+            btnTestRDPBN90.Location = new Point(12, 383);
+            btnTestRDPBN90.Margin = new Padding(5);
+            btnTestRDPBN90.Name = "btnTestRDPBN90";
+            btnTestRDPBN90.Size = new Size(204, 51);
+            btnTestRDPBN90.TabIndex = 5;
+            btnTestRDPBN90.Text = "(Получить статистику) N90->";
+            btnTestRDPBN90.UseVisualStyleBackColor = true;
+            btnTestRDPBN90.Click += btnTestRDPBN90_Click;
+            // 
+            // btnTestRDPBN83
+            // 
+            btnTestRDPBN83.Location = new Point(12, 323);
+            btnTestRDPBN83.Margin = new Padding(5);
+            btnTestRDPBN83.Name = "btnTestRDPBN83";
+            btnTestRDPBN83.Size = new Size(204, 51);
+            btnTestRDPBN83.TabIndex = 4;
+            btnTestRDPBN83.Text = "(Выключить бракер) N83->";
+            btnTestRDPBN83.UseVisualStyleBackColor = true;
+            btnTestRDPBN83.Click += btnTestRDPBN83_Click;
+            // 
+            // btnTestRDPBN82
+            // 
+            btnTestRDPBN82.Location = new Point(12, 263);
+            btnTestRDPBN82.Margin = new Padding(5);
+            btnTestRDPBN82.Name = "btnTestRDPBN82";
+            btnTestRDPBN82.Size = new Size(204, 51);
+            btnTestRDPBN82.TabIndex = 3;
+            btnTestRDPBN82.Text = "(Включить бракер) N82->";
+            btnTestRDPBN82.UseVisualStyleBackColor = true;
+            btnTestRDPBN82.Click += btnTestRDPBN82_Click;
+            // 
+            // btnTestRDPBN81
+            // 
+            btnTestRDPBN81.Location = new Point(12, 203);
+            btnTestRDPBN81.Margin = new Padding(5);
+            btnTestRDPBN81.Name = "btnTestRDPBN81";
+            btnTestRDPBN81.Size = new Size(204, 51);
+            btnTestRDPBN81.TabIndex = 2;
+            btnTestRDPBN81.Text = "(Съем плохой) N81->";
+            btnTestRDPBN81.UseVisualStyleBackColor = true;
+            btnTestRDPBN81.Click += btnTestRDPBN81_Click;
+            // 
+            // btnTestRDPBN80
+            // 
+            btnTestRDPBN80.Location = new Point(12, 143);
+            btnTestRDPBN80.Margin = new Padding(5);
+            btnTestRDPBN80.Name = "btnTestRDPBN80";
+            btnTestRDPBN80.Size = new Size(204, 51);
+            btnTestRDPBN80.TabIndex = 1;
+            btnTestRDPBN80.Text = "(Съем ОК) N80->";
+            btnTestRDPBN80.UseVisualStyleBackColor = true;
+            btnTestRDPBN80.Click += btnTestRDPBN80_Click;
+            // 
+            // btnRDPBTestConnect
+            // 
+            btnRDPBTestConnect.Location = new Point(12, 5);
+            btnRDPBTestConnect.Margin = new Padding(5);
+            btnRDPBTestConnect.Name = "btnRDPBTestConnect";
+            btnRDPBTestConnect.Size = new Size(204, 89);
+            btnRDPBTestConnect.TabIndex = 0;
+            btnRDPBTestConnect.Text = "Подключение";
+            btnRDPBTestConnect.UseVisualStyleBackColor = true;
+            btnRDPBTestConnect.Click += btnRDPBTestConnect_Click;
+            // 
+            // tbDB
+            // 
+            tbDB.Controls.Add(btnRestoreRemoteDB);
+            tbDB.Controls.Add(btnRestoreLocalDB);
+            tbDB.Controls.Add(btnMoveToArchive);
+            tbDB.Controls.Add(btnTestDBRemoteRecreate);
+            tbDB.Controls.Add(btnTestDBLocalRecreate);
+            tbDB.Controls.Add(btnTestDBRemote);
+            tbDB.Controls.Add(btnTestDBLocal);
+            tbDB.Location = new Point(4, 29);
+            tbDB.Margin = new Padding(5);
+            tbDB.Name = "tbDB";
+            tbDB.Size = new Size(1808, 982);
+            tbDB.TabIndex = 7;
+            tbDB.Text = "База данных";
+            tbDB.UseVisualStyleBackColor = true;
+            // 
+            // btnRestoreRemoteDB
+            // 
+            btnRestoreRemoteDB.Location = new Point(632, 146);
+            btnRestoreRemoteDB.Margin = new Padding(5);
+            btnRestoreRemoteDB.Name = "btnRestoreRemoteDB";
+            btnRestoreRemoteDB.Size = new Size(290, 92);
+            btnRestoreRemoteDB.TabIndex = 6;
+            btnRestoreRemoteDB.Text = "Восстановить удаленную базу данных";
+            btnRestoreRemoteDB.UseVisualStyleBackColor = true;
+            btnRestoreRemoteDB.Click += btnRestoreRemoteDB_Click;
+            // 
+            // btnRestoreLocalDB
+            // 
+            btnRestoreLocalDB.Location = new Point(632, 20);
+            btnRestoreLocalDB.Margin = new Padding(5);
+            btnRestoreLocalDB.Name = "btnRestoreLocalDB";
+            btnRestoreLocalDB.Size = new Size(290, 92);
+            btnRestoreLocalDB.TabIndex = 5;
+            btnRestoreLocalDB.Text = "Восстановить локальную базу данных";
+            btnRestoreLocalDB.UseVisualStyleBackColor = true;
+            btnRestoreLocalDB.Click += btnRestoreLocalDB_Click;
+            // 
+            // btnMoveToArchive
+            // 
+            btnMoveToArchive.Location = new Point(972, 89);
+            btnMoveToArchive.Margin = new Padding(5);
+            btnMoveToArchive.Name = "btnMoveToArchive";
+            btnMoveToArchive.Size = new Size(290, 92);
+            btnMoveToArchive.TabIndex = 4;
+            btnMoveToArchive.Text = "Переместить данные в архив";
+            btnMoveToArchive.UseVisualStyleBackColor = true;
+            btnMoveToArchive.Click += btnMoveToArchive_Click;
+            // 
+            // btnTestDBRemoteRecreate
+            // 
+            btnTestDBRemoteRecreate.Location = new Point(332, 146);
+            btnTestDBRemoteRecreate.Margin = new Padding(5);
+            btnTestDBRemoteRecreate.Name = "btnTestDBRemoteRecreate";
+            btnTestDBRemoteRecreate.Size = new Size(290, 92);
+            btnTestDBRemoteRecreate.TabIndex = 3;
+            btnTestDBRemoteRecreate.Text = "Пересоздать удаленную базу данных";
+            btnTestDBRemoteRecreate.UseVisualStyleBackColor = true;
+            btnTestDBRemoteRecreate.Click += btnTestDBRemoteRecreate_Click;
+            // 
+            // btnTestDBLocalRecreate
+            // 
+            btnTestDBLocalRecreate.Location = new Point(332, 20);
+            btnTestDBLocalRecreate.Margin = new Padding(5);
+            btnTestDBLocalRecreate.Name = "btnTestDBLocalRecreate";
+            btnTestDBLocalRecreate.Size = new Size(290, 92);
+            btnTestDBLocalRecreate.TabIndex = 2;
+            btnTestDBLocalRecreate.Text = "Пересоздать локальную базу данных";
+            btnTestDBLocalRecreate.UseVisualStyleBackColor = true;
+            btnTestDBLocalRecreate.Click += btnTestDBLocalRecreate_Click;
+            // 
+            // btnTestDBRemote
+            // 
+            btnTestDBRemote.Location = new Point(32, 146);
+            btnTestDBRemote.Margin = new Padding(5);
+            btnTestDBRemote.Name = "btnTestDBRemote";
+            btnTestDBRemote.Size = new Size(290, 92);
+            btnTestDBRemote.TabIndex = 1;
+            btnTestDBRemote.Text = "Проверить базу данных архива";
+            btnTestDBRemote.UseVisualStyleBackColor = true;
+            btnTestDBRemote.Click += btnTestDBRemote_Click;
+            // 
+            // btnTestDBLocal
+            // 
+            btnTestDBLocal.Location = new Point(32, 20);
+            btnTestDBLocal.Margin = new Padding(5);
+            btnTestDBLocal.Name = "btnTestDBLocal";
+            btnTestDBLocal.Size = new Size(290, 92);
+            btnTestDBLocal.TabIndex = 0;
+            btnTestDBLocal.Text = "Проверить локальную базу данных";
+            btnTestDBLocal.UseVisualStyleBackColor = true;
+            btnTestDBLocal.Click += btnTestDBLocal_Click;
+            // 
+            // tbArchive
+            // 
+            tbArchive.Location = new Point(4, 29);
+            tbArchive.Name = "tbArchive";
+            tbArchive.Size = new Size(1808, 982);
+            tbArchive.TabIndex = 8;
+            tbArchive.Text = "Архив съемов";
+            tbArchive.UseVisualStyleBackColor = true;
+            // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Tick += timer1_Tick;
             // 
             // DoMCSettingsInterface
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1820, 1032);
-            this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.menuStrip1);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(5);
-            this.MinimumSize = new System.Drawing.Size(917, 565);
-            this.Name = "DoMCSettingsInterface";
-            this.Text = "Управление ПМК";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.DoMCMainInterface_FormClosed);
-            this.Load += new System.EventHandler(this.DoMCMainInterface_Load);
-            this.menuStrip1.ResumeLayout(false);
-            this.menuStrip1.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
-            this.tbSettingsStatus.ResumeLayout(false);
-            this.tbSettingsStatus.PerformLayout();
-            this.tbGetStandard.ResumeLayout(false);
-            this.tbGetStandard.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudStandardLevel)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbAverage)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard1)).EndInit();
-            this.tbTest.ResumeLayout(false);
-            this.tbTest.PerformLayout();
-            this.ssFooter.ResumeLayout(false);
-            this.ssFooter.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chTestStandard)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chTestDiff)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numFrame)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chTestReadLine)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTestStandard)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTestDifference)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTestReadImage)).EndInit();
-            this.tbLEDControl.ResumeLayout(false);
-            this.tbLEDControl.PerformLayout();
-            this.pnlTestLCBSetWorkMode.ResumeLayout(false);
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.pnlTestLCBCurrent.ResumeLayout(false);
-            this.pnlTestLCBCurrent.PerformLayout();
-            this.pnlTestLCBStatus.ResumeLayout(false);
-            this.gbLEDs.ResumeLayout(false);
-            this.gbLEDs.PerformLayout();
-            this.gbTestLCBInputs.ResumeLayout(false);
-            this.gbTestLCBInputs.PerformLayout();
-            this.gbTestLCBOutputs.ResumeLayout(false);
-            this.gbTestLCBOutputs.PerformLayout();
-            this.tbRDP.ResumeLayout(false);
-            this.tbRDP.PerformLayout();
-            this.tbDB.ResumeLayout(false);
-            this.panel4.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(9F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1820, 1061);
+            Controls.Add(tabControl1);
+            Controls.Add(menuStrip1);
+            Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            MainMenuStrip = menuStrip1;
+            Margin = new Padding(5);
+            MinimumSize = new Size(917, 565);
+            Name = "DoMCSettingsInterface";
+            Text = "Управление ПМК";
+            FormClosed += DoMCMainInterface_FormClosed;
+            Load += DoMCMainInterface_Load;
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
+            tabControl1.ResumeLayout(false);
+            tbSettingsStatus.ResumeLayout(false);
+            tbSettingsStatus.PerformLayout();
+            tbGetStandard.ResumeLayout(false);
+            tbGetStandard.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudStandardLevel).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbAverage).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard1).EndInit();
+            tbTest.ResumeLayout(false);
+            tbTest.PerformLayout();
+            ssFooter.ResumeLayout(false);
+            ssFooter.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)chTestStandard).EndInit();
+            ((System.ComponentModel.ISupportInitialize)chTestDiff).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numFrame).EndInit();
+            ((System.ComponentModel.ISupportInitialize)chTestReadLine).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbTestStandard).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbTestDifference).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbTestReadImage).EndInit();
+            tbLEDControl.ResumeLayout(false);
+            tbLEDControl.PerformLayout();
+            panel4.ResumeLayout(false);
+            pnlTestLCBSetWorkMode.ResumeLayout(false);
+            panel3.ResumeLayout(false);
+            panel3.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            pnlTestLCBCurrent.ResumeLayout(false);
+            pnlTestLCBCurrent.PerformLayout();
+            pnlTestLCBStatus.ResumeLayout(false);
+            gbLEDs.ResumeLayout(false);
+            gbLEDs.PerformLayout();
+            gbTestLCBInputs.ResumeLayout(false);
+            gbTestLCBInputs.PerformLayout();
+            gbTestLCBOutputs.ResumeLayout(false);
+            gbTestLCBOutputs.PerformLayout();
+            tbRDP.ResumeLayout(false);
+            tbRDP.PerformLayout();
+            tbDB.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
