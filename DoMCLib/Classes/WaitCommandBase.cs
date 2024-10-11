@@ -28,7 +28,8 @@ namespace DoMCLib.Classes
                 while (!IsCompleteSuccessfully && !IsError && (DateTime.Now - start).TotalSeconds < timeoutInSeconds)
                 {
                     NoNeedToWaitMore = MakeDecisionIsCommandCompleteFunc();
-                    if (NoNeedToWaitMore) break;
+                    if (NoNeedToWaitMore)
+                        break;
                     Task.Delay(10).Wait();
                 }
             }

@@ -22,5 +22,9 @@ namespace DoMCLib.Classes.Module.CCD.Commands.Classes
         {
             return Enumerable.Range(0, 12).Where(i => requested[i] && !answered[i]).ToList();
         }
+        public List<int> CardsAnswered()
+        {
+            return Enumerable.Range(0, 12).Where(i => requested[i] && answered[i]).ToList();
+        }
     }
 }

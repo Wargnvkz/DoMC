@@ -24,6 +24,8 @@ using DoMCLib.Classes.Module.LCB;
 using DoMCLib.Classes.Module.RDPB;
 using DoMCLib.Classes.Module.CCD;
 using DoMC.Classes;
+using DoMCLib.Classes.Module.CCD.Commands.Classes;
+using DoMCModuleControl.Commands;
 
 namespace DoMC
 {
@@ -345,65 +347,46 @@ namespace DoMC
             }*/
         }
 
-        public bool StartLCB()
+        private bool WaitForCommand<T1, T2>(object? InputData, int TimeoutInSeconds, string LogMessage, LoggerLevel LogMessageLevel, out T2? outputData)
+            where T1 : CommandBase
+            where T2 : class
         {
-            var startCmd = Controller.CreateCommand(typeof(LCBModule.StartCommand));
-            if (startCmd == null) return false;
-            startCmd.ExecuteCommandAsync().Wait();
+            WorkingLog.Add(LogMessageLevel, LogMessage);
+
+            var CommandInstance = Controller.CreateCommand(typeof(T1));
+            if (CommandInstance == null)
+            {
+                outputData = null;
+                return false;
+            };
+            var resultExpositionCommand = CommandInstance.Wait(InputData, TimeoutInSeconds);
+            outputData = resultExpositionCommand as T2;
+            return true;
         }
+
+
         private bool LoadConfiguration(bool WorkingMode, bool LoadCCD = true, bool LoadLCB = true, int[] Sockets = null, bool ShowMessages = true)
         {
 
-
-            bool res = false;
-            //InterfaceDataExchange.Configuration = InterfaceDataExchange.Configuration;
-            InterfaceDataExchange.CCDDataEchangeStatuses.IsConfigurationLoaded = false;
-            InterfaceDataExchange.CCDDataEchangeStatuses.IsNetworkCardSet = false;
-            InterfaceDataExchange.CCDDataEchangeStatuses.FastRead = true;
-            InterfaceDataExchange.LEDStatus.LСBInitialized = false;
-            InterfaceDataExchange.LEDStatus.LCBConfigurationLoaded = false;
-
-            if (!InterfaceDataExchange.IsCCDConfigurationFull) { DoMCNoConfigurationErrorMessage(); return false; }
-
-            if ((InterfaceDataExchange?.CardsConnection ?? null) != null)
-            {
-                InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
-            }
-
             if (LoadCCD)
             {
-                WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек гнезд в модуль плат ПЗС");
-
-                InterfaceDataExchange.SendCommand(ModuleCommand.SetAllCardsAndSocketsConfiguration);
-                res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.SetAllCardsAndSocketsConfiguration && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-                if (!res)
+                if (!WaitForCommand<CCDCardDataModule.SetExpositionCommand, SetReadingParametersCommandResult>(Context, Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, "Передача настроек экспозиции гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
                 {
-                    InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                    if (ShowMessages) DoMCNotAbleLoadConfigurationErrorMessage();
-                    return false;
+                    if (result != null)
+                    {
+                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
+                    }
                 }
-                InterfaceDataExchange.CCDDataEchangeStatuses.IsNetworkCardSet = true;
-
-                WorkingLog.Add("Подключение к платам ПЗС");
-                InterfaceDataExchange.SendCommand(ModuleCommand.CCDStart);
-                res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, InterfaceDataExchange.CardsConnection.AreCardsConnected);
-                if (!res || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
+                if (!WaitForCommand<CCDCardDataModule.SetReadingParametersCommand, SetReadingParametersCommandResult>(Context, Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, "Передача настроек чтения гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
                 {
-                    InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                    if (ShowMessages) DoMCNotAbleLoadConfigurationErrorMessage();
-                    return false;
+                    if (result != null)
+                    {
+                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
+                    }
                 }
 
-                WorkingLog.Add("Загрузка конфигурации в платы ПЗС");
-                InterfaceDataExchange.SendCommand(ModuleCommand.LoadConfiguration);
-                res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.LoadConfiguration && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-                if (!res || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
-                {
-                    InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                    if (ShowMessages) DoMCNotAbleLoadConfigurationErrorMessage();
-                    return false;
-                }
-                InterfaceDataExchange.CCDDataEchangeStatuses.IsConfigurationLoaded = true;
+                if (setReadingParametersCommand.IsError) return false;
+
             }
 
             if (LoadLCB)

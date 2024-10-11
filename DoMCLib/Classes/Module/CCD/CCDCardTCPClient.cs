@@ -22,7 +22,7 @@ namespace DoMCLib.Classes.Module.CCD
     /// <summary>
     /// Работа с одной платой по протоколу TCP/IP
     /// </summary>
-    public class CCDCardTCPClient
+    public class CCDCardTCPClient<T> where T : ISocketDevice, new()
     {
         public int PortCommand = 200;
         public int PortData = 100;
@@ -33,8 +33,10 @@ namespace DoMCLib.Classes.Module.CCD
         private CancellationTokenSource receiveCancellationTokenSource { get; set; }
         private Task ReceiveTask { get; set; }
 
-        private TcpClient TCPClientCommandConnection;
-        private TcpClient DoMCCardTCPClientDataConnection;
+        T TCPClientCommandConnection;
+        T DoMCCardTCPClientDataConnection;
+        //private TcpClient TCPClientCommandConnection;
+        //private TcpClient DoMCCardTCPClientDataConnection;
         private DateTime LastReceiveAt;
         private DateTime LastSendAt;
         public int ReconnectTimeoutInSeconds = 30;
@@ -85,7 +87,7 @@ namespace DoMCLib.Classes.Module.CCD
             }
         }*/
 
-        private void Connect()
+        private void Connect(CancellationToken cancellationToken)
         {
             try
             {
@@ -99,29 +101,23 @@ namespace DoMCLib.Classes.Module.CCD
                             TCPClientCommandConnection.Close();
                         }
                         catch { }
-                        TCPClientCommandConnection = null;
                     }
                 }
-                TCPClientCommandConnection = new TcpClient();
+                TCPClientCommandConnection = new T();// TcpClient();
                 var target = GetServerCommandIPAddress();
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Установка соединения с {target.Address.ToString()}:{target.Port}");
-                var connectionResult = TCPClientCommandConnection.BeginConnect(target.Address, target.Port, null, null);
-                var connectSucceeded = connectionResult.AsyncWaitHandle.WaitOne(ConnectionTimeoutInMilliseconds);
+                //var connectionResult = TCPClientCommandConnection.BeginConnect(target.Address, target.Port, null, null);
+                //var connectionResult = TCPClientCommandConnection.ConnectAsync(target,);
+                //var connectSucceeded = connectionResult.AsyncWaitHandle.WaitOne(ConnectionTimeoutInMilliseconds);
+                var connectionTask=TCPClientCommandConnection.ConnectAsync(target, ConnectionTimeoutInMilliseconds, cancellationToken);
+                var connectSucceeded = connectionTask.Wait(ConnectionTimeoutInMilliseconds, cancellationToken);
                 if (!connectSucceeded)
                 {
                     throw new SocketException(10060);
                 }
-                TCPClientCommandConnection.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
                 //TCPClientCommandConnection.Connect(target);
 
-                try
-                {
-                    // Ускорение подтверждения получения пакета. Платы ждут подтверждения ровно 200 мс и перепосылают пакет, а windows обычно отвечат позже
-                    int SIO_TCP_SET_ACK_FREQUENCY = unchecked((int)0x98000017);
-                    var outputArray = new byte[128];
-                    var bytesInOutputArray = TCPClientCommandConnection.Client.IOControl(SIO_TCP_SET_ACK_FREQUENCY, BitConverter.GetBytes(1), outputArray);
-                }
-                catch { }
+
                 IsConnected = true;
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Соединение установлено.");
                 //WorkingLog.Add(LoggerLevel.Information,$"Плата: {CardNumber}. ");
@@ -135,6 +131,90 @@ namespace DoMCLib.Classes.Module.CCD
             }
         }
 
+
+        public bool GetImageDataFromSocketAsync(int Socket, int msTimeout, CancellationToken cancellationToken, out SocketReadData socketReadData)
+        {
+            socketReadData = new SocketReadData();
+            try
+            {
+
+                var ip = GetServerIPAddressSocketData(Socket);
+                WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Начало чтения гнезда {Socket}. Адрес: {ip}");
+
+                var socketDevice = new T();
+                socketDevice.ConnectAsync(ip, msTimeout, cancellationToken);
+                WorkingLog.Add(LoggerLevel.Information, $"Подключение к {ip} успешно установлено.");
+
+
+                //var ns = DoMCCardTCPClientDataConnection.GetStream();
+
+                socketReadData.ImageDataRead = 0;
+                socketReadData.ImageData = new byte[SocketWorkStatus.ProperImageSizeInBytes];
+                //ns.ReadTimeout = 100;
+                var buffer = new byte[4096];
+                var startedAt = DateTime.Now;
+                var FirstRead = true;
+                var PreciseTimer = new Stopwatch();
+
+                do
+                {
+                    var readTask = socketDevice.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                    int read = 0;
+                    if (readTask.Wait(msTimeout, cancellationToken))
+                    {
+                        read = readTask.Result;
+                    }
+                    //Если прочитано больше нужного размера, то берем только то, что вначале
+                    if (socketReadData.ImageDataRead + read > SocketWorkStatus.ProperImageSizeInBytes)
+                        read = SocketWorkStatus.ProperImageSizeInBytes - socketReadData.ImageDataRead;
+                    Array.Copy(buffer, 0, socketReadData.ImageData, socketReadData.ImageDataRead, read);
+                    socketReadData.ImageDataRead += read;
+
+                    if (FirstRead && read > 0)
+                    {
+                        FirstRead = false;
+                        PreciseTimer.Start();
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Плата: {CardNumber}. Гнездо: {Socket}. Получен первый пакет.");
+                    }
+
+                } while (socketReadData.ImageDataRead < SocketWorkStatus.ProperImageSizeInBytes &&
+                         (DateTime.Now - startedAt).TotalMilliseconds < msTimeout &&
+                         !cancellationToken.IsCancellationRequested);
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Нет изображения гнезда");
+                }
+                if (FirstRead)
+                {
+                    WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Чтение гнезда завершено с ошибкой.");
+                }
+                else
+                {
+                    WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Чтение гнезда завершено. Время чтения: {socketReadData.ImageTicksRead / 10000d} мс. Прочитано {socketReadData.ImageDataRead} байт");
+                }
+                socketReadData.ImageTicksRead = PreciseTimer.ElapsedTicks;
+                if (socketReadData.ImageDataRead != SocketWorkStatus.ProperImageSizeInBytes)
+                {
+                    throw new Exception($"Прочитано {socketReadData.ImageDataRead} байт");
+                }
+
+                return socketReadData.ImageDataRead == SocketWorkStatus.ProperImageSizeInBytes;
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, $"Плата: {CardNumber}. Гнездо: {Socket}. Чтение гнезда завершено с ошибкой. {ex.Message}");
+                return false;
+            }
+            finally
+            {
+                DoMCCardTCPClientDataConnection.Close();
+                WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Соединение закрыто.");
+            }
+        }
+
+
+        /*
         /// <summary>
         /// Запускает чтение из порта данных. Должно выполняться вместе с командой получения изображений (9)
         /// </summary>
@@ -251,7 +331,7 @@ namespace DoMCLib.Classes.Module.CCD
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Соединение закрыто.");
             }
         }
-
+        */
         /*private bool NeedReconnect()
         {
             return !(IsAnyCommandCompleteForAllSockets() || GetLastCommandRunningTime() / 1000 < ReconnectTimeoutInSeconds);
@@ -288,7 +368,7 @@ namespace DoMCLib.Classes.Module.CCD
             Controller.GetObserver().Notify($"{this.GetType().Name}.Module.Stop", null);
         }
 
-        public bool Send(byte[] data)
+        public bool Send(byte[] data, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
             //WriteSocketStatusLog("Статус гнезд при посылке данных в плату");
@@ -300,7 +380,7 @@ namespace DoMCLib.Classes.Module.CCD
             var packet = Command2Packet(data);// NetworkStreamConverter.Data2Packet(data);
             try
             {
-                return WritePacketToTCPSocket(packet);
+                return WritePacketToTCPSocket(packet, cancellationToken);
             }
             catch (InvalidOperationException ex)
             {
@@ -315,21 +395,20 @@ namespace DoMCLib.Classes.Module.CCD
                 return false;
             }
         }
-        private void Send(byte Socket, byte[] data)
+        private void Send(byte Socket, byte[] data, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
             data[0] = Socket;
-            Send(data);
+            Send(data, cancellationToken);
         }
-        private bool WritePacketToTCPSocket(byte[] packet)
+        private bool WritePacketToTCPSocket(byte[] packet, CancellationToken cancellationToken)
         {
             if (!IsConnected) return false;
             lock (TCPClientCommandConnection)
             {
                 if (TCPClientCommandConnection != null)
                 {
-                    var ns = TCPClientCommandConnection.GetStream();
-                    ns.Write(packet, 0, packet.Length);
+                    TCPClientCommandConnection.WriteAsync(packet, 0, packet.Length, cancellationToken);
                     return true;
                 }
             }
@@ -347,15 +426,19 @@ namespace DoMCLib.Classes.Module.CCD
                     //    Connect();
                     lock (TCPClientCommandConnection)
                     {
-                        var ns = TCPClientCommandConnection.GetStream();
-                        ns.ReadTimeout = 1;
+                        //var ns = TCPClientCommandConnection.GetStream();
+                        TCPClientCommandConnection.SetReadTimeout(1);
                         var tmpBuffer = new byte[2048];
-                        int read;
+                        int read = 0;
                         do
                         {
                             try
                             {
-                                read = ns.Read(tmpBuffer, 0, tmpBuffer.Length);
+                                var readTask = TCPClientCommandConnection.ReadAsync(tmpBuffer, 0, tmpBuffer.Length, receiveCancellationTokenSource.Token);
+                                if (readTask.Wait(10, receiveCancellationTokenSource.Token))
+                                {
+                                    read = readTask.Result;
+                                }
                             }
                             catch (Exception ex) { read = 0; }
                             if (read > 0)
@@ -577,25 +660,25 @@ namespace DoMCLib.Classes.Module.CCD
         /// Command = 4, Загрузка конфигурации чтения в гнезда по списку
         /// </summary>
 
-        public void SendCommandSetSocketsExpositionParameters(SocketParameters socketParameters)
+        public void SendCommandSetSocketsExpositionParameters(SocketParameters socketParameters, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             if (socketParameters == null || !socketParameters.IsSocketReading) return;
             var cfg = socketParameters.ReadingParameters.GetFrameExpositionConfiguration();
-            Send(0, BinaryConverter.ToBytes(cfg));
+            Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
 
         }
         /// <summary>
         /// Command = 11, Загрузка основной конфигурации в гнезда по списку
         /// </summary>
-        public void SendCommandSetSocketReadingParameters(SocketParameters socketParameters)
+        public void SendCommandSetSocketReadingParameters(SocketParameters socketParameters, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             if (socketParameters == null || !socketParameters.IsSocketReading) return;
             var cfg = socketParameters.ReadingParameters.GetReadingParametersConfiguration();
-            Send(0, BinaryConverter.ToBytes(cfg));
+            Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
 
         }
 
@@ -604,51 +687,51 @@ namespace DoMCLib.Classes.Module.CCD
         /// Command = 1, читать изображения с датчиков
         /// </summary>
 
-        public void SendCommandReadAllSockets()
+        public void SendCommandReadAllSockets(CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             var cfg = new CCDCardReadRequest1();
             cfg.Address = 0;
-            Send(BinaryConverter.ToBytes(cfg));
+            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
 
         }
         /// <summary>
         /// Command = 1, читать изображение одного гнезда
         /// </summary>
 
-        public void SendCommandReadSocket(byte SocketNum)
+        public void SendCommandReadSocket(byte SocketNum, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             var cfg = new CCDCardReadRequest1();
             cfg.Address = 0;
-            Send(SocketNum, BinaryConverter.ToBytes(cfg));
+            Send(SocketNum, BinaryConverter.ToBytes(cfg), cancellationToken);
         }
 
         /// <summary>
         /// Command = 5, установка параметров чтения или запуск чтения по внешнему сигналу
         /// </summary>
 
-        public void SendCommandSetSocketReadingParameters(bool AnswerWithImage, bool ExternalStart, bool FastRead, bool ResetReady = true)
+        public void SendCommandSetSocketReadingParameters(CancellationToken cancellationToken, bool AnswerWithImage, bool ExternalStart, bool FastRead, bool ResetReady = true)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             var cfg = CCDCardConfigRequest5.GetConfiguration(ResetReady, AnswerWithImage, ExternalStart, FastRead);
             cfg.Address = 0;
-            Send(BinaryConverter.ToBytes(cfg));
+            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
 
         }
         /// <summary>
         /// Command = 5, запуск по внешнему старту
         /// </summary>
-        public void SendCommandReadSeveralSocketsExternal(bool FastRead)
+        public void SendCommandReadSeveralSocketsExternal(bool FastRead, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             var cfg = CCDCardConfigRequest5.GetConfiguration(true, false, true, FastRead);
             cfg.Address = 0;
-            Send(BinaryConverter.ToBytes(cfg));
+            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
 
         }
 
@@ -656,28 +739,28 @@ namespace DoMCLib.Classes.Module.CCD
         /// Command = 9, получить прочитанные изображения по всем гнездам
         /// </summary>
 
-        public void SendCommandGetAllSocketImages()
+        public void SendCommandGetAllSocketImages(CancellationToken cancellationToken)
         {
 
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             var cfg = new CCDCardArrayRequest9();
             cfg.Address = 8;
-            Send(BinaryConverter.ToBytes(cfg));
+            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
 
         }
         /// <summary>
         /// Command = 9, получить прочитанное изображение по одному гнезду
         /// </summary>
 
-        public void SendCommandGetSocketImage(int socket)
+        public void SendCommandGetSocketImage(int socket, CancellationToken cancellationToken)
         {
 
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             var cfg = new CCDCardArrayRequest9();
             cfg.Address = (byte)socket;
-            Send(BinaryConverter.ToBytes(cfg));
+            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
 
         }
         #endregion

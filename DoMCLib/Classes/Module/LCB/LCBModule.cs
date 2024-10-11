@@ -112,11 +112,11 @@ namespace DoMCLib.Classes.Module.LCB
 
 
         // Вызов команд снаружи модуля
-        public void SetNewPreformParameters(LCBSettings settings)
+        public void SetLCBParameters(LCBSettings settings)
         {
             CurrentSettings = settings;
         }
-        public void SetNewWorkingParameters(LCBWorkingParameters parameters)
+        public void SetWorkingParameters(LCBWorkingParameters parameters)
         {
             CurrentWorkingParameters = parameters;
         }

@@ -154,11 +154,10 @@ namespace DoMCModuleControl.Commands
         /// <summary>
         /// Запуск команды на асинхронное выполнение
         /// </summary>
-        public async Task<bool> ExecuteCommandAsync()
+        public async Task ExecuteCommandAsync()
         {
             var task = new Task(ExecuteCommandBase);
             await task;
-            return IsCompleteSuccessfully;
         }
         /// <summary>
         /// Запуск команды на асинхронное выполнение с передачей входных данный
@@ -168,7 +167,6 @@ namespace DoMCModuleControl.Commands
             SetInputData(InputData);
             var task = new Task(ExecuteCommandBase);
             await task;
-            return IsCompleteSuccessfully;
         }
         /// <summary>
         /// Метод описываемый в потомках, то есть в конкретной команде и выполняющий сам код команды. Классам реализующим этот метод не нужно заботиться о логировании или ошибках. Все это сделано в базовом классе, чтобы соблюсти стандартизацию
@@ -215,6 +213,16 @@ namespace DoMCModuleControl.Commands
             // Если метод не реализован в потомке, генерируем исключение
             throw new NotImplementedException("Метод Wait не реализован для этой команды.");
 
+        }
+        /// <summary>
+        /// Ждет завершения выполнения команды.
+        /// Если команда не запущена, то запускает ее
+        /// </summary>
+        /// <param name="TimeoutInSeconds">Таймаут в секундах, -1 без таймаута</param>
+        public virtual object? Wait(object? InputData, int TimeoutInSeconds)
+        {
+            SetInputData(InputData);
+            return Wait(TimeoutInSeconds);
         }
     }
 

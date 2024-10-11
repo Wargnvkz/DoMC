@@ -13,6 +13,7 @@ namespace DoMCLib.Classes.Module.CCD
     {
         /// <summary>
         /// послыка команды плате на передачу данных об изображении и подключение к плате для получения данных изображения гнезд
+        /// OutputData - GetImageDataCommandResponse - массив гнезд соответствующих гнездам на машине (не платам)
         /// </summary>
         public class GetSocketsImagesDataCommand : WaitCommandBase
         {
