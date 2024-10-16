@@ -31,10 +31,12 @@ namespace DoMCModuleControl.Commands
         /// <summary>
         /// Экземпляр модуля к которому будет обращаться команда
         /// </summary>
-        public ModuleBase Module { get; set; }
+        public AbstractModuleBase Module { get; set; }
 
-        public CommandInfo(string? commandName, Type? inputType, Type? outputType, Type commandClass, ModuleBase module)
+        public CommandInfo(string? commandName, Type? inputType, Type? outputType, Type commandClass, AbstractModuleBase module)
         {
+            if (commandClass == null) throw new ArgumentNullException(nameof(commandClass));
+            if (module == null) throw new ArgumentNullException(nameof(module));
             CommandName = commandName;
             InputType = inputType;
             OutputType = outputType;

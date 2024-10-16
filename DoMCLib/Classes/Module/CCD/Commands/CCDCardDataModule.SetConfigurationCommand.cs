@@ -13,7 +13,7 @@ namespace DoMCLib.Classes.Module.CCD
         public class SetConfigurationCommand : WaitCommandBase
         {
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public SetConfigurationCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;

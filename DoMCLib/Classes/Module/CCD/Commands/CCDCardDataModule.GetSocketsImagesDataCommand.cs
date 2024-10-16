@@ -19,7 +19,7 @@ namespace DoMCLib.Classes.Module.CCD
         {
             GetImageDataCommandResponse result = new GetImageDataCommandResponse();
             CancellationTokenSource[] cancellationTokenSources = new CancellationTokenSource[12];
-            public GetSocketsImagesDataCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(GetImageDataCommandResponse)) { }
+            public GetSocketsImagesDataCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(GetImageDataCommandResponse)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
@@ -32,13 +32,13 @@ namespace DoMCLib.Classes.Module.CCD
                     {
                         result.SetCardRequested(i);
                         cancellationTokenSources[i] = new CancellationTokenSource();
-                        module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages();
+                        module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages(CancellationTokenSourceBase.Token);
                         var task = new Task((i) =>
                         {
                             var cardnumber = (int)i;
                             for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
                             {
-                                var ReadResult = module.tcpClients[cardParameters[cardnumber].Item1].GetImageDataFromSocketSync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, cancellationTokenSources[cardnumber], out SocketReadData data);
+                                var ReadResult = module.tcpClients[cardParameters[cardnumber].Item1].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, cancellationTokenSources[cardnumber], out SocketReadData data);
                                 if (ReadResult)
                                 {
                                     TCPCardSocket cardSocket = new TCPCardSocket() { CCDCardNumber = cardnumber, InnerSocketNumber = socket };

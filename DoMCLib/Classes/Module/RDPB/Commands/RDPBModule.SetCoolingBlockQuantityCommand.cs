@@ -7,9 +7,9 @@ namespace DoMCLib.Classes.Module.RDPB
 {
     public partial class RDPBModule
     {
-        public class SetCoolingBlockQuantityCommand : CommandBase
+        public class SetCoolingBlockQuantityCommand : AbstractCommandBase
         {
-            public SetCoolingBlockQuantityCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(int), null) { }
+            public SetCoolingBlockQuantityCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(int), null) { }
 
             protected override void Executing() => ((RDPBModule)Module).Send(RDPBCommandType.SetCoolingBlocks, (int)(InputData ?? 4));
 

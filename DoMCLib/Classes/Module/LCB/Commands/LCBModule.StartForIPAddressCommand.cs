@@ -7,9 +7,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class StartForIPAddressCommand : CommandBase
+        public class StartForIPAddressCommand : AbstractCommandBase
         {
-            public StartForIPAddressCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(IPAddress), null) { }
+            public StartForIPAddressCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(IPAddress), null) { }
             protected override void Executing() => ((LCBModule)Module).StartForIPAddress((IPAddress)InputData);
         }
 

@@ -38,14 +38,15 @@ namespace DoMCModuleControl
             {
                 var handlers = NotificationReceivers.GetInvocationList();
 
-                foreach (Func<string, object?, Task> handler in handlers.Cast<Func<string, object?, Task>>())
+                //foreach (Func<string, object?, Task> handler in handlers.Cast<Func<string, object?, Task>>())
+                foreach (var handler in handlers)
                 {
-                    Task.Run(async () =>
+                    Task.Run(() =>
                     {
                         try
                         {
                             Logger.Add(LoggerLevel.FullDetailedInformation, $"Событие {eventName} передано в {handler.GetType().Name}");
-                            await handler.Invoke(eventName, eventData);
+                            handler.DynamicInvoke(eventName, eventData);
                             Logger.Add(LoggerLevel.FullDetailedInformation, $"Событие {eventName} в {handler.GetType().Name} завершено");
                         }
                         catch (Exception ex)

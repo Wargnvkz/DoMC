@@ -11,6 +11,8 @@ using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.InteropServices.Marshalling;
+using System.Runtime.InteropServices;
+using DoMCModuleControl.External;
 
 namespace DoMCModuleControl
 {
@@ -28,7 +30,7 @@ namespace DoMCModuleControl
         /// <summary>
         /// список модулей, к которым можно получить доступ по именам
         /// </summary>
-        private readonly Dictionary<string, Modules.ModuleBase> _modules = [];
+        private readonly Dictionary<string, Modules.AbstractModuleBase> _modules = [];
 
         /// <summary>
         /// Наблюдательн
@@ -44,14 +46,15 @@ namespace DoMCModuleControl
         /// </summary>
         private readonly IMainUserInterface MainUserInterface;
 
-        public MainController(Type mainUserInterfaceType)
+        public MainController(Type mainUserInterfaceType, IFileSystem logFileSystem = null)
         {
+            if (mainUserInterfaceType == null) throw new ArgumentNullException(nameof(mainUserInterfaceType));
             // Создаем экземпляр интерфейса
             var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(mainUserInterfaceType);
             MainUserInterface = mainUserInterface ?? throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{mainUserInterfaceType.Name}\".");
             MainUserInterface.SetMainController(this);
-            MainFileLogger = new BaseFilesLogger();
-            MainSystemLogger = new BaseSystemLogger();
+            MainFileLogger = new BaseFilesLogger(logFileSystem == null ? new FileSystem() : logFileSystem);
+            MainSystemLogger = new BaseSystemLogger(new ExternalFileSystem());
             SystemLogger = new Logger("DoMC", MainSystemLogger);
             MainFileLogger.RegisterExternalLogger(SystemLogger);
             Observer = new Observer(GetLogger("Events"));
@@ -96,9 +99,10 @@ namespace DoMCModuleControl
         /// регистрация модуля
         /// </summary>
         /// <param name="module">экземпляр модуля</param>
-        public void RegisterModule(Modules.ModuleBase module)
+        public void RegisterModule(Modules.AbstractModuleBase module)
         {
-            _modules.Add(module.GetType().Name, module);
+            if (module != null)
+                _modules.Add(module.GetType().Name, module);
         }
 
 
@@ -110,18 +114,27 @@ namespace DoMCModuleControl
         {
 
             var StartingConfiguration = GetMainApplicationConfiguration();
-
+            string[] moduleAssemblies;
             // Поиск всех сборок с модулями
-            var moduleAssemblies = Directory.GetFiles("Modules", "*.dll");
+            try
+            {
+                moduleAssemblies = Directory.GetFiles("Modules", "*.dll");
+            }
+            catch
+            {
+                moduleAssemblies = new string[0];
+            }
             List<Type> UITypes = [];
             List<Type> ModuleTypes = [];
 
             foreach (var assemblyPath in moduleAssemblies)
             {
                 var assembly = Assembly.LoadFrom(assemblyPath);
-
-                // Поиск всех классов, реализующих ModuleBase
-                var moduleTypes = assembly.GetTypes().Where(t => typeof(Modules.ModuleBase).IsAssignableFrom(t) && !t.IsInterface);
+            }
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                // Поиск всех классов, реализующих AbstractModuleBase
+                var moduleTypes = assembly.GetTypes().Where(t => typeof(Modules.AbstractModuleBase).IsAssignableFrom(t) && !t.IsInterface);
                 ModuleTypes.AddRange(moduleTypes);
                 var uiTypes = assembly.GetTypes().Where(t => typeof(IMainUserInterface).IsAssignableFrom(t) && !t.IsInterface).ToList();
                 UITypes.AddRange(uiTypes);
@@ -162,16 +175,18 @@ namespace DoMCModuleControl
 
             foreach (var moduleType in ModuleTypes)
             {
-
-                // Создание экземпляра модуля и регистрация его в MainController
-                var module = (Modules.ModuleBase?)Activator.CreateInstance(moduleType, mainController);
-                if (module == null)
+                if (!moduleType.IsAbstract)
                 {
-                    //TODO: залогировать, что модуль не ModuleBase
-                }
-                else
-                {
-                    mainController.RegisterModule(module);
+                    // Создание экземпляра модуля и регистрация его в MainController
+                    var module = (Modules.AbstractModuleBase?)Activator.CreateInstance(moduleType, mainController);
+                    if (module == null)
+                    {
+                        //TODO: залогировать, что модуль не AbstractModuleBase
+                    }
+                    else
+                    {
+                        mainController.RegisterModule(module);
+                    }
                 }
             }
 
@@ -186,12 +201,12 @@ namespace DoMCModuleControl
             var moduleTypes = new List<Type>();
             foreach (var assembly in assemblies)
             {
-                moduleTypes.AddRange(assembly.GetTypes().Where(t => typeof(ModuleBase).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
+                moduleTypes.AddRange(assembly.GetTypes().Where(t => typeof(AbstractModuleBase).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
             }
 
             foreach (var moduleType in moduleTypes)
             {
-                var module = (Modules.ModuleBase?)Activator.CreateInstance(moduleType, this);
+                var module = (Modules.AbstractModuleBase?)Activator.CreateInstance(moduleType, this);
                 if (module == null) throw new InvalidOperationException("Не получилось создать экземпляр модуля");
                 RegisterModule(module);
             }
@@ -216,10 +231,16 @@ namespace DoMCModuleControl
         /// <param name="commandInfo"></param>
         public void RegisterCommand(CommandInfo commandInfo)
         {
-            if (commandInfo == null || commandInfo.CommandName == null) return;
+            if (commandInfo == null) throw new ArgumentNullException(nameof(commandInfo));
+            if (commandInfo.CommandName == null) throw new ArgumentNullException(nameof(commandInfo.CommandName));
+            if (commandInfo.CommandClass == null) throw new ArgumentNullException(nameof(commandInfo.CommandClass));
+            if (commandInfo.Module == null) throw new ArgumentNullException(nameof(commandInfo.Module));
             _commands[commandInfo.CommandName] = commandInfo;
         }
 
+        /// <summary>
+        /// Поиск по всем загруженным сборкам и регистрация найденных команд
+        /// </summary>
         public void RegisterAllCommands()
         {
 
@@ -227,24 +248,42 @@ namespace DoMCModuleControl
             var commandTypes = new List<Type>();
             foreach (var assembly in assemblies)
             {
-                commandTypes.AddRange(assembly.GetTypes().Where(t => typeof(CommandBase).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
+                commandTypes.AddRange(assembly.GetTypes().Where(t => typeof(AbstractCommandBase).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
             }
 
 
             foreach (var commandType in commandTypes)
             {
-                ModuleBase? moduleInstance = null;
+                AbstractModuleBase? moduleInstance = null;
 
-                if (commandType.DeclaringType != null && typeof(ModuleBase).IsAssignableFrom(commandType.DeclaringType))
+                if (commandType.DeclaringType != null && typeof(AbstractModuleBase).IsAssignableFrom(commandType.DeclaringType))
                 {
-                    moduleInstance = (ModuleBase?)Activator.CreateInstance(commandType.DeclaringType, this);
+                    var moduleInstanceFound = _modules.Where(ni => ni.Value.GetType() == commandType.DeclaringType);
+                    if (moduleInstanceFound.Count() > 0)
+                    {
+                        moduleInstance = moduleInstanceFound.First().Value;
+                    }
+                    else
+                    {
+                        moduleInstance = (AbstractModuleBase?)Activator.CreateInstance(commandType.DeclaringType, this);
+                        RegisterModule(moduleInstance);
+                    }
                 }
                 else
                 {
                     var moduleTypeAttribute = commandType.GetCustomAttribute<CommandModuleTypeAttribute>();
-                    if (moduleTypeAttribute != null)
+                    if (moduleTypeAttribute != null && moduleTypeAttribute.ModuleType != null)
                     {
-                        moduleInstance = (ModuleBase?)Activator.CreateInstance(moduleTypeAttribute.ModuleType, this);
+                        var moduleInstanceFound = _modules.Where(ni => ni.Value.GetType() == moduleTypeAttribute.ModuleType);
+                        if (moduleInstanceFound.Count() > 0)
+                        {
+                            moduleInstance = moduleInstanceFound.First().Value;
+                        }
+                        else
+                        {
+                            moduleInstance = (AbstractModuleBase?)Activator.CreateInstance(moduleTypeAttribute.ModuleType, this);
+                            RegisterModule(moduleInstance);
+                        }
                     }
 
                 }
@@ -252,7 +291,7 @@ namespace DoMCModuleControl
 
                 if (moduleInstance != null)
                 {
-                    var commandInstance = (CommandBase?)Activator.CreateInstance(commandType, this, moduleInstance);
+                    var commandInstance = (AbstractCommandBase?)Activator.CreateInstance(commandType, this, moduleInstance);
                     if (commandInstance != null)
                     {
                         var commandInfo = new CommandInfo(
@@ -288,13 +327,22 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public CommandBase? CreateCommand(string commandName)
+        public AbstractCommandBase? CreateCommand(string commandName)
         {
+            if (commandName == null) throw new ArgumentNullException(nameof(commandName));
             if (_commands.TryGetValue(commandName, out var commandInfo))
             {
                 if (commandInfo.CommandClass != null)
                 {
-                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
+                    try
+                    {
+                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
+                    }
+                    catch
+                    {
+                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module);
+
+                    }
                 }
                 throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
             }
@@ -302,20 +350,72 @@ namespace DoMCModuleControl
         }
 
         /// <summary>
-        /// Создание команды по имени (из списка известных команд создается экземпляр команды, который выполняет код)
+        /// Создание команды по типу
         /// </summary>
         /// <param name="commandName">Текстовое имя команды</param>
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public CommandBase? CreateCommand(Type commandType)
+        public AbstractCommandBase? CreateCommand(Type commandType)
         {
+            if (commandType == null) throw new ArgumentNullException(nameof(commandType));
+
             var commandInfo = _commands.Where(c => c.Value.CommandClass == commandType).FirstOrDefault().Value;
             if (commandInfo != null)
             {
                 if (commandInfo.CommandClass != null)
                 {
-                    return (CommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
+                    try
+                    {
+                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
+                    }
+                    catch
+                    {
+                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module);
+
+                    }
+                }
+                throw new ArgumentNullException($"В команде \"{commandInfo.CommandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
+            }
+            throw new ArgumentException($"Команда \"{commandType.Name}\" не найдена.");
+        }
+
+        /// <summary>
+        /// Создание команды по типу команды и модуля
+        /// </summary>
+        /// <param name="commandName">Текстовое имя команды</param>
+        /// <returns>Созданная команда</returns>
+        /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
+        /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
+        public AbstractCommandBase? CreateCommand(Type commandType, Type moduleType)
+        {
+            if (commandType == null) throw new ArgumentNullException(nameof(commandType));
+            if (moduleType == null) throw new ArgumentNullException(nameof(moduleType));
+
+            var commandInfo = _commands.Where(c => c.Value.CommandClass == commandType).FirstOrDefault().Value;
+            if (commandInfo != null)
+            {
+                if (commandInfo.CommandClass != null)
+                {
+                    AbstractModuleBase? moduleInstance;
+                    var moduleInstanceFound = _modules.Where(ni => ni.Value.GetType() == moduleType);
+                    if (moduleInstanceFound.Count() > 0)
+                    {
+                        moduleInstance = moduleInstanceFound.First().Value;
+                    }
+                    else
+                    {
+                        moduleInstance = (AbstractModuleBase?)Activator.CreateInstance(moduleType, this);
+                        RegisterModule(moduleInstance);
+                    }
+                    try
+                    {
+                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
+                    }
+                    catch
+                    {
+                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module);
+                    }
                 }
                 throw new ArgumentNullException($"В команде \"{commandInfo.CommandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
             }
@@ -335,6 +435,18 @@ namespace DoMCModuleControl
         public IMainUserInterface GetMainUserInterface()
         {
             return MainUserInterface;
+        }
+
+        public AbstractModuleBase GetModule(Type ModuleType)
+        {
+            var moduleInstanceFound = _modules.Where(ni => ni.Value.GetType() == ModuleType);
+            return moduleInstanceFound.FirstOrDefault().Value;
+        }
+
+        public AbstractModuleBase GetModule(string ModuleName)
+        {
+            var moduleInstanceFound = _modules.Where(ni => ni.Key == ModuleName);
+            return moduleInstanceFound.FirstOrDefault().Value;
         }
     }
 

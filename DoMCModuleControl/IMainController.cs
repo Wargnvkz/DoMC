@@ -1,5 +1,6 @@
 ﻿using DoMCModuleControl.Commands;
 using DoMCModuleControl.Logging;
+using DoMCModuleControl.Modules;
 using DoMCModuleControl.UI;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,12 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public CommandBase? CreateCommand(string commandName);
-        public CommandBase? CreateCommand(Type commandType);
+        public AbstractCommandBase? CreateCommand(string commandName);
+        public AbstractCommandBase? CreateCommand(Type commandType);
+        public AbstractCommandBase? CreateCommand(Type commandType, Type ModuleType);
+        public AbstractModuleBase GetModule(Type ModuleType);
+        public AbstractModuleBase GetModule(string ModuleName);
+
         /// <summary>
         /// Регистрация команды в контроллере
         /// </summary>

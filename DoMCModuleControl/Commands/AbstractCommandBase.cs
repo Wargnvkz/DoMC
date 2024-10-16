@@ -15,7 +15,7 @@ namespace DoMCModuleControl.Commands
     /// "{CommandName}.Success" - OutputData (loggin - Informational)
     /// "{CommandName}.Error" - Exception (loggin - Critical)
     /// </summary>
-    public abstract class CommandBase
+    public abstract class AbstractCommandBase
     {
         //TODO: сделать синхронизацию для многопоточности
         /// <summary>
@@ -37,7 +37,7 @@ namespace DoMCModuleControl.Commands
         /// <summary>
         /// Модуль с которым работает команда
         /// </summary>
-        protected Modules.ModuleBase Module { get; private set; }
+        protected Modules.AbstractModuleBase Module { get; private set; }
         /// <summary>
         /// Статус: Команда запущена
         /// </summary>
@@ -56,6 +56,7 @@ namespace DoMCModuleControl.Commands
         public Exception? Error { get; private set; }
 
         public IMainController Controller { get; private set; }
+        public CancellationTokenSource CancellationTokenSourceBase { get; private set; }
 
         public enum Events
         {
@@ -71,12 +72,14 @@ namespace DoMCModuleControl.Commands
         /// <param name="module">Модуль с которым будет работать команда</param>
         /// <param name="inputType">Тип входных данных</param>
         /// <param name="outputType">Тип выходных данных</param>
-        public CommandBase(IMainController mainController, Modules.ModuleBase module, Type? inputType = null, Type? outputType = null)
+        public AbstractCommandBase(IMainController mainController, Modules.AbstractModuleBase module, Type? inputType = null, Type? outputType = null)
         {
             Controller = mainController;
             Module = module;
             InputType = inputType;
             OutputType = outputType;
+            CancellationTokenSourceBase = new CancellationTokenSource();
+
         }
 
         /// <summary>

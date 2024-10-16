@@ -10,7 +10,7 @@ namespace DoMCLib
 {
     public static class ObserverExtention
     {
-        public static void Notify(this Observer observer, ModuleBase module, string Operation, string eventType, object? data)
+        public static void Notify(this Observer observer, AbstractModuleBase module, string Operation, string eventType, object? data)
         {
             observer.Notify($"{module}.{Operation}.{eventType}", data);
         }

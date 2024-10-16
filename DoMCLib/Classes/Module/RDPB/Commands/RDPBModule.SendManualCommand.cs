@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.RDPB
 {
     public partial class RDPBModule
     {
-        public class SendManualCommand : CommandBase
+        public class SendManualCommand : AbstractCommandBase
         {
-            public SendManualCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(string), null) { }
+            public SendManualCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(string), null) { }
 
             protected override void Executing() => ((RDPBModule)Module).SendManualCommandProc((string)(InputData ?? String.Empty));
 

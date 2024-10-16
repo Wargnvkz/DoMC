@@ -14,7 +14,7 @@ namespace DoMCLib.Classes.Module.CCD
         public class StartCommand : WaitCommandBase
         {
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public StartCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;

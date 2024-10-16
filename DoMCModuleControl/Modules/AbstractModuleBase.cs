@@ -12,7 +12,7 @@ namespace DoMCModuleControl.Modules
     /// <summary>
     /// Базовый класс для модулей программы. Модули сами разбираются что и как им делать
     /// </summary>
-    public abstract class ModuleBase
+    public abstract class AbstractModuleBase
     {
         /// <summary>
         /// главный контроллер управляющий всеми связями, объектами, модулями, интерфесом и командой
@@ -22,7 +22,7 @@ namespace DoMCModuleControl.Modules
         /// Конструктор
         /// </summary>
         /// <param name="MainController">Главный контроллер всего</param>
-        public ModuleBase(IMainController MainController)
+        public AbstractModuleBase(IMainController MainController)
         {
             this.MainController = MainController;
         }

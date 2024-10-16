@@ -5,22 +5,41 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using DoMCModuleControl.External;
 
 namespace DoMCModuleControl.Logging
 {
     public class BaseSystemLogger : IBaseLogger
     {
+        IFileSystem FileSystem;
+        ILogger? ExternalLogger;
+        public BaseSystemLogger(IFileSystem fileSystem)
+        {
+            FileSystem = fileSystem;
+        }
         public void AddMessage(string Module, string Message)
         {
-            //TODO: Запись логов в системные логи, в случае если ошибка, которую в обычные логи невозможно записать. Например, нет места на диске для логов.
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            try
             {
+                using (var sw = FileSystem.GetStreamWriter(Module, true))
+                {
+                    sw.WriteLine(Message);
+                }
             }
+            catch (Exception ex)
+            {
+                ExternalLogger?.Add(LoggerLevel.Critical, $"Ошибка при логировании", ex);
+            }
+        }
+
+        public void Flush(string Module)
+        {
+
         }
 
         public void RegisterExternalLogger(ILogger logger)
         {
-
+            ExternalLogger = logger;
         }
     }
 }

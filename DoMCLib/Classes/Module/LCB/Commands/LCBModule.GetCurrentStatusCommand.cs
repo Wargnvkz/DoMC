@@ -7,9 +7,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class GetCurrentStatusCommand : CommandBase
+        public class GetCurrentStatusCommand : AbstractCommandBase
         {
-            public GetCurrentStatusCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(NetworkInterface), typeof(LEDDataExchangeStatus)) { }
+            public GetCurrentStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(NetworkInterface), typeof(LEDDataExchangeStatus)) { }
             protected override void Executing()
             {
                 OutputData = ((LCBModule)Module).GetLEDDataExchangeStatus();

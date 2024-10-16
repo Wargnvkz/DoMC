@@ -7,9 +7,9 @@ namespace DoMCLib.Classes.Module.RDPB
 {
     public partial class RDPBModule
     {
-        public class SendSetIsOkCommand : CommandBase
+        public class SendSetIsOkCommand : AbstractCommandBase
         {
-            public SendSetIsOkCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            public SendSetIsOkCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
 
             protected override void Executing() => ((RDPBModule)Module).Send(RDPBCommandType.SetIsOK);
 

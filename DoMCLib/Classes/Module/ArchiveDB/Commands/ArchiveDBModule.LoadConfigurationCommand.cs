@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.ArchiveDB
 {
     public partial class ArchiveDBModule
     {
-        public class LoadConfigurationCommand : CommandBase
+        public class LoadConfigurationCommand : AbstractCommandBase
         {
-            public LoadConfigurationCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ArchiveDBConfiguration), null) { }
+            public LoadConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ArchiveDBConfiguration), null) { }
             protected override void Executing() => ((ArchiveDBModule)Module).SetConfiguration((ArchiveDBConfiguration)InputData);
         }
        

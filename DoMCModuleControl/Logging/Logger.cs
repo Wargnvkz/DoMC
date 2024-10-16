@@ -14,6 +14,8 @@ namespace DoMCModuleControl.Logging
         public IBaseLogger BaseLogger { get; private set; }
         public Logger(string moduleName, IBaseLogger baseLogger)
         {
+            if (moduleName == null) throw new ArgumentNullException(nameof(moduleName));
+            if (baseLogger == null) throw new ArgumentNullException(nameof(baseLogger));
             ModuleName = moduleName;
             BaseLogger = baseLogger;
             MaxLogginLevel = LoggerLevel.Information;
@@ -29,6 +31,7 @@ namespace DoMCModuleControl.Logging
 
         public void Add(LoggerLevel level, string Message, Exception ex)
         {
+            if (ex == null) throw new ArgumentNullException(nameof(ex));
             if (level <= MaxLogginLevel)
             {
                 BaseLogger.AddMessage(ModuleName, $"{Message} {ex.Message} {ex.StackTrace ?? ""}");
@@ -38,6 +41,14 @@ namespace DoMCModuleControl.Logging
         public void SetMaxLogginLevel(LoggerLevel level)
         {
             MaxLogginLevel = level;
+        }
+
+        public void Flush()
+        {
+            lock (this)
+            {
+                BaseLogger.Flush(ModuleName);
+            }
         }
     }
 }

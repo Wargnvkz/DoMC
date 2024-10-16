@@ -1,5 +1,6 @@
 ﻿using DoMCModuleControl.Modules;
 using DoMCModuleControl;
+using DoMCLib.Classes.Module.LCB;
 
 /// <summary>
 /// Управление получением данных из платы и передача данных в плату
@@ -12,7 +13,7 @@ namespace DoMCLib.Classes.Module.CCD
         public class SendReadSocketCommand : WaitCommandBase
         {
             Commands.Classes.SetReadingParametersCommandResult result = new Commands.Classes.SetReadingParametersCommandResult();
-            public SendReadSocketCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(Commands.Classes.SetReadingParametersCommandResult)) { }
+            public SendReadSocketCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(Commands.Classes.SetReadingParametersCommandResult)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
@@ -24,7 +25,7 @@ namespace DoMCLib.Classes.Module.CCD
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
                         result.SetCardRequested(i);
-                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketReadingParameters(cardParameters[i].Item2);
+                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketReadingParameters(cardParameters[i].Item2, CancellationTokenSourceBase.Token);
                     }
                 }
                 else

@@ -7,9 +7,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class StartForInterfaceCommand : CommandBase
+        public class StartForInterfaceCommand : AbstractCommandBase
         {
-            public StartForInterfaceCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(NetworkInterface), null) { }
+            public StartForInterfaceCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(NetworkInterface), null) { }
             protected override void Executing() => ((LCBModule)Module).StartForInterface((NetworkInterface)InputData);
         }
 

@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class SetLCBParametersCommand : CommandBase
+        public class SetLCBParametersCommand : AbstractCommandBase
         {
-            public SetLCBParametersCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(LCBSettings), null) { }
+            public SetLCBParametersCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(LCBSettings), null) { }
             protected override void Executing() => ((LCBModule)Module).SetLCBParameters((LCBSettings)InputData);
         }
 

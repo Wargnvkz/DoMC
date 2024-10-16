@@ -16,7 +16,7 @@ namespace DoMCLib.Classes.Module.RDPB
     /// Observer of MainController:
     /// "RDPBModule.StatusChanged" - RDPBStatus
     /// </summary>
-    public partial class RDPBModule : ModuleBase
+    public partial class RDPBModule : AbstractModuleBase
     {
         public DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig config;
         private IMainController mainController;

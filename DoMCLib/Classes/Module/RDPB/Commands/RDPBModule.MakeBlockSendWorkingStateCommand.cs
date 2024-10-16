@@ -7,9 +7,9 @@ namespace DoMCLib.Classes.Module.RDPB
 {
     public partial class RDPBModule
     {
-        public class MakeBlockSendWorkingStateCommand : CommandBase
+        public class MakeBlockSendWorkingStateCommand : AbstractCommandBase
         {
-            public MakeBlockSendWorkingStateCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            public MakeBlockSendWorkingStateCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
 
             protected override void Executing() => ((RDPBModule)Module).Send(RDPBCommandType.GetParameters);
 

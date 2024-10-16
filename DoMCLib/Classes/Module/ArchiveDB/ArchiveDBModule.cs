@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DoMCLib.Classes.Module.ArchiveDB
 {
-    public partial class ArchiveDBModule : DoMCModuleControl.Modules.ModuleBase
+    public partial class ArchiveDBModule : DoMCModuleControl.Modules.AbstractModuleBase
     {
         ArchiveDBConfiguration Configuration;
         DateTime TimeLastLocalToRemoteCheck;

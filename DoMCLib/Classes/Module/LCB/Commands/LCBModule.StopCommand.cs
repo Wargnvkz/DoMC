@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class StopCommand : CommandBase
+        public class StopCommand : AbstractCommandBase
         {
-            public StopCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
             protected override void Executing() => ((LCBModule)Module).Stop();
         }
 

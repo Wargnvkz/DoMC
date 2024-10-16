@@ -26,5 +26,10 @@ namespace DoMCModuleControl.Logging
         /// </summary>
         /// <param name="level"></param>
         public void SetMaxLogginLevel(LoggerLevel level);
+        /// <summary>
+        /// записывает все незаписынные сообщения
+        /// </summary>
+        /// <returns></returns>
+        public void Flush();
     }
 }

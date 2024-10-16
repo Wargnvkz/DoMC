@@ -13,7 +13,7 @@ namespace DoMCLib.Classes.Module.CCD
         public class SendReadSocketWithExternalSignalCommand : WaitCommandBase
         {
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public SendReadSocketWithExternalSignalCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            public SendReadSocketWithExternalSignalCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
@@ -25,7 +25,7 @@ namespace DoMCLib.Classes.Module.CCD
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
                         result.SetCardRequested(i);
-                        module.tcpClients[cardParameters[i].Item1].SendCommandReadSeveralSocketsExternal(true);
+                        module.tcpClients[cardParameters[i].Item1].SendCommandReadSeveralSocketsExternal(true, CancellationTokenSourceBase.Token);
                     }
                 }
                 else

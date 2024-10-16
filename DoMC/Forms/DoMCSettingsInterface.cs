@@ -26,6 +26,7 @@ using DoMCLib.Classes.Module.CCD;
 using DoMC.Classes;
 using DoMCLib.Classes.Module.CCD.Commands.Classes;
 using DoMCModuleControl.Commands;
+using DoMCModuleControl.Modules;
 
 namespace DoMC
 {
@@ -348,7 +349,7 @@ namespace DoMC
         }
 
         private bool WaitForCommand<T1, T2>(object? InputData, int TimeoutInSeconds, string LogMessage, LoggerLevel LogMessageLevel, out T2? outputData)
-            where T1 : CommandBase
+            where T1 : AbstractCommandBase
             where T2 : class
         {
             WorkingLog.Add(LogMessageLevel, LogMessage);
@@ -363,7 +364,23 @@ namespace DoMC
             outputData = resultExpositionCommand as T2;
             return true;
         }
+        private bool WaitForCommand<T1, T2, T3>(object? InputData, int TimeoutInSeconds, string LogMessage, LoggerLevel LogMessageLevel, out T3? outputData)
+            where T1 : AbstractCommandBase
+            where T2 : AbstractModuleBase
+            where T3 : class
+        {
+            WorkingLog.Add(LogMessageLevel, LogMessage);
 
+            var CommandInstance = Controller.CreateCommand(typeof(T1), typeof(T2));
+            if (CommandInstance == null)
+            {
+                outputData = null;
+                return false;
+            };
+            var resultExpositionCommand = CommandInstance.Wait(InputData, TimeoutInSeconds);
+            outputData = resultExpositionCommand as T3;
+            return true;
+        }
 
         private bool LoadConfiguration(bool WorkingMode, bool LoadCCD = true, bool LoadLCB = true, int[] Sockets = null, bool ShowMessages = true)
         {
@@ -384,13 +401,17 @@ namespace DoMC
                         WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
                     }
                 }
-
-                if (setReadingParametersCommand.IsError) return false;
-
             }
 
             if (LoadLCB)
             {
+                if (!WaitForCommand<CCDCardDataModule.SetExpositionCommand, SetReadingParametersCommandResult>(Context, Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, "Передача настроек экспозиции гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
+                {
+                    if (result != null)
+                    {
+                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
+                    }
+                }
                 //InterfaceDataExchange.CardsConnection.PacketLogActive = false;
                 WorkingLog.Add("Подключение к БУС");
                 InterfaceDataExchange.SendCommand(ModuleCommand.InitLCB);

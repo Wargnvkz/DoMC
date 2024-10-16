@@ -13,7 +13,7 @@ namespace DoMCLib.Classes.Module.CCD
         public class SetExpositionCommand : WaitCommandBase
         {
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public SetExpositionCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(Commands.Classes.SetReadingParametersCommandResult)) { }
+            public SetExpositionCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(Commands.Classes.SetReadingParametersCommandResult)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;

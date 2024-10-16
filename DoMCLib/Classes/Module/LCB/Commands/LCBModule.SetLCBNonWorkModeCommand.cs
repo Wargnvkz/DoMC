@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class SetLCBNonWorkModeCommand : CommandBase
+        public class SetLCBNonWorkModeCommand : AbstractCommandBase
         {
-            public SetLCBNonWorkModeCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            public SetLCBNonWorkModeCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
             protected override void Executing() => ((LCBModule)Module).SetLCBNonWorkMode();
         }
 

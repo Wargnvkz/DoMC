@@ -7,12 +7,11 @@ using DoMCModuleControl.Commands;
 /// </summary>
 namespace DoMCLib.Classes
 {
-    public abstract class WaitCommandBase : CommandBase
+    public abstract class WaitCommandBase : AbstractCommandBase
     {
-        public WaitCommandBase(IMainController mainController, ModuleBase module, Type? InputType, Type? OutputType) : base(mainController, module, InputType, OutputType)
+        public WaitCommandBase(IMainController mainController, AbstractModuleBase module, Type? InputType, Type? OutputType) : base(mainController, module, InputType, OutputType)
         {
             if (MakeDecisionIsCommandCompleteFunc == null) throw new ArgumentNullException(nameof(MakeDecisionIsCommandCompleteFunc));
-
         }
 
         public override object? Wait(int timeoutInSeconds)
@@ -29,7 +28,10 @@ namespace DoMCLib.Classes
                 {
                     NoNeedToWaitMore = MakeDecisionIsCommandCompleteFunc();
                     if (NoNeedToWaitMore)
+                    {
+                        CancellationTokenSourceBase.Cancel();
                         break;
+                    }
                     Task.Delay(10).Wait();
                 }
             }

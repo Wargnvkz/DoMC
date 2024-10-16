@@ -14,7 +14,7 @@ namespace DoMCLib.Classes.Module.CCD
         public class StopCommand : WaitCommandBase
         {
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public StopCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;

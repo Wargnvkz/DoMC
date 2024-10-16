@@ -15,8 +15,7 @@ namespace DoMCLib.Classes.Module.CCD
         public class GetSocketImageDataCommand : WaitCommandBase
         {
             SocketReadData? result = null;
-            CancellationTokenSource cancellationTokenSources = new CancellationTokenSource();
-            public GetSocketImageDataCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(GetSocketImageDataCommandData), typeof(SocketReadData)) { }
+            public GetSocketImageDataCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(GetSocketImageDataCommandData), typeof(SocketReadData)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
@@ -27,13 +26,12 @@ namespace DoMCLib.Classes.Module.CCD
                     var cardSocket = cardSocketParameters[0].Item2;
                     var SocketParameters = cardSocketParameters[0].Item3;
 
-                    cancellationTokenSources = new CancellationTokenSource();
-                    module.tcpClients[cardSocket.CCDCardNumber].SendCommandGetSocketImage(cardSocket.InnerSocketNumber, cancellationTokenSources.Token);
+                    module.tcpClients[cardSocket.CCDCardNumber].SendCommandGetSocketImage(cardSocket.InnerSocketNumber, CancellationTokenSourceBase.Token);
                     //var task = new Task(new Action<object?>((i) => { }), cardSocket.InnerSocketNumber,);
                     var task = new Task(new Action<object?>((i) =>
                     {
                         var cardnumber = (int)i;
-                        var ReadResult = module.tcpClients[cardSocket.CCDCardNumber].GetImageDataFromSocketSync(cardSocket.InnerSocketNumber, Data.Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, cancellationTokenSources, out SocketReadData data);
+                        var ReadResult = module.tcpClients[cardSocket.CCDCardNumber].GetImageDataFromSocketAsync(cardSocket.InnerSocketNumber, Data.Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, CancellationTokenSourceBase.Token, out SocketReadData data);
                         if (ReadResult)
                         {
                             var equipmentSocket = Data.Context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
@@ -44,7 +42,7 @@ namespace DoMCLib.Classes.Module.CCD
                             result = null;
                         }
 
-                    }), cardSocket.InnerSocketNumber, cancellationTokenSources.Token);
+                    }), cardSocket.InnerSocketNumber, CancellationTokenSourceBase.Token);
                     task.Start();
                 }
                 else
@@ -59,7 +57,7 @@ namespace DoMCLib.Classes.Module.CCD
                 {
                     var CardAnswerResults = (CCDCardAnswerResults)data;
                     if (CardAnswerResults == null) return;
-                    cancellationTokenSources.Cancel();
+                    CancellationTokenSourceBase.Cancel();
                 }
             }
 

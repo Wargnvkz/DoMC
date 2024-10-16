@@ -22,7 +22,7 @@ namespace DoMCLib.Classes.Module.CCD
     /// <summary>
     /// Работа с одной платой по протоколу TCP/IP
     /// </summary>
-    public class CCDCardTCPClient<T> where T : ISocketDevice, new()
+    public class CCDCardTCPClient
     {
         public int PortCommand = 200;
         public int PortData = 100;
@@ -33,10 +33,10 @@ namespace DoMCLib.Classes.Module.CCD
         private CancellationTokenSource receiveCancellationTokenSource { get; set; }
         private Task ReceiveTask { get; set; }
 
-        T TCPClientCommandConnection;
-        T DoMCCardTCPClientDataConnection;
+        ISocketDevice TCPClientCommandConnection;
+        ISocketDevice TCPClientImageDataConnection;
         //private TcpClient TCPClientCommandConnection;
-        //private TcpClient DoMCCardTCPClientDataConnection;
+        //private TcpClient TCPClientImageDataConnection;
         private DateTime LastReceiveAt;
         private DateTime LastSendAt;
         public int ReconnectTimeoutInSeconds = 30;
@@ -61,12 +61,16 @@ namespace DoMCLib.Classes.Module.CCD
         //private ILogger WorkingLogSocketStatus;
         private IMainController Controller;
         private Task ImagesReadAllSocketsThread = null;
+        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
         /// </summary>
         /// <param name="DoMCCardNumber">Номер платы. от 1 до 12</param>
-        public CCDCardTCPClient(int DoMCCardNumber, IMainController controller)
+        public CCDCardTCPClient(int DoMCCardNumber, ISocketDevice commandDevice, ISocketDevice ImageDataDevice, IMainController controller)
         {
+            if (commandDevice == null || ImageDataDevice == null) throw new ArgumentNullException();
+            TCPClientCommandConnection = commandDevice;
+            TCPClientImageDataConnection = ImageDataDevice;
             IsCardNumberUsed = true;
             if (CardNumber < 1 && CardNumber > 12) throw new ArgumentOutOfRangeException("Номер платы должен быть от 1 до 12");
             CardNumber = DoMCCardNumber;
@@ -93,23 +97,19 @@ namespace DoMCLib.Classes.Module.CCD
             {
                 if ((DateTime.Now - LastReceiveAt).TotalSeconds > ReconnectTimeoutInSeconds || (LastReceiveAt - LastSendAt).TotalSeconds > ReconnectTimeoutInSeconds)
                 {
-                    if (TCPClientCommandConnection != null)
+                    try
                     {
-                        try
-                        {
-                            IsConnected = false;
-                            TCPClientCommandConnection.Close();
-                        }
-                        catch { }
+                        IsConnected = false;
+                        TCPClientCommandConnection.Close();
                     }
+                    catch { }
                 }
-                TCPClientCommandConnection = new T();// TcpClient();
                 var target = GetServerCommandIPAddress();
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Установка соединения с {target.Address.ToString()}:{target.Port}");
                 //var connectionResult = TCPClientCommandConnection.BeginConnect(target.Address, target.Port, null, null);
                 //var connectionResult = TCPClientCommandConnection.ConnectAsync(target,);
                 //var connectSucceeded = connectionResult.AsyncWaitHandle.WaitOne(ConnectionTimeoutInMilliseconds);
-                var connectionTask=TCPClientCommandConnection.ConnectAsync(target, ConnectionTimeoutInMilliseconds, cancellationToken);
+                var connectionTask = TCPClientCommandConnection.ConnectAsync(target, ConnectionTimeoutInMilliseconds, cancellationToken);
                 var connectSucceeded = connectionTask.Wait(ConnectionTimeoutInMilliseconds, cancellationToken);
                 if (!connectSucceeded)
                 {
@@ -141,12 +141,11 @@ namespace DoMCLib.Classes.Module.CCD
                 var ip = GetServerIPAddressSocketData(Socket);
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Начало чтения гнезда {Socket}. Адрес: {ip}");
 
-                var socketDevice = new T();
-                socketDevice.ConnectAsync(ip, msTimeout, cancellationToken);
+                TCPClientImageDataConnection.ConnectAsync(ip, msTimeout, cancellationToken);
                 WorkingLog.Add(LoggerLevel.Information, $"Подключение к {ip} успешно установлено.");
 
 
-                //var ns = DoMCCardTCPClientDataConnection.GetStream();
+                //var ns = TCPClientImageDataConnection.GetStream();
 
                 socketReadData.ImageDataRead = 0;
                 socketReadData.ImageData = new byte[SocketWorkStatus.ProperImageSizeInBytes];
@@ -158,7 +157,7 @@ namespace DoMCLib.Classes.Module.CCD
 
                 do
                 {
-                    var readTask = socketDevice.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                    var readTask = TCPClientImageDataConnection.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
                     int read = 0;
                     if (readTask.Wait(msTimeout, cancellationToken))
                     {
@@ -208,7 +207,7 @@ namespace DoMCLib.Classes.Module.CCD
             }
             finally
             {
-                DoMCCardTCPClientDataConnection.Close();
+                TCPClientImageDataConnection.Close();
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Соединение закрыто.");
             }
         }
@@ -221,7 +220,7 @@ namespace DoMCLib.Classes.Module.CCD
         /// <param name="Socket"></param>
         /// <param name="msTimeout"></param>
         /// <returns>Завершено ли чтение</returns>
-        public bool GetImageDataFromSocketSync(int Socket, int msTimeout, CancellationTokenSource cancellationTokenSource, out SocketReadData socketReadData)
+        public bool GetImageDataFromSocketSync(int Socket, int msTimeout, CancellationTokenSourceBase cancellationTokenSource, out SocketReadData socketReadData)
         {
             socketReadData = new SocketReadData();
             try
@@ -235,20 +234,20 @@ namespace DoMCLib.Classes.Module.CCD
 
                     var ip = GetServerIPAddressSocketData(Socket);
                     WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Начало чтения гнезда {Socket}. Адрес: {ip.ToString()}");
-                    DoMCCardTCPClientDataConnection = new TcpClient();
+                    TCPClientImageDataConnection = new TcpClient();
 
                     StepToTick.Add(new Tuple<int, long>(1, sw.ElapsedTicks));
 
-                    DoMCCardTCPClientDataConnection.Connect(ip);
+                    TCPClientImageDataConnection.Connect(ip);
 
                     StepToTick.Add(new Tuple<int, long>(2, sw.ElapsedTicks));
 
                     WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Соединение открыто.");
-                    DoMCCardTCPClientDataConnection.ReceiveBufferSize = 1048576;
+                    TCPClientImageDataConnection.ReceiveBufferSize = 1048576;
 
                     StepToTick.Add(new Tuple<int, long>(3, sw.ElapsedTicks));
 
-                    var ns = DoMCCardTCPClientDataConnection.GetStream();
+                    var ns = TCPClientImageDataConnection.GetStream();
 
                     socketReadData.ImageDataRead = 0;
                     socketReadData.ImageData = new byte[SocketWorkStatus.ProperImageSizeInBytes];
@@ -327,7 +326,7 @@ namespace DoMCLib.Classes.Module.CCD
             }
             finally
             {
-                DoMCCardTCPClientDataConnection.Close();
+                TCPClientImageDataConnection.Close();
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Соединение закрыто.");
             }
         }
@@ -342,6 +341,7 @@ namespace DoMCLib.Classes.Module.CCD
         {
             try
             {
+                cancellationTokenSource.Cancel();
                 if (IsConnected) WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Соединение закрыто.");
                 IsConnected = false;
                 TCPClientCommandConnection?.Close();
@@ -353,9 +353,9 @@ namespace DoMCLib.Classes.Module.CCD
         {
             if (IsStarted) return;
             IsStarted = true;
-            Connect();
+            cancellationTokenSource = new CancellationTokenSource();
+            Connect(cancellationTokenSource.Token);
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             ReceiveTask = new Task(ReceiveThreadProc);
             ReceiveTask.Start();
             Controller.GetObserver().Notify($"{this.GetType().Name}.Module.Start", null);
@@ -404,15 +404,18 @@ namespace DoMCLib.Classes.Module.CCD
         private bool WritePacketToTCPSocket(byte[] packet, CancellationToken cancellationToken)
         {
             if (!IsConnected) return false;
-            lock (TCPClientCommandConnection)
+            try
             {
-                if (TCPClientCommandConnection != null)
+                lock (TCPClientCommandConnection)
                 {
                     TCPClientCommandConnection.WriteAsync(packet, 0, packet.Length, cancellationToken);
                     return true;
                 }
             }
-            return false;
+            catch
+            {
+                return false;
+            }
         }
 
         private void ReceiveThreadProc()

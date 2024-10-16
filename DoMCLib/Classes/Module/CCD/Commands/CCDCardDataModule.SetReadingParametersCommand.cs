@@ -13,7 +13,7 @@ namespace DoMCLib.Classes.Module.CCD
         public class SetReadingParametersCommand : WaitCommandBase
         {
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public SetReadingParametersCommand(IMainController mainController, ModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(CCDCardDataCommandResponse)) { }
+            public SetReadingParametersCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(CCDCardDataCommandResponse)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;

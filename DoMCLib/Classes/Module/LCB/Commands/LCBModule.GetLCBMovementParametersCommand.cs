@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class GetLCBMovementParametersCommand : CommandBase
+        public class GetLCBMovementParametersCommand : AbstractCommandBase
         {
-            public GetLCBMovementParametersCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            public GetLCBMovementParametersCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
             protected override void Executing() => ((LCBModule)Module).GetLCBMovementParameters();
         }
 

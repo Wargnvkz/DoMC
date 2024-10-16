@@ -1,6 +1,7 @@
 ﻿#pragma warning disable IDE0063
 #pragma warning disable IDE0090
 using DoMCModuleControl;
+using DoMCModuleControl.External;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -20,27 +21,29 @@ namespace DoMCModuleControl.Logging
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         private readonly Task _logTask;
         private ILogger? ExternalLogger;
+        private IFileSystem FileSystem;
 
-        public BaseFilesLogger()
+        public BaseFilesLogger(IFileSystem fileSystem)
         {
+            if (fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
+            FileSystem = fileSystem;
             _logTask = Task.Run(WriteMessagesSync);
         }
 
-
-        private static string GetLogFileName(string ModuleName, DateTime ShiftDate)
+        private string GetLogFileName(string ModuleName, DateTime ShiftDate)
         {
             var path = GetPath(ModuleName);
 
-            var filename = Path.Combine(path, $"{ModuleName}_{ShiftDate:yyyyMMdd)}.log");
+            var filename = FileSystem.PathCombine(path, $"{ModuleName}_{ShiftDate:yyyyMMdd}.log");
             return filename;
         }
 
-        private static string GetPath(string ModuleName)
+        private string GetPath(string ModuleName)
         {
-            var path = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location ?? ".") ?? ".", "Logs", ModuleName);
+            var path = FileSystem.PathCombine(FileSystem.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location ?? ".") ?? ".", "Logs", ModuleName);
 
             if (!path.EndsWith('\\')) path += '\\';
-            Directory.CreateDirectory(path);
+            FileSystem.CreateDirectory(path);
             return path;
         }
 
@@ -86,7 +89,7 @@ namespace DoMCModuleControl.Logging
                     MessagesOfModule[Module].Enqueue(Message);
                 }
             }
-            catch (Exception ex) { AddMessage("Logger", $"Ошибка изменения даты:{ex.Message} {ex.StackTrace}"); }
+            catch (Exception ex) { AddMessage("Logger", $"Ошибка:{ex.Message} {ex.StackTrace}"); }
 
         }
 
@@ -94,26 +97,34 @@ namespace DoMCModuleControl.Logging
         {
             while (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
-                try
+                foreach (var key in MessagesOfModule.Keys)
                 {
-                    foreach (var key in MessagesOfModule.Keys)
-                    {
-                        using (var File = new StreamWriter(GetLogFileName(key, CurrentDate), true))
-                        {
-                            while (MessagesOfModule[key].TryDequeue(out string? text))
-                            {
-                                File.WriteLine(text ?? "");
-                            }
-                            File.Flush();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ExternalLogger?.Add(LoggerLevel.Critical, $"Ошибка изменения даты:{ex.Message} {ex.StackTrace}");
+                    WriteBuffer(key);
                 }
                 Task.Delay(100).Wait();
             }
+
+        }
+
+        private void WriteBuffer(string ModuleName)
+        {
+            try
+            {
+                using (var File = FileSystem.GetStreamWriter(GetLogFileName(ModuleName, CurrentDate), true))
+                {
+                    while (MessagesOfModule[ModuleName].TryDequeue(out string? text))
+                    {
+                        File.WriteLine(text ?? "");
+                    }
+                    File.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExternalLogger?.Add(LoggerLevel.Critical, $"Ошибка при записи сообщения для модуля {ModuleName}:{ex.Message} {ex.StackTrace}");
+                MessagesOfModule[ModuleName].Clear();
+            }
+
 
         }
 
@@ -132,6 +143,11 @@ namespace DoMCModuleControl.Logging
         public void RegisterExternalLogger(ILogger logger)
         {
             ExternalLogger = logger;
+        }
+
+        public void Flush(string ModuleName)
+        {
+            WriteBuffer(ModuleName);
         }
 
     }

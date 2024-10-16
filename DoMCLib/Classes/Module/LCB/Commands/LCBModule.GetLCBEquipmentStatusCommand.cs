@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class GetLCBEquipmentStatusCommand : CommandBase
+        public class GetLCBEquipmentStatusCommand : AbstractCommandBase
         {
-            public GetLCBEquipmentStatusCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            public GetLCBEquipmentStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
             protected override void Executing() => ((LCBModule)Module).GetLCBEquipmentStatus();
         }
 

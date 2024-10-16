@@ -14,9 +14,9 @@
         public static string CreateCommandText(Type moduleType, string MethodName, Type? InputType = null, Type? OutputType = null)
         {
             var text =
-            $"            public class {MethodName}Command : CommandBase\r\n" +
+            $"            public class {MethodName}Command : AbstractCommandBase\r\n" +
             $"            {{\r\n" +
-            $"                public {MethodName}Command(IMainController mainController, ModuleBase module) : base(mainController, module, {(InputType == null ? "null" : "typeof(" + InputType.Name + ")")}, null) {{ }}\r\n";
+            $"                public {MethodName}Command(IMainController mainController, AbstractModuleBase module) : base(mainController, module, {(InputType == null ? "null" : "typeof(" + InputType.Name + ")")}, null) {{ }}\r\n";
             string OutputDataString = String.Empty;
             if (OutputType != null)
             {

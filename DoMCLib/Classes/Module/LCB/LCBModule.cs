@@ -20,8 +20,8 @@ using DoMCLib.Tools;
 
 namespace DoMCLib.Classes.Module.LCB
 {
-    // Изначально это был другой класс который я пытаюсь переделать на ModuleBase
-    public partial class LCBModule : ModuleBase
+    // Изначально это был другой класс который я пытаюсь переделать на AbstractModuleBase
+    public partial class LCBModule : AbstractModuleBase
     {
         UdpClient udp;
         int portFromComputer = 1556;

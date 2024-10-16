@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.RDPB
 {
     public partial class RDPBModule
     {
-        public class StartCommand : CommandBase
+        public class StartCommand : AbstractCommandBase
         {
-            public StartCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
             protected override void Executing() => ((RDPBModule)Module).Start();
 
         }

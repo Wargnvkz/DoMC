@@ -9,6 +9,7 @@ using DoMCLib.Tools;
 using DoMCModuleControl.Commands;
 using DoMCLib.Classes.Module.CCD.Commands.Classes;
 using System.Threading;
+using DoMCLib.Classes.Module.LCB;
 
 /// <summary>
 /// Управление получением данных из платы и передача данных в плату
@@ -19,14 +20,17 @@ namespace DoMCLib.Classes.Module.CCD
     /// <summary>
     /// Управление получением данных из платы и передача данных в плату
     /// </summary>
-    public partial class CCDCardDataModule : ModuleBase
+    public partial class CCDCardDataModule : AbstractModuleBase
     {
         CCDCardTCPClient[] tcpClients;
         public CCDCardDataModule(IMainController MainController) : base(MainController)
         {
             tcpClients = new CCDCardTCPClient[12];
+            for (int i = 0; i < tcpClients.Length; i++)
+            {
+                tcpClients[i] = new CCDCardTCPClient(i + 1, new TcpSocketDevice(), new TcpSocketDevice(), MainController);
+            }
         }
-
     }
 
 }

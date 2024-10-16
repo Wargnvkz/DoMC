@@ -18,6 +18,7 @@ namespace DoMCModuleControl
 
         public ThrottledErrorNotifier(Observer observer, int ignoreErrorsBeforeSeconds, int maxErrorCounter)
         {
+            if (observer == null) throw new ArgumentNullException(nameof(observer));
             Observer = observer;
             IgnoreErrorsSeconds = ignoreErrorsBeforeSeconds;
             MaxErrorCounter = maxErrorCounter;

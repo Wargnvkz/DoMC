@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateCommands", "TestApp\C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{0E503F2A-9F5B-4675-A5CA-361F388639FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMC", "DoMC\DoMC.csproj", "{C78D4114-28DA-407F-980B-AE4463A3E21C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMC", "DoMC\DoMC.csproj", "{C78D4114-28DA-407F-980B-AE4463A3E21C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMCModuleControlTests", "DoMCModuleControlTests\DoMCModuleControlTests.csproj", "{0DC95198-DC04-4E00-BD30-1D1AB8AD557F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{C78D4114-28DA-407F-980B-AE4463A3E21C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C78D4114-28DA-407F-980B-AE4463A3E21C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C78D4114-28DA-407F-980B-AE4463A3E21C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DC95198-DC04-4E00-BD30-1D1AB8AD557F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DC95198-DC04-4E00-BD30-1D1AB8AD557F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DC95198-DC04-4E00-BD30-1D1AB8AD557F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DC95198-DC04-4E00-BD30-1D1AB8AD557F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

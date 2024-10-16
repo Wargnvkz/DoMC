@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.ArchiveDB
 {
     public partial class ArchiveDBModule
     {
-        public class StopCommand : CommandBase
+        public class StopCommand : AbstractCommandBase
         {
-            public StopCommand(IMainController mainController, ModuleBase module) : base(mainController, module, null, null) { }
+            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
             protected override void Executing() => ((ArchiveDBModule)Module).Stop();
         }
 
