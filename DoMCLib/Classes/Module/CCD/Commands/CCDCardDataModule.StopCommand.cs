@@ -11,22 +11,22 @@ namespace DoMCLib.Classes.Module.CCD
 
     public partial class CCDCardDataModule
     {
-        public class StopCommand : WaitCommandBase
+        public class StopCommand : WaitingCommandBase
         {
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCApplicationContext), typeof(CCDCardDataCommandResponse)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
-                var context = (ApplicationContext)InputData;
+                var context = (DoMCApplicationContext)InputData;
                 if (context != null)
                 {
                     var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
                     var cardParameters = context.GetCardParametersByCardList(workingCards);
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
-                        result.SetCardRequested(i);
-                        module.tcpClients[cardParameters[i].Item1].Start();
+                        result.SetCardRequested(cardParameters[i].Item1);
+                        module.tcpClients[cardParameters[i].Item1].Stop();
                     }
                 }
                 else
@@ -41,13 +41,13 @@ namespace DoMCLib.Classes.Module.CCD
                 {
                     var CardAnswerResults = (CCDCardAnswerResults)data;
                     if (CardAnswerResults == null) return;
-                    result.SetCardAnswered(CardAnswerResults.CardNumber);
+                    result.SetCardAnswered(CardAnswerResults.CardNumber - 1);
                 }
             }
 
             protected override bool MakeDecisionIsCommandCompleteFunc()
             {
-                return result.CardsNotAnswered().Count() > 0;
+                return result.CardsNotAnswered().Count() == 0;
             }
 
             protected override void PrepareOutputData()

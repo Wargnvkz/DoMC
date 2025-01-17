@@ -10,22 +10,22 @@ namespace DoMCLib.Classes.Module.CCD
 
     public partial class CCDCardDataModule
     {
-        public class SendReadSocketCommand : WaitCommandBase
+        public class SendReadSocketCommand : WaitingCommandBase
         {
             Commands.Classes.SetReadingParametersCommandResult result = new Commands.Classes.SetReadingParametersCommandResult();
-            public SendReadSocketCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(Commands.Classes.SetReadingParametersCommandResult)) { }
+            public SendReadSocketCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCApplicationContext), typeof(Commands.Classes.SetReadingParametersCommandResult)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
-                var context = (ApplicationContext)InputData;
+                var context = (DoMCApplicationContext)InputData;
                 if (context != null)
                 {
                     var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
                     var cardParameters = context.GetCardParametersByCardList(workingCards);
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
-                        result.SetCardRequested(i);
-                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketReadingParameters(cardParameters[i].Item2, CancellationTokenSourceBase.Token);
+                        result.SetCardRequested(cardParameters[i].Item1);
+                        module.tcpClients[cardParameters[i].Item1].SendCommandReadSocket(1, CancelationTokenSourceToCancelCommandExecution.Token);
                     }
                 }
                 else
@@ -37,19 +37,19 @@ namespace DoMCLib.Classes.Module.CCD
 
             protected override void NotificationReceived(string NotificationName, object? data)
             {
-                if (NotificationName.Contains("ResponseSetReadingParametersConfiguration"))
+                if (NotificationName.Contains("ResponseReadSockets"))
                 {
                     var CardAnswerResults = (CCDCardAnswerResults)data;
                     if (CardAnswerResults == null) return;
-                    result.SetCardAnswered(CardAnswerResults.CardNumber);
-                    result.SetReadResult(CardAnswerResults.CardNumber, CardAnswerResults.ReadingSocketsResult == 0);
-                    result.SetAnswerTime(CardAnswerResults.CardNumber, CardAnswerResults.ReadingSocketsTime);
+                    result.SetCardAnswered(CardAnswerResults.CardNumber - 1);
+                    result.SetReadResult(CardAnswerResults.CardNumber - 1, CardAnswerResults.ReadingSocketsResult == 0);
+                    result.SetAnswerTime(CardAnswerResults.CardNumber - 1, CardAnswerResults.ReadingSocketsTime);
                 }
             }
 
             protected override bool MakeDecisionIsCommandCompleteFunc()
             {
-                return result.CardsNotAnswered().Count() > 0;
+                return result.CardsNotAnswered().Count() == 0;
             }
 
             protected override void PrepareOutputData()

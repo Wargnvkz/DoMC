@@ -17,7 +17,7 @@ namespace DoMCLib.Classes.Configuration.CCD
         public bool[] LEDStatuses; // горит ли светодиод
         public bool LEDStatusesAdded = false; // прочитаны ли статусы светодиодов
         public bool[] SocketsToSave; // Гнезда, которые надо сохранить. Берется из конфигурации
-        private static int DefaultLEDQnt = 12;
+        public static readonly int DefaultLEDQnt = 12;
         public short MaxDeviation;
         public Point MaxDeviationPoint;
         public short Average;
@@ -27,11 +27,8 @@ namespace DoMCLib.Classes.Configuration.CCD
 
         public void SetLEDStatuses(bool[] LEDStatuses, DateTime TimeLCBSincSignal)
         {
-            if (LEDStatuses == null)
-            {
-                this.LEDStatuses = new bool[DefaultLEDQnt];
-                return;
-            }
+            if (LEDStatuses == null) throw new ArgumentNullException(nameof(LEDStatuses));
+            if (TimeLCBSincSignal == DateTime.MinValue) throw new ArgumentOutOfRangeException(nameof(TimeLCBSincSignal));
             this.LEDStatuses = new bool[LEDStatuses.Length];
             for (int i = 0; i < LEDStatuses.Length; i++)
             {
@@ -43,7 +40,7 @@ namespace DoMCLib.Classes.Configuration.CCD
 
         public void SetImageProcessParameters(ImageProcessParameters[] parameters)
         {
-            ImageProcessParameters = parameters;
+            ImageProcessParameters = parameters.Select(p => p.Clone()).ToArray();
         }
     }
 }

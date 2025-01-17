@@ -20,9 +20,9 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public AbstractCommandBase? CreateCommand(string commandName);
-        public AbstractCommandBase? CreateCommand(Type commandType);
-        public AbstractCommandBase? CreateCommand(Type commandType, Type ModuleType);
+        public AbstractCommandBase? CreateCommandInstance(string commandName);
+        public AbstractCommandBase? CreateCommandInstance(Type commandType);
+        public AbstractCommandBase? CreateCommandInstance(Type commandType, Type ModuleType);
         public AbstractModuleBase GetModule(Type ModuleType);
         public AbstractModuleBase GetModule(string ModuleName);
 

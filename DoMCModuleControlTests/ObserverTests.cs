@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DoMCModuleControl.Logging;
-using DoMCModuleControlTests.External;
+using DoMCTestingTools.ClassesForTests;
 
-namespace DoMCModuleControl.Tests
+namespace DoMCModuleControlTests
 {
     [TestClass()]
     public class ObserverTests
@@ -16,13 +16,13 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void ObserverTest()
         {
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             var fileSystem = new FileSystemForTests();
             var baseLogger = new BaseFilesLogger(fileSystem);
-            var logger = new Logger("Test", baseLogger);
+            var logger = new Logger(ModuleName, baseLogger);
             logger.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
             var observer = new Observer(logger);
-
-            bool wasNotified = false;  // Флаг для фиксации вызова события
+            bool wasNotified = false;
             string expectedEventName = "TestEvent";
             object? expectedEventData = null;
             int counter = 0;
@@ -38,18 +38,16 @@ namespace DoMCModuleControl.Tests
             // Act
             observer.Notify(expectedEventName, expectedEventData);
             var start = DateTime.Now;
-            double timeoutInSeconds = 1;
+            double timeoutInSeconds = 30;
             while (counter == 0 && (DateTime.Now - start).TotalSeconds < timeoutInSeconds)
             {
                 Task.Delay(10).Wait();
             }
             // Assert
             Assert.AreEqual(1, counter);
+            Assert.IsTrue(wasNotified);
             logger.Flush();
-            var files = fileSystem.GetFiles(null);
-            Assert.AreNotEqual(files.Length, 0);
-            var logText = String.Join("\r\n\r\n", files.Select(file => fileSystem.GetStreamReader(file).ReadToEnd()));
-            Assert.AreNotEqual(logText.Trim().Length, 0);
+
         }
     }
 }

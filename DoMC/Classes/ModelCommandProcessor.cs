@@ -11,22 +11,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static DoMCLib.Classes.Module.LCB.LCBModule;
-using ApplicationContext = DoMCLib.Classes.ApplicationContext;
+using DoMCApplicationContext = DoMCLib.Classes.DoMCApplicationContext;
 
 namespace DoMC.Classes
 {
     public class ModelCommandProcessor
     {
         IMainController Controller;
-        ApplicationContext Context;
+        DoMCApplicationContext Context;
         Observer observer;
         ILogger logger;
-        public ModelCommandProcessor(IMainController controller, ApplicationContext applicationContext)
+        public ModelCommandProcessor(IMainController controller, DoMCApplicationContext applicationContext)
         {
             Controller = controller;
             Context = applicationContext;
             observer = Controller.GetObserver();
-            observer.NotificationReceivers += Observer_NotificationReceived;
+            //observer.NotificationReceivers += Observer_NotificationReceived;
             logger = Controller.GetLogger("Operations");
         }
 
@@ -72,64 +72,64 @@ namespace DoMC.Classes
 
         public bool StartLCB()
         {
-            var startCmd = Controller.CreateCommand(typeof(LCBModule.StartCommand));
+            var startCmd = Controller.CreateCommandInstance(typeof(LCBModule.LCBStartCommand));
             if (startCmd == null) return false;
             startCmd.ExecuteCommandAsync().Wait();
-            return startCmd.IsCompleteSuccessfully;
+            return startCmd.WasCompletedSuccessfully();
         }
         public bool StartCCD()
         {
-            var startCmd = Controller.CreateCommand(typeof(CCDCardDataModule.StartCommand));
+            var startCmd = Controller.CreateCommandInstance(typeof(CCDCardDataModule.StartCommand));
             if (startCmd == null) return false;
             startCmd.ExecuteCommandAsync().Wait();
-            return startCmd.IsCompleteSuccessfully;
+            return startCmd.WasCompletedSuccessfully();
         }
         public bool StartRDPB()
         {
-            var startCmd = Controller.CreateCommand(typeof(RDPBModule.StartCommand));
+            var startCmd = Controller.CreateCommandInstance(typeof(RDPBModule.StartCommand));
             if (startCmd == null) return false;
             startCmd.ExecuteCommandAsync().Wait();
-            return startCmd.IsCompleteSuccessfully;
+            return startCmd.WasCompletedSuccessfully();
         }
 
         public bool StopLCB()
         {
-            var StopCmd = Controller.CreateCommand(typeof(LCBModule.StopCommand));
+            var StopCmd = Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand));
             if (StopCmd == null) return false;
             StopCmd.ExecuteCommandAsync().Wait();
-            return StopCmd.IsCompleteSuccessfully;
+            return StopCmd.WasCompletedSuccessfully();
         }
         public bool StopCCD()
         {
-            var StopCmd = Controller.CreateCommand(typeof(CCDCardDataModule.StopCommand));
+            var StopCmd = Controller.CreateCommandInstance(typeof(CCDCardDataModule.StopCommand));
             if (StopCmd == null) return false;
             StopCmd.ExecuteCommandAsync().Wait();
-            return StopCmd.IsCompleteSuccessfully;
+            return StopCmd.WasCompletedSuccessfully();
         }
         public bool StopRDPB()
         {
-            var StopCmd = Controller.CreateCommand(typeof(RDPBModule.StopCommand));
+            var StopCmd = Controller.CreateCommandInstance(typeof(RDPBModule.StopCommand));
             if (StopCmd == null) return false;
             StopCmd.ExecuteCommandAsync().Wait();
-            return StopCmd.IsCompleteSuccessfully;
+            return StopCmd.WasCompletedSuccessfully();
         }
 
         public bool LoadConfigurationLCB()
         {
-            var setLCBConfigCommand = Controller.CreateCommand(typeof(LCBModule.SetLCBParametersCommand));
+            var setLCBConfigCommand = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBParametersForWorkingModeCommand));
             if (setLCBConfigCommand == null) return false;
-            setLCBConfigCommand.ExecuteCommandAsync(Context.Configuration.CurrentSettings.LCBSettings).Wait();
-            if (setLCBConfigCommand.IsError) return false;
+            setLCBConfigCommand.ExecuteCommandAsync(Context.Configuration.ReadingSocketsSettings.LCBSettings).Wait();
+            if (!setLCBConfigCommand.WasCompletedSuccessfully()) return false;
 
-            var setLCBMovementParametersCommand = Controller.CreateCommand(typeof(LCBModule.SetLCBMovementParametersCommand));
+            var setLCBMovementParametersCommand = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBMovementParametersCommand));
             if (setLCBMovementParametersCommand == null) return false;
             setLCBMovementParametersCommand.ExecuteCommandAsync().Wait();
-            if (setLCBMovementParametersCommand.IsError) return false;
+            if (!setLCBMovementParametersCommand.WasCompletedSuccessfully()) return false;
 
-            var setLCBCurrentCommand = Controller.CreateCommand(typeof(LCBModule.SetLCBCurrentCommand));
+            var setLCBCurrentCommand = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBCurrentCommand));
             if (setLCBCurrentCommand == null) return false;
             setLCBCurrentCommand.ExecuteCommandAsync().Wait();
-            if (setLCBCurrentCommand.IsError) return false;
+            if (!setLCBCurrentCommand.WasCompletedSuccessfully()) return false;
             return true;
         }
         public bool LoadConfigurationCCD()
@@ -139,19 +139,19 @@ namespace DoMC.Classes
         }
         public bool LoadConfigurationRDPB()
         {
-            var LoadConfigurationCmd = Controller.CreateCommand(typeof(RDPBModule.LoadConfigurationCommand));
+            var LoadConfigurationCmd = Controller.CreateCommandInstance(typeof(RDPBModule.LoadConfigurationCommand));
             if (LoadConfigurationCmd == null) return false;
             LoadConfigurationCmd.ExecuteCommandAsync(Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig).Wait();
-            return LoadConfigurationCmd.IsCompleteSuccessfully;
+            return LoadConfigurationCmd.WasCompletedSuccessfully();
         }
 
         public bool SendCCDReadCommand(bool ExternalSignal)
         {
             if (ExternalSignal)
             {
-                var setExpositionCommand = Controller.CreateCommand(typeof(CCDCardDataModule.SendReadSocketWithExternalSignalCommand));
+                var setExpositionCommand = Controller.CreateCommandInstance(typeof(CCDCardDataModule.SendReadSocketsWithExternalSignalCommand));
                 if (setExpositionCommand == null) return false;
-                var resultExpositionCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout);
+                var resultExpositionCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
                 if (resultExpositionCommand is SetReadingParametersCommandResult resultExposition)
                 {
                     var lst = resultExposition.CardsNotAnswered();
@@ -164,9 +164,9 @@ namespace DoMC.Classes
             }
             else
             {
-                var setExpositionCommand = Controller.CreateCommand(typeof(CCDCardDataModule.SendReadSocketCommand));
+                var setExpositionCommand = Controller.CreateCommandInstance(typeof(CCDCardDataModule.SendReadSocketCommand));
                 if (setExpositionCommand == null) return false;
-                var resultExpositionCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout);
+                var resultExpositionCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
                 if (resultExpositionCommand is SetReadingParametersCommandResult resultExposition)
                 {
                     var lst = resultExposition.CardsNotAnswered();
@@ -184,9 +184,9 @@ namespace DoMC.Classes
 
         public GetImageDataCommandResponse? GetReadImagesCommand()
         {
-            var setExpositionCommand = Controller.CreateCommand(typeof(CCDCardDataModule.GetSocketsImagesDataCommand));
+            var setExpositionCommand = Controller.CreateCommandInstance(typeof(CCDCardDataModule.GetSocketsImagesDataCommand));
             if (setExpositionCommand == null) return null;
-            var resultCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout);
+            var resultCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
             if (resultCommand is GetImageDataCommandResponse resultExposition)
             {
                 var lst = resultExposition.CardsNotAnswered();

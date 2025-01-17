@@ -7,14 +7,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using ApplicationContext = DoMCLib.Classes.ApplicationContext;
+using DoMCApplicationContext = DoMCLib.Classes.DoMCApplicationContext;
 
 namespace DoMC
 {
     public partial class DoMCInnerVarsForm : Form
     {
-        ApplicationContext Context;
-        public DoMCInnerVarsForm(ApplicationContext context)
+        DoMCApplicationContext Context;
+        public DoMCInnerVarsForm(DoMCApplicationContext context)
         {
             InitializeComponent();
             Context = context;

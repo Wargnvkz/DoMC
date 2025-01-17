@@ -28,7 +28,7 @@ namespace DoMCLib.Classes.Module.CCD
             tcpClients = new CCDCardTCPClient[12];
             for (int i = 0; i < tcpClients.Length; i++)
             {
-                tcpClients[i] = new CCDCardTCPClient(i + 1, new TcpSocketDevice(), new TcpSocketDevice(), MainController);
+                tcpClients[i] = new CCDCardTCPClient(i + 1, typeof(TcpSocketDevice), MainController);
             }
         }
     }

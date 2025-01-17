@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DoMCLib.Classes.Configuration;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,10 +12,10 @@ namespace DoMCLib.Forms
 {
     public partial class DoMCGeneralSettingsForm : Form
     {
-        public DoMCLib.Classes.DoMCGeneralSettings Value
+        public DoMCStandardRecalculationSettings Value
         {
             get {
-                var res = new DoMCLib.Classes.DoMCGeneralSettings();
+                var res = new DoMCStandardRecalculationSettings();
                 int.TryParse(txbCycles.Text, out res.NCycle);
                 double.TryParse(txbStandardPercent.Text, out res.StandardPercent);
                 return res;
@@ -25,6 +26,7 @@ namespace DoMCLib.Forms
                 txbStandardPercent.Text = gs.StandardPercent.ToString("F2");
             }
         }
+        
         public DoMCGeneralSettingsForm()
         {
             InitializeComponent();

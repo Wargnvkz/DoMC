@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DoMCModuleControl.Commands;
 using System.Diagnostics.CodeAnalysis;
-using DoMCModuleControlTests.ClassesForTests;
+using DoMCTestingTools.ClassesForTests;
 
 namespace DoMCModuleControl.Tests
 {
@@ -17,7 +17,8 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void MainControllerTest()
         {
-            var controller = new MainController(typeof(TestUserInterface));
+            var controller = new MainController();
+            controller.CreateUserInterface(typeof(TestUserInterface));
             Assert.IsNotNull(controller);
             Assert.IsNotNull(controller.GetLogger("Test"));
             Assert.IsNotNull(controller.GetObserver());
@@ -28,7 +29,7 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void CreateTest()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             Assert.IsNotNull(controller.GetLogger("Test"));
             Assert.IsNotNull(controller.GetObserver());
@@ -38,7 +39,7 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void RegisterModuleTest()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             var module = new TestModule(controller);
             controller.RegisterModule(module);
@@ -64,7 +65,7 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void RegisterCommandTest()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             var module = new TestModule(controller);
             controller.RegisterModule(module);
@@ -88,7 +89,7 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void RegisterAllCommandsTest()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             controller.RegisterAllCommands();
             var commands = controller.GetRegisteredCommandList();
@@ -98,7 +99,7 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void GetRegisteredCommandListTest()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             var module = new TestModule(controller);
             controller.RegisterModule(module);
@@ -107,51 +108,52 @@ namespace DoMCModuleControl.Tests
             Assert.IsNotNull(commands.Find(c => c.CommandName == "TestCommand"));
         }
 
-        [TestMethod("CreateCommand(string commandName)")]
+        [TestMethod("CreateCommandInstance(string commandName)")]
         public void CreateCommandTest()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             var module = new TestModule(controller);
             controller.RegisterModule(module);
             controller.RegisterCommand(new CommandInfo("TestCommand", typeof(TestInputData), typeof(TestOutputData), typeof(TestModule.TestCommand), module));
-            var command = controller.CreateCommand("TestCommand");
+            var command = controller.CreateCommandInstance("TestCommand");
             Assert.IsNotNull(command);
-            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommand((string)null));
+            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommandInstance((string)null));
         }
 
-        [TestMethod("CreateCommand(Type commandType)")]
+        [TestMethod("CreateCommandInstance(Type commandType)")]
         public void CreateCommandTest1()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             var module = new TestModule(controller);
             controller.RegisterModule(module);
             controller.RegisterCommand(new CommandInfo("TestCommand", typeof(TestInputData), typeof(TestOutputData), typeof(TestModule.TestCommand), module));
-            var command = controller.CreateCommand(typeof(TestModule.TestCommand));
+            var command = controller.CreateCommandInstance(typeof(TestModule.TestCommand));
             Assert.IsNotNull(command);
-            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommand((Type)null));
+            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommandInstance((Type)null));
         }
 
-        [TestMethod("CreateCommand(Type commandType, Type moduleType)")]
+        [TestMethod("CreateCommandInstance(Type commandType, Type moduleType)")]
         public void CreateCommandTest2()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             var module = new TestModule(controller);
             controller.RegisterModule(module);
             controller.RegisterCommand(new CommandInfo("TestCommand", typeof(TestInputData), typeof(TestOutputData), typeof(TestModule.TestCommand), module));
-            var command = controller.CreateCommand(typeof(TestModule.TestCommand), module.GetType());
+            var command = controller.CreateCommandInstance(typeof(TestModule.TestCommand), module.GetType());
             Assert.IsNotNull(command);
-            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommand(null, module.GetType()));
-            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommand(typeof(TestModule.TestCommand), null));
-            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommand(null, null));
+            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommandInstance(null, module.GetType()));
+            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommandInstance(typeof(TestModule.TestCommand), null));
+            Assert.ThrowsException<ArgumentNullException>(() => controller.CreateCommandInstance(null, null));
         }
 
         [TestMethod()]
         public void GetObserverTest()
         {
-            var controller = new MainController(typeof(TestUserInterface));
+            var controller = new MainController();
+            controller.CreateUserInterface(typeof(TestUserInterface));
             Assert.IsNotNull(controller);
             Assert.IsNotNull(controller.GetObserver());
         }
@@ -159,7 +161,8 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void GetLoggerTest()
         {
-            var controller = new MainController(typeof(TestUserInterface));
+            var controller = new MainController();
+            controller.CreateUserInterface(typeof(TestUserInterface));
             Assert.IsNotNull(controller);
             Assert.IsNotNull(controller.GetLogger("Test"));
         }
@@ -167,7 +170,8 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void GetMainUserInterfaceTest()
         {
-            var controller = new MainController(typeof(TestUserInterface));
+            var controller = new MainController();
+            controller.CreateUserInterface(typeof(TestUserInterface));
             Assert.IsNotNull(controller);
             Assert.IsNotNull(controller.GetMainUserInterface());
         }
@@ -175,7 +179,7 @@ namespace DoMCModuleControl.Tests
         [TestMethod("GetModule(string ModuleName)")]
         public void GetModuleTest()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             var module = new TestModule(controller);
             controller.RegisterModule(module);
@@ -186,21 +190,12 @@ namespace DoMCModuleControl.Tests
         [TestMethod("GetModule(Type ModuleType)")]
         public void GetModuleTest1()
         {
-            var controller = MainController.Create();
+            var controller = MainController.Create(null);
             Assert.IsNotNull(controller);
             var module = new TestModule(controller);
             controller.RegisterModule(module);
             Assert.IsNotNull(controller.GetModule(module.GetType()) as TestModule);
             Assert.IsNull(controller.GetModule((Type)null));
         }
-    }
-
-    public class TestInputData
-    {
-        public int Value { get; set; }
-    }
-    public class TestOutputData
-    {
-        public string? Value { get; set; }
     }
 }

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace DoMCLib.Forms
+namespace DoMC.Forms.Settings
 {
     public partial class DoMCDBSettingsForm : Form
     {

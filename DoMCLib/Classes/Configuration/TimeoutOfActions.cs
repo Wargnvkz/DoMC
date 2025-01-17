@@ -5,10 +5,10 @@
         /// <summary>
         /// Время ожидания ответа от плат ПЗС в миллисекундах
         /// </summary>
-        public int WaitForCCDCardAnswerTimeout = 30000;
-        public int WaitForLCBCardAnswerTimeout = 30000;
-        public int WaitForRDPBCardAnswerTimeout = 1000;
+        public int WaitForCCDCardAnswerTimeoutInSeconds = 30;
+        public int WaitForLCBCardAnswerTimeoutInSeconds = 30;
+        public int WaitForRDPBCardAnswerTimeoutInSeconds = 1;
         public int DelayBeforeMoveDataToArchiveTimeInSeconds = 3600;
-        public int WaitForSynchrosignalTimoutAfterCCDReadingFailed = 10000;
+        public int WaitForSynchrosignalTimoutAfterCCDReadingFailedInSeconds = 10;
     }
 }

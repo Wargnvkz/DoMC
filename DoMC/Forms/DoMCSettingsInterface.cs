@@ -27,19 +27,21 @@ using DoMC.Classes;
 using DoMCLib.Classes.Module.CCD.Commands.Classes;
 using DoMCModuleControl.Commands;
 using DoMCModuleControl.Modules;
+using DoMC.Forms;
+using DoMCModuleControl.UI;
+using DoMC.UserControls;
+using DoMCLib.Forms;
 
 namespace DoMC
 {
-    public partial class DoMCSettingsInterface : Form
+    public partial class DoMCSettingsInterface : Form, IDoMCSettingsUpdatedProvider//, IMainUserInterface
     {
 
         DoMCLib.Forms.ShowPreformImages checkpreformalgorithmsForm;
 
         bool invertColors = false;
         //bool IsAbleToWork = false;
-        bool TestLCBConnected = false;
         bool TestRDPBConnected = false;
-        bool showMaxDevPoint = false;
         int AdminPinCode = 1234;
         bool LCBSettingsPreformLengthGotFromConfig = false;
         bool LCBSettingsDelayLengthGotFromConfig = false;
@@ -47,40 +49,75 @@ namespace DoMC
         IMainController Controller;
         ILogger WorkingLog;
         Observer observer;
-        DoMCLib.Classes.ApplicationContext Context;
+        DoMCLib.Classes.DoMCApplicationContext Context;
 
         SettingsPageSocketsStatus SettingsPageSocketsStatusShow = SettingsPageSocketsStatus.IsSocketSettingsOk;
 
         Bitmap bmpCheckSign = new Bitmap(512, 512);
         DoMCArchiveForm archiveForm = null;
 
-        ModelCommandProcessor contextProcessor;
+        //ModelCommandProcessor contextProcessor;
 
-        public DoMCSettingsInterface(IMainController controller, DoMCLib.Classes.ApplicationContext context)
+        TestCCDInterface TestCCDInterfaceView;
+        GetCCDStandardInterface GetCCDStandardInterface;
+        TestLCBInterface TestLCBInterface;
+        CheckSettings CheckSettingsInterface;
+        bool MovingCyclesToArchive = false;
+
+        public event EventHandler SettingsUpdated;
+
+        public DoMCSettingsInterface()
         {
             InitializeComponent();
+
+        }
+
+        public void SetMainController(IMainController controller, object? data)
+        {
+            Context = (DoMCLib.Classes.DoMCApplicationContext)data;
+            Controller = controller;
+            Controller = controller;
             WorkingLog = controller.GetLogger("SettingInterface");
             observer = controller.GetObserver();
-            Context = context;
-            WorkingLog.Add(LoggerLevel.Critical, "Запускт интерфейса настройки");
-            //observer.NotificationReceivers += Observer_NotificationReceived;
-            //CreateDataExchange();
-            contextProcessor = new ModelCommandProcessor(controller, Context);
+            //Context = context;
+            //contextProcessor = new ModelCommandProcessor(controller, Context);
+            WorkingLog.Add(LoggerLevel.Critical, "Запуск интерфейса настройки");
             InitControls();
+            observer.NotificationReceivers += Observer_NotificationReceivers;
+        }
 
+        private void Observer_NotificationReceivers(string EventName, object? arg2)
+        {
+            if (EventName == DoMCApplicationContext.ConfigurationUpdateEventName)
+            {
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(() => PreparationsAfterChangingConfig()));
+                }
+                else
+                {
+                    PreparationsAfterChangingConfig();
+                }
+            }
+        }
+        private void PreparationsAfterChangingConfig()
+        {
+            Context.FillEquipmentSocket2CardSocket();
+            FillSettingPage();
+
+        }
+        private void NotifyConfigurationUpdated()
+        {
+            observer.Notify(DoMCApplicationContext.ConfigurationUpdateEventName, Context.Configuration);
         }
 
         private void InitControls()
         {
             WorkingLog.Add(LoggerLevel.Critical, "SetFormSchema");
             SetFormSchema();
-            WorkingLog.Add(LoggerLevel.Critical, "FillSettingPage");
+            WorkingLog.Add(LoggerLevel.Critical, "FillPage");
             FillSettingPage();
-            TestLCBOutputs = new CheckBox[] { cbTestLCBOutput0, cbTestLCBOutput1, cbTestLCBOutput2, cbTestLCBOutput3, cbTestLCBOutput4, cbTestLCBOutput5 };
-            TestLCBInputs = new CheckBox[] { cbTestLCBInput0, cbTestLCBInput1, cbTestLCBInput2, cbTestLCBInput3, cbTestLCBInput4, cbTestLCBInput5, cbTestLCBInput6, cbTestLCBInput7 };
-            TestLCBLEDs = new CheckBox[] { cbTestLCBLED0, cbTestLCBLED1, cbTestLCBLED2, cbTestLCBLED3, cbTestLCBLED4, cbTestLCBLED5, cbTestLCBLED6, cbTestLCBLED7, cbTestLCBLED8, cbTestLCBLED9, cbTestLCBLED10, cbTestLCBLED11 };
             IsCycleStarted = false;
-            TestCCDIsReading = false;
 
             try
             {
@@ -116,6 +153,25 @@ namespace DoMC
 
             var bmpGraphics = Graphics.FromImage(bmpCheckSign);
             bmpGraphics.DrawString("✓", new Font("Arial", 300), new SolidBrush(Color.LimeGreen), new PointF(0, 0));
+
+            TestCCDInterfaceView = new TestCCDInterface(Controller, WorkingLog, this);
+            tbCCDTest.Controls.Add(TestCCDInterfaceView);
+            TestCCDInterfaceView.Size = tbCCDTest.ClientSize;
+
+            GetCCDStandardInterface = new GetCCDStandardInterface(Controller, WorkingLog, this);
+            tbGetStandard.Controls.Add(GetCCDStandardInterface);
+            GetCCDStandardInterface.Size = tbCCDTest.ClientSize;
+
+            TestLCBInterface = new TestLCBInterface(Controller, WorkingLog, this);
+            tbTestLCB_uc.Controls.Add(TestLCBInterface);
+            TestLCBInterface.Size = tbTestLCB_uc.ClientSize;
+
+
+            CheckSettingsInterface = new CheckSettings(Controller, WorkingLog, this);
+            tbSettingsCheck.Controls.Add(CheckSettingsInterface);
+            CheckSettingsInterface.Size = tbSettingsCheck.ClientSize;
+
+            FillSettingPage();
         }
         private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
@@ -182,10 +238,11 @@ namespace DoMC
 
         private void FillSettingPage()
         {
+            SettingsUpdated?.Invoke(this, new EventArgs());
             /*var q = Context.Configuration.HardwareSettings.SocketQuantity;
             //var q = Context.Configuration.HardwareSettings.SocketQuantity;
             lvDoMCCards.Items.Clear();
-            var cardsWorking = InterfaceDataExchange.GetIsCardsWorking();
+            var cardsWorking = Context.GetIsCardsWorking();
             for (int i = 0; i < CCDCardMAC.LastCardNumber(q); i++)
             {
                 var f = CCDCardMAC.FirstSocket(i);
@@ -205,44 +262,37 @@ namespace DoMC
                 var lvi = new ListViewItem(new string[] { (i + 1).ToString(), "🗸", UserInterfaceControls.MacToString(CCDCardMAC.ToMAC((byte)(i + 1))), f.ToString(), (f + sq - 1).ToString() });
                 lvi.BackColor = color;
                 lvDoMCCards.Items.Add(lvi);
-            }*/
-
+            }
+            
             SettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Context.Configuration.HardwareSettings.SocketQuantity, ref pnlSockets);
-            //UserInterfaceControls.SetSocketStatuses(SettingsSocketsPanelList, UserInterfaceControls.GetListOfSetSocketConfiguration(Context.Configuration.HardwareSettings.SocketQuantity, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations), Color.Green, Color.DarkGray);
-            /*switch (SettingsPageSocketsStatusShow)
+            //UserInterfaceControls.SetSocketStatuses(SettingsSocketsPanelList, UserInterfaceControls.GetListOfSetSocketConfiguration(Context.Configuration.HardwareSettings.SocketQuantity, Context.Configuration.SocketToCardSocketConfigurations), Color.Green, Color.DarkGray);
+            switch (SettingsPageSocketsStatusShow)
             {
                 case SettingsPageSocketsStatus.IsSocketSettingsOk:
                     UserInterfaceControls.SetSocketStatuses(SettingsSocketsPanelList, UserInterfaceControls.GetListOfSetSocketConfiguration(Configuration.SocketQuantity, Configuration.SocketToCardSocketConfigurations), Color.Green, Color.DarkGray);
                     break;
                 case SettingsPageSocketsStatus.SocketCardsIsWorking:
-                    UserInterfaceControls.SetSocketStatuses(SettingsSocketsPanelList, InterfaceDataExchange.GetIsCardWorking(), Color.Green, Color.OrangeRed);
+                    UserInterfaceControls.SetSocketStatuses(SettingsSocketsPanelList, Context.GetIsCardWorking(), Color.Green, Color.OrangeRed);
                     break;
-            }*/
-            StandardSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Context.Configuration.HardwareSettings.SocketQuantity, ref pnlGetStandardSockets, GetStandard_Click);
-            //UserInterfaceControls.SetSocketStatuses(StandardSettingsSocketsPanelList, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.Select(s => s.Value.StandardImage != null).ToArray(), Color.Green, Color.DarkGray);
+            }
+            StandardSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Context.Configuration.HardwareSettings.SocketQuantity, ref pnlGetStandardSockets, ChooseSocket_Click);
+            //UserInterfaceControls.SetSocketStatuses(StandardSettingsSocketsPanelList, Context.Configuration.SocketToCardSocketConfigurations.Select(s => s.Value.StandardImage != null).ToArray(), Color.Green, Color.DarkGray);
 
-            /*WorkModeStandardSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Configuration.SocketQuantity, ref pnlWorkSockets, GetWorkModeStandard_Click);
-            UserInterfaceControls.SetSocketStatuses(WorkModeStandardSettingsSocketsPanelList, UserInterfaceControls.GetListOfSetSocketConfiguration(Configuration.SocketQuantity, Configuration.SocketToCardSocketConfigurations), Color.Green, Color.DarkGray);*/
+            WorkModeStandardSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Configuration.SocketQuantity, ref pnlWorkSockets, GetWorkModeStandard_Click);
+            UserInterfaceControls.SetSocketStatuses(WorkModeStandardSettingsSocketsPanelList, UserInterfaceControls.GetListOfSetSocketConfiguration(Configuration.SocketQuantity, Configuration.SocketToCardSocketConfigurations), Color.Green, Color.DarkGray);
 
             //SetTestCCDSocketStatuses();
             CreateTestCCDPanelSocketStatuses();
             SetTestCCDPanelSocketStatuses();
 
             SetCheckedMenuItems();
-        }
-
-        private void SetTestCCDSocketStatuses()
-        {
-            //TestCCDSocketStatuses = UserInterfaceControls.GetIntListOfSetSocketConfiguration(Context.Configuration.HardwareSettings.SocketQuantity, InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations);
-        }
-
-        private void CreateTestCCDPanelSocketStatuses()
-        {
-            TestSocketsSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(Context.Configuration.HardwareSettings.SocketQuantity, ref pnlTestSockets, TestShowSocketImages_Click);
-        }
-        private void SetTestCCDPanelSocketStatuses()
-        {
-            UserInterfaceControls.SetSocketStatuses(TestSocketsSettingsSocketsPanelList, TestCCDSocketStatuses, Color.DarkGray, Color.Green, Color.Red);
+            */
+            miLEDSettings.Checked = Context.Configuration.ReadingSocketsSettings.IsLCBSettingsSet();
+            miReadParameters.Checked = Context.Configuration.ReadingSocketsSettings.IsReadingParametersSet();
+            miStandardRecalcSetting.Checked = Context.Configuration.HardwareSettings.IsStandardRecalculationSettingsSet();
+            miSetCheckSockets.Checked = Context.Configuration.HardwareSettings.SocketsToCheck != null && Context.Configuration.HardwareSettings.SocketsToCheck.Any(s => s);
+            miDBSettings.Checked = Context.Configuration.HardwareSettings.IsDBSettingsSet();
+            miRDPSettings.Checked = Context.Configuration.HardwareSettings.IsRemoveDefectedPreformBlockConfigSet();
         }
 
         private void SetFormSchema()
@@ -338,162 +388,43 @@ namespace DoMC
             #endregion
         }
 
-        private void SetConfigurationIsNotLoaded()
-        {
-            /*InterfaceDataExchange.CCDDataEchangeStatuses.IsConfigurationLoaded = false;
-            //InterfaceDataExchange.Configuration = InterfaceDataExchange.Configuration;
-            if ((InterfaceDataExchange?.CardsConnection ?? null) != null)
-            {
-                InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
-            }*/
-        }
-
-        private bool WaitForCommand<T1, T2>(object? InputData, int TimeoutInSeconds, string LogMessage, LoggerLevel LogMessageLevel, out T2? outputData)
-            where T1 : AbstractCommandBase
-            where T2 : class
-        {
-            WorkingLog.Add(LogMessageLevel, LogMessage);
-
-            var CommandInstance = Controller.CreateCommand(typeof(T1));
-            if (CommandInstance == null)
-            {
-                outputData = null;
-                return false;
-            };
-            var resultExpositionCommand = CommandInstance.Wait(InputData, TimeoutInSeconds);
-            outputData = resultExpositionCommand as T2;
-            return true;
-        }
-        private bool WaitForCommand<T1, T2, T3>(object? InputData, int TimeoutInSeconds, string LogMessage, LoggerLevel LogMessageLevel, out T3? outputData)
-            where T1 : AbstractCommandBase
-            where T2 : AbstractModuleBase
-            where T3 : class
-        {
-            WorkingLog.Add(LogMessageLevel, LogMessage);
-
-            var CommandInstance = Controller.CreateCommand(typeof(T1), typeof(T2));
-            if (CommandInstance == null)
-            {
-                outputData = null;
-                return false;
-            };
-            var resultExpositionCommand = CommandInstance.Wait(InputData, TimeoutInSeconds);
-            outputData = resultExpositionCommand as T3;
-            return true;
-        }
-
-        private bool LoadConfiguration(bool WorkingMode, bool LoadCCD = true, bool LoadLCB = true, int[] Sockets = null, bool ShowMessages = true)
-        {
-
-            if (LoadCCD)
-            {
-                if (!WaitForCommand<CCDCardDataModule.SetExpositionCommand, SetReadingParametersCommandResult>(Context, Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, "Передача настроек экспозиции гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
-                {
-                    if (result != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                    }
-                }
-                if (!WaitForCommand<CCDCardDataModule.SetReadingParametersCommand, SetReadingParametersCommandResult>(Context, Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, "Передача настроек чтения гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
-                {
-                    if (result != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                    }
-                }
-            }
-
-            if (LoadLCB)
-            {
-                if (!WaitForCommand<CCDCardDataModule.SetExpositionCommand, SetReadingParametersCommandResult>(Context, Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, "Передача настроек экспозиции гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
-                {
-                    if (result != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                    }
-                }
-                //InterfaceDataExchange.CardsConnection.PacketLogActive = false;
-                WorkingLog.Add("Подключение к БУС");
-                InterfaceDataExchange.SendCommand(ModuleCommand.InitLCB);
-                res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.InitLCBStatus == 2);
-                if (!res)
-                {
-                    InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                    if (ShowMessages) DoMCNotAbleLoadConfigurationErrorMessage();
-                    return false;
-                }
-                InterfaceDataExchange.LEDStatus.LСBInitialized = true;
-
-                if (WorkingMode)
-                {
-                    WorkingLog.Add("Вход в рабочий режим");
-                    if (!InterfaceDataExchange.IsLEDConfiguartionFull) return false;
-                    // Загрузить в БУС параметры работы и перевести в рабочий режим
-
-                    WorkingLog.Add("Установка рабочего режима БУС");
-                    InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBCurrentRequest);
-                    res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandSent == 1 && InterfaceDataExchange.LEDStatus.LastCommandReceivedStatusIsOK);
-                    if (!res)
-                    {
-                        InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                        if (ShowMessages) DoMCNotAbleLoadConfigurationErrorMessage();
-                        return false;
-                    }
-
-
-                    WorkingLog.Add("Установка параметров движения в БУС");
-                    InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBMovementParametersRequest);
-                    res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.InitLCBStatus == 2, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-                    if (!res)
-                    {
-                        InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                        if (ShowMessages) DoMCNotAbleLoadConfigurationErrorMessage();
-                        return false;
-                    }
-
-
-                    InterfaceDataExchange.LEDStatus.LCBConfigurationLoaded = true;
-                }
-            }
-            return res;
-        }
 
         /*private void StopCCDWork()
         {
-            InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
+            Context.SendCommand(ModuleCommand.CCDStop);
         }*/
 
 
         private void SetCheckedMenuItems()
         {
-            /*if (InterfaceDataExchange.Configuration != null)
+            /*if (Context.Configuration != null)
             {
-                if (InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations != null)
+                if (Context.Configuration.SocketToCardSocketConfigurations != null)
                 {
-                    if (InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.Keys.Count == Context.Configuration.HardwareSettings.SocketQuantity)
+                    if (Context.Configuration.SocketToCardSocketConfigurations.Keys.Count == Context.Configuration.HardwareSettings.SocketQuantity)
                         miReadParameters.Checked = true;
                     else
                         miReadParameters.Checked = false;
                 }
 
-                if (InterfaceDataExchange.Configuration.WorkModeSettings != null)
+                if (Context.Configuration.WorkModeSettings != null)
                 {
-                    var k = InterfaceDataExchange.Configuration.WorkModeSettings.Koefficient;
+                    var k = Context.Configuration.WorkModeSettings.Koefficient;
                     if (k == 0 || double.IsNaN(k) || double.IsInfinity(k))
                     {
-                        miStandardSavingModeSetting.Checked = false;
+                        miStandardRecalcSetting.Checked = false;
                     }
                     else
                     {
-                        miStandardSavingModeSetting.Checked = true;
+                        miStandardRecalcSetting.Checked = true;
                     }
                 }
                 else
                 {
-                    miStandardSavingModeSetting.Checked = false;
+                    miStandardRecalcSetting.Checked = false;
 
                 }
-                if (InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets != null)
+                if (Context.Configuration.CardSocket2EquipmentSocket != null)
                 {
                     miPhysicToDisplaySocket.Checked = true;
                 }
@@ -509,806 +440,36 @@ namespace DoMC
 
 
 
-        #region tblTest
-
-        short[,] testImage;
-        int TestSocketNumberSelected;
-
-        short[,] TestDiffImage;
-        short[,] TestReadImage;
-        short[,] TestStandardImage;
-        Bitmap TestBmpReadImage;
-        Bitmap TestBmpDiffImage;
-        Bitmap TestBmpStandardImage;
-
-        bool TestCCDIsReading;
-
-        private void AbleForRead(bool IsReading)
-        {
-            btnTest_ReadAllSocket.Enabled = !IsReading;
-            btnTest_ReadSelectedSocket.Enabled = !IsReading;
-            btnCycleStart.Enabled = !IsReading;
-
-        }
-
-        private void btnTest_ReadAllSockets_Click(object sender, EventArgs e)
-        {
-            if (TestCCDIsReading) return;
-            TestCCDIsReading = true;
-            AbleForRead(true);
-            long Start = 0;
-            try
-            {
-                TestSocketNumberSelected = 0;
-                lblTestSelectedSocket.Text = "";
-                InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
-                InterfaceDataExchange.CCDDataEchangeStatuses.FastRead = true;
-                InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart = cbTest_ExternalStart.Checked;
-                InterfaceDataExchange.CardsConnection.StartReadBytes();
-                Start = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-                TestReadAllSockets();
-                InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + " " + ex.Source);
-            }
-            finally
-            {
-                TestCCDIsReading = false;
-            }
-            //FillSettingPage();
-            SetTestCCDPanelSocketStatuses();
-            AbleForRead(false);
-            /*DisplayMessage.Show(
-                $"Чтений: {InterfaceDataExchange.CardsConnection.ReadBytesCounter()}\r\n" +
-                $"Время чтения: {(InterfaceDataExchange.PreciseTimer.ElapsedTicks - Start) / 10}мкс\r\n" +
-                $"Время среднего чтения: {InterfaceDataExchange.CardsConnection.ReadBytesCounter() * 8 / ((InterfaceDataExchange.PreciseTimer.ElapsedTicks - Start) / 10)} Мбит/сек\r\n",
-                "Завершено");*/
-        }
-
-
-        private bool TestReadAllSockets()
-        {
-            WorkingLog.Add("--------------- Получение изображений по всем гнездам ---------------");
-            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Start;
-            CheckForDoMCModule();
-            WorkingLog.Add("Начало загрузки конфигурации");
-            if (!LoadConfiguration(false, true, false))
-            {
-                //DoMCNotAbleLoadConfigurationErrorMessage();
-                return false;
-            }
-            //IsAbleToWork = true;
-            //InterfaceDataExchange.SendCommand(ModuleCommand.CCDCardsReset);
-            InterfaceDataExchange.SendResetToCCDCards();
-            Thread.Sleep(50);
-            InterfaceDataExchange.CurrentCycleCCD = new CycleImagesCCD();
-            InterfaceDataExchange.CurrentCycleCCD.Differences = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
-            if (InterfaceDataExchange.CCDDataEchangeStatuses.SocketsToSave != null)
-                InterfaceDataExchange.CurrentCycleCCD.SocketsToSave =
-                    new bool[Context.Configuration.HardwareSettings.SocketQuantity].Select((s, i) => InterfaceDataExchange.CCDDataEchangeStatuses.SocketsToSave.Contains(i + 1)).ToArray();
-            else
-                InterfaceDataExchange.CurrentCycleCCD.SocketsToSave = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
-
-            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Processing;
-
-            //if (!IsAbleToWork) return false;
-            WorkingLog.Add("Начало чтения гнезда");
-            var startReading = DateTime.Now;
-            bool rc = true;
-            if (InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart)
-            {
-                WorkingLog.Add("Запуск чтения по внешнему сигналу");
-                InterfaceDataExchange.SendCommand(ModuleCommand.StartReadExternal);
-                rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
-                {
-                    return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartReadExternal && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                }, null);
-                if (!rc)
-                {
-                    InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                    InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
-                    WorkingLog.Add("Платы не смогли вовремя получить данные");
-                    WorkingLog.Add($"Статус модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus}");
-                    WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep}");
-                    InterfaceDataExchange.CardsConnection.WriteSocketStatusLog(WorkingLog, "Статусы гнезд после ошибки");
-                    return false;
-                }
-            }
-            else
-            {
-                WorkingLog.Add("Запуск чтения");
-                Thread.Sleep(10);
-                InterfaceDataExchange.SendCommand(ModuleCommand.StartRead);
-                rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
-                {
-                    return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartRead && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-                if (!rc)
-                {
-                    //DoMCNotAbleToReadSocketErrorMessage();
-                    //IsWorkingModeStarted = false;
-                    InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                    InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
-                    WorkingLog.Add("Платы не смогли вовремя получить данные");
-                    WorkingLog.Add($"Статус модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus}");
-                    WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep}");
-                    InterfaceDataExchange.CardsConnection.WriteSocketStatusLog(WorkingLog, "Статусы гнезд после ошибки");
-                    return false;
-                }
-            }
-            var CCDEndTime = DateTime.Now;
-            if ((CCDEndTime - startReading).TotalSeconds < 1)
-            {
-                WorkingLog.Add("Программная ошибка при проверке на готовность данных");
-                WorkingLog.Add($"Время начала чтения: {startReading:dd-MM-yyyy HH\\:mm\\:ss.fff}");
-                WorkingLog.Add($"Время завершения чтения: {CCDEndTime:dd-MM-yyyy HH\\:mm\\:ss.fff}");
-                WorkingLog.Add($"Статус модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus}");
-                WorkingLog.Add($"Шаг модуля: {InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep}");
-                InterfaceDataExchange.CardsConnection.WriteSocketStatusLog(WorkingLog, "Статусы гнезд после ошибки");
-            }
-            WorkingLog.Add("Получение изображения");
-            InterfaceDataExchange.CurrentCycleCCD.CycleCCDDateTime = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.GetSocketImages);
-            var ri = UserInterfaceControls.Wait(2 * InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
-            {
-                var mst = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus;
-                var stp = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep;
-                return mst == ModuleCommand.GetSocketImages && (stp == ModuleCommandStep.Complete || stp == ModuleCommandStep.Error);
-            }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-            if (!ri || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
-            {
-                //DoMCNotAbleToReadSocketErrorMessage();
-                //IsWorkingModeStarted = false;
-                InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
-                return false;
-            }
-            WorkingLog.Add("Изображение получено");
-            var images = InterfaceDataExchange.CCDDataEchangeStatuses.Images;
-            if (images is null)
-            {
-                //DoMCNotAbleToReadSocketErrorMessage();
-                //IsWorkingModeStarted = false;
-                InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
-                return false;
-            }
-            InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = images;
-
-
-            //var beforeDataReady = InterfaceDataExchange.CCDDataEchangeStatuses.ReadyToSendTime; // время, когда можно начинать получать данные
-            var beforeSync = InterfaceDataExchange.LEDStatus.TimeSyncSignalGot; // Время получения сихроимпульса
-
-            InterfaceDataExchange.CCDDataEchangeStatuses.StartProcessImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-            InterfaceDataExchange.CCDDataEchangeStatuses.StartDecisionImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-
-            /*if (System.Diagnostics.Debugger.IsAttached)
-            {
-                for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
-                {
-                    InterfaceDataExchange.CheckIfSocketGood(i + 1);
-                }
-            }
-            else
-            {*/
-            WorkingLog.Add("Проверка изображения");
-            InterfaceDataExchange.CheckIfAllSocketsGood();
-            //}
-
-            for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
-            {
-                TestCCDSocketStatuses[i] = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[i + 1] != null ? (InterfaceDataExchange.CurrentCycleCCD.IsSocketGood[i] ? 1 : 2) : 0;
-            }
-
-            InterfaceDataExchange.CCDDataEchangeStatuses.StopProcessImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-            InterfaceDataExchange.CCDDataEchangeStatuses.StopDecisionImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-
-            /*if (InterfaceDataExchange.CyclesCCD.Count > 2)
-            {
-                InterfaceDataExchange.Errors.NotEnoughTimeToProcessSQL = true;
-            }
-            else
-            {
-                InterfaceDataExchange.Errors.NotEnoughTimeToProcessSQL = false;
-
-            }
-            //InterfaceDataExchange.CyclesCCD.Enqueue(InterfaceDataExchange.CurrentCycleCCD);
-
-            //var afterDataReady = InterfaceDataExchange.CCDDataEchangeStatuses.ReadyToSendTime; // время, когда можно было получать 
-            var afterSync = InterfaceDataExchange.LEDStatus.TimeSyncSignalGot; // Время получения сихроимпульса
-            // Если был синхроимпульс пока мы обрабатывали, значит мы не успеваем
-            if (afterSync != beforeSync)
-            {
-                InterfaceDataExchange.Errors.NotEnoughTimeToProcessData = true;
-            }
-            else
-            {
-                InterfaceDataExchange.Errors.NotEnoughTimeToProcessData = false;
-
-            }*/
-            //Application.DoEvents();
-            WorkingLog.Add("Остановка связи с плат ПЗС");
-            StopCCDWork();
-            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Complete;
-            return true;
-        }
-
-        private void btnReadSelectedSocket_Click(object sender, EventArgs e)
-        {
-            if (TestCCDIsReading) return;
-            if (TestSocketNumberSelected < 1 || TestSocketNumberSelected > Context.Configuration.HardwareSettings.SocketQuantity) return;
-            AbleForRead(true);
-            TestCCDIsReading = true;
-            try
-            {
-                InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
-                InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart = cbTest_ExternalStart.Checked;
-                InterfaceDataExchange.CCDDataEchangeStatuses.FastRead = true;
-                TestReadOneSocket(TestSocketNumberSelected);
-                InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + " " + ex.Source);
-            }
-            finally
-            {
-                TestCCDIsReading = false;
-            }
-            ShowSocket(TestSocketNumberSelected);
-            /*            FillSettingPage();
-
-                        TestCCDSocketStatuses[TestSocketNumberSelected - 1] = 2;
-
-                        SetTestCCDPanelSocketStatuses();*/
-            SetTestCCDPanelSocketStatuses();
-            AbleForRead(false);
-
-        }
-
-        private bool TestReadOneSocket(int SelectedSocket)
-        {
-            if (SelectedSocket == 0) return false;
-            InterfaceDataExchange.CCDDataEchangeStatuses.SocketsToSave = new int[1] { SelectedSocket };
-            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Start;
-            CheckForDoMCModule();
-            if (!LoadConfiguration(false, true, false)) //------ загрузить конфигурацию для одного гнезда
-            {
-                //DoMCNotAbleLoadConfigurationErrorMessage();
-                return false;
-            }
-            //IsAbleToWork = true;
-            InterfaceDataExchange.SendResetToCCDCards();
-            Thread.Sleep(50);
-            InterfaceDataExchange.CurrentCycleCCD = new CycleImagesCCD();
-            InterfaceDataExchange.CurrentCycleCCD.Differences = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-            InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
-
-            //UserInterfaceControls.SetSocketStatuses(WorkModeStandardSettingsSocketsPanelList, new bool[WorkModeStandardSettingsSocketsPanelList.Length], Color.Green, Color.DarkGray);
-            //if (!IsAbleToWork) return false;
-
-            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Processing;
-
-            //InterfaceDataExchange.SocketsToSave = new int[] { 1 };
-            bool rc = true;
-            if (InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart)
-            {
-                InterfaceDataExchange.SendCommand(ModuleCommand.StartSeveralSocketReadExternal);
-                rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
-                {
-                    return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketReadExternal && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error);
-                if (!rc)
-                {
-                    //DoMCNotAbleToReadSocketErrorMessage();
-                    //IsWorkingModeStarted = false;
-                    InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                    InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
-                    return false;
-                }
-            }
-            else
-            {
-                InterfaceDataExchange.SendCommand(ModuleCommand.CCDCardsReset);
-                Thread.Sleep(10);
-                InterfaceDataExchange.SendCommand(ModuleCommand.StartSeveralSocketRead);
-                rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
-                {
-                    return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketRead && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error);
-                if (!rc)
-                {
-                    //DoMCNotAbleToReadSocketErrorMessage();
-                    //IsWorkingModeStarted = false;
-                    InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                    InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
-                    return false;
-                }
-            }
-            InterfaceDataExchange.CurrentCycleCCD.CycleCCDDateTime = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.GetSeveralSocketImages);
-            var ri = UserInterfaceControls.Wait(2 * InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
-              {
-                  var mst = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus;
-                  var stp = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep;
-                  return mst == ModuleCommand.GetSeveralSocketImages && (stp == ModuleCommandStep.Complete || stp == ModuleCommandStep.Error);
-              }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-            if (!ri || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
-            {
-                //DoMCNotAbleToReadSocketErrorMessage();
-                //IsWorkingModeStarted = false;
-                InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
-                return false;
-            }
-            var images = InterfaceDataExchange.CCDDataEchangeStatuses.Images;
-            if (images is null)
-            {
-                //DoMCNotAbleToReadSocketErrorMessage();
-                //IsWorkingModeStarted = false;
-                InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
-                return false;
-            }
-            InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = images;
-
-            InterfaceDataExchange.CCDDataEchangeStatuses.StartProcessImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-
-
-            /*Parallel.For(0, images.Length, new ParallelOptions() { MaxDegreeOfParallelism = InterfaceDataExchange.MaxDegreeOfParallelism }, i =>
-            {
-                try
-                {
-                    var socketnumber = i + 1;
-                    if (Configuration.SocketToCardSocketConfigurations.ContainsKey(socketnumber))
-                    {
-                        var socket = Configuration.SocketToCardSocketConfigurations[socketnumber];
-                        if (socket == null) return;
-                        InterfaceDataExchange.CurrentCycleCCD.StandardImage[i] = Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage;
-                        var diffImg = ImageTools.GetDifference(InterfaceDataExchange.CurrentCycleCCD.WorkModeImages[i], Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage);
-
-                        var deviationImg = ImageTools.DeviationByLine(diffImg, InterfaceDataExchange.Configuration.ImageProcessParameters.DeviationWindow);
-                        var dev = ImageTools.MaxDeviation(deviationImg, out Point pMaxDev, InterfaceDataExchange.Configuration.ImageProcessParameters.GetRectangle());
-                        InterfaceDataExchange.CurrentCycleCCD.Differences[i] = deviationImg;
-                        InterfaceDataExchange.CurrentCycleCCD.MaxDeviationPoint = pMaxDev;
-                        var socketresult = (dev < InterfaceDataExchange.Configuration.ImageProcessParameters.MaxDeviation);
-                        InterfaceDataExchange.CurrentCycleCCD.IsSocketGood[i] = socketresult;
-                        TestCCDSocketStatuses[i] = socketresult ? 1 : 2;
-                        //var dev = ImageTools.CalculateDeviationFull(new short[][,] { InterfaceDataExchange.CurrentCycle.Differences[i] }, socket.StartLine, socket.EndLine);
-
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                }
-            });*/
-
-            InterfaceDataExchange.CCDDataEchangeStatuses.StartDecisionImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
-                {
-                    InterfaceDataExchange.CheckIfSocketGood(i + 1);
-                }
-            }
-            else
-            {
-                InterfaceDataExchange.CheckIfAllSocketsGood();
-            }
-            InterfaceDataExchange.CCDDataEchangeStatuses.StopDecisionImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-
-            for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
-            {
-                TestCCDSocketStatuses[i] = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[i + 1] != null ? (InterfaceDataExchange.CurrentCycleCCD.IsSocketGood[i] ? 1 : 2) : 0;
-            }
-
-            InterfaceDataExchange.CCDDataEchangeStatuses.StopProcessImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-
-
-            //SetTestCCDPanelSocketStatuses();
-            //Application.DoEvents();
-            StopCCDWork();
-            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Complete;
-            return true;
-        }
-        private void TestTabDrawGraphLine(int linen)
-        {
-            short[] ReadLine;
-            short[] StandardLine;
-            short[] DiffLine;
-            if (cbFullMax.Checked)
-            {
-                ReadLine = LineFrom2D(TestReadImage, linen);
-                StandardLine = LineFrom2D(TestStandardImage, linen);
-                DiffLine = LineFrom2D(TestDiffImage, linen);
-                for (int y = 0; y < 512; y++) for (int x = 0; x < 512; x++) if (ReadLine[x] < TestReadImage[y, x]) ReadLine[x] = TestReadImage[y, x]; ;
-                for (int y = 0; y < 512; y++) for (int x = 0; x < 512; x++) if (StandardLine[x] < TestStandardImage[y, x]) StandardLine[x] = TestStandardImage[y, x]; ;
-                for (int y = 0; y < 512; y++) for (int x = 0; x < 512; x++) if (DiffLine[x] < TestDiffImage[y, x]) DiffLine[x] = TestDiffImage[y, x]; ;
-            }
-            else
-            {
-                ReadLine = LineFrom2D(TestReadImage, linen);
-                StandardLine = LineFrom2D(TestStandardImage, linen);
-                DiffLine = LineFrom2D(TestDiffImage, linen);
-            }
-
-            {
-                #region Graph Read
-                if (ReadLine != null)
-                {
-                    chTestReadLine.ChartAreas.Clear();
-                    var ca = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-                    ca.AxisX.Minimum = 0;
-                    ca.AxisX.Interval = 32;
-                    ca.AxisX.Maximum = 512;
-                    chTestReadLine.ChartAreas.Add(ca);
-                    chTestReadLine.Series.Clear();
-
-
-                    var ns = new System.Windows.Forms.DataVisualization.Charting.Series();
-                    ns.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                    ns.Points.Clear();
-                    for (int i = 0; i < 512; i++)
-                        ns.Points.AddXY(i, ReadLine[i]);
-                    chTestReadLine.Series.Add(ns);
-                }
-                #endregion
-                /*
-                #region Standard
-                {
-                    var ns = new System.Windows.Forms.DataVisualization.Charting.Series();
-                    ns.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                    ns.Points.Clear();
-                    for (int i = 0; i < 512; i++)
-                        ns.Points.AddXY(i, StandardLine[i]);
-                    chTestReadLine.Series.Add(ns);
-                }
-                #endregion
-                
-                #region Difference
-                {
-                    var ns = new System.Windows.Forms.DataVisualization.Charting.Series();
-                    ns.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                    ns.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-                    ns.Points.Clear();
-                    for (int i = 0; i < 512; i++)
-                        ns.Points.AddXY(i, DiffLine[i]);
-                    chTestReadLine.Series.Add(ns);
-                }
-                #endregion
-
-                */
-
-                #region Standard
-                if (StandardLine != null)
-                {
-                    chTestStandard.ChartAreas.Clear();
-                    var ca = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-                    ca.AxisX.Minimum = 0;
-                    ca.AxisX.Interval = 32;
-                    ca.AxisX.Maximum = 512;
-                    chTestStandard.ChartAreas.Add(ca);
-                    chTestStandard.Series.Clear();
-
-
-                    var ns = new System.Windows.Forms.DataVisualization.Charting.Series();
-                    ns.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                    ns.Points.Clear();
-                    for (int i = 0; i < 512; i++)
-                        ns.Points.AddXY(i, StandardLine[i]);
-                    chTestStandard.Series.Add(ns);
-                }
-                #endregion
-
-                #region Difference
-                if (DiffLine != null)
-                {
-
-                    chTestDiff.ChartAreas.Clear();
-                    var ca = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-                    ca.AxisX.Minimum = 0;
-                    ca.AxisX.Interval = 32;
-                    ca.AxisX.Maximum = 512;
-                    chTestDiff.ChartAreas.Add(ca);
-                    chTestDiff.Series.Clear();
-
-
-                    var ns = new System.Windows.Forms.DataVisualization.Charting.Series();
-                    ns.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-                    ns.Points.Clear();
-                    for (int i = 0; i < 512; i++)
-                        ns.Points.AddXY(i, DiffLine[i]);
-                    chTestDiff.Series.Add(ns);
-                }
-                #endregion
-            }
-
-        }
-
-        private short[] LineFrom2D(short[,] Image, int frame)
-        {
-            if (Image == null) return null;
-            short[] line = new short[512];
-            if (cbVertical.Checked)
-            {
-                for (int x = 0; x < 512; x++) line[x] = Image[x, frame];
-            }
-            else
-            {
-                for (int x = 0; x < 512; x++) line[x] = Image[frame, x];
-            }
-            return line;
-        }
-        private void TestShowSocketImages_Click(object sender, EventArgs e)
-        {
-            if (TestCCDIsReading) return;
-            CheckForDoMCModule();
-            var ctrl = (Control)sender;
-            var socketnumber = (int)ctrl.Tag;
-            ShowSocket(socketnumber);
-            /*TestSocketNumberSelected = socketnumber;
-            lblTestSelectedSocket.Text = TestSocketNumberSelected.ToString();
-
-            if (InterfaceDataExchange.CurrentCycleCCD == null || InterfaceDataExchange.CurrentCycleCCD.WorkModeImages.Length < TestSocketNumberSelected || InterfaceDataExchange.CurrentCycleCCD.WorkModeImages[TestSocketNumberSelected - 1] == null)
-            {
-                //MessageBox.Show("Изображения для гнезда еще не получены");
-                TestBmpReadImage = null;
-                TestBmpDiffImage = null;
-                TestBmpStandardImage = null;
-                TestRedrawBitmap();
-                TestTabDrawGraphLine(0);
-                return;
-            }
-
-            InterfaceDataExchange.CurrentCycleCCD.Differences[socketnumber - 1] = ImageTools.GetDifference(InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage, InterfaceDataExchange.CurrentCycleCCD.WorkModeImages[socketnumber - 1]);
-
-            TestDiffImage = InterfaceDataExchange.CurrentCycleCCD.Differences[socketnumber - 1];
-            TestReadImage = InterfaceDataExchange.CurrentCycleCCD.WorkModeImages[socketnumber - 1];
-            TestStandardImage = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage;
-
-            TestBmpReadImage = ImageTools.DrawImage(TestReadImage, true);
-            TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, true);
-            TestBmpStandardImage = ImageTools.DrawImage(TestStandardImage, true);
-            //pbTestReadImage.Image = TestBmpReadImage;
-            //pbTestDifference.Image = TestBmpDiffImage;
-            //pbTestStandard.Image = TestBmpStandardImage;
-
-
-            var timedur = InterfaceDataExchange.CCDDataEchangeStatuses.SocketReadImageStop[socketnumber - 1] - InterfaceDataExchange.CCDDataEchangeStatuses.SocketReadImageStart[socketnumber - 1];
-            var stimedur = $"{timedur * 1e-4} ms";
-            lblTimeDuration.Text = stimedur;
-
-            numFrame.Value = 0;
-            TestRedrawBitmap();
-            TestTabDrawGraphLine(0);*/
-        }
-
-        private void ShowSocket(int socketnumber)
-        {
-            TestSocketNumberSelected = socketnumber;
-            lblTestSelectedSocket.Text = TestSocketNumberSelected.ToString();
-
-            if (InterfaceDataExchange.CurrentCycleCCD == null || InterfaceDataExchange.CurrentCycleCCD.WorkModeImages.Length < TestSocketNumberSelected || InterfaceDataExchange.CurrentCycleCCD.WorkModeImages[TestSocketNumberSelected - 1] == null)
-            {
-                //MessageBox.Show("Изображения для гнезда еще не получены");
-                TestBmpReadImage = null;
-                TestBmpDiffImage = null;
-                TestBmpStandardImage = null;
-                TestRedrawBitmap();
-                TestTabDrawGraphLine((int)numFrame.Value);
-                return;
-            }
-            /*var diff = ImageTools.GetDifference(InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage, InterfaceDataExchange.CurrentCycleCCD.WorkModeImages[socketnumber - 1]);*/
-            InterfaceDataExchange.CurrentCycleCCD.StandardImage[socketnumber - 1] = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage;
-            InterfaceDataExchange.CheckIfSocketGood(TestSocketNumberSelected);
-
-            TestDiffImage = InterfaceDataExchange.CurrentCycleCCD.Differences[socketnumber - 1];
-            TestReadImage = InterfaceDataExchange.CurrentCycleCCD.WorkModeImages[socketnumber - 1];
-            TestStandardImage = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage;
-
-            TestBmpReadImage = ImageTools.DrawImage(TestReadImage, invertColors);
-            if (!InterfaceDataExchange.CurrentCycleCCD.IsSocketGood[TestSocketNumberSelected - 1] || showMaxDevPoint)
-                TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors, InterfaceDataExchange.CurrentCycleCCD.MaxDeviationPoint);
-            else
-                TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors);
-            TestBmpStandardImage = ImageTools.DrawImage(TestStandardImage, invertColors);
-            /*pbTestReadImage.Image = TestBmpReadImage;
-            pbTestDifference.Image = TestBmpDiffImage;
-            pbTestStandard.Image = TestBmpStandardImage;*/
-
-
-
-            var sp = InterfaceDataExchange.CCDDataEchangeStatuses.StartProcessImages;
-            var ep = InterfaceDataExchange.CCDDataEchangeStatuses.StopProcessImages;
-
-            lblTimeImageProcess.Text = $"Обработка изображений и принятие решения:{(ep - sp) * 1e-4:F3} мс";
-
-            //numFrame.Value = 0;
-            TestRedrawBitmap();
-            TestTabDrawGraphLine((int)numFrame.Value);
-
-            if (checkpreformalgorithmsForm != null)
-            {
-                checkpreformalgorithmsForm.SetStandardImage(TestStandardImage);
-                checkpreformalgorithmsForm.SetImage(TestReadImage);
-                checkpreformalgorithmsForm.SetImageProcessParameters(InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].ImageProcessParameters);
-                checkpreformalgorithmsForm.RecalcAndRedrawImages();
-
-            }
-        }
-
-        private void TestRedrawBitmap()
-        {
-            pbTestReadImage.Invalidate();
-            pbTestDifference.Invalidate();
-            pbTestStandard.Invalidate();
-        }
-
-        private void numFrame_ValueChanged(object sender, EventArgs e)
-        {
-            TestTabDrawGraphLine((int)numFrame.Value);
-            TestRedrawBitmap();
-        }
-
-
-        private void pbTestReadImage_Paint(object sender, PaintEventArgs e)
-        {
-
-            if (TestBmpReadImage == null) return;
-            e.Graphics.DrawImage(TestBmpReadImage, 0, 0, pbTestReadImage.Width, pbTestReadImage.Height);
-            var lineN = (int)numFrame.Value;
-            if (cbVertical.Checked)
-            {
-                var k = (double)pbTestReadImage.Width / 512;
-                e.Graphics.DrawLine(new Pen(Color.Red), (int)(lineN * k), 0, (int)(lineN * k), 511);
-
-            }
-            else
-            {
-                var k = (double)pbTestReadImage.Height / 512;
-                e.Graphics.DrawLine(new Pen(Color.Red), 0, (int)(lineN * k), 511, (int)(lineN * k));
-            }
-        }
-
-        private void pbTestDifference_Paint(object sender, PaintEventArgs e)
-        {
-
-            if (TestBmpDiffImage == null) return;
-            e.Graphics.DrawImage(TestBmpDiffImage, 0, 0, pbTestDifference.Width, pbTestDifference.Height);
-            var lineN = (int)numFrame.Value;
-            if (cbVertical.Checked)
-            {
-                var k = (double)pbTestDifference.Width / 512;
-                e.Graphics.DrawLine(new Pen(Color.Red), (int)(lineN * k), 0, (int)(lineN * k), 511);
-
-            }
-            else
-            {
-                var k = (double)pbTestDifference.Height / 512;
-                e.Graphics.DrawLine(new Pen(Color.Red), 0, (int)(lineN * k), 511, (int)(lineN * k));
-            }
-        }
-
-        private void pbTestStandard_Paint(object sender, PaintEventArgs e)
-        {
-            if (TestBmpStandardImage == null) return;
-            e.Graphics.DrawImage(TestBmpStandardImage, 0, 0, pbTestStandard.Width, pbTestStandard.Height);
-            var lineN = (int)numFrame.Value;
-            if (cbVertical.Checked)
-            {
-                var k = (double)pbTestStandard.Width / 512;
-                e.Graphics.DrawLine(new Pen(Color.Red), (int)(lineN * k), 0, (int)(lineN * k), 511);
-
-            }
-            else
-            {
-                var k = (double)pbTestStandard.Height / 512;
-                e.Graphics.DrawLine(new Pen(Color.Red), 0, (int)(lineN * k), 511, (int)(lineN * k));
-            }
-        }
-
-        private void pbTestReadImage_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (cbVertical.Checked)
-            {
-                var k = (double)pbTestReadImage.Width / 512;
-                numFrame.Value = (int)(e.X / k);
-            }
-            else
-            {
-                var k = (double)pbTestReadImage.Height / 512;
-                numFrame.Value = (int)(e.Y / k);
-            }
-        }
-
-        private void pbTestDifference_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (cbVertical.Checked)
-            {
-                var k = (double)pbTestDifference.Width / 512;
-                numFrame.Value = (int)(e.X / k);
-            }
-            else
-            {
-                var k = (double)pbTestDifference.Height / 512;
-                numFrame.Value = (int)(e.Y / k);
-            }
-        }
-
-        private void pbTestStandard_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (cbVertical.Checked)
-            {
-                var k = (double)pbTestStandard.Width / 512;
-                numFrame.Value = (int)(e.X / k);
-            }
-            else
-            {
-                var k = (double)pbTestStandard.Height / 512;
-                numFrame.Value = (int)(e.Y / k);
-            }
-        }
-
-        private void cbFullMax_CheckedChanged(object sender, EventArgs e)
-        {
-            if (cbFullMax.Checked)
-            {
-                numFrame.Enabled = false;
-                cbVertical.Enabled = false;
-            }
-            else
-            {
-                numFrame.Enabled = true;
-                cbVertical.Enabled = true;
-
-            }
-            //numFrame.Value = 0;
-            TestRedrawBitmap();
-            TestTabDrawGraphLine((int)numFrame.Value);
-        }
-
-        #endregion TestTab
-
         int TempStandardSocketNumber = -1;
         private void GetStandard_Click(object sender, EventArgs e)
         {
-            CheckForDoMCModule();
+            /*CheckForDoMCModule();
             var ctrl = (Control)sender;
             var socketnumber = (int)ctrl.Tag;
-            TempStandardSocketNumber = socketnumber;
-            lblStandardSocketNumber.Text = TempStandardSocketNumber.ToString();
+            ChosenSocketNumber = socketnumber;
+            lblStandardSocketNumber.Text = ChosenSocketNumber.ToString();
 
-            if (!InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(TempStandardSocketNumber))
+            if (!Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(ChosenSocketNumber))
             {
                 DoMCSocketIsNotConfiguredErrorMessage();
                 return;
             }
-            var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+            var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
 
             var img = socket.StandardImage;
             socket.TempAverageImage = img;
-            /*if (img != null)
-                socket.ImageText = ImageTools.ToBase64(ImageTools.Compress(ImageTools.ImageToArray(img)));*/
+
             var msbmp = ImageTools.DrawImage(img, invertColors);
             pbAverage.Image = msbmp;
-            InterfaceDataExchange.Configuration.Save();
-
+            Context.Configuration.Save();
+            */
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             /*if (InterfaceDataExchange == null) return;
             string text;
-            switch (InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus)
+            switch (Context.CCDDataEchangeStatuses.ModuleStatus)
             {
                 case ModuleCommand.StartIdle: text = "Не занят"; break;
                 case ModuleCommand.SetAllCardsAndSocketsConfiguration: text = "Настройка платы чтения гнезд"; break;
@@ -1323,10 +484,10 @@ namespace DoMC
                 case ModuleCommand.StandardRead: text = "Чтение эталона"; break;
                 case ModuleCommand.StandardWrite: text = "Запись эталона"; break;
                 case ModuleCommand.StopModuleWork: text = "Остановка работы"; break;
-                default: text = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus.ToString(); break;
+                default: text = Context.CCDDataEchangeStatuses.ModuleStatus.ToString(); break;
             }
             var stepText = "";
-            switch (InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep)
+            switch (Context.CCDDataEchangeStatuses.ModuleStep)
             {
                 case ModuleCommandStep.Start:
                     stepText = "Запуск";
@@ -1342,7 +503,7 @@ namespace DoMC
                     break;
             }
             string overallText;
-            switch (InterfaceDataExchange.OperationOverallStatus)
+            switch (Context.OperationOverallStatus)
             {
                 case ModuleCommandStep.Start:
                     overallText = "Запуск";
@@ -1357,33 +518,33 @@ namespace DoMC
                     overallText = "Ошибка";
                     break;
                 default:
-                    overallText = InterfaceDataExchange.OperationOverallStatus.ToString();
+                    overallText = Context.OperationOverallStatus.ToString();
                     break;
             }*/
-            var fulltext = $"{text}: {stepText} ({overallText})";
+            /*var fulltext = $"{text}: {stepText} ({overallText})";
             lblStatus.Text = fulltext;
             tslTestCCDCardReadStatus.Text = "Статус: " + fulltext;
             lblGetStandardWorkStatus.Text = fulltext;
 
-            if ((DateTime.Now - InterfaceDataExchange.LEDStatus.TimeSyncSignalGot).TotalMilliseconds < 700)
+            if ((DateTime.Now - Context.LEDStatus.TimeSyncSignalGot).TotalMilliseconds < 700)
                 cbTestLCBSyncrosignal.CheckState = CheckState.Indeterminate;
             else
                 cbTestLCBSyncrosignal.CheckState = CheckState.Unchecked;
 
             if (TestRDPBConnected)
             {
-                if (InterfaceDataExchange.RDPBCurrentStatus.IsCurrentStatusActual())
+                if (Context.RDPBCurrentStatus.IsCurrentStatusActual())
                 {
-                    txbTestRDPBCoolingBlocksStatus.Text = InterfaceDataExchange.RDPBCurrentStatus.CoolingBlocksQuantity.ToString();
+                    txbTestRDPBCoolingBlocksStatus.Text = Context.RDPBCurrentStatus.CoolingBlocksQuantity.ToString();
                 }
 
-                if (InterfaceDataExchange.RDPBCurrentStatus.IsParametersActual())
+                if (Context.RDPBCurrentStatus.IsParametersActual())
                 {
 
                 }
             }
 
-            if (InterfaceDataExchange.DataStorage != null && InterfaceDataExchange.DataStorage.IsMovingReportWorking())
+            if (Context.DataStorage != null && Context.DataStorage.IsMovingReportWorking())
             {
                 btnMoveToArchive.BackColor = Color.LimeGreen;
             }
@@ -1399,88 +560,96 @@ namespace DoMC
                     btnMoveToArchive.BackColor = SystemColors.Control;
                 }
 
-            }
+            }*/
         }
 
         private void DoMCMainInterface_FormClosed(object sender, FormClosedEventArgs e)
         {
-            InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBNonWorkModeRequest);
-            InterfaceDataExchange.SendCommand(ModuleCommand.LCBStop);
-            InterfaceDataExchange.SendCommand(ModuleCommand.StopModuleWork);
+            /*Context.SendCommand(ModuleCommand.SetLCBNonWorkModeRequest);
+            Context.SendCommand(ModuleCommand.LCBStop);
+            Context.SendCommand(ModuleCommand.StopModuleWork);*/
+            observer.NotificationReceivers -= Observer_NotificationReceivers;
         }
 
         private void pbStandard1_DoubleClick(object sender, EventArgs e)
         {
-            if (TempStandardSocketNumber < 0) return;
-            if (!InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(TempStandardSocketNumber))
-            {
-                DoMCSocketIsNotConfiguredErrorMessage();
-                return;
-            }
-            var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
-            if (socket.TempImages == null) return;
-            var sf = new ShowFrameForm();
-            sf.Image = socket.TempImages[0];
-            sf.Show();
-            //pbMainStandard.Image = pbStandard1.Image;
+            /*if (ChosenSocketNumber < 0) return;
+             if (!Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(ChosenSocketNumber))
+             {
+                 DoMCSocketIsNotConfiguredErrorMessage();
+                 return;
+             }
+             var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
+             if (socket.TempImages == null) return;
+             var sf = new ShowFrameForm();
+             sf.Image = socket.TempImages[0];
+             sf.Show();
+             //pbMainStandard.Image = pbStandard1.Image;
+            */
         }
 
         private void pbStandard2_DoubleClick(object sender, EventArgs e)
         {
-            if (TempStandardSocketNumber < 0) return;
-            if (!InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(TempStandardSocketNumber))
+            /*if (ChosenSocketNumber < 0) return;
+            if (!Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(ChosenSocketNumber))
             {
                 DoMCSocketIsNotConfiguredErrorMessage();
                 return;
             }
-            var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+            var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
             if (socket.TempImages == null) return;
             var sf = new ShowFrameForm();
             sf.Image = socket.TempImages[1];
             sf.Show();
             //pbMainStandard.Image = pbStandard2.Image;
+            */
         }
 
         private void pbStandard3_DoubleClick(object sender, EventArgs e)
         {
-            if (TempStandardSocketNumber < 0) return;
-            if (!InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(TempStandardSocketNumber))
+            /*
+            if (ChosenSocketNumber < 0) return;
+            if (!Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(ChosenSocketNumber))
             {
                 DoMCSocketIsNotConfiguredErrorMessage();
                 return;
             }
-            var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+            var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
             if (socket.TempImages == null) return;
             var sf = new ShowFrameForm();
             sf.Image = socket.TempImages[2];
             sf.Show();
             //pbMainStandard.Image = pbStandard3.Image;
+            */
         }
 
         private void pbAverage_DoubleClick(object sender, EventArgs e)
         {
-            if (TempStandardSocketNumber < 0) return;
-            if (!InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(TempStandardSocketNumber))
+            /*
+            if (ChosenSocketNumber < 0) return;
+            if (!Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(ChosenSocketNumber))
             {
                 DoMCSocketIsNotConfiguredErrorMessage();
                 return;
             }
-            var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+            var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
             if (socket.TempAverageImage == null) return;
             var sf = new ShowFrameForm();
             sf.Image = socket.TempAverageImage;
             sf.Show();
             //pbMainStandard.Image = pbAverage.Image;
+            */
         }
 
         private void btnMakeAverage_Click(object sender, EventArgs e)
         {
-            if (!InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(TempStandardSocketNumber))
+            /*
+            if (!Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(ChosenSocketNumber))
             {
                 DoMCSocketIsNotConfiguredErrorMessage();
                 return;
             }
-            var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+            var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
             var lvl = (double)nudStandardLevel.Value / 100.0d;
             var imagesForStandards = new short[0][,];
             for (int i = 0; i < 3; i++)
@@ -1495,10 +664,11 @@ namespace DoMC
             var AvgIm = ImageTools.CalculateAverage(imagesForStandards);
             socket.TempAverageImage = AvgIm;
             socket.StandardImage = AvgIm;
-            InterfaceDataExchange.Configuration.Save();
+            Context.Configuration.Save();
             var msbmp = ImageTools.DrawImage(AvgIm, invertColors);
             pbAverage.Image = msbmp;
-            FillSettingPage();
+            FillPage();
+            */
         }
         bool StandardIsReading = false;
         private void btnReadImagesForStandard_Click(object sender, EventArgs e)
@@ -1513,29 +683,29 @@ namespace DoMC
 
         private void ImagesForStandard()
         {
-
+            /*
             try
             {
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Start;
-                InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
+                Context.OperationOverallStatus = ModuleCommandStep.Start;
+                Context.CardsConnection.PacketLogActive = Context.Configuration.LogPackets;
 
                 CheckForDoMCModule();
-                if (TempStandardSocketNumber < 0) return;
-                if (!InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(TempStandardSocketNumber))
+                if (ChosenSocketNumber < 0) return;
+                if (!Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(ChosenSocketNumber))
                 {
                     DoMCSocketIsNotConfiguredErrorMessage();
-                    //InterfaceDataExchange.SendCommand(ModuleCommand.StartIdle);
+                    //Context.SendCommand(ModuleCommand.StartIdle);
                     return;
                 }
-                var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+                var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
                 socket.DataType = 0;
                 if (!LoadConfiguration(false))
                 {
-                    InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                    Context.OperationOverallStatus = ModuleCommandStep.Error;
                     return;
                 }
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Processing;
-                InterfaceDataExchange.SendResetToCCDCards();
+                Context.OperationOverallStatus = ModuleCommandStep.Processing;
+                Context.SendResetToCCDCards();
                 Thread.Sleep(200);
                 PictureBox[] StandardPictures = new PictureBox[3] { pbStandard1, pbStandard2, pbStandard3 };
 
@@ -1546,83 +716,83 @@ namespace DoMC
                 Application.DoEvents();
 
 
-                InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart = cbExternalSignalForStandard.Checked;
-                InterfaceDataExchange.CCDDataEchangeStatuses.SocketsToSave = new int[] { TempStandardSocketNumber };
+                Context.CCDDataEchangeStatuses.ExternalStart = cbExternalSignalForStandard.Checked;
+                Context.CCDDataEchangeStatuses.SocketsToSave = new int[] { ChosenSocketNumber };
                 for (int repeat = 0; repeat < 3; repeat++)
                 {
                     DataExchangeKernel.Log.Add(new Guid(), $"Начало чтения гнезда", true);
                     bool rc = true;
-                    if (InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart)
+                    if (Context.CCDDataEchangeStatuses.ExternalStart)
                     {
-                        InterfaceDataExchange.SendCommand(ModuleCommand.StartSeveralSocketReadExternal);
-                        rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                        Context.SendCommand(ModuleCommand.StartSeveralSocketReadExternal);
+                        rc = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                         {
-                            return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketReadExternal && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
+                            return Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketReadExternal && Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
                         }, null);
                         if (!rc)
                         {
-                            InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                            Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                            Context.OperationOverallStatus = ModuleCommandStep.Error;
                             DoMCNotAbleToReadSocketErrorMessage();
-                            //InterfaceDataExchange.SendCommand(ModuleCommand.StartIdle);
+                            //Context.SendCommand(ModuleCommand.StartIdle);
                             return;
                         }
 
                     }
                     else
                     {
-                        InterfaceDataExchange.SendCommand(ModuleCommand.StartSeveralSocketRead);
-                        rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                        Context.SendCommand(ModuleCommand.StartSeveralSocketRead);
+                        rc = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                         {
-                            return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketRead && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                        }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+                            return Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketRead && Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
+                        }, () => Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
                         if (!rc)
                         {
-                            InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                            Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                            Context.OperationOverallStatus = ModuleCommandStep.Error;
                             DoMCNotAbleToReadSocketErrorMessage();
-                            //InterfaceDataExchange.SendCommand(ModuleCommand.StartIdle);
+                            //Context.SendCommand(ModuleCommand.StartIdle);
 
                             return;
                         }
                     }
                     DataExchangeKernel.Log.Add(new Guid(), $"Начало чтения картинки", true);
-                    InterfaceDataExchange.SendCommand(ModuleCommand.GetSeveralSocketImages);
-                    var ri = UserInterfaceControls.Wait(1 * InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                    Context.SendCommand(ModuleCommand.GetSeveralSocketImages);
+                    var ri = UserInterfaceControls.Wait(1 * Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                     {
-                        var mst = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus;
-                        var stp = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep;
+                        var mst = Context.CCDDataEchangeStatuses.ModuleStatus;
+                        var stp = Context.CCDDataEchangeStatuses.ModuleStep;
                         return mst == ModuleCommand.GetSeveralSocketImages && (stp == ModuleCommandStep.Complete || stp == ModuleCommandStep.Error);
-                    }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-                    if (!ri || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
+                    }, () => Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+                    if (!ri || Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
                     {
-                        InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                        InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                        Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                        Context.OperationOverallStatus = ModuleCommandStep.Error;
                         DoMCNotAbleToReadSocketErrorMessage();
-                        //InterfaceDataExchange.SendCommand(ModuleCommand.StartIdle);
+                        //Context.SendCommand(ModuleCommand.StartIdle);
                         return;
                     }
                     DataExchangeKernel.Log.Add(new Guid(), $"Картинка получена", true);
-                    var images = InterfaceDataExchange.CCDDataEchangeStatuses.Images;
+                    var images = Context.CCDDataEchangeStatuses.Images;
                     if (images is null)
                     {
-                        InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                        Context.OperationOverallStatus = ModuleCommandStep.Error;
                         DoMCNotAbleToReadSocketErrorMessage();
                         break;
                     }
-                    socket.TempImages[repeat] = images[TempStandardSocketNumber - 1];
-                    var sbmp = ImageTools.DrawImage(images[TempStandardSocketNumber - 1], invertColors);
+                    socket.TempImages[repeat] = images[ChosenSocketNumber - 1];
+                    var sbmp = ImageTools.DrawImage(images[ChosenSocketNumber - 1], invertColors);
                     StandardPictures[repeat].Image = sbmp;
 
                     //Application.DoEvents();
                 }
-                InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus = ModuleCommand.StartIdle;
+                Context.CCDDataEchangeStatuses.ModuleStatus = ModuleCommand.StartIdle;
 
 
                 var dev = ImageTools.CalculateDeviationFull(socket.TempImages, socket.ImageProcessParameters.GetRectangle());
                 socket.TempDeviations = dev;
                 this.Invoke((MethodInvoker)delegate { ImagesForStandardSetLabelValues(); });
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Complete;
+                Context.OperationOverallStatus = ModuleCommandStep.Complete;
 
             }
             finally
@@ -1630,13 +800,14 @@ namespace DoMC
                 StandardIsReading = false;
                 StopCCDWork();
             }
+            */
         }
-
+        /*
         private void ImagesForStandardSetLabelValues()
         {
             try
             {
-                var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+                var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
                 var dev = socket.TempDeviations;
                 lblDeviation1.Text = dev.SocketAverage[0].ToString("F3");
                 lblDeviation2.Text = dev.SocketAverage[1].ToString("F3");
@@ -1647,27 +818,31 @@ namespace DoMC
             }
             catch { }
         }
-
+        */
         private void nudStandardLevel_ValueChanged(object sender, EventArgs e)
         {
-            if (TempStandardSocketNumber < 0) return;
-            if (!InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(TempStandardSocketNumber))
+            /*
+            if (ChosenSocketNumber < 0) return;
+            if (!Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(ChosenSocketNumber))
             {
                 DoMCSocketIsNotConfiguredErrorMessage();
                 return;
             }
-            var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+            var socket = Context.Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
             var lvl = (double)nudStandardLevel.Value / 100.0d;
             var avg = socket.TempDeviations.TotalAverage;
             var s = socket.TempDeviations.TotalDeviation;
             lblRange.Text = $"{avg - s * lvl:F3} - {avg + s * lvl:F3}";
+            */
         }
 
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
         {
+            /*
             var sf = new ShowFrameForm();
             sf.Image = testImage;
             sf.Show();
+            */
         }
 
         private void btnStandardSettings_Click(object sender, EventArgs e)
@@ -1680,24 +855,25 @@ namespace DoMC
         }
         private void FullStandardGet()
         {
+            /*
             try
             {
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Start;
+                Context.OperationOverallStatus = ModuleCommandStep.Start;
                 WorkingLog.Add(LoggerLevel.Information, "--------------- Получение эталонов по всем гнездам ---------------");
-                InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
+                Context.CardsConnection.PacketLogActive = Context.Configuration.LogPackets;
 
                 CheckForDoMCModule();
-                //var socket = Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
-                foreach (var socket in InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations)
+                //var socket = Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
+                foreach (var socket in Context.Configuration.SocketToCardSocketConfigurations)
                 {
                     socket.Value.DataType = 0;
                     socket.Value.TempImages = new short[3][,];
                 }
                 WorkingLog.Add(LoggerLevel.Information, "Начало загрузки конфигурации");
                 if (!LoadConfiguration(false, true, false)) return;
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Processing;
+                Context.OperationOverallStatus = ModuleCommandStep.Processing;
                 WorkingLog.Add(LoggerLevel.Information, "Сброс гнезд");
-                InterfaceDataExchange.SendResetToCCDCards();
+                Context.SendResetToCCDCards();
                 Thread.Sleep(200);
 
                 PictureBox[] StandardPictures = new PictureBox[3] { pbStandard1, pbStandard2, pbStandard3 };
@@ -1707,25 +883,25 @@ namespace DoMC
                 pbAverage.Image = null;
 
 
-                InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart = cbExternalSignalForStandard.Checked;
-                //InterfaceDataExchange.SocketsToSave = new int[] { TempStandardSocketNumber };
+                Context.CCDDataEchangeStatuses.ExternalStart = cbExternalSignalForStandard.Checked;
+                //Context.SocketsToSave = new int[] { ChosenSocketNumber };
                 for (int repeat = 0; repeat < 3; repeat++)
                 {
                     DataExchangeKernel.Log.Add(new Guid(), $"Начало чтения гнезда", true);
                     WorkingLog.Add(LoggerLevel.Information, "Начало чтения гнезда");
                     bool rc = true;
-                    if (InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart)
+                    if (Context.CCDDataEchangeStatuses.ExternalStart)
                     {
                         WorkingLog.Add(LoggerLevel.Information, "Запуск чтения по внешнему сигналу");
-                        InterfaceDataExchange.SendCommand(ModuleCommand.StartReadExternal);
-                        rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                        Context.SendCommand(ModuleCommand.StartReadExternal);
+                        rc = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                         {
-                            return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartReadExternal && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                        }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+                            return Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartReadExternal && Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
+                        }, () => Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
                         if (!rc)
                         {
-                            InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                            Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                            Context.OperationOverallStatus = ModuleCommandStep.Error;
                             DoMCNotAbleToReadSocketErrorMessage();
                             return;
                         }
@@ -1733,32 +909,32 @@ namespace DoMC
                     else
                     {
                         WorkingLog.Add(LoggerLevel.Information, "Запуск чтения");
-                        InterfaceDataExchange.SendCommand(ModuleCommand.StartRead);
-                        rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                        Context.SendCommand(ModuleCommand.StartRead);
+                        rc = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                         {
-                            return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartRead && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                        }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+                            return Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartRead && Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
+                        }, () => Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
                         if (!rc)
                         {
-                            InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                            Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                            Context.OperationOverallStatus = ModuleCommandStep.Error;
                             DoMCNotAbleToReadSocketErrorMessage();
                             return;
                         }
                     }
                     DataExchangeKernel.Log.Add(new Guid(), $"Начало чтения картинки", true);
                     WorkingLog.Add("Получение изображения");
-                    InterfaceDataExchange.SendCommand(ModuleCommand.GetSocketImages);
-                    var ri = UserInterfaceControls.Wait(2 * InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                    Context.SendCommand(ModuleCommand.GetSocketImages);
+                    var ri = UserInterfaceControls.Wait(2 * Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                     {
-                        var mst = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus;
-                        var stp = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep;
+                        var mst = Context.CCDDataEchangeStatuses.ModuleStatus;
+                        var stp = Context.CCDDataEchangeStatuses.ModuleStep;
                         return mst == ModuleCommand.GetSocketImages && (stp == ModuleCommandStep.Complete || stp == ModuleCommandStep.Error);
-                    }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-                    if (!ri || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
+                    }, () => Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+                    if (!ri || Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
                     {
-                        InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                        InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                        Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                        Context.OperationOverallStatus = ModuleCommandStep.Error;
                         DoMCNotAbleToReadSocketErrorMessage();
                         return;
                     }
@@ -1766,23 +942,23 @@ namespace DoMC
                     WorkingLog.Add("Изображение получено");
 
 
-                    var images = InterfaceDataExchange.CCDDataEchangeStatuses.Images;
+                    var images = Context.CCDDataEchangeStatuses.Images;
                     if (images is null)
                     {
-                        InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                        Context.OperationOverallStatus = ModuleCommandStep.Error;
                         DoMCNotAbleToReadSocketErrorMessage();
                         break;
                     }
                     for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
                     {
-                        var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[i + 1];
+                        var socket = Context.Configuration.SocketToCardSocketConfigurations[i + 1];
                         socket.TempImages[repeat] = images[i];
                     }
                     StandardPictures[repeat].Image = bmpCheckSign;
                 }
                 for (int s = 0; s < Context.Configuration.HardwareSettings.SocketQuantity; s++)
                 {
-                    var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[s + 1];
+                    var socket = Context.Configuration.SocketToCardSocketConfigurations[s + 1];
 
                     var dev = ImageTools.CalculateDeviationFull(socket.TempImages, socket.ImageProcessParameters.GetRectangle());
                     socket.TempDeviations = dev;
@@ -1802,49 +978,49 @@ namespace DoMC
                     socket.TempAverageImage = AvgIm;
                     socket.StandardImage = AvgIm;
                 }
-                InterfaceDataExchange.Configuration.Save();
+                Context.Configuration.Save();
                 WorkingLog.Add("Отключение от плат ПЗС");
                 StopCCDWork();
                 pbAverage.Image = bmpCheckSign;
-                FillSettingPage();
+                FillPage();
                 DisplayMessage.Show("Эталоны по всем гнездам созданы.", "Завершено");
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Complete;
+                Context.OperationOverallStatus = ModuleCommandStep.Complete;
             }
             finally
             {
-                InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
+                Context.SendCommand(ModuleCommand.CCDStop);
                 StandardIsReading = false;
             }
+            */
         }
 
         #region Menu
 
         private void miReadParameters_Click(object sender, EventArgs e)
         {
-            CheckForDoMCModule();
             var ssf = new DoMCLib.Forms.DoMCSocketSettingsListForm();
             ssf.SocketQuantity = Context.Configuration.HardwareSettings.SocketQuantity;
-            ssf.SocketConfigurations = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations;
+            ssf.SocketConfigurations = Context.Configuration.ReadingSocketsSettings.CCDSocketParameters;
             if (ssf.ShowDialog() == DialogResult.OK)
             {
                 Context.Configuration.HardwareSettings.SocketQuantity = ssf.SocketQuantity;
-                InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations = ssf.SocketConfigurations;
-                if (InterfaceDataExchange.Configuration.SocketsToCheck == null || InterfaceDataExchange.Configuration.SocketsToCheck.Length != ssf.SocketQuantity)
+                Context.Configuration.ReadingSocketsSettings.CCDSocketParameters = ssf.SocketConfigurations;
+                if (Context.Configuration.HardwareSettings.SocketsToCheck == null || Context.Configuration.HardwareSettings.SocketsToCheck.Length != ssf.SocketQuantity)
                 {
-                    InterfaceDataExchange.Configuration.SocketsToCheck = new bool[ssf.SocketQuantity];
-                    for (int i = 0; i < ssf.SocketQuantity; i++) InterfaceDataExchange.Configuration.SocketsToCheck[i] = true;
+                    Context.Configuration.HardwareSettings.SocketsToCheck = new bool[ssf.SocketQuantity];
+                    for (int i = 0; i < ssf.SocketQuantity; i++) Context.Configuration.HardwareSettings.SocketsToCheck[i] = true;
                 }
+                Context.Configuration.SaveHardwareSettings();
+                Context.Configuration.SaveReadingSocketsSettings();
             }
-            InterfaceDataExchange.Configuration.Save();
-            SetConfigurationIsNotLoaded();
-
-
-            FillSettingPage();
+            //FillSettingPage();
+            NotifyConfigurationUpdated();
         }
 
         private void miSaveStandard_Click(object sender, EventArgs e)
         {
-            var dir = System.IO.Path.Combine(Application.StartupPath, ApplicationCardParameters.StandardsPath);
+
+            var dir = System.IO.Path.Combine(Application.StartupPath, ".");// ApplicationCardParameters.StandardsPath);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             var sd = new SaveFileDialog();
@@ -1854,12 +1030,14 @@ namespace DoMC
             sd.Filter = "Эталоны (*.std)|*.std|Все файлы (*.*)|*.*";
             if (sd.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.SaveStandard(sd.FileName);
+                Context.Configuration.SaveAll();
             }
+
         }
 
         private void miLoadStandard_Click(object sender, EventArgs e)
         {
+            /*
             var dir = System.IO.Path.Combine(Application.StartupPath, ApplicationCardParameters.StandardsPath);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
@@ -1870,39 +1048,44 @@ namespace DoMC
             od.AddExtension = true;
             if (od.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.LoadStandard(od.FileName);
-                FillSettingPage();
+                Context.Configuration.LoadStandard(od.FileName);
+                FillPage();
             }
-
+            */
         }
 
         private void miWorkModeSettings_Click(object sender, EventArgs e)
         {
+
             var gsf = new DoMCLib.Forms.DoMCGeneralSettingsForm();
-            gsf.Value = InterfaceDataExchange.Configuration.WorkModeSettings;
+            gsf.Value = Context.Configuration.HardwareSettings.StandardRecalculationParameters;
             if (gsf.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.WorkModeSettings = gsf.Value;
-                InterfaceDataExchange.Configuration.Save();
-                FillSettingPage();
+                Context.Configuration.HardwareSettings.StandardRecalculationParameters = gsf.Value;
+                Context.Configuration.SaveHardwareSettings();
+                NotifyConfigurationUpdated();
+                //FillSettingPage();
             }
+
         }
 
         private void miLEDSettings_Click(object sender, EventArgs e)
         {
+
             var ls = new DoMCLib.Forms.LEDSettingsForm();
-            ls.Current = InterfaceDataExchange.Configuration.LCBSettings.LEDCurrent;
-            ls.PreformLength = InterfaceDataExchange.Configuration.LCBSettings.PreformLength;
-            ls.DelayLength = InterfaceDataExchange.Configuration.LCBSettings.DelayLength;
-            ls.LCBKoefficient = InterfaceDataExchange.Configuration.LCBSettings.LCBKoefficient;
+            ls.Current = Context.Configuration.ReadingSocketsSettings.LCBSettings.LEDCurrent;
+            ls.PreformLength = Context.Configuration.ReadingSocketsSettings.LCBSettings.PreformLength;
+            ls.DelayLength = Context.Configuration.ReadingSocketsSettings.LCBSettings.DelayLength;
+            ls.LCBKoefficient = Context.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient;
             if (ls.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.LCBSettings.LEDCurrent = ls.Current;
-                InterfaceDataExchange.Configuration.LCBSettings.PreformLength = ls.PreformLength;
-                InterfaceDataExchange.Configuration.LCBSettings.DelayLength = ls.DelayLength;
-                InterfaceDataExchange.Configuration.LCBSettings.LCBKoefficient = ls.LCBKoefficient;
-                InterfaceDataExchange.Configuration.Save();
-                FillSettingPage();
+                Context.Configuration.ReadingSocketsSettings.LCBSettings.LEDCurrent = ls.Current;
+                Context.Configuration.ReadingSocketsSettings.LCBSettings.PreformLength = ls.PreformLength;
+                Context.Configuration.ReadingSocketsSettings.LCBSettings.DelayLength = ls.DelayLength;
+                Context.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient = ls.LCBKoefficient;
+                Context.Configuration.SaveReadingSocketsSettings();
+                NotifyConfigurationUpdated();
+                //FillSettingPage();
             }
         }
 
@@ -1914,408 +1097,6 @@ namespace DoMC
             SetFormSchema();
 
         }
-        #region TestLCB
-        CheckBox[] TestLCBOutputs;
-        CheckBox[] TestLCBInputs;
-        CheckBox[] TestLCBLEDs;
-        private void btnTestLCBReadStatuses_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-
-            var start = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.GetLCBEquipmentStatusRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => { return InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.GetLCBEquipmentStatusResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start; });
-            if (!res)
-            {
-                MessageBox.Show("Не удалось получить данные");
-                return;
-            }
-            for (int o = 0; o < TestLCBOutputs.Length; o++)
-            {
-                TestLCBOutputs[o].CheckState = InterfaceDataExchange.LEDStatus.Outputs[o] ? CheckState.Indeterminate : CheckState.Unchecked;
-            }
-            for (int i = 0; i < TestLCBInputs.Length; i++)
-            {
-                TestLCBInputs[i].CheckState = InterfaceDataExchange.LEDStatus.Inputs[i] ? CheckState.Indeterminate : CheckState.Unchecked;
-            }
-            if (InterfaceDataExchange.LEDStatus.LEDStatuses == null) InterfaceDataExchange.LEDStatus.LEDStatuses = new bool[12];
-            for (int l = 0; l < TestLCBLEDs.Length; l++)
-            {
-                TestLCBLEDs[l].CheckState = InterfaceDataExchange.LEDStatus.LEDStatuses[l] ? CheckState.Indeterminate : CheckState.Unchecked;
-            }
-        }
-
-        private void btnTestLCBWriteStatuses_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-
-            for (int o = 0; o < TestLCBOutputs.Length; o++)
-            {
-                InterfaceDataExchange.LEDStatus.Outputs[o] = TestLCBOutputs[o].CheckState != CheckState.Unchecked;
-            }
-
-            for (int i = 0; i < TestLCBInputs.Length; i++)
-            {
-                InterfaceDataExchange.LEDStatus.Inputs[i] = false;
-            }
-
-            if (InterfaceDataExchange.LEDStatus.LEDStatuses == null) InterfaceDataExchange.LEDStatus.LEDStatuses = new bool[12];
-            for (int l = 0; l < TestLCBLEDs.Length; l++)
-            {
-                InterfaceDataExchange.LEDStatus.LEDStatuses[l] = TestLCBLEDs[l].CheckState != CheckState.Unchecked;
-            }
-
-            var start = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBEquipmentStatusRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => { return InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBEquipmentStatusResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start; });
-            if (!res || !InterfaceDataExchange.LEDStatus.LastCommandReceivedStatusIsOK)
-            {
-                MessageBox.Show("Не удалось передать данные");
-                return;
-            }
-        }
-
-
-        private void btnTestLCBInit_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted) return;
-            if (TestLCBConnected)
-            {
-                TestLCBStop();
-            }
-            else
-            {
-                TestLCBStart();
-
-            }
-        }
-
-        private void btnTestLCBStop_Click(object sender, EventArgs e)
-        {
-            TestLCBStop();
-        }
-
-        private void TestLCBStart()
-        {
-            btnTestLCBInit.BackColor = Color.Gray;
-            //InterfaceDataExchange.Configuration = InterfaceDataExchange.Configuration;
-            if (!LoadConfiguration(false, false, true))
-            {
-                btnTestLCBInit.BackColor = Color.Red;
-                DoMCNotInitializedErrorMessage();
-                return;
-            }
-            TestLCBConnected = true;
-            InterfaceDataExchange.CardsConnection.PacketLogActive = false;
-            btnTestLCBInit.BackColor = Color.Green;
-        }
-
-        private void TestLCBStop()
-        {
-            InterfaceDataExchange.SendCommand(ModuleCommand.LCBStop);
-            TestLCBTestStarted = false;
-            TestLCBConnected = false;
-            btnTestLCBInit.BackColor = SystemColors.Control;
-        }
-
-
-        private void btnTestLCBClearAll_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-
-            for (int o = 0; o < TestLCBOutputs.Length; o++)
-            {
-                TestLCBOutputs[o].CheckState = CheckState.Unchecked;
-            }
-            for (int i = 0; i < TestLCBInputs.Length; i++)
-            {
-                TestLCBInputs[i].CheckState = CheckState.Unchecked;
-            }
-            if (InterfaceDataExchange.LEDStatus.LEDStatuses == null) InterfaceDataExchange.LEDStatus.LEDStatuses = new bool[12];
-            for (int l = 0; l < TestLCBLEDs.Length; l++)
-            {
-                TestLCBLEDs[l].CheckState = CheckState.Unchecked;
-            }
-        }
-
-        private void btnTestLCBSetAll_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-
-            for (int o = 0; o < TestLCBOutputs.Length; o++)
-            {
-                TestLCBOutputs[o].CheckState = CheckState.Checked;
-            }
-            for (int i = 0; i < TestLCBInputs.Length; i++)
-            {
-                TestLCBInputs[i].CheckState = CheckState.Checked;
-            }
-            if (InterfaceDataExchange.LEDStatus.LEDStatuses == null) InterfaceDataExchange.LEDStatus.LEDStatuses = new bool[12];
-            for (int l = 0; l < TestLCBLEDs.Length; l++)
-            {
-                TestLCBLEDs[l].CheckState = CheckState.Checked;
-            }
-        }
-
-        bool TestLCBTestStarted = false;
-
-        private void btnTestLCBFullTest_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-            TestLCBTestStarted = true;
-            List<CheckBox> checkboxes = new List<CheckBox>();
-            checkboxes.AddRange(TestLCBLEDs);
-            checkboxes.AddRange(TestLCBOutputs);
-            checkboxes.Add(null);
-
-            for (int o1 = 0; o1 < checkboxes.Count; o1++)
-            {
-                for (int i1 = 0; i1 < checkboxes.Count; i1++)
-                {
-                    if (checkboxes[i1] != null)
-                        checkboxes[i1].CheckState = CheckState.Unchecked;
-                }
-                if (checkboxes[o1] != null)
-                    checkboxes[o1].CheckState = CheckState.Checked;
-
-                for (int o = 0; o < TestLCBOutputs.Length; o++)
-                {
-                    InterfaceDataExchange.LEDStatus.Outputs[o] = TestLCBOutputs[o].CheckState != CheckState.Unchecked;
-                }
-
-                for (int i = 0; i < TestLCBInputs.Length; i++)
-                {
-                    InterfaceDataExchange.LEDStatus.Inputs[i] = false;
-                }
-
-                if (InterfaceDataExchange.LEDStatus.LEDStatuses == null) InterfaceDataExchange.LEDStatus.LEDStatuses = new bool[12];
-                for (int l = 0; l < TestLCBLEDs.Length; l++)
-                {
-                    InterfaceDataExchange.LEDStatus.LEDStatuses[l] = TestLCBLEDs[l].CheckState != CheckState.Unchecked;
-                }
-
-                Application.DoEvents();
-                var start = DateTime.Now;
-                InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBEquipmentStatusRequest);
-                var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => { return InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBEquipmentStatusResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start; });
-                if (!res || !InterfaceDataExchange.LEDStatus.LastCommandReceivedStatusIsOK)
-                {
-                    MessageBox.Show("Не удалось передать данные");
-                    return;
-                }
-                Thread.Sleep(500);
-            }
-            TestLCBTestStarted = false;
-
-        }
-
-
-
-        private void btnTestLCBGetCurrent_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-            var start = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.GetLCBCurrentRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => { return InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.GetLEDCurrentResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start; });
-            if (!res)
-            {
-                MessageBox.Show("Не удалось получить данные");
-                return;
-            }
-            txbTestLCBCurrent.Text = (InterfaceDataExchange.LEDStatus.LEDCurrent).ToString();
-        }
-
-        private void btnTestLCBSetCurrent_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-            if (!int.TryParse(txbTestLCBCurrent.Text, out int current))
-            {
-                MessageBox.Show("Значение тока должно быть целым числом");
-                txbTestLCBCurrent.Focus();
-                return;
-            }
-            var start = DateTime.Now;
-            //InterfaceDataExchange.LEDStatus.LEDCurrent = current ;
-            InterfaceDataExchange.Configuration.LCBSettings.LEDCurrent = current;
-            InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBCurrentRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => { return InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLEDCurrentResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start; });
-            if (!res || !InterfaceDataExchange.LEDStatus.LastCommandReceivedStatusIsOK)
-            {
-                MessageBox.Show("Не удалось передать данные");
-                return;
-            }
-        }
-
-        private void btnTestLCBGetMovementParameters_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-            var start = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.GetLCBMovementParametersRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => { return InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.GetLCBMovementParametersResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start; });
-            if (!res)
-            {
-                MessageBox.Show("Не удалось получить данные");
-                return;
-            }
-            SetImpulsesToTextBoxes(txbTestLCBPreformLength, txbTestLCBPreformLengthMm, InterfaceDataExchange.LEDStatus.PreformLength);
-            SetImpulsesToTextBoxes(txbTestLCBDelayLength, txbTestLCBDelayLengthMm, InterfaceDataExchange.LEDStatus.DelayLength);
-
-            /*txbTestLCBPreformLength.Text = InterfaceDataExchange.LEDStatus.PreformLength.ToString();
-            txbTestLCBDelayLength.Text = InterfaceDataExchange.LEDStatus.DelayLength.ToString();*/
-
-        }
-
-        private void btnTestLCBSetMovementParameters_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-            if (!int.TryParse(txbTestLCBPreformLength.Text, out int preformLength))
-            {
-                MessageBox.Show("Значение длины преформы в импульсах должно быть целым числом");
-                txbTestLCBPreformLength.Focus();
-                return;
-            }
-            if (!int.TryParse(txbTestLCBDelayLength.Text, out int delayLength))
-            {
-                MessageBox.Show("Значение расстояния задержки в импульсах должно быть целым числом");
-                txbTestLCBDelayLength.Focus();
-                return;
-            }
-            InterfaceDataExchange.Configuration.LCBSettings.PreformLength = preformLength;
-            InterfaceDataExchange.Configuration.LCBSettings.DelayLength = delayLength;
-            var start = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBMovementParametersRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => { return InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBMovementParametersResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start; });
-            if (!res || !InterfaceDataExchange.LEDStatus.LastCommandReceivedStatusIsOK)
-            {
-                MessageBox.Show("Не удалось передать данные");
-                return;
-            }
-        }
-
-        private void TestLCBSetWorkMode()
-        {
-            var start = DateTime.Now;
-            InterfaceDataExchange.IsWorkingModeStarted = true;
-            InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBWorkModeRequest);
-            InterfaceDataExchange.IsWorkingModeStarted = false;
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBWorkModeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start);
-            if (!res)
-            {
-                MessageBox.Show("Не удалось получить данные");
-                return;
-            }
-            //txbTestLCBMaximumHorizontalStroke.Text = (InterfaceDataExchange.LEDStatus.MaximumHorizontalStroke).ToString();
-        }
-
-        private void TestLCBSetSettingMode()
-        {
-            var start = DateTime.Now;
-            InterfaceDataExchange.IsWorkingModeStarted = false;
-            InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBNonWorkModeRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBWorkModeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start);
-            if (!res)
-            {
-                MessageBox.Show("Не удалось получить данные");
-                return;
-            }
-            //txbTestLCBMaximumHorizontalStroke.Text = (InterfaceDataExchange.LEDStatus.MaximumHorizontalStroke).ToString();
-        }
-        private void chbTestLCBWorkMode_CheckedChanged(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-            if (chbTestLCBWorkMode.Checked)
-            {
-                chbTestLCBWorkMode.BackColor = Color.Green;
-                TestLCBSetWorkMode();
-            }
-            else
-            {
-                chbTestLCBWorkMode.BackColor = Color.Transparent;
-                TestLCBSetSettingMode();
-            }
-        }
-        private void btnTestLCBGetMaxPosition_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-            var start = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.GetLCBMaxPositionRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.GetLCBMaxHorizontalStrokeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start);
-            if (!res)
-            {
-                MessageBox.Show("Не удалось получить данные");
-                return;
-            }
-            txbTestLCBMaximumHorizontalStroke.Text = (InterfaceDataExchange.LEDStatus.MaximumHorizontalStroke).ToString();
-            if ((InterfaceDataExchange?.Configuration?.LCBSettings.LCBKoefficient ?? 0) > 0)
-            {
-                txbTestLCBMaximumHorizontalStrokeMm.Text = (InterfaceDataExchange.LEDStatus.MaximumHorizontalStroke / InterfaceDataExchange.Configuration.LCBSettings.LCBKoefficient).ToString();
-            }
-        }
-
-        System.Windows.Forms.Timer TestLCBGetCurrentPositionTimer;
-        private void btnTestLCBGetCurrentPosition_Click(object sender, EventArgs e)
-        {
-            if (TestLCBTestStarted | !TestLCBConnected) return;
-            if (TestLCBGetCurrentPositionTimer == null)
-            {
-                TestLCBGetCurrentPositionTimer = new System.Windows.Forms.Timer();
-                TestLCBGetCurrentPositionTimer.Interval = 200;
-                TestLCBGetCurrentPositionTimer.Tick += TestLCBGetCurrentPositionTimer_Tick;
-                TestLCBGetCurrentPositionTimer.Start();
-                TestLCBSetGetCurrentButtonActive(true);
-            }
-            else
-            {
-                TestLCBGetCurrentPositionTimer.Stop();
-                TestLCBGetCurrentPositionTimer = null;
-                TestLCBSetGetCurrentButtonActive(false);
-            }
-        }
-
-        private void TestLCBGetCurrentPositionTimer_Tick(object sender, EventArgs e)
-        {
-            if (!TestLCBGetCurrentPosition())
-            {
-                if (TestLCBGetCurrentPositionTimer != null)
-                {
-                    TestLCBGetCurrentPositionTimer.Stop();
-                    TestLCBGetCurrentPositionTimer = null;
-                }
-                TestLCBSetGetCurrentButtonActive(false);
-                MessageBox.Show("Не удалось получить данные");
-            }
-        }
-        private void TestLCBSetGetCurrentButtonActive(bool active)
-        {
-            Color clr;
-            if (active)
-                clr = Color.Green;
-            else
-                clr = SystemColors.Control;
-
-            btnTestLCBGetCurrentPosition.BackColor = clr;
-        }
-
-        private bool TestLCBGetCurrentPosition()
-        {
-            var start = DateTime.Now;
-            InterfaceDataExchange.SendCommand(ModuleCommand.GetLCBCurrentPositionRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.GetLCBCurrentHorizontalStrokeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start);
-            if (!res)
-            {
-                return false;
-            }
-            txbTestLCBCurrentHorizontalStroke.Text = (InterfaceDataExchange.LEDStatus.CurrentHorizontalStroke).ToString();
-            if ((InterfaceDataExchange?.Configuration?.LCBSettings.LCBKoefficient ?? 0) > 0)
-            {
-                txbTestLCBCurrentHorizontalStrokeMm.Text = (InterfaceDataExchange.LEDStatus.CurrentHorizontalStroke / InterfaceDataExchange.Configuration.LCBSettings.LCBKoefficient).ToString();
-            }
-
-            return true;
-        }
-
-
-        #endregion TestLCB
 
         #region Опрос в цикле
         bool IsCycleStarted;
@@ -2327,30 +1108,32 @@ namespace DoMC
 
         private void btnCycleStartStop_Click(object sender, EventArgs e)
         {
-
+            /*
             if (TestCCDIsReading) return;
             TestCCDIsReading = true;
             IsCycleStarted = true;
             AbleForCycle(true);
             AbleForRead(true);
-            InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart = cbTest_ExternalStart.Checked;
-            InterfaceDataExchange.CCDDataEchangeStatuses.FastRead = true;
+            Context.CCDDataEchangeStatuses.ExternalStart = cbTest_ExternalStart.Checked;
+            Context.CCDDataEchangeStatuses.FastRead = true;
             CycleReadingProc();
             IsCycleStarted = false;
             TestCCDIsReading = false;
+            */
         }
 
         private void btnCycleStop_Click(object sender, EventArgs e)
         {
             IsCycleStarted = false;
-            TestCCDIsReading = false;
+            //TestCCDIsReading = false;
         }
 
         private void CycleReadingProc()
         {
+            /*
             try
             {
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Start;
+                Context.OperationOverallStatus = ModuleCommandStep.Start;
 
                 if (TestSocketNumberSelected < 1)
                 {
@@ -2358,7 +1141,7 @@ namespace DoMC
                     TestCCDIsReading = false;
                     return;
                 }
-                InterfaceDataExchange.CCDDataEchangeStatuses.SocketsToSave = new int[1] { TestSocketNumberSelected };
+                Context.CCDDataEchangeStatuses.SocketsToSave = new int[1] { TestSocketNumberSelected };
                 CheckForDoMCModule();
                 if (!LoadConfiguration(false, true, false)) //------ загрузить конфигурацию для одного гнезда
                 {
@@ -2367,97 +1150,97 @@ namespace DoMC
                 }
                 //IsAbleToWork = true;
 
-                InterfaceDataExchange.CurrentCycleCCD = new CycleImagesCCD();
-                InterfaceDataExchange.CurrentCycleCCD.Differences = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-                InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-                InterfaceDataExchange.CurrentCycleCCD.StandardImage = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
-                InterfaceDataExchange.CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
+                Context.CurrentCycleCCD = new CycleImagesCCD();
+                Context.CurrentCycleCCD.Differences = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+                Context.CurrentCycleCCD.WorkModeImages = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+                Context.CurrentCycleCCD.StandardImage = new short[Context.Configuration.HardwareSettings.SocketQuantity][,];
+                Context.CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
 
                 //UserInterfaceControls.SetSocketStatuses(WorkModeStandardSettingsSocketsPanelList, new bool[WorkModeStandardSettingsSocketsPanelList.Length], Color.Green, Color.DarkGray);
                 //if (!IsAbleToWork) return;
 
 
-                InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Processing;
+                Context.OperationOverallStatus = ModuleCommandStep.Processing;
 
                 while (IsCycleStarted)
                 {
                     Application.DoEvents();
                     bool rc = true;
-                    if (InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart)
+                    if (Context.CCDDataEchangeStatuses.ExternalStart)
                     {
-                        InterfaceDataExchange.SendCommand(ModuleCommand.StartSeveralSocketReadExternal);
-                        rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                        Context.SendCommand(ModuleCommand.StartSeveralSocketReadExternal);
+                        rc = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                         {
                             Application.DoEvents();
-                            return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketReadExternal && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                        }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+                            return Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketReadExternal && Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
+                        }, () => Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
                         if (!rc)
                         {
                             //DoMCNotAbleToReadSocketErrorMessage();
                             //IsWorkingModeStarted = false;
-                            InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                            Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                            Context.OperationOverallStatus = ModuleCommandStep.Error;
                             return;
                         }
                     }
                     else
                     {
-                        InterfaceDataExchange.SendCommand(ModuleCommand.CCDCardsReset);
+                        Context.SendCommand(ModuleCommand.CCDCardsReset);
                         Thread.Sleep(10);
-                        InterfaceDataExchange.SendCommand(ModuleCommand.StartSeveralSocketRead);
-                        rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                        Context.SendCommand(ModuleCommand.StartSeveralSocketRead);
+                        rc = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                         {
                             Application.DoEvents();
-                            return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketRead && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
-                        }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+                            return Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartSeveralSocketRead && Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
+                        }, () => Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
                         if (!rc)
                         {
                             //DoMCNotAbleToReadSocketErrorMessage();
                             //IsWorkingModeStarted = false;
-                            InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                            Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                            Context.OperationOverallStatus = ModuleCommandStep.Error;
                             return;
                         }
                     }
-                    InterfaceDataExchange.CurrentCycleCCD.CycleCCDDateTime = DateTime.Now;
-                    InterfaceDataExchange.SendCommand(ModuleCommand.GetSeveralSocketImages);
-                    var ri = UserInterfaceControls.Wait(2 * InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                    Context.CurrentCycleCCD.CycleCCDDateTime = DateTime.Now;
+                    Context.SendCommand(ModuleCommand.GetSeveralSocketImages);
+                    var ri = UserInterfaceControls.Wait(2 * Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                     {
                         Application.DoEvents();
 
-                        var mst = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus;
-                        var stp = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep;
+                        var mst = Context.CCDDataEchangeStatuses.ModuleStatus;
+                        var stp = Context.CCDDataEchangeStatuses.ModuleStep;
                         return mst == ModuleCommand.GetSeveralSocketImages && (stp == ModuleCommandStep.Complete || stp == ModuleCommandStep.Error);
-                    }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
-                    if (!ri || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
+                    }, () => Context.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+                    if (!ri || Context.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
                     {
                         //DoMCNotAbleToReadSocketErrorMessage();
                         //IsWorkingModeStarted = false;
-                        InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                        InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                        Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                        Context.OperationOverallStatus = ModuleCommandStep.Error;
                         return;
                     }
-                    var images = InterfaceDataExchange.CCDDataEchangeStatuses.Images;
+                    var images = Context.CCDDataEchangeStatuses.Images;
                     if (images is null)
                     {
                         //DoMCNotAbleToReadSocketErrorMessage();
                         //IsWorkingModeStarted = false;
-                        InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
-                        InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Error;
+                        Context.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
+                        Context.OperationOverallStatus = ModuleCommandStep.Error;
                         return;
                     }
-                    InterfaceDataExchange.CurrentCycleCCD.WorkModeImages = images;
+                    Context.CurrentCycleCCD.WorkModeImages = images;
 
                     Application.DoEvents();
 
-                    for (int i = 0; i < InterfaceDataExchange.CurrentCycleCCD.WorkModeImages.Length; i++)
+                    for (int i = 0; i < Context.CurrentCycleCCD.WorkModeImages.Length; i++)
                     {
                         var socketnumber = i + 1;
-                        if (InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations.ContainsKey(socketnumber))
+                        if (Context.Configuration.SocketToCardSocketConfigurations.ContainsKey(socketnumber))
                         {
-                            var socket = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber];
-                            InterfaceDataExchange.CurrentCycleCCD.Differences[i] = ImageTools.GetDifference(InterfaceDataExchange.CurrentCycleCCD.WorkModeImages[i], InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage);
-                            //var dev = ImageTools.CalculateDeviationFull(new short[][,] { InterfaceDataExchange.CurrentCycle.Differences[i] }, socket.StartLine, socket.EndLine);
+                            var socket = Context.Configuration.SocketToCardSocketConfigurations[socketnumber];
+                            Context.CurrentCycleCCD.Differences[i] = ImageTools.GetDifference(Context.CurrentCycleCCD.WorkModeImages[i], Context.Configuration.SocketToCardSocketConfigurations[socketnumber].StandardImage);
+                            //var dev = ImageTools.CalculateDeviationFull(new short[][,] { Context.CurrentCycle.Differences[i] }, socket.StartLine, socket.EndLine);
                         }
                     }
                     Application.DoEvents();
@@ -2472,141 +1255,120 @@ namespace DoMC
 
             }
             StopCCDWork();
-            InterfaceDataExchange.OperationOverallStatus = ModuleCommandStep.Complete;
+            Context.OperationOverallStatus = ModuleCommandStep.Complete;
+            */
         }
 
         #endregion
 
-        private void pbTestReadImage_DoubleClick(object sender, EventArgs e)
-        {
-            if (TestReadImage == null) return;
-            var sf = new ShowFrameForm();
-            sf.Image = TestReadImage;
-            sf.Show();
-        }
-
-        private void pbTestDifference_DoubleClick(object sender, EventArgs e)
-        {
-            if (TestDiffImage == null) return;
-            var sf = new ShowFrameForm();
-            sf.Image = TestDiffImage;
-            sf.Show();
-        }
-
-        private void pbTestStandard_DoubleClick(object sender, EventArgs e)
-        {
-            if (TestStandardImage == null) return;
-            var sf = new ShowFrameForm();
-            sf.Image = TestStandardImage;
-            sf.Show();
-        }
-
         private void cbInvertColors_CheckedChanged(object sender, EventArgs e)
         {
             invertColors = cbInvertColors.Checked;
-            ShowSocket(TestSocketNumberSelected);
+            //ShowSocket(TestSocketNumberSelected);
         }
 
         private void miSetCheckSockets_Click(object sender, EventArgs e)
         {
-            if (InterfaceDataExchange != null && InterfaceDataExchange.Configuration != null)
+
+            if (Context.Configuration.HardwareSettings.SocketsToCheck != null)
             {
-                if (InterfaceDataExchange.Configuration.SocketsToCheck == null) InterfaceDataExchange.Configuration.SocketsToCheck = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
-                var scf = new DoMCSocketOnOffForm();
-                scf.SocketIsOn = InterfaceDataExchange.Configuration.SocketsToCheck;
+                //if (Context.Configuration.HardwareSettings.SocketsToCheck == null) Context.Configuration.HardwareSettings.SocketsToCheck = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
+                var scf = new DoMCSocketOnOffForm(Context);
+                scf.SocketIsOn = Context.Configuration.HardwareSettings.SocketsToCheck;
                 scf.Text = "Включение проверки данных по гнездам";
-                scf.ShowDialog();
-                InterfaceDataExchange.Configuration.SocketsToCheck = scf.SocketIsOn;
-                InterfaceDataExchange.Configuration.Save();
+                if (scf.ShowDialog() == DialogResult.OK)
+                {
+                    Context.Configuration.HardwareSettings.SocketsToCheck = scf.SocketIsOn;
+                    Context.Configuration.SaveHardwareSettings();
+                }
             }
+
         }
 
         private void miWorkInterfaceStart_Click(object sender, EventArgs e)
         {
+            /*
             TestLCBStop();
             var wmf = new DoMCWorkModeInterface();
             wmf.SetMemoryReference(globalMemory);
             this.Hide();
             wmf.ShowDialog();
             this.Show();
+            */
         }
 
         private void miDBSettings_Click(object sender, EventArgs e)
         {
-            if (InterfaceDataExchange?.Configuration == null) return;
-
-            var dbsf = new DoMCLib.Forms.DoMCDBSettingsForm();
-            dbsf.LocalDBConnectionString = InterfaceDataExchange.Configuration.LocalDataStorageConnectionString;
-            dbsf.RemoteDBConnectionString = InterfaceDataExchange.Configuration.RemoteDataStorageConnectionString;
-            dbsf.DelayBeforeMoveDataToArchive = InterfaceDataExchange.Configuration.Timeouts.DelayBeforeMoveDataToArchiveTimeInSeconds;
-            if (dbsf.ShowDialog() == DialogResult.OK)
+            if (Context.Configuration != null && Context.Configuration.HardwareSettings != null)
             {
-                InterfaceDataExchange.Configuration.LocalDataStorageConnectionString = dbsf.LocalDBConnectionString;
-                InterfaceDataExchange.Configuration.RemoteDataStorageConnectionString = dbsf.RemoteDBConnectionString;
-                InterfaceDataExchange.Configuration.Timeouts.DelayBeforeMoveDataToArchiveTimeInSeconds = dbsf.DelayBeforeMoveDataToArchive;
-                InterfaceDataExchange.Configuration.Save();
+                var dbsf = new Forms.Settings.DoMCDBSettingsForm();
+                dbsf.LocalDBConnectionString = Context.Configuration.HardwareSettings.LocalDataStoragePath;
+                dbsf.RemoteDBConnectionString = Context.Configuration.HardwareSettings.RemoteDataStoragePath;
+                dbsf.DelayBeforeMoveDataToArchive = Context.Configuration.HardwareSettings.Timeouts.DelayBeforeMoveDataToArchiveTimeInSeconds;
+                if (dbsf.ShowDialog() == DialogResult.OK)
+                {
+                    Context.Configuration.HardwareSettings.LocalDataStoragePath = dbsf.LocalDBConnectionString;
+                    Context.Configuration.HardwareSettings.RemoteDataStoragePath = dbsf.RemoteDBConnectionString;
+                    Context.Configuration.HardwareSettings.Timeouts.DelayBeforeMoveDataToArchiveTimeInSeconds = dbsf.DelayBeforeMoveDataToArchive;
+                    Context.Configuration.SaveHardwareSettings();
+                    NotifyConfigurationUpdated();
+                    //FillSettingPage();
+                }
             }
+
         }
 
-        private void miSaveSockets_Click(object sender, EventArgs e)
-        {
-            if (InterfaceDataExchange != null && InterfaceDataExchange.Configuration != null)
-            {
-                if (InterfaceDataExchange.Configuration.SocketsToSave == null || InterfaceDataExchange.Configuration.SocketsToSave.Length != Context.Configuration.HardwareSettings.SocketQuantity)
-                    InterfaceDataExchange.Configuration.SocketsToSave = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
-                var scf = new DoMCSocketOnOffForm();
-                scf.SocketIsOn = InterfaceDataExchange.Configuration.SocketsToSave;
-                scf.Text = "Включение сохранения данных по гнездам";
-                scf.ShowDialog();
-                InterfaceDataExchange.Configuration.SocketsToSave = scf.SocketIsOn;
-                InterfaceDataExchange.Configuration.Save();
-            }
-        }
 
         private void miRDPSettings_Click(object sender, EventArgs e)
         {
-            if (InterfaceDataExchange != null && InterfaceDataExchange.Configuration != null)
+
+            if (Context != null && Context.Configuration != null)
             {
-                if (InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig == null)
-                    InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig = new RemoveDefectedPreformBlockConfig();
                 var rdpsf = new RDPSettingsForm();
-                rdpsf.IPPort = InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.Port;
-                rdpsf.IPAddress = IPAddress.Parse(InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.IP ?? "0.0.0.0");
-                rdpsf.CoolingBlocks = InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity;
-                rdpsf.MachineNumber = InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.MachineNumber;
-                rdpsf.SendBadCycleToRDPB = InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.SendBadCycleToRDPB;
+                rdpsf.IPPort = Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.Port;
+                rdpsf.IPAddress = IPAddress.Parse(String.IsNullOrWhiteSpace(Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.IP) ? "0.0.0.0" : Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.IP);
+                rdpsf.CoolingBlocks = Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity;
+                rdpsf.MachineNumber = Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.MachineNumber;
+                rdpsf.SendBadCycleToRDPB = Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.SendBadCycleToRDPB;
                 rdpsf.Text = "Параметры бракера";
                 if (rdpsf.ShowDialog() == DialogResult.OK)
                 {
-                    InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.Port = rdpsf.IPPort;
-                    InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.IP = rdpsf.IPAddress.ToString();
-                    InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity = rdpsf.CoolingBlocks;
-                    InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.MachineNumber = rdpsf.MachineNumber;
-                    InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.SendBadCycleToRDPB = rdpsf.SendBadCycleToRDPB;
-                    InterfaceDataExchange.Configuration.Save();
+                    Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.Port = rdpsf.IPPort;
+                    Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.IP = rdpsf.IPAddress.ToString();
+                    Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity = rdpsf.CoolingBlocks;
+                    Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.MachineNumber = rdpsf.MachineNumber;
+                    Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.SendBadCycleToRDPB = rdpsf.SendBadCycleToRDPB;
+                    Context.Configuration.SaveHardwareSettings();
+                    NotifyConfigurationUpdated();
+                    //FillSettingPage();
                 }
             }
+
         }
 
         private void TestRDPBStop()
         {
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBStop);
-            if (!InterfaceDataExchange.RDPBCurrentStatus.IsStarted)
+            /*
+            Context.SendCommand(ModuleCommand.RDPBStop);
+            if (!Context.RDPBCurrentStatus.IsStarted)
             {
                 TestRDPBConnected = false;
                 btnRDPBTestConnect.BackColor = SystemColors.Control;
                 btnRDPBTestConnect.Text = "Подключить";
             }
+            */
         }
         private void TestRDPBStart()
         {
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBStart);
-            if (InterfaceDataExchange.RDPBCurrentStatus.IsStarted)
+            /*
+            Context.SendCommand(ModuleCommand.RDPBStart);
+            if (Context.RDPBCurrentStatus.IsStarted)
             {
                 TestRDPBConnected = true;
                 btnRDPBTestConnect.BackColor = Color.Green;
                 btnRDPBTestConnect.Text = "Отключить";
             }
+            */
         }
 
         private void btnRDPBTestConnect_Click(object sender, EventArgs e)
@@ -2624,10 +1386,11 @@ namespace DoMC
 
         private void btnTestRDPBN80_Click(object sender, EventArgs e)
         {
+            /*
             if (!TestRDPBConnected) return;
             this.Enabled = false;
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBSetIsOK);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForRDPBCardAnswerTimeout, () => InterfaceDataExchange.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetIsOK && InterfaceDataExchange.RDPBCurrentStatus.IsCurrentStatusActual());
+            Context.SendCommand(ModuleCommand.RDPBSetIsOK);
+            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetIsOK && Context.RDPBCurrentStatus.IsCurrentStatusActual());
             if (!res)
             {
                 btnRDPBTestConnect.BackColor = Color.Red;
@@ -2636,14 +1399,16 @@ namespace DoMC
             }
             TestRDPBStatusFill();
             this.Enabled = true;
+            */
         }
 
         private void btnTestRDPBN81_Click(object sender, EventArgs e)
         {
+            /*
             //if (!TestRDPBConnected) return;
             this.Enabled = false;
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBSetIsBad);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForRDPBCardAnswerTimeout, () => InterfaceDataExchange.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetIsBad && InterfaceDataExchange.RDPBCurrentStatus.IsCurrentStatusActual());
+            Context.SendCommand(ModuleCommand.RDPBSetIsBad);
+            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetIsBad && Context.RDPBCurrentStatus.IsCurrentStatusActual());
             if (!res)
             {
                 btnRDPBTestConnect.BackColor = Color.Red;
@@ -2652,13 +1417,15 @@ namespace DoMC
             }
             TestRDPBStatusFill();
             this.Enabled = true;
+            */
         }
 
         private void btnTestRDPBN82_Click(object sender, EventArgs e)
         {
+            /*
             if (!TestRDPBConnected) return;
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBOn);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForRDPBCardAnswerTimeout, () => InterfaceDataExchange.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.On);
+            Context.SendCommand(ModuleCommand.RDPBOn);
+            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.On);
             if (!res)
             {
                 btnRDPBTestConnect.BackColor = Color.Red;
@@ -2667,14 +1434,16 @@ namespace DoMC
             }
             TestRDPBStatusFill();
             this.Enabled = true;
+            */
         }
 
         private void btnTestRDPBN83_Click(object sender, EventArgs e)
         {
+            /*
             if (!TestRDPBConnected) return;
             this.Enabled = false;
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBOff);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForRDPBCardAnswerTimeout, () => InterfaceDataExchange.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.Off);
+            Context.SendCommand(ModuleCommand.RDPBOff);
+            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.Off);
             if (!res)
             {
                 btnRDPBTestConnect.BackColor = Color.Red;
@@ -2683,14 +1452,16 @@ namespace DoMC
             }
             TestRDPBStatusFill();
             this.Enabled = true;
+            */
         }
 
         private void btnTestRDPBN90_Click(object sender, EventArgs e)
         {
+            /*
             if (!TestRDPBConnected) return;
             this.Enabled = false;
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBGetParameters);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForRDPBCardAnswerTimeout, () => InterfaceDataExchange.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.GetParameters && InterfaceDataExchange.RDPBCurrentStatus.IsParametersActual());
+            Context.SendCommand(ModuleCommand.RDPBGetParameters);
+            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.GetParameters && Context.RDPBCurrentStatus.IsParametersActual());
             if (!res)
             {
                 btnRDPBTestConnect.BackColor = Color.Red;
@@ -2699,66 +1470,74 @@ namespace DoMC
             }
             TestRDPBStatusFill();
             this.Enabled = true;
+            */
         }
 
         private void btnTestRDPBSendCommand_Click(object sender, EventArgs e)
         {
+            /*
             if (!TestRDPBConnected) return;
-            InterfaceDataExchange.RDPBCurrentStatus.ManualCommand = txbTestRDPBManualCommand.Text;
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBSendManualCommand);
-            Thread.Sleep(InterfaceDataExchange.Configuration.Timeouts.WaitForRDPBCardAnswerTimeout / 10);
+            Context.RDPBCurrentStatus.ManualCommand = txbTestRDPBManualCommand.Text;
+            Context.SendCommand(ModuleCommand.RDPBSendManualCommand);
+            Thread.Sleep(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds / 10);
             TestRDPBStatusFill();
+            */
         }
 
         private void cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged(object sender, EventArgs e)
         {
+            /*
             if (!TestRDPBConnected) return;
-            InterfaceDataExchange.RDPBCurrentStatus.CoolingBlocksQuantityToSet = int.Parse(cbTestRDPBCoolingBlocksQuantity.SelectedItem?.ToString() ?? "0");
-            InterfaceDataExchange.SendCommand(ModuleCommand.RDPBSetCoolingBlockQuantity);
-            UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForRDPBCardAnswerTimeout, () => InterfaceDataExchange.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetCoolingBlocks && InterfaceDataExchange.RDPBCurrentStatus.IsParametersActual());
+            Context.RDPBCurrentStatus.CoolingBlocksQuantityToSet = int.Parse(cbTestRDPBCoolingBlocksQuantity.SelectedItem?.ToString() ?? "0");
+            Context.SendCommand(ModuleCommand.RDPBSetCoolingBlockQuantity);
+            UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetCoolingBlocks && Context.RDPBCurrentStatus.IsParametersActual());
             TestRDPBStatusFill();
+            */
         }
 
         private void TestRDPBStatusFill()
         {
+            /*
             lvTestRDPBStatuses.Items.Clear();
             lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[]{"Короб",
-                InterfaceDataExchange.RDPBCurrentStatus.BoxDirection == DoMCLib.Classes.BoxDirectionType.Left ? "Левый" :
-                InterfaceDataExchange.RDPBCurrentStatus.BoxDirection == DoMCLib.Classes.BoxDirectionType.Right ? "Правый" :
+                Context.RDPBCurrentStatus.BoxDirection == DoMCLib.Classes.BoxDirectionType.Left ? "Левый" :
+                Context.RDPBCurrentStatus.BoxDirection == DoMCLib.Classes.BoxDirectionType.Right ? "Правый" :
                 "Неизвестно"
             }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Номер короба", InterfaceDataExchange.RDPBCurrentStatus.BoxNumber.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Бракер ", (InterfaceDataExchange.RDPBCurrentStatus.BlockIsOn ? "Включен" : "Выключен") }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Охлаждающих блоков", InterfaceDataExchange.RDPBCurrentStatus.CoolingBlocksQuantity.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Номер цикла", InterfaceDataExchange.RDPBCurrentStatus.CycleNumber.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Забракованных съемов", InterfaceDataExchange.RDPBCurrentStatus.BadSetQuantityInBox.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Хороших съемов", InterfaceDataExchange.RDPBCurrentStatus.GoodSetQuantityInBox.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Съемов в коробе", InterfaceDataExchange.RDPBCurrentStatus.SetQuantityInBox.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Номер короба", Context.RDPBCurrentStatus.BoxNumber.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Бракер ", (Context.RDPBCurrentStatus.BlockIsOn ? "Включен" : "Выключен") }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Охлаждающих блоков", Context.RDPBCurrentStatus.CoolingBlocksQuantity.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Номер цикла", Context.RDPBCurrentStatus.CycleNumber.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Забракованных съемов", Context.RDPBCurrentStatus.BadSetQuantityInBox.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Хороших съемов", Context.RDPBCurrentStatus.GoodSetQuantityInBox.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Съемов в коробе", Context.RDPBCurrentStatus.SetQuantityInBox.ToString() }));
             lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[]{"Направление ленты",
-                InterfaceDataExchange.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Stoped ? "Стоит" :
-                InterfaceDataExchange.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Left ? "Влево" :
-                InterfaceDataExchange.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Right ? "Вправо" :
+                Context.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Stoped ? "Стоит" :
+                Context.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Left ? "Влево" :
+                Context.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Right ? "Вправо" :
                 "Ошибка датчика"
             }));
             lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[]{"Ошибки",
-                InterfaceDataExchange.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.NoErrors ? "Ошибок нет" :
-                InterfaceDataExchange.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.TransporterDriveUnit ? "Авария привода конвейера" :
-                InterfaceDataExchange.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.SensorOfInitialState ? "Авария датчика исходного состояния" :
+                Context.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.NoErrors ? "Ошибок нет" :
+                Context.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.TransporterDriveUnit ? "Авария привода конвейера" :
+                Context.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.SensorOfInitialState ? "Авария датчика исходного состояния" :
                 "Неизвестная ошибка"
             }));
-            txbTestRDPBCoolingBlocksStatus.Text = InterfaceDataExchange.RDPBCurrentStatus.CoolingBlocksQuantity.ToString();
+            txbTestRDPBCoolingBlocksStatus.Text = Context.RDPBCurrentStatus.CoolingBlocksQuantity.ToString();
+            */
         }
 
         private void btnTestDBLocal_Click(object sender, EventArgs e)
         {
-            TestDB(InterfaceDataExchange.Configuration.LocalDataStorageConnectionString);
+            //TestDB(Context.Configuration.LocalDataStorageConnectionString);
         }
         private void btnTestDBRemote_Click(object sender, EventArgs e)
         {
-            TestDB(InterfaceDataExchange.Configuration.RemoteDataStorageConnectionString);
+            //TestDB(Context.Configuration.RemoteDataStorageConnectionString);
         }
         private bool TestDBCheckForConfiguration(string ConnectionString)
         {
+            /*
             if (String.IsNullOrEmpty(ConnectionString))
             {
                 MessageBox.Show("Не настроено подключение к базе данных");
@@ -2775,6 +1554,7 @@ namespace DoMC
                 MessageBox.Show("Не указано имя базы данных");
                 return false;
             }
+            */
             return true;
         }
         private void TestDB(string ConnectionString)
@@ -2815,12 +1595,12 @@ namespace DoMC
 
         private void btnTestDBLocalRecreate_Click(object sender, EventArgs e)
         {
-            RecreateDB(InterfaceDataExchange.Configuration.LocalDataStorageConnectionString);
+            //RecreateDB(Context.Configuration.LocalDataStorageConnectionString);
         }
 
         private void btnTestDBRemoteRecreate_Click(object sender, EventArgs e)
         {
-            RecreateDB(InterfaceDataExchange.Configuration.RemoteDataStorageConnectionString);
+            //RecreateDB(Context.Configuration.RemoteDataStorageConnectionString);
         }
         private void RecreateDB(string ConnectionString)
         {
@@ -2848,12 +1628,12 @@ namespace DoMC
         }
         private void btnRestoreLocalDB_Click(object sender, EventArgs e)
         {
-            RestoreDB(InterfaceDataExchange.Configuration.LocalDataStorageConnectionString);
+            //RestoreDB(Context.Configuration.LocalDataStorageConnectionString);
         }
 
         private void btnRestoreRemoteDB_Click(object sender, EventArgs e)
         {
-            RestoreDB(InterfaceDataExchange.Configuration.RemoteDataStorageConnectionString);
+            //RestoreDB(Context.Configuration.RemoteDataStorageConnectionString);
         }
         private void RestoreDB(string ConnectionString)
         {
@@ -2881,18 +1661,11 @@ namespace DoMC
 
         private void cbTestCCDMaxPointShow_CheckedChanged(object sender, EventArgs e)
         {
-            showMaxDevPoint = cbTestCCDMaxPointShow.Checked;
-            ShowSocket(TestSocketNumberSelected);
+            //showMaxDevPoint = cbTestCCDMaxPointShow.Checked;
+            //ShowSocket(TestSocketNumberSelected);
         }
 
-        private void numFrame_DoubleClick(object sender, EventArgs e)
-        {
-            var value = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog("Введите номер линии", false, (int)numFrame.Value);
-            if (value >= 0 && value < 512)
-            {
-                numFrame.Value = value;
-            }
-        }
+
 
 
         private bool StringToDouble(string str, out double value)
@@ -2916,35 +1689,39 @@ namespace DoMC
 
         private void SetImpulsesToTextBoxes(TextBox impTxb, TextBox mmTxb, double impulses)
         {
-            if (mmTxb != null)
+            
+            /*if (mmTxb != null)
             {
                 if ((InterfaceDataExchange?.Configuration?.LCBSettings.LCBKoefficient ?? 0) > 0)
                 {
-                    mmTxb.Text = (impulses / InterfaceDataExchange.Configuration.LCBSettings.LCBKoefficient).ToString("F4");
+                    mmTxb.Text = (impulses / Context.Configuration.LCBSettings.LCBKoefficient).ToString("F4");
                 }
             }
             if (impTxb != null)
             {
                 impTxb.Text = ((int)impulses).ToString("F0");
             }
-
+            */
         }
         private void SetmmToTextBoxes(TextBox impTxb, TextBox mmTxb, double mm)
         {
+            /*
             if (impTxb != null)
             {
                 if ((InterfaceDataExchange?.Configuration?.LCBSettings.LCBKoefficient ?? 0) > 0)
                 {
-                    impTxb.Text = ((int)(mm * InterfaceDataExchange.Configuration.LCBSettings.LCBKoefficient)).ToString();
+                    impTxb.Text = ((int)(mm * Context.Configuration.LCBSettings.LCBKoefficient)).ToString();
                 }
             }
             if (mmTxb != null)
             {
                 mmTxb.Text = mm.ToString("F4");
             }
+            */
         }
         private void txbTestLCBPreformLength_TextChanged(object sender, EventArgs e)
         {
+
             var ctrl = sender as TextBox;
             if (ctrl == null) return;
             if (ctrl.Focused || LCBSettingsPreformLengthGotFromConfig)
@@ -3000,34 +1777,39 @@ namespace DoMC
 
         private void соответствиеГнездToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
             var psf = new DoMCLib.Forms.PhysicalSocketsForm();
-            if (InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets == null || InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets.GetSocketQuantity() != Context.Configuration.HardwareSettings.SocketQuantity)
+            if (Context.Configuration.HardwareSettings.CardSocket2EquipmentSocket == null || Context.Configuration.HardwareSettings.CardSocket2EquipmentSocket.Length != Context.Configuration.HardwareSettings.SocketQuantity)
             {
-                InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets = new DisplaySockets2PhysicalSockets();
-                InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets.SetDefaultMatrix(Context.Configuration.HardwareSettings.SocketQuantity);
+                Context.Configuration.HardwareSettings.CardSocket2EquipmentSocket = Enumerable.Range(1, 96).ToArray();
             }
-            psf.DisplaySockets2PhysicalSockets = InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets;
+            psf.CardSocket2EquipmentSocket = Context.Configuration.HardwareSettings.CardSocket2EquipmentSocket;
             if (psf.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.DisplaySockets2PhysicalSockets = psf.DisplaySockets2PhysicalSockets;
-                InterfaceDataExchange.Configuration.Save();
-                FillSettingPage();
+                Context.Configuration.HardwareSettings.CardSocket2EquipmentSocket = psf.CardSocket2EquipmentSocket;
+                Context.Configuration.SaveHardwareSettings();
+                NotifyConfigurationUpdated();
+                //FillSettingPage(); 
             }
+
         }
 
         string ConfigFileDialogExtentions = "Config file (*.DoMCConfig)|*.DoMCConfig";
         private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
             var saveDlg = new SaveFileDialog();
             saveDlg.Filter = ConfigFileDialogExtentions;
             if (saveDlg.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.Save(saveDlg.FileName);
+                Context.Configuration.SaveAll(saveDlg.FileName);
             }
+
         }
 
         private void загрузитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
             var openDlg = new OpenFileDialog();
             openDlg.Filter = ConfigFileDialogExtentions;
             if (openDlg.ShowDialog() == DialogResult.OK)
@@ -3035,31 +1817,33 @@ namespace DoMC
                 try
                 {
                     this.Cursor = Cursors.WaitCursor;
-                    InterfaceDataExchange.Configuration.Load(openDlg.FileName);
-                    InterfaceDataExchange.Configuration.Save();
-                    FillSettingPage();
-                    //Refresh();
+                    Context.Configuration.Load(openDlg.FileName);
+                    Context.Configuration.SaveAll();
+                    NotifyConfigurationUpdated();
                 }
                 finally
                 {
                     this.Cursor = Cursors.Default;
                 }
             }
+
         }
 
         private void btnSettingsCheckCardStatus_Click(object sender, EventArgs e)
         {
-            var socketsToCheckOld = InterfaceDataExchange.Configuration.SocketsToCheck;
-            var timeout = InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout;
-            InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout = 3000;
-            InterfaceDataExchange.Configuration.SocketsToCheck = Enumerable.Repeat(true, 96).ToArray();
+            /*
+            var socketsToCheckOld = Context.Configuration.SocketsToCheck;
+            var timeout = Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds;
+            Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds = 3000;
+            Context.Configuration.SocketsToCheck = Enumerable.Repeat(true, 96).ToArray();
             LoadConfiguration(false, true, false, ShowMessages: false);
-            InterfaceDataExchange.Configuration.SocketsToCheck = socketsToCheckOld;
-            InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout = timeout;
-            InterfaceDataExchange.SendCommand(ModuleCommand.CCDGetSocketStatus);
+            Context.Configuration.SocketsToCheck = socketsToCheckOld;
+            Context.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds = timeout;
+            Context.SendCommand(ModuleCommand.CCDGetSocketStatus);
             SettingsPageSocketsStatusShow = SettingsPageSocketsStatus.SocketCardsIsWorking;
             StopCCDWork();
-            FillSettingPage();
+            FillPage();
+            */
         }
         private enum SettingsPageSocketsStatus
         {
@@ -3090,77 +1874,81 @@ namespace DoMC
 
         private void miInterfaceLogs_Click(object sender, EventArgs e)
         {
-            FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.MainSystem, Log.GetCurrentShiftDate()));
+            //FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.MainSystem, Log.GetCurrentShiftDate()));
         }
 
         private void miLCBLogs_Click(object sender, EventArgs e)
         {
-            FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.LCB, Log.GetCurrentShiftDate()));
+            //FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.LCB, Log.GetCurrentShiftDate()));
 
         }
 
         private void miRDPBLogs_Click(object sender, EventArgs e)
         {
-            FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.RDPB, Log.GetCurrentShiftDate()));
+            //FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.RDPB, Log.GetCurrentShiftDate()));
 
         }
 
         private void miDBLogs_Click(object sender, EventArgs e)
         {
-            FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.DB, Log.GetCurrentShiftDate()));
+            //FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.DB, Log.GetCurrentShiftDate()));
 
         }
 
         private void miMainInterfaceLogsArchive_Click(object sender, EventArgs e)
         {
-            FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.MainSystem));
+            // FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.MainSystem));
         }
 
         private void miLCBLogsArchive_Click(object sender, EventArgs e)
         {
-            FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.LCB));
+            //  FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.LCB));
         }
 
         private void miRDPBLogsArchive_Click(object sender, EventArgs e)
         {
-            FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.RDPB));
+            // FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.RDPB));
         }
 
         private void miDBLogsArchive_Click(object sender, EventArgs e)
         {
-            FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.DB));
+            //   FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.DB));
         }
 
-        bool MovingCyclesToArchive = false;
+
         private void btnMoveToArchive_Click(object sender, EventArgs e)
         {
+            /*
             if (MovingCyclesToArchive)
             {
                 MovingCyclesToArchive = false;
-                InterfaceDataExchange.SendCommand(ModuleCommand.ArchiveDBStop);
+                Context.SendCommand(ModuleCommand.ArchiveDBStop);
                 btnMoveToArchive.BackColor = SystemColors.Control;
 
             }
             else
             {
                 MovingCyclesToArchive = true;
-                InterfaceDataExchange.SendCommand(ModuleCommand.ArchiveDBStart);
+                Context.SendCommand(ModuleCommand.ArchiveDBStart);
                 btnMoveToArchive.BackColor = Color.DarkGreen;
             }
+            */
         }
 
         private void дополнительныеПараметрыToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var af = new DoMCLib.Forms.DoMCAdditionalParametersForm();
-            af.AverageToHaveImage = InterfaceDataExchange.Configuration.AverageToHaveImage;
-            af.LogPackets = InterfaceDataExchange.Configuration.LogPackets;
-            af.RegisterEmptyImages = InterfaceDataExchange.Configuration.RegisterEmptyImages;
+            af.AverageToHaveImage = Context.Configuration.HardwareSettings.AverageToHaveImage;
+            af.LogPackets = Context.Configuration.HardwareSettings.LogPackets;
+            af.RegisterEmptyImages = Context.Configuration.HardwareSettings.RegisterEmptyImages;
             if (af.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.AverageToHaveImage = af.AverageToHaveImage;
-                InterfaceDataExchange.Configuration.LogPackets = af.LogPackets;
-                InterfaceDataExchange.Configuration.RegisterEmptyImages = af.RegisterEmptyImages;
+                Context.Configuration.HardwareSettings.AverageToHaveImage = af.AverageToHaveImage;
+                Context.Configuration.HardwareSettings.LogPackets = af.LogPackets;
+                Context.Configuration.HardwareSettings.RegisterEmptyImages = af.RegisterEmptyImages;
+                NotifyConfigurationUpdated();
             }
+
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
@@ -3188,8 +1976,8 @@ namespace DoMC
 
         private void tsmiReadImageStatistics_Click(object sender, EventArgs e)
         {
-            /*var statFrom = new ImageReadBytesStatiscticsForm(InterfaceDataExchange);
-            statFrom.Show();*/
+            //var statFrom = new ImageReadBytesStatiscticsForm(InterfaceDataExchange);
+            //statFrom.Show();
         }
 
         private void btnLCBSaveToConfig_Click(object sender, EventArgs e)
@@ -3212,21 +2000,27 @@ namespace DoMC
                 txbTestLCBCurrent.Focus();
                 return;
             }
-            InterfaceDataExchange.Configuration.LCBSettings.LEDCurrent = current;
-            InterfaceDataExchange.Configuration.LCBSettings.PreformLength = preformLength;
-            InterfaceDataExchange.Configuration.LCBSettings.DelayLength = delayLength;
+            //Context.Configuration.LCBSettings.LEDCurrent = current;
+            //Context.Configuration.LCBSettings.PreformLength = preformLength;
+            //Context.Configuration.LCBSettings.DelayLength = delayLength;
         }
 
         private void btnLCBLoadFromConfig_Click(object sender, EventArgs e)
         {
-
+            /*
             LCBSettingsPreformLengthGotFromConfig = true;
             LCBSettingsDelayLengthGotFromConfig = true;
-            txbTestLCBCurrent.Text = InterfaceDataExchange.Configuration.LCBSettings.LEDCurrent.ToString();
-            txbTestLCBPreformLength.Text = InterfaceDataExchange.Configuration.LCBSettings.PreformLength.ToString();
-            txbTestLCBDelayLength.Text = InterfaceDataExchange.Configuration.LCBSettings.DelayLength.ToString();
-
+            txbTestLCBCurrent.Text = Context.Configuration.LCBSettings.LEDCurrent.ToString();
+            txbTestLCBPreformLength.Text = Context.Configuration.LCBSettings.PreformLength.ToString();
+            txbTestLCBDelayLength.Text = Context.Configuration.LCBSettings.DelayLength.ToString();
+            */
         }
+
+        public DoMCLib.Classes.DoMCApplicationContext GetContext()
+        {
+            return Context;
+        }
+
     }
 
 

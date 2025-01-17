@@ -12,9 +12,5 @@ namespace DoMCLib.Exceptions
         public DoMCException(string message) : base(message) { }
 
     }
-    public class DoMCExceptionSocketConfigurationWasNotSet : DoMCException
-    {
-        public DoMCExceptionSocketConfigurationWasNotSet() : base("Нет параметров чтения гнезд") { }
 
-    }
 }

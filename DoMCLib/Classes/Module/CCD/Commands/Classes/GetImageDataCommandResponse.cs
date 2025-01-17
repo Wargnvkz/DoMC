@@ -17,7 +17,8 @@
 
         public List<int> GetCardsNotStopped()
         {
-            return Enumerable.Range(0, 12).Where(i => requested[i] && !answered[i] && !completedSuccessfully[i] && !error[i]).ToList();
+            //TODO: Понять как реагировать на ошибку при чтении картинки гнезда. Все отменять и выходить или ждать и дочитывать
+            return Enumerable.Range(0, 12).Where(i => requested[i] && !answered[i] && !completedSuccessfully[i] && !error[i] || !FirstRequestSent).ToList();
         }
     }
 }

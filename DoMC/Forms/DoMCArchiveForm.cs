@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
 
-namespace DoMC
+namespace DoMC.Forms
 {
     public partial class DoMCArchiveForm : Form
     {
@@ -46,6 +46,11 @@ namespace DoMC
             SetNumericUpDownArrowsWidth(nudArchiveTo, nudArchiveTo.Width / 2);
             dtpArchiveFrom.CalendarFont = new Font(dtpArchiveFrom.CalendarFont.FontFamily, 8);
             ResetButtons();
+        }
+        public void SetParameters(string localConnectionString, string remoteConnectionString)
+        {
+            LocalPathString = localConnectionString;
+            RemotePathString = remoteConnectionString;
         }
         private void SetNumericUpDownArrowsWidth(NumericUpDown nud, int newWidth)
         {

@@ -1,4 +1,6 @@
 ﻿using DoMCLib.Classes;
+using DoMCLib.Classes.Configuration.CCD;
+using DoMCLib.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

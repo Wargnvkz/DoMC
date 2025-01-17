@@ -20,7 +20,7 @@ namespace DoMCLib.Classes.Configuration.CCD
             }
             set
             {
-                if (string.IsNullOrEmpty(value)) StandardImage = new short[512, 512];
+                if (string.IsNullOrEmpty(value)) StandardImage = null;
                 else
                     StandardImage = Tools.ImageTools.ArrayToImage(Tools.ImageTools.Decompress(Tools.ImageTools.FromBase64(value)));
             }

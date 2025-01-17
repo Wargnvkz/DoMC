@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DoMCModuleControl.Modules;
-using DoMCModuleControlTests.ClassesForTests;
 using DoMCModuleControl.External;
+using DoMCTestingTools.ClassesForTests;
 
 namespace DoMCModuleControl.Commands.Tests
 {
@@ -19,7 +19,8 @@ namespace DoMCModuleControl.Commands.Tests
         {
             new CommandModuleTypeAttribute(typeof(TestModule));
             new CommandModuleTypeAttribute(null);
-            var controller = new MainController(typeof(TestUserInterface), new NoFileSystem());
+            var controller = new MainController(new NoFileSystem());
+            controller.CreateUserInterface(typeof(TestUserInterface));
             var module = new TestModule(controller);
 
             var cmd = new TestCommand(controller, module);

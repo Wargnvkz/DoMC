@@ -22,6 +22,7 @@ namespace DoMCModuleControl.Logging
         private readonly Task _logTask;
         private ILogger? ExternalLogger;
         private IFileSystem FileSystem;
+        private static object lockObject = new object();
 
         public BaseFilesLogger(IFileSystem fileSystem)
         {
@@ -86,7 +87,7 @@ namespace DoMCModuleControl.Logging
                     {
                         MessagesOfModule.TryAdd(Module, new ConcurrentQueue<string>());
                     }
-                    MessagesOfModule[Module].Enqueue(Message);
+                    MessagesOfModule[Module].Enqueue(msg);
                 }
             }
             catch (Exception ex) { AddMessage("Logger", $"Ошибка:{ex.Message} {ex.StackTrace}"); }
@@ -99,7 +100,8 @@ namespace DoMCModuleControl.Logging
             {
                 foreach (var key in MessagesOfModule.Keys)
                 {
-                    WriteBuffer(key);
+                    if (MessagesOfModule[key].Count > 0)
+                        WriteBuffer(key);
                 }
                 Task.Delay(100).Wait();
             }
@@ -110,13 +112,16 @@ namespace DoMCModuleControl.Logging
         {
             try
             {
-                using (var File = FileSystem.GetStreamWriter(GetLogFileName(ModuleName, CurrentDate), true))
+                lock (lockObject)
                 {
-                    while (MessagesOfModule[ModuleName].TryDequeue(out string? text))
+                    using (var File = FileSystem.GetStreamWriter(GetLogFileName(ModuleName, CurrentDate), true))
                     {
-                        File.WriteLine(text ?? "");
+                        while (MessagesOfModule[ModuleName].TryDequeue(out string? text))
+                        {
+                            File.WriteLine(text ?? "");
+                        }
+                        File.Flush();
                     }
-                    File.Flush();
                 }
             }
             catch (Exception ex)
@@ -147,7 +152,8 @@ namespace DoMCModuleControl.Logging
 
         public void Flush(string ModuleName)
         {
-            WriteBuffer(ModuleName);
+            if (MessagesOfModule.ContainsKey(ModuleName) && MessagesOfModule[ModuleName].Count > 0)
+                WriteBuffer(ModuleName);
         }
 
     }

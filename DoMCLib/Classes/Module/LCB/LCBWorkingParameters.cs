@@ -10,6 +10,14 @@ namespace DoMCLib.Classes.Module.LCB
     public class LCBWorkingParameters
     {
         public int WaitForLCBCardAnswerTimeoutInSeconds;
-        public IPAddress LCBInterfaceAddress;
+        //public IPAddress LCBInterfaceAddress;
+
+        public LCBWorkingParameters Clone()
+        {
+            var result = new LCBWorkingParameters();
+            result.WaitForLCBCardAnswerTimeoutInSeconds = WaitForLCBCardAnswerTimeoutInSeconds;
+            //result.LCBInterfaceAddress = new IPAddress(LCBInterfaceAddress.GetAddressBytes(), LCBInterfaceAddress.ScopeId);
+            return result;
+        }
     }
 }

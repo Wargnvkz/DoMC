@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoMCModuleControlTests.External;
-using DoMCModuleControlTests.ClassesForTests;
+using DoMCTestingTools.ClassesForTests;
+
 
 namespace DoMCModuleControl.Logging.Tests
 {

@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoMCModuleControlTests.ClassesForTests;
 using static DoMCModuleControl.Commands.Tests.CommandModuleTypeAttributeTests;
+using DoMCTestingTools.ClassesForTests;
 
 namespace DoMCModuleControl.Commands.Tests
 {
@@ -16,7 +16,8 @@ namespace DoMCModuleControl.Commands.Tests
         [TestMethod()]
         public void CommandInfoTest()
         {
-            var controller = new MainController(typeof(TestUserInterface), new NoFileSystem());
+            var controller = new MainController(new NoFileSystem());
+            controller.CreateUserInterface(typeof(TestUserInterface));
             var module = new TestModule(controller);
 
             var cmd = new TestCommand(controller, module);
@@ -39,7 +40,9 @@ namespace DoMCModuleControl.Commands.Tests
         [TestMethod()]
         public void CloneTest()
         {
-            var controller = new MainController(typeof(TestUserInterface), new NoFileSystem());
+            var controller = new MainController(new NoFileSystem());
+            controller.CreateUserInterface(typeof(TestUserInterface));
+
             var module = new TestModule(controller);
 
             var cmd = new TestCommand(controller, module);

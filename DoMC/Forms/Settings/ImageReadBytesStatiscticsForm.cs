@@ -11,11 +11,9 @@ namespace DoMCLib.Forms
 {
     public partial class ImageReadBytesStatiscticsForm : Form
     {
-        private DoMCLib.Classes.DoMCInterfaceDataExchange InterfaceDataExchange;
-        public ImageReadBytesStatiscticsForm(DoMCLib.Classes.DoMCInterfaceDataExchange interfaceDataExchange)
+        public ImageReadBytesStatiscticsForm()
         {
             InitializeComponent();
-            InterfaceDataExchange = interfaceDataExchange;
             PrepareList();
         }
 
@@ -33,6 +31,7 @@ namespace DoMCLib.Forms
 
         private void FillList()
         {
+            /*
             if ((InterfaceDataExchange?.CardsConnection ?? null) == null)
             {
                 for (int socket = 0; socket < 16; socket++)
@@ -55,6 +54,7 @@ namespace DoMCLib.Forms
                 lvImagesReadStatistics.Items[row].SubItems[column].Text = $"{imageReadData.BytesRead} байт ({imageReadData.TimeReadInMs:F0} мс)";
 
             }
+            */
         }
 
         private void timer1_Tick(object sender, EventArgs e)

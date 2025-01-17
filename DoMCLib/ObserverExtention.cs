@@ -12,7 +12,11 @@ namespace DoMCLib
     {
         public static void Notify(this Observer observer, AbstractModuleBase module, string Operation, string eventType, object? data)
         {
-            observer.Notify($"{module}.{Operation}.{eventType}", data);
+            observer.Notify(GetEventName(module, Operation, eventType), data);
+        }
+        public static string GetEventName(AbstractModuleBase module, string Operation, string eventType)
+        {
+            return $"{module}.{Operation}.{eventType}";
         }
     }
 }

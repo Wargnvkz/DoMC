@@ -848,7 +848,7 @@ namespace DoMCLib.Forms
                 //bool ToZero = false;
                 //if (m[i].Any(e => e > 1e-3)) ToZero = true;
                 M[i] = RoundLine(m[i]);
-                /*for (int j = 0; j < N + 1; j++)
+                /*for (int j = 0; j < ImagesToMakeStandard + 1; j++)
                 {
                     M[i][j] = Math.Round(m[i][j],8);
                 }*/

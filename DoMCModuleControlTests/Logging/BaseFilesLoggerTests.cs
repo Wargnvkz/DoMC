@@ -6,8 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DoMCModuleControl.External.Tests;
-using DoMCModuleControlTests.External;
-using DoMCModuleControlTests.ClassesForTests;
+
+using System.Reflection;
+using DoMCTestingTools.ClassesForTests;
 
 namespace DoMCModuleControl.Logging.Tests
 {
@@ -27,7 +28,7 @@ namespace DoMCModuleControl.Logging.Tests
         {
             var fileSystem = new FileSystemForTests();
             var baseLogger = new BaseFilesLogger(fileSystem);
-            var ModuleName = "TestModule";
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             var MessageText = "Text Message";
 
             baseLogger.AddMessage(ModuleName, MessageText);
@@ -56,7 +57,7 @@ namespace DoMCModuleControl.Logging.Tests
         [TestMethod()]
         public void RegisterExternalLoggerTest()
         {
-            var ModuleName = "Test";
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             var Message = "TestMessage";
             var baseFileLogger = new BaseFilesLogger(new ErrorFileSystem());
             baseFileLogger.RegisterExternalLogger(null);

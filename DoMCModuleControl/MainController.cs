@@ -13,6 +13,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.InteropServices;
 using DoMCModuleControl.External;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DoMCModuleControl
 {
@@ -44,27 +45,24 @@ namespace DoMCModuleControl
         /// <summary>
         /// Основной интерфейс программы
         /// </summary>
-        private readonly IMainUserInterface MainUserInterface;
+        private IMainUserInterface MainUserInterface;
+        private Type MainUserInterfaceType;
 
-        public MainController(Type mainUserInterfaceType, IFileSystem logFileSystem = null)
+        public MainController(IFileSystem? logFileSystem = null)
         {
-            if (mainUserInterfaceType == null) throw new ArgumentNullException(nameof(mainUserInterfaceType));
-            // Создаем экземпляр интерфейса
-            var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(mainUserInterfaceType);
-            MainUserInterface = mainUserInterface ?? throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{mainUserInterfaceType.Name}\".");
-            MainUserInterface.SetMainController(this);
             MainFileLogger = new BaseFilesLogger(logFileSystem == null ? new FileSystem() : logFileSystem);
             MainSystemLogger = new BaseSystemLogger(new ExternalFileSystem());
             SystemLogger = new Logger("DoMC", MainSystemLogger);
             MainFileLogger.RegisterExternalLogger(SystemLogger);
             Observer = new Observer(GetLogger("Events"));
         }
+
         /// <summary>
         /// Создает модуль управления. Перед вызовом нужно вызвать AssemblyLoader.LoadAssembliesFromPath иначе нужные библиотеки с командами, модулями и интрефейсом не будут найдены
         /// </summary>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static MainController Create()
+        public static MainController Create(object? data)
         {
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -91,7 +89,8 @@ namespace DoMCModuleControl
                     throw new InvalidOperationException("Не найден ни один главный интерфейс");
                 }
             }
-            var mainController = new MainController(UIType);
+            var mainController = new MainController(null);
+            mainController.CreateUserInterface(UIType, data);
             return mainController;
         }
 
@@ -107,23 +106,31 @@ namespace DoMCModuleControl
 
 
         /// <summary>
-        /// Создание основного контроллера с созданием модулей из библиотек в папке Modules/*.dll
+        /// Создание основного контроллера с созданием модулей из библиотек в папке Modules/*.dll. Перед вызовом нужно вызвать AssemblyLoader.LoadAssembliesFromPath иначе нужные библиотеки с командами, модулями и интрефейсом не будут найдены
         /// </summary>
         /// <returns>Новый главный контроллер</returns>
-        public static MainController LoadDLLModules()
+        public static MainController LoadDLLModules(object? data = null)
         {
 
             var StartingConfiguration = GetMainApplicationConfiguration();
+            List<string> AssembliesNames = new List<string>();
             string[] moduleAssemblies;
             // Поиск всех сборок с модулями
             try
             {
-                moduleAssemblies = Directory.GetFiles("Modules", "*.dll");
+                AssembliesNames.AddRange(Directory.GetFiles("*.dll"));
             }
             catch
             {
-                moduleAssemblies = new string[0];
             }
+            try
+            {
+                AssembliesNames.AddRange(Directory.GetFiles("Modules", "*.dll"));
+            }
+            catch
+            {
+            }
+            moduleAssemblies = AssembliesNames.ToArray();
             List<Type> UITypes = [];
             List<Type> ModuleTypes = [];
 
@@ -141,7 +148,7 @@ namespace DoMCModuleControl
             }
             Type UIType;
             var interfaceClassName = StartingConfiguration[MainInterfaceFieldString];
-            if (!String.IsNullOrEmpty(interfaceClassName))
+            if (!string.IsNullOrEmpty(interfaceClassName))
             {
                 var uiType = Type.GetType(interfaceClassName);
                 UIType = uiType ?? throw new InvalidOperationException($"Интерфейс \"{interfaceClassName}\", указанный в файле {appsettingsPath}, не найден.");
@@ -171,7 +178,8 @@ namespace DoMCModuleControl
                 throw new InvalidOperationException($"Тип интерфейса \"{interfaceClassName}\" не является наследником IMainUserInterface.");
             }
 
-            var mainController = new MainController(UIType);
+            var mainController = new MainController(null);
+            mainController.CreateUserInterface(UIType, data);
 
             foreach (var moduleType in ModuleTypes)
             {
@@ -193,6 +201,25 @@ namespace DoMCModuleControl
             return mainController;
         }
 
+        public void CreateUserInterface(Type mainUserInterfaceType, object? data = null)
+        {
+            if (mainUserInterfaceType == null) throw new ArgumentNullException(nameof(mainUserInterfaceType));
+            var mainUserInterface = (IMainUserInterface?)Activator.CreateInstance(mainUserInterfaceType);
+            MainUserInterface = mainUserInterface ?? throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{mainUserInterfaceType.Name}\".");
+            MainUserInterface.SetMainController(this, data);
+        }
+        public void CreateUserInterface(object? data = null)
+        {
+            if (MainUserInterfaceType == null) throw new ArgumentNullException(nameof(MainUserInterfaceType));
+            var MainUserInterface = (IMainUserInterface?)Activator.CreateInstance(MainUserInterfaceType);
+            MainUserInterface = MainUserInterface ?? throw new InvalidOperationException($"Не удалось создать экземпляр типа \"{MainUserInterfaceType.Name}\".");
+            MainUserInterface.SetMainController(this, data);
+        }
+
+        public void SetUserInterface(IMainUserInterface userInterface)
+        {
+            MainUserInterface = userInterface;
+        }
 
         public void FindAndRegisterAllModules()
         {
@@ -327,7 +354,7 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public AbstractCommandBase? CreateCommand(string commandName)
+        public AbstractCommandBase? CreateCommandInstance(string commandName)
         {
             if (commandName == null) throw new ArgumentNullException(nameof(commandName));
             if (_commands.TryGetValue(commandName, out var commandInfo))
@@ -356,7 +383,7 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public AbstractCommandBase? CreateCommand(Type commandType)
+        public AbstractCommandBase? CreateCommandInstance(Type commandType)
         {
             if (commandType == null) throw new ArgumentNullException(nameof(commandType));
 
@@ -387,7 +414,7 @@ namespace DoMCModuleControl
         /// <returns>Созданная команда</returns>
         /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
         /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public AbstractCommandBase? CreateCommand(Type commandType, Type moduleType)
+        public AbstractCommandBase? CreateCommandInstance(Type commandType, Type moduleType)
         {
             if (commandType == null) throw new ArgumentNullException(nameof(commandType));
             if (moduleType == null) throw new ArgumentNullException(nameof(moduleType));

@@ -39,6 +39,21 @@ namespace DoMCLib.Configuration
         public short ThresholdAverageToHaveImage = 200;
 
         public bool RegisterEmptyImages = false;
+        public short AverageToHaveImage;
+        public bool LogPackets;
+
+        public bool IsStandardRecalculationSettingsSet()
+        {
+            return StandardRecalculationParameters != null && StandardRecalculationParameters.StandardPercent != 0 && StandardRecalculationParameters.NCycle != 0;
+        }
+        public bool IsRemoveDefectedPreformBlockConfigSet()
+        {
+            return RemoveDefectedPreformBlockConfig != null && RemoveDefectedPreformBlockConfig.IsConfigReady;
+        }
+        public bool IsDBSettingsSet()
+        {
+            return !string.IsNullOrWhiteSpace(LocalDataStoragePath) && !string.IsNullOrWhiteSpace(RemoteDataStoragePath) && Timeouts != null && Timeouts.DelayBeforeMoveDataToArchiveTimeInSeconds > 0;
+        }
 
     }
 

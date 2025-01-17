@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DoMCLib.Classes.Configuration.CCD;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,49 +12,34 @@ namespace DoMCLib.Forms
 {
     public partial class DoMCSocketSettingsForm : Form
     {
-        private DoMCLib.Configuration.CCDSocketConfiguration _Configuration;
-        public DoMCLib.Configuration.CCDSocketConfiguration Configuration
+
+        private SocketParameters _Configuration;
+        public SocketParameters Configuration
         {
             get
             {
-                var cfg = _Configuration;
-                cfg.ImageProcessParameters = _Configuration.ImageProcessParameters.Clone();
-
-                /*cfg.ImageProcessParameters.DeviationWindow = DeviationWindow;
-                cfg.ImageProcessParameters.MaxDeviation = MaxDeviation;
-                cfg.ImageProcessParameters.MaxAverage = MaxAverage;
-                cfg.ImageProcessParameters.TopBorder = TopBorder;
-                cfg.ImageProcessParameters.BottomBorder = BottomBorder;
-                cfg.ImageProcessParameters.LeftBorder = LeftBorder;
-                cfg.ImageProcessParameters.RightBorder = RightBorder;*/
-
-
-                cfg.Exposition = Exposition;
-                cfg.FilterModule = FilterModule;
-                cfg.FrameDuration = FrameDuration;
-                cfg.MeasureDelay = MeasureDelay;
-                cfg.DataType = DataType;
+                var cfg = _Configuration.Clone();
+                cfg.ImageProcess = _Configuration.ImageProcess.Clone();
+                cfg.ReadingParameters.Exposition = Exposition;
+                cfg.ReadingParameters.FilterModule = FilterModule;
+                cfg.ReadingParameters.FrameDuration = FrameDuration;
+                cfg.ReadingParameters.MeasureDelay = MeasureDelay;
+                cfg.ReadingParameters.DataType = DataType;
                 return cfg;
             }
             set
             {
-                var cfg = value;
+                var cfg = value.Clone();
                 _Configuration = cfg;
-                _Configuration.ImageProcessParameters = cfg.ImageProcessParameters.Clone();
-                /*DeviationWindow = cfg.ImageProcessParameters.DeviationWindow;
-                MaxDeviation = cfg.ImageProcessParameters.MaxDeviation;
-                MaxAverage = cfg.ImageProcessParameters.MaxAverage;
-                TopBorder = cfg.ImageProcessParameters.TopBorder;
-                BottomBorder = cfg.ImageProcessParameters.BottomBorder;
-                LeftBorder = cfg.ImageProcessParameters.LeftBorder;
-                RightBorder = cfg.ImageProcessParameters.RightBorder;*/
-                Exposition = cfg.Exposition;
-                FilterModule = cfg.FilterModule;
-                FrameDuration = cfg.FrameDuration;
-                MeasureDelay = cfg.MeasureDelay;
-                DataType = cfg.DataType;
+                _Configuration.ImageProcess = cfg.ImageProcess.Clone();
+                Exposition = cfg.ReadingParameters.Exposition;
+                FilterModule = cfg.ReadingParameters.FilterModule;
+                FrameDuration = cfg.ReadingParameters.FrameDuration;
+                MeasureDelay = cfg.ReadingParameters.MeasureDelay;
+                DataType = cfg.ReadingParameters.DataType;
             }
         }
+
         private int FilterModule
         {
             get
@@ -222,12 +208,14 @@ namespace DoMCLib.Forms
 
         private void btnImageParameters_Click(object sender, EventArgs e)
         {
+
             var form = new DoMCImageProcessSettingsForm();
-            form.ImageProcessParameters = _Configuration.ImageProcessParameters.Clone();
+            form.ImageProcessParameters = _Configuration.ImageProcess.Clone();
             if (form.ShowDialog() == DialogResult.OK)
             {
-                _Configuration.ImageProcessParameters = form.ImageProcessParameters.Clone();
+                _Configuration.ImageProcess = form.ImageProcessParameters.Clone();
             }
+
         }
     }
 }

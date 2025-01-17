@@ -12,10 +12,10 @@ namespace DoMC.Tools
                                                                                             { 72, new Tuple<int, int>(6, 12) },
                                                                                             { 48, new Tuple<int, int>(6, 8) },
                                                                                             { 32, new Tuple<int, int>(4, 8) },
-            {8,new Tuple<int, int>(2,4) },
+            /*{8,new Tuple<int, int>(2,4) },
             {4,new Tuple<int, int>(2,2) },
             {2,new Tuple<int, int>(1,2) },
-            {1,new Tuple<int, int>(1,1) }
+            {1,new Tuple<int, int>(1,1) }*/
         };
 
         public static Size GetPanelSocketSize(Panel pnl, int SocketQuantity)
@@ -51,7 +51,7 @@ namespace DoMC.Tools
                     pnl.Left = x * socketsize.Width;
                     pnl.Height = socketsize.Height - 1;
                     pnl.Width = socketsize.Width - 1;
-                    pnl.Tag = n + 1;
+                    pnl.Tag = n;
                     if (click_event != null)
                         pnl.Click += click_event;
                     var lbl = new Label();
@@ -61,7 +61,7 @@ namespace DoMC.Tools
                     lbl.TextAlign = ContentAlignment.MiddleCenter;
                     lbl.Height = pnl.Height;
                     lbl.Width = pnl.Width;
-                    lbl.Tag = n + 1;
+                    lbl.Tag = n;
                     if (click_event != null)
                         lbl.Click += click_event;
                     pnl.Controls.Add(lbl);
@@ -90,7 +90,6 @@ namespace DoMC.Tools
                 if (Statuses[i] ^ TrueIsOK)
                 {
                     PanelsOfSockets[i].BackColor = ColorNotOK;
-
                 }
                 else
                 {
@@ -100,7 +99,7 @@ namespace DoMC.Tools
         }
         public static void SetSocketStatuses(Panel[] PanelsOfSockets, int[] Statuses, params Color[] Colors)
         {
-            if (Statuses.Length <= 0 || Colors.Length <= 0) return;
+            if ((Statuses?.Length ?? 0) <= 0 || (Colors?.Length ?? 0) <= 0) return;
             for (int i = 0; i < PanelsOfSockets.Length; i++)
             {
                 if (i >= Statuses.Length) return;
@@ -134,9 +133,9 @@ namespace DoMC.Tools
         public static bool[] GetListOfSetSocketConfiguration(DoMCLib.Configuration.ApplicationConfiguration cfg)
         {
             bool[] setConfig = new bool[cfg.HardwareSettings.SocketQuantity];
-            if (cfg.CurrentSettings.CCDSocketParameters != null)
+            if (cfg.ReadingSocketsSettings.CCDSocketParameters != null)
             {
-                Array.Fill(setConfig, true, 0, cfg.CurrentSettings.CCDSocketParameters.Length);
+                Array.Fill(setConfig, true, 0, cfg.ReadingSocketsSettings.CCDSocketParameters.Length);
             }
             return setConfig;
         }
@@ -150,14 +149,14 @@ namespace DoMC.Tools
         {
             int[] setConfig = new int[cfg.HardwareSettings.SocketQuantity];
 
-            if (cfg.ProcessingData.CCDSocketStandardsImage != null && cfg.CurrentSettings.CCDSocketParameters != null)
+            if (cfg.ProcessingDataSettings.CCDSocketStandardsImage != null && cfg.ReadingSocketsSettings.CCDSocketParameters != null)
             {
                 for (int i = 0; i < cfg.HardwareSettings.SocketQuantity; i++)
                 {
                     setConfig[i] = 0;
-                    if (cfg.ProcessingData.CCDSocketStandardsImage.Length > i && cfg.CurrentSettings.CCDSocketParameters.Length > i)
+                    if (cfg.ProcessingDataSettings.CCDSocketStandardsImage.Length > i && cfg.ReadingSocketsSettings.CCDSocketParameters.Length > i)
                     {
-                        if (cfg.ProcessingData.CCDSocketStandardsImage[i] != null && cfg.CurrentSettings.CCDSocketParameters[i] != null)
+                        if (cfg.ProcessingDataSettings.CCDSocketStandardsImage[i] != null && cfg.ReadingSocketsSettings.CCDSocketParameters[i] != null)
                             setConfig[i] = 1;
                     }
                 }
@@ -169,9 +168,8 @@ namespace DoMC.Tools
 
         public static bool[] GetListOfSetStandardSocketConfiguration(int SocketQuantity, DoMCLib.Classes.Configuration.CCD.SocketParameters[] SocketConfigurations)
         {
-            bool[] setConfig = new bool[SocketQuantity];
-            SocketConfigurations?.Keys.Select(k => k).ToList().ForEach(s => setConfig[s - 1] = SocketConfigurations[s].StandardImage != null);
-            return setConfig;
+            if (SocketConfigurations == null) return new bool[0];
+            return SocketConfigurations.Select(k => k.ReadingParameters != null).ToArray();
         }
 
         public static bool Wait(int msTimeout, Func<bool> ConditionFunc)

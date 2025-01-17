@@ -8,7 +8,7 @@ namespace DoMCModuleControl.UI
 {
     public interface IMainUserInterface
     {
-        public void SetMainController(IMainController mainController);
+        public void SetMainController(IMainController mainController, object? Data);
         public void Show();
         public void Hide();
         public void Close();

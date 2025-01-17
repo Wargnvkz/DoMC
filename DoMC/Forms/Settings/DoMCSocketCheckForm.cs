@@ -1,4 +1,5 @@
-﻿using DoMCLib.Tools;
+﻿using DoMC.Tools;
+using DoMCLib.Tools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace DoMCLib.Forms
+namespace DoMC.Forms
 {
     public partial class DoMCSocketOnOffForm : Form
     {
@@ -16,9 +17,32 @@ namespace DoMCLib.Forms
         public bool[] SocketIsOn;
 
         private Panel[] SocketPanels;
-        public DoMCSocketOnOffForm()
+        int[][] cards = new int[12][];
+        CardNameDataGridViewClass[] CardsNames = new CardNameDataGridViewClass[12];
+        public DoMCSocketOnOffForm(DoMCLib.Classes.DoMCApplicationContext context)
         {
             InitializeComponent();
+            SocketQuantity = context.Configuration.HardwareSettings.SocketQuantity;
+            for (int i = 0; i < cards.Length; i++)
+            {
+                cards[i] = new int[8];
+            }
+            for (int i = 0; i < SocketQuantity; i++)
+            {
+                var cs = new TCPCardSocket(context.EquipmentSocket2CardSocket[i]);
+                cards[cs.CCDCardNumber][cs.InnerSocketNumber] = i;
+            }
+            for (int i = 0; i < cards.Length; i++)
+            {
+                CardsNames[i] = new CardNameDataGridViewClass() { CardName = $"Плата {i + 1}" };
+            }
+            dgvCardNumbers.DataSource = CardsNames;
+            foreach (DataGridViewColumn col in dgvCardNumbers.Columns)
+            {
+                col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                col.HeaderCell.Style.Padding = new Padding(0);
+            }
+            SocketPanels = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets, SocketChange_Click);
         }
 
         public new DialogResult ShowDialog()
@@ -33,7 +57,7 @@ namespace DoMCLib.Forms
                 SocketQuantity = SocketIsOn.Length;
             }
             lblSocketQuantity.Text = SocketQuantity.ToString();
-            SocketPanels = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets, SocketChange_Click);
+            //SocketPanels = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets, SocketChange_Click);
             ShowStatuses();
             return base.ShowDialog();
         }
@@ -44,63 +68,23 @@ namespace DoMCLib.Forms
 
         }
 
-        private void SocketChange_Click(object sender, EventArgs e)
+        private void SocketChange_Click(object? sender, EventArgs e)
         {
             var ctrl = sender as Control;
             if (ctrl != null)
             {
                 var n = (int)ctrl.Tag;
-                SocketIsOn[n - 1] = !SocketIsOn[n - 1];
+                SocketIsOn[n] = !SocketIsOn[n];
                 ShowStatuses();
             }
         }
-
-        /*private void ddlSocketQuantity_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UserInterfaceControls.RemoveSocketStatusPanels(SocketPanels, pnlSockets);
-            SocketPanels = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets);
-            var toremove = SocketConfigurations?.Keys.Select(s => s).Where(sn => sn >= SocketPanels.Length).ToList();
-            if (toremove != null)
-                foreach (var rk in toremove)
-                {
-                    SocketConfigurations.Remove(rk);
-                }
-
-            for (int i = 0; i < SocketPanels.Length; i++)
-            {
-                SocketPanels[i].Click += DoMCSocketSettingsPanel_Click;
-                SocketPanels[i].Tag = i + 1;
-                for (int j = 0; j < SocketPanels[i].Controls.Count; j++)
-                {
-                    SocketPanels[i].Controls[j].Click += DoMCSocketSettingsPanel_Click;
-                    SocketPanels[i].Controls[j].Tag = i + 1;
-                }
-            }
-            UserInterfaceControls.SetSocketStatuses(SocketPanels, UserInterfaceControls.GetListOfSetSocketConfiguration(SocketQuantity, SocketConfigurations), Color.Green, Color.DarkGray);
-        }
-        */
-        /*private void DoMCSocketSettingsPanel_Click(object sender, EventArgs e)
-        {
-            var SocketN = (int)((Control)sender).Tag;
-            var ss = new DoMCSocketSettingsForm();
-            if (SocketConfigurations == null) SocketConfigurations = new Dictionary<int, DoMC.Configuration.CCDSocketConfiguration>();
-            if (SocketConfigurations.ContainsKey(SocketN))
-            {
-                var cfg = SocketConfigurations[SocketN];
-                ss.Configuration = cfg;
-            }
-            if (ss.ShowDialog() == DialogResult.OK)
-            {
-                var cfg = ss.Configuration;
-                SocketConfigurations[SocketN] = cfg;
-                UserInterfaceControls.SetSocketStatuses(SocketPanels, UserInterfaceControls.GetListOfSetSocketConfiguration(SocketQuantity, SocketConfigurations), Color.Green, Color.DarkGray);
-            }
-        }*/
+        
 
         private void bntReset_Click(object sender, EventArgs e)
         {
             if (SocketIsOn == null) return;
-            for (int i = 0; i < SocketIsOn.Length; i++) {
+            for (int i = 0; i < SocketIsOn.Length; i++)
+            {
                 SocketIsOn[i] = false;
             }
             ShowStatuses();
@@ -115,6 +99,40 @@ namespace DoMCLib.Forms
             }
             ShowStatuses();
 
+        }
+
+        public class CardNameDataGridViewClass
+        {
+            public string? CardName { get; set; }
+            public string On { get; set; } = "+";
+            public string Off { get; set; } = "-";
+        }
+
+        private void dgvCardNumbers_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var senderGrid = (DataGridView)sender;
+
+            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn &&
+                e.RowIndex >= 0)
+            {
+                if (e.ColumnIndex == 1)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        SocketIsOn[cards[e.RowIndex][i]] = true;
+                    }
+                    ShowStatuses();
+                }
+                if (e.ColumnIndex == 2)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        SocketIsOn[cards[e.RowIndex][i]] = false;
+                    }
+                    ShowStatuses();
+                }
+
+            }
         }
     }
 }

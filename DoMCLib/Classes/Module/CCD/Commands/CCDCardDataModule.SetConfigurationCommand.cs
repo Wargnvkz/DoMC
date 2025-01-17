@@ -10,22 +10,22 @@ namespace DoMCLib.Classes.Module.CCD
 
     public partial class CCDCardDataModule
     {
-        public class SetConfigurationCommand : WaitCommandBase
+        public class SetConfigurationCommand : WaitingCommandBase
         {
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
-            public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), null) { }
+            public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCApplicationContext), null) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
-                var context = (ApplicationContext)InputData;
+                var context = (DoMCApplicationContext)InputData;
                 if (context != null)
                 {
                     var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
                     var cardParameters = context.GetCardParametersByCardList(workingCards);
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
-                        result.SetCardRequested(i);
-                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketReadingParameters(false, false, false, true);
+                        result.SetCardRequested(cardParameters[i].Item1);
+                        module.tcpClients[cardParameters[i].Item1].SendCommandSetSocketReadingParameters(CancelationTokenSourceToCancelCommandExecution.Token, false, false, false, true);
                     }
                 }
                 else
@@ -40,13 +40,13 @@ namespace DoMCLib.Classes.Module.CCD
                 {
                     var CardAnswerResults = (CCDCardAnswerResults)data;
                     if (CardAnswerResults == null) return;
-                    result.SetCardAnswered(CardAnswerResults.CardNumber);
+                    result.SetCardAnswered(CardAnswerResults.CardNumber-1);
                 }
             }
 
             protected override bool MakeDecisionIsCommandCompleteFunc()
             {
-                return result.CardsNotAnswered().Count() > 0;
+                return result.CardsNotAnswered().Count() == 0;
             }
 
             protected override void PrepareOutputData()
@@ -55,7 +55,6 @@ namespace DoMCLib.Classes.Module.CCD
 
             }
         }
-
 
     }
 

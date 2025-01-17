@@ -6,9 +6,9 @@ namespace DoMCLib.Classes.Module.LCB
 {
     public partial class LCBModule
     {
-        public class StartCommand : AbstractCommandBase
+        public class LCBStartCommand : SimpleWaitingCommandBase
         {
-            public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
+            public LCBStartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null, LCBModule.Operations.Started.ToString(), LCBModule.EventType.Success.ToString()) { }
             protected override void Executing() => ((LCBModule)Module).Start();
         }
     }

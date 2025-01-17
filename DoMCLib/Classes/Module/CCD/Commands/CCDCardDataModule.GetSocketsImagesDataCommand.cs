@@ -2,6 +2,7 @@
 using DoMCModuleControl;
 using DoMCLib.Tools;
 using DoMCLib.Classes.Module.CCD.Commands.Classes;
+using DoMCLib.Classes.Configuration.CCD;
 
 /// <summary>
 /// Управление получением данных из платы и передача данных в плату
@@ -15,44 +16,25 @@ namespace DoMCLib.Classes.Module.CCD
         /// послыка команды плате на передачу данных об изображении и подключение к плате для получения данных изображения гнезд
         /// OutputData - GetImageDataCommandResponse - массив гнезд соответствующих гнездам на машине (не платам)
         /// </summary>
-        public class GetSocketsImagesDataCommand : WaitCommandBase
+        public class GetSocketsImagesDataCommand : WaitingCommandBase
         {
             GetImageDataCommandResponse result = new GetImageDataCommandResponse();
             CancellationTokenSource[] cancellationTokenSources = new CancellationTokenSource[12];
-            public GetSocketsImagesDataCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ApplicationContext), typeof(GetImageDataCommandResponse)) { }
+            public GetSocketsImagesDataCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCApplicationContext), typeof(GetImageDataCommandResponse)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
-                var context = (ApplicationContext)InputData;
+                var context = (DoMCApplicationContext)InputData;
                 if (context != null)
                 {
                     var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
                     var cardParameters = context.GetCardParametersByCardList(workingCards);
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
-                        result.SetCardRequested(i);
-                        cancellationTokenSources[i] = new CancellationTokenSource();
-                        module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages(CancellationTokenSourceBase.Token);
-                        var task = new Task((i) =>
-                        {
-                            var cardnumber = (int)i;
-                            for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
-                            {
-                                var ReadResult = module.tcpClients[cardParameters[cardnumber].Item1].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeout, cancellationTokenSources[cardnumber], out SocketReadData data);
-                                if (ReadResult)
-                                {
-                                    TCPCardSocket cardSocket = new TCPCardSocket() { CCDCardNumber = cardnumber, InnerSocketNumber = socket };
-                                    var equipmentSocket = context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
-                                    result.SetSocketReadData(equipmentSocket - 1, data);
-                                }
-                                else
-                                {
-                                    result.SetCardError(cardnumber);
-                                }
-                            }
-                            result.SetCardCompleteSuccessfully(cardnumber);
-                        }, i, cancellationTokenSources[i].Token);
-                        task.Start();
+                        result.SetCardRequested(cardParameters[i].Item1);
+                        cancellationTokenSources[cardParameters[i].Item1] = new CancellationTokenSource();
+                        module.tcpClients[cardParameters[i].Item1].SendCommandGetAllSocketImages(CancelationTokenSourceToCancelCommandExecution.Token);
+                        StartReadAllSockets(cardParameters[i].Item1, context, module);
                     }
                 }
                 else
@@ -61,14 +43,38 @@ namespace DoMCLib.Classes.Module.CCD
                 }
 
             }
+            private void StartReadAllSockets(int cardnumber, DoMCApplicationContext context, CCDCardDataModule module)
+            {
+                var task = new Task(() =>
+                {
+                    for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
+                    {
+                        var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
+                        if (ReadResult)
+                        {
+                            TCPCardSocket cardSocket = new TCPCardSocket(cardnumber, socket);
+                            var equipmentSocket = context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
+                            result.SetSocketReadData(equipmentSocket - 1, data);
+                        }
+                        else
+                        {
+                            result.SetCardError(cardnumber);
+                        }
+                    }
+                    result.SetCardCompleteSuccessfully(cardnumber);
+                }, cancellationTokenSources[cardnumber].Token);
+                task.Start();
+            }
+
+
             protected override void NotificationReceived(string NotificationName, object? data)
             {
                 if (NotificationName.Contains("ResponseGetSocketsImages"))
                 {
                     var CardAnswerResults = (CCDCardAnswerResults)data;
                     if (CardAnswerResults == null) return;
-                    result.SetCardAnswered(CardAnswerResults.CardNumber);
-                    result.SetCardError(CardAnswerResults.CardNumber);
+                    result.SetCardAnswered(CardAnswerResults.CardNumber - 1);
+                    result.SetCardError(CardAnswerResults.CardNumber - 1);
                     cancellationTokenSources[CardAnswerResults.CardNumber].Cancel();
                 }
             }
@@ -82,6 +88,15 @@ namespace DoMCLib.Classes.Module.CCD
             {
                 OutputData = result;
 
+            }
+
+            public override void Cancel()
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    cancellationTokenSources[i]?.Cancel();
+                }
+                base.Cancel();
             }
         }
 

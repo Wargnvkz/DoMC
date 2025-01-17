@@ -30,7 +30,7 @@ namespace DoMCLib.Forms
             SocketQuantity = socketQuantity;
             PanelsOfSockets = new Panel[SocketQuantity];
             SocketErrorStatus = new int[SocketQuantity];
-            PanelsOfSockets= UserInterfaceControls.CreateSocketStatusPanels(socketQuantity, ref pnlSocketStatus);
+            //PanelsOfSockets= UserInterfaceControls.CreateSocketStatusPanels(socketQuantity, ref pnlSocketStatus);
             //CreateSocketStatusPanels();
         }
 
@@ -73,7 +73,7 @@ namespace DoMCLib.Forms
         
         public void SetStatus(bool[] Statuses,bool TrueIsOK=true)
         {
-            UserInterfaceControls.SetSocketStatuses(PanelsOfSockets, Statuses, Color.Green, Color.Red);
+            //UserInterfaceControls.SetSocketStatuses(PanelsOfSockets, Statuses, Color.Green, Color.Red);
             chSocketErrors.Series[0].Points.Clear();
             chSocketErrors.Series[0].MarkerStep = 1;
             for (int i = 0; i < Statuses.Length; i++)

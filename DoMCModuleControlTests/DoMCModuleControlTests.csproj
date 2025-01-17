@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DoMCModuleControl\DoMCModuleControl.csproj" />
+    <ProjectReference Include="..\DoMCTestingTools\DoMCTestingTools.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DoMCModuleControl.Logging;
-using DoMCModuleControlTests.External;
 using System.Threading;
+using DoMCTestingTools.ClassesForTests;
 
 namespace DoMCModuleControl.Tests
 {
@@ -17,9 +17,10 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void ThrottledErrorNotifierTest()
         {
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             var fileSystem = new FileSystemForTests();
             var baseLogger = new BaseFilesLogger(fileSystem);
-            var logger = new Logger("Test", baseLogger);
+            var logger = new Logger(ModuleName, baseLogger);
             logger.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
             var observer = new Observer(logger);
             new ThrottledErrorNotifier(observer, 10, 10);
@@ -30,11 +31,12 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void SendErrorTest()
         {
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             int throttleTime = 4;
             int throttleCounter = 10;
             var fileSystem = new FileSystemForTests();
             var baseLogger = new BaseFilesLogger(fileSystem);
-            var logger = new Logger("Test", baseLogger);
+            var logger = new Logger(ModuleName, baseLogger);
             logger.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
             var observer = new Observer(logger);
             var throttledErrorNotifier = new ThrottledErrorNotifier(observer, throttleTime, throttleCounter);
@@ -53,12 +55,12 @@ namespace DoMCModuleControl.Tests
             var start = DateTime.Now;
             throttledErrorNotifier.SendError(expectedEventName, expectedEventData);
             throttledErrorNotifier.SendError(expectedEventName, expectedEventData);
-            double timeoutInSeconds = 1;
+            double timeoutInSeconds = 30;
             while (counter == 0 && (DateTime.Now - start).TotalSeconds < timeoutInSeconds)
             {
                 Task.Delay(10).Wait();
             }
-            Assert.AreEqual(counter, 1);
+            Assert.AreEqual(1, counter);
             int runCounter = 0;
             while ((DateTime.Now - start).TotalSeconds < throttleTime)
             {

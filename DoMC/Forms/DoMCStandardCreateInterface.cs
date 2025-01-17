@@ -1,6 +1,4 @@
-﻿using DataExchangeKernel.ACS_Core;
-using DataExchangeKernel.Interface;
-using DoMC;
+﻿using DoMC;
 using DoMCLib.Classes;
 using DoMCLib.Configuration;
 using DoMCLib.Tools;
@@ -16,8 +14,9 @@ using System.Windows.Forms;
 
 namespace DoMC
 {
-    public partial class DoMCStandardCreateInterface : Form, IUserKernelInterface
+    public partial class DoMCStandardCreateInterface : Form
     {
+        /*
         DoMCInterfaceDataExchange InterfaceDataExchange = null;
         Bitmap bmpCheckSign;
         PictureBox[] StandardPictures;
@@ -27,15 +26,18 @@ namespace DoMC
         Thread th;
         Log WorkingLog;
         List<Form> badforms = new List<Form>();
+        */
         public DoMCStandardCreateInterface()
         {
             InitializeComponent();
-            bmpCheckSign = new Bitmap(100, 100);
+            /*bmpCheckSign = new Bitmap(100, 100);
             var bmpGraphics = Graphics.FromImage(bmpCheckSign);
             bmpGraphics.DrawString("✓", new Font("Arial", 30), new SolidBrush(Color.LimeGreen), new PointF(0, 0));
             StandardPictures = new PictureBox[3] { pbStandard1, pbStandard2, pbStandard3 };
             WorkingLog = new Log(Log.LogModules.MainSystem);
+            */
         }
+        /*
         public void SetMemoryReference(GlobalMemory memory)
         {
             InterfaceDataExchange = memory?.OverallMemory[ApplicationCardParameters.DoMCCardControlInstance] as DoMCInterfaceDataExchange;
@@ -51,7 +53,7 @@ namespace DoMC
             }
 
         }
-
+        */
         private void DoMCNotFoundErrorMessage()
         {
             DisplayMessage.Show("Не найдено устройство управления платами ПМК", "Ошибка");
@@ -60,6 +62,7 @@ namespace DoMC
 
         private void btnCreateStandard_Click(object sender, EventArgs e)
         {
+            /*
             if (InterfaceDataExchange == null) return;
             if (th != null && th.ThreadState == ThreadState.Running) return;
             if (InterfaceDataExchange.IsWorkingModeStarted)
@@ -84,16 +87,18 @@ namespace DoMC
                 tmCheckSignShow.Enabled = false;
                 btnCreateStandard.Enabled = true;
             }
+            */
         }
 
         private void StopReading()
         {
             StopLCBWorking();
-            InterfaceDataExchange.StopCCD();
+            //InterfaceDataExchange.StopCCD();
         }
 
         private void ReadImages(object o)
         {
+            /*
             try
             {
                 if (InterfaceDataExchange == null) return;
@@ -101,7 +106,7 @@ namespace DoMC
 
                 InterfaceDataExchange.CardsConnection.PacketLogActive = InterfaceDataExchange.Configuration.LogPackets;
 
-                //var socket = Configuration.SocketToCardSocketConfigurations[TempStandardSocketNumber];
+                //var socket = Configuration.SocketToCardSocketConfigurations[ChosenSocketNumber];
                 foreach (var socket in InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations)
                 {
                     socket.Value.DataType = 0;
@@ -127,7 +132,7 @@ namespace DoMC
 
 
                 InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart = true;
-                //InterfaceDataExchange.SocketsToSave = new int[] { TempStandardSocketNumber };
+                //InterfaceDataExchange.SocketsToSave = new int[] { ChosenSocketNumber };
                 for (int repeat = 0; repeat < ImageNumberToCalcStandard; repeat++)
                 {
                     WorkingLog?.Add($"Запрос на чтение гнезд: {repeat}");
@@ -135,7 +140,7 @@ namespace DoMC
                     bool rc = true;
 
                     InterfaceDataExchange.SendCommand(ModuleCommand.StartReadExternal);
-                    rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                    rc = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                     {
                         return InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartReadExternal && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete;
                     }, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
@@ -149,7 +154,7 @@ namespace DoMC
                     WorkingLog?.Add($"Запрос изображения");
                     DataExchangeKernel.Log.Add(new Guid(), $"Начало чтения картинки", true);
                     InterfaceDataExchange.SendCommand(ModuleCommand.GetSocketImages);
-                    var ri = UserInterfaceControls.Wait(5 * InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () =>
+                    var ri = UserInterfaceControls.Wait(5 * InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () =>
                     {
                         var mst = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus;
                         var stp = InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep;
@@ -222,36 +227,7 @@ namespace DoMC
                             }
                         }
                     }
-                    /*
-                    #region Old compare
-                    List<short[,]> DeltaImages = new List<short[,]>(); // Разницы картинок
-                    List<Tuple<int, int>> ImagesXY = new List<Tuple<int, int>>(); // Какие гнезда сравнивались, индекс соответствует DeltaIndex
-                    for (int imgX = 0; imgX < ImageNumberToCalcStandard; imgX++)
-                    {
-                        for (int img_Y = imgX + 1; img_Y < ImageNumberToCalcStandard; img_Y++)
-                        {
-                            var dXY = ImageTools.GetDifference(socket.TempImages[imgX], socket.TempImages[img_Y]);
-                            ImagesXY.Add(new Tuple<int, int>(imgX, img_Y));
-                            DeltaImages.Add(dXY);
-
-                        }
-                    }
-
-
-
-                    var imgdev = ImageTools.CalculateDeviationFull(DeltaImages.ToArray(), socket.ImageProcessParameters.GetRectangle());
-                    var badCounter = new int[ImageNumberToCalcStandard];
-                    for (int imgN = 0; imgN < DeltaImages.Count; imgN++)
-                    {
-                        var XY = ImagesXY[imgN];
-                        if (imgdev.SocketAverage[imgN] > socket.ImageProcessParameters.MaxAverage * 2)//|| Math.Max(Math.Abs(imgdev.Max[imgN]), Math.Abs(imgdev.Min[imgN])) > 3000)
-                        {
-                            badCounter[XY.Item1]++;
-                            badCounter[XY.Item2]++;
-                        }
-                    }
-                    #endregion
-                    */
+                   
                     List<short[,]> ImagesForStandards = new List<short[,]>();
                     for (int imgN = 0; imgN < ImageNumberToCalcStandard; imgN++)
                     {
@@ -298,8 +274,9 @@ namespace DoMC
             }
             finally
             {
-                StopReading();
+                StopReadingBecauseOfError();
             }
+            */
         }
         /*
         private bool LoadConfiguration()
@@ -320,7 +297,7 @@ namespace DoMC
 
 
             InterfaceDataExchange.SendCommand(ModuleCommand.SetAllCardsAndSocketsConfiguration);
-            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.SetAllCardsAndSocketsConfiguration && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.SetAllCardsAndSocketsConfiguration && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
             if (!res)
             {
                 InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
@@ -330,7 +307,7 @@ namespace DoMC
             InterfaceDataExchange.CCDDataEchangeStatuses.IsNetworkCardSet = true;
 
             InterfaceDataExchange.SendCommand(ModuleCommand.LoadConfiguration);
-            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.LoadConfiguration && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.LoadConfiguration && InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Complete || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
             if (!res || InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep == ModuleCommandStep.Error)
             {
                 InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
@@ -343,7 +320,7 @@ namespace DoMC
 
             //InterfaceDataExchange.CardsConnection.PacketLogActive = false;
             InterfaceDataExchange.SendCommand(ModuleCommand.InitLCB);
-            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.InitLCBStatus == 2);
+            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () => InterfaceDataExchange.InitLCBStatus == 2);
             if (!res)
             {
                 InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
@@ -357,7 +334,7 @@ namespace DoMC
             // Загрузить в БУС параметры работы и перевести в рабочий режим
 
             InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBCurrentRequest);
-            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandSent == 1 && InterfaceDataExchange.LEDStatus.LastCommandReceivedStatusIsOK);
+            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandSent == 1 && InterfaceDataExchange.LEDStatus.LastCommandReceivedStatusIsOK);
             if (!res)
             {
                 InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
@@ -367,7 +344,7 @@ namespace DoMC
 
 
             InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBMovementParametersRequest);
-            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.InitLCBStatus == 2, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
+            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () => InterfaceDataExchange.InitLCBStatus == 2, () => InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStatus == ModuleCommand.StartIdle);
             if (!res)
             {
                 InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
@@ -383,16 +360,19 @@ namespace DoMC
             DisplayMessage.Show($"Не могу загрузить конфигурацию в плату ({ErrorMessage})", "Ошибка");
             return;
         }
+        /*
         private void DoMCNotAbleLoadConfigurationErrorMessage(DoMCInterfaceDataExchange.LoadError error)
         {
             MessageBox.Show($"Не могу загрузить конфигурацию в плату ({error})", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
+        */
         private void StopLCBWorking()
         {
+            /*
             var start = DateTime.Now;
             InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBNonWorkModeRequest);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForLCBCardAnswerTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBWorkModeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start);
+            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForLCBCardAnswerTimeoutInSeconds, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBWorkModeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start);
             if (!res)
             {
                 DisplayMessage.Show("Не удалось остановить БУС", "Ошибка");
@@ -403,25 +383,27 @@ namespace DoMC
             //InterfaceDataExchange.SendCommand(ModuleCommand.StartIdle);
             //InterfaceDataExchange.SendResetToCCDCards();
             Thread.Sleep(200);
+            */
         }
         private void WorkLCBStart()
         {
+            /*
             var start = DateTime.Now;
             InterfaceDataExchange.SendCommand(ModuleCommand.InitLCB);
-            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeout, () => InterfaceDataExchange.InitLCBStatus == 2);
+            var res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, () => InterfaceDataExchange.InitLCBStatus == 2);
             if (!res)
             {
                 InterfaceDataExchange.CCDDataEchangeStatuses.ModuleStep = ModuleCommandStep.Error;
                 throw new Exception("Не удалось подключиться к БУС");
             }
             InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBWorkModeRequest);
-            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForLCBCardAnswerTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBWorkModeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start);
+            res = UserInterfaceControls.Wait(InterfaceDataExchange.Configuration.Timeouts.WaitForLCBCardAnswerTimeoutInSeconds, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBWorkModeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > start);
             if (!res)
             {
                 DisplayMessage.Show("Не удалось запустить БУС", "Ошибка");
                 return;
             }
-
+            */
         }
         private void DoMCNotAbleToReadSocketErrorMessage()
         {
@@ -431,12 +413,13 @@ namespace DoMC
 
         private void ResetCheckSigns()
         {
-            for (int i = 0; i < StandardPictures.Length; i++) StandardPictures[i].Image = null;
+           // for (int i = 0; i < StandardPictures.Length; i++) StandardPictures[i].Image = null;
             pbStandardSum.Image = null;
         }
 
         private void tmCheckSignShow_Tick(object sender, EventArgs e)
         {
+            /*
             if (!(th?.IsAlive ?? false))
             {
                 tmCheckSignShow.Enabled = false;
@@ -455,6 +438,7 @@ namespace DoMC
                 //btnCreateStandard.Enabled = true;
 
             }
+            */
         }
 
         private void DoMCStandardCreateInterface_Paint(object sender, PaintEventArgs e)
@@ -464,11 +448,13 @@ namespace DoMC
 
         private void DoMCStandardCreateInterface_FormClosed(object sender, FormClosedEventArgs e)
         {
+            /*
             if (th != null && th.ThreadState == ThreadState.Running)
             {
                 th.Abort();
-                StopReading();
+                StopReadingBecauseOfError();
             }
+            */
         }
     }
 }

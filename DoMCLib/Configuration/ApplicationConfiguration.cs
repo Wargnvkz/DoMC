@@ -1,6 +1,7 @@
 ﻿#pragma warning disable IDE0063
 #pragma warning disable IDE0090
 #pragma warning disable IDE0290
+using DoMCLib.Tools;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,13 @@ namespace DoMCLib.Configuration
     /// </summary>
     public class ApplicationConfiguration
     {
+        private static string HardwareSettingsFile = "HardwareSettings.json";
+        private static string ReadingSocketsSettingsFile = "ReadingSocketsSettings.json";
+        private static string ProcessingDataSettingsFile = "ProcessingDataSettings.json";
+        private static string MetaDataFile = "metadata.json";
         public HardwareSettings HardwareSettings { get; set; } = new HardwareSettings();
-        public ReadingSocketsSettings CurrentSettings { get; set; } = new ReadingSocketsSettings();
-        public ProcessingSettings ProcessingData { get; set; } = new ProcessingSettings();
+        public ReadingSocketsSettings ReadingSocketsSettings { get; set; } = new ReadingSocketsSettings(96);
+        public ProcessingDataSettings ProcessingDataSettings { get; set; } = new ProcessingDataSettings(96);
 
         private readonly string ConfigurationFilePath;
         private const int CurrentFileVersion = 2;
@@ -34,20 +39,35 @@ namespace DoMCLib.Configuration
         {
             if (File.Exists(ConfigurationFilePath))
             {
-                using (ZipArchive archive = ZipFile.OpenRead(ConfigurationFilePath))
+                try
                 {
-                    var metadata = ApplicationConfiguration.ReadZipEntry<dynamic>(archive, "metadata.json");
-                    int fileVersion = metadata?.FileVersion != null ? int.Parse((string)metadata.FileVersion) : 1;
-
-                    if (fileVersion != CurrentFileVersion)
+                    using (ZipArchive archive = ZipFile.OpenRead(ConfigurationFilePath))
                     {
-                        MigrateData(fileVersion, CurrentFileVersion);
-                    }
+                        var metadata = ApplicationConfiguration.ReadZipEntry<dynamic>(archive, MetaDataFile);
+                        int fileVersion = metadata?.FileVersion != null ? int.Parse((string)metadata.FileVersion) : 1;
 
-                    CurrentSettings = ReadZipEntry<ReadingSocketsSettings>(archive, "settings.json") ?? new ReadingSocketsSettings();
-                    ProcessingData = ReadZipEntry<ProcessingSettings>(archive, "data.bin") ?? new ProcessingSettings();
+                        if (fileVersion != CurrentFileVersion)
+                        {
+                            MigrateData(fileVersion, CurrentFileVersion);
+                        }
+
+                        HardwareSettings = ReadZipEntry<HardwareSettings>(archive, HardwareSettingsFile) ?? new HardwareSettings();
+                        ReadingSocketsSettings = ReadZipEntry<ReadingSocketsSettings>(archive, ReadingSocketsSettingsFile) ?? new ReadingSocketsSettings(96);
+                        ProcessingDataSettings = ReadZipEntry<ProcessingDataSettings>(archive, ProcessingDataSettingsFile) ?? new ProcessingDataSettings(96);
+                    }
+                }
+                catch (FileNotFoundException ex)
+                {
+                    HardwareSettings = new HardwareSettings();
+                    ReadingSocketsSettings = new ReadingSocketsSettings(96);
+                    ProcessingDataSettings = new ProcessingDataSettings(96);
+                    SaveAll();
                 }
             }
+        }
+        public void Load(string filename)
+        {
+            throw new NotImplementedException();
         }
 
         private void MigrateData(int oldVersion, int newVersion)
@@ -60,10 +80,9 @@ namespace DoMCLib.Configuration
                 }*/
             }
 
-            UpdateZipEntry("metadata.json", new { FileVersion = newVersion.ToString(), LastUpdate = DateTime.UtcNow });
         }
 
-        private void UpdateZipEntry<T>(string entryName, T data)
+        private void UpdateZipEntry<T>(string filename, string entryName, T data)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -73,18 +92,19 @@ namespace DoMCLib.Configuration
                     writer.Write(json);
                     writer.Flush();
                     memoryStream.Position = 0;
-                }
 
-                using (FileStream zipToOpen = new FileStream(ConfigurationFilePath, FileMode.OpenOrCreate))
-                {
-                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+
+                    using (FileStream zipToOpen = new FileStream(filename, FileMode.OpenOrCreate))
                     {
-                        var entry = archive.GetEntry(entryName);
-                        entry?.Delete();
-                        entry = archive.CreateEntry(entryName);
-                        using (Stream entryStream = entry.Open())
+                        using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
                         {
-                            memoryStream.CopyTo(entryStream);
+                            var entry = archive.GetEntry(entryName);
+                            entry?.Delete();
+                            entry = archive.CreateEntry(entryName);
+                            using (Stream entryStream = entry.Open())
+                            {
+                                memoryStream.CopyTo(entryStream);
+                            }
                         }
                     }
                 }
@@ -109,21 +129,72 @@ namespace DoMCLib.Configuration
             return default;
         }
 
-        public void SaveCurrentSettings()
+        public void SaveReadingSocketsSettings()
         {
-            UpdateZipEntry("settings.json", CurrentSettings);
+            UpdateZipEntry(ConfigurationFilePath, ReadingSocketsSettingsFile, ReadingSocketsSettings);
         }
 
-        public void SaveProcessingData()
+        public void SaveProcessingDataSettings()
         {
-            UpdateZipEntry("data.bin", ProcessingData);
+            UpdateZipEntry(ConfigurationFilePath, ProcessingDataSettingsFile, ProcessingDataSettings);
+        }
+        public void SaveHardwareSettings()
+        {
+            UpdateZipEntry(ConfigurationFilePath, HardwareSettingsFile, HardwareSettings);
         }
 
         public void SaveAll()
         {
-            SaveCurrentSettings();
-            SaveProcessingData();
-            UpdateZipEntry("metadata.json", new { FileVersion = CurrentFileVersion.ToString(), LastUpdate = DateTime.UtcNow });
+            SaveHardwareSettings();
+            SaveReadingSocketsSettings();
+            SaveProcessingDataSettings();
+            UpdateZipEntry(ConfigurationFilePath, "metadata.json", new { FileVersion = CurrentFileVersion.ToString(), LastUpdate = DateTime.UtcNow });
         }
+        public void SaveAll(string filename)
+        {
+            throw new NotImplementedException();
+            SaveHardwareSettings();
+            SaveReadingSocketsSettings();
+            SaveProcessingDataSettings();
+            UpdateZipEntry(ConfigurationFilePath, "metadata.json", new { FileVersion = CurrentFileVersion.ToString(), LastUpdate = DateTime.UtcNow });
+        }
+
+        public void SaveStandardSettings(string filename)
+        {
+            UpdateZipEntry(filename, ProcessingDataSettingsFile, ProcessingDataSettings);
+            UpdateZipEntry(filename, ReadingSocketsSettingsFile, ReadingSocketsSettings);
+        }
+
+        public void LoadStandardSettings(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                try
+                {
+                    using (ZipArchive archive = ZipFile.OpenRead(filename))
+                    {
+                        ReadingSocketsSettings = ReadZipEntry<ReadingSocketsSettings>(archive, ReadingSocketsSettingsFile) ?? new ReadingSocketsSettings(96);
+                        ProcessingDataSettings = ReadZipEntry<ProcessingDataSettings>(archive, ProcessingDataSettingsFile) ?? new ProcessingDataSettings(96);
+                    }
+                }
+                catch (FileNotFoundException ex)
+                {
+                    ReadingSocketsSettings = new ReadingSocketsSettings(96);
+                    ProcessingDataSettings = new ProcessingDataSettings(96);
+                    SaveAll();
+                }
+            }
+        }
+
+
+        public void SetCheckCard(int CardNumber, bool IsCardChecking)
+        {
+            for (var socket = 0; socket < 8; socket++)
+            {
+                var tcpcardsocket = new TCPCardSocket(CardNumber, socket);
+                HardwareSettings.SocketsToCheck[HardwareSettings.CardSocket2EquipmentSocket[tcpcardsocket.InnerSocketNumber] - 1] = IsCardChecking;
+            }
+        }
+
     }
 }

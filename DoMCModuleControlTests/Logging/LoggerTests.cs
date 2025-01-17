@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoMCModuleControlTests.External;
+using DoMCTestingTools.ClassesForTests;
 
 namespace DoMCModuleControl.Logging.Tests
 {
@@ -15,20 +15,22 @@ namespace DoMCModuleControl.Logging.Tests
         [TestMethod()]
         public void LoggerTest()
         {
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             var fileSystem = new FileSystemForTests();
             var baseLogger = new BaseFilesLogger(fileSystem);
-            new Logger("Test", baseLogger);
+            new Logger(ModuleName, baseLogger);
             Assert.ThrowsException<ArgumentNullException>(() => new Logger(null, baseLogger));
-            Assert.ThrowsException<ArgumentNullException>(() => new Logger("Test", null));
+            Assert.ThrowsException<ArgumentNullException>(() => new Logger(ModuleName, null));
             Assert.ThrowsException<ArgumentNullException>(() => new Logger(null, null));
         }
 
         [TestMethod("public void Add(LoggerLevel level, string Message)")]
         public void AddTest()
         {
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             var fileSystem = new FileSystemForTests();
             var baseLogger = new BaseFilesLogger(fileSystem);
-            var logger = new Logger("Test", baseLogger);
+            var logger = new Logger(ModuleName, baseLogger);
             logger.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
             logger.Add(LoggerLevel.FullDetailedInformation, "TestMessage");
             logger.Flush();
@@ -47,9 +49,10 @@ namespace DoMCModuleControl.Logging.Tests
         [TestMethod("public void Add(LoggerLevel level, string Message, Exception ex)")]
         public void AddWithExceptionTest()
         {
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             var fileSystem = new FileSystemForTests();
             var baseLogger = new BaseFilesLogger(fileSystem);
-            var logger = new Logger("Test", baseLogger);
+            var logger = new Logger(ModuleName, baseLogger);
             logger.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
             logger.Add(LoggerLevel.FullDetailedInformation, "TestMessage", new Exception());
             logger.Flush();
@@ -70,9 +73,10 @@ namespace DoMCModuleControl.Logging.Tests
         [TestMethod()]
         public void SetMaxLogginLevelTest()
         {
+            var ModuleName = LoggerTestTool.GetLoggerTestModuleName();
             var fileSystem = new FileSystemForTests();
             var baseLogger = new BaseFilesLogger(fileSystem);
-            var logger = new Logger("Test", baseLogger);
+            var logger = new Logger(ModuleName, baseLogger);
             logger.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
             logger.SetMaxLogginLevel((LoggerLevel)int.MaxValue);
         }

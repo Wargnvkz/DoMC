@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -41,22 +42,38 @@ namespace DoMCModuleControl.Commands
         /// <summary>
         /// Статус: Команда запущена
         /// </summary>
-        public bool IsRunning { get; private set; }
+        public bool IsRunning { get; protected set; }
         /// <summary>
         /// Статус: Команда завершена успешно
         /// </summary>
-        public bool IsCompleteSuccessfully { get; private set; }
+        public bool IsCompleteSuccessfully { get; protected set; }
+        /// <summary>
+        /// Статус: Команда отменена
+        /// </summary>
+        public bool IsCanceled { get; protected set; }
         /// <summary>
         /// Статус: Команда завершена с ошибкой
         /// </summary>
-        public bool IsError { get; private set; }
+        public bool IsError { get; protected set; }
         /// <summary>
         /// Статус: ошибка приведшая к завершению
         /// </summary>
         public Exception? Error { get; private set; }
 
         public IMainController Controller { get; private set; }
-        public CancellationTokenSource CancellationTokenSourceBase { get; private set; }
+        public CancellationTokenSource CancelationTokenSourceToCancelCommandExecution { get; private set; } = new CancellationTokenSource();
+        public bool HasNotBeenRunningYet()
+        {
+            return !IsRunning && !IsCompleteSuccessfully && !IsError && !IsCanceled;
+        }
+        public bool HasStopedAlready()
+        {
+            return !IsRunning && (IsCompleteSuccessfully || IsError || IsCanceled);
+        }
+        public bool WasCompletedSuccessfully()
+        {
+            return !IsRunning && IsCompleteSuccessfully && !IsError && !IsCanceled;
+        }
 
         public enum Events
         {
@@ -78,7 +95,7 @@ namespace DoMCModuleControl.Commands
             Module = module;
             InputType = inputType;
             OutputType = outputType;
-            CancellationTokenSourceBase = new CancellationTokenSource();
+            CancelationTokenSourceToCancelCommandExecution = new CancellationTokenSource();
 
         }
 
@@ -183,9 +200,9 @@ namespace DoMCModuleControl.Commands
         public void SetInputData(object? inputData)
         {
             if (InputType == null || inputData == null) return;
-            if (InputType.IsInstanceOfType(inputData))
+            if (!InputType.IsInstanceOfType(inputData))
             {
-                throw new ArgumentException($"Неверный тип данных. Ожидается {InputType.Name}.");
+                throw new ArgumentException($"Неверный тип данных. Передан тип {inputData.GetType().FullName}, а ожидается {InputType.FullName}.");
             }
             InputData = inputData;
         }
@@ -222,11 +239,47 @@ namespace DoMCModuleControl.Commands
         /// Если команда не запущена, то запускает ее
         /// </summary>
         /// <param name="TimeoutInSeconds">Таймаут в секундах, -1 без таймаута</param>
-        public virtual object? Wait(object? InputData, int TimeoutInSeconds)
+        public virtual bool Wait<T>(object? InputData, int TimeoutInSeconds, out T outputData) where T:class
         {
-            SetInputData(InputData);
-            return Wait(TimeoutInSeconds);
+            try
+            {
+                SetInputData(InputData);
+                var resultExpositionCommand = Wait(TimeoutInSeconds);
+                if (resultExpositionCommand == null)
+                {
+                    outputData = null;
+                }
+                else
+                {
+                    outputData = resultExpositionCommand as T;
+                }
+                return WasCompletedSuccessfully();
+                // return true;
+            }
+            catch (NotImplementedException)
+            {
+                ExecuteCommand(InputData);
+                Task.Delay(100).Wait();
+                outputData = null;
+                return true;
+            }
         }
+        /// <summary>
+        /// Немедленное прекращение выполнения команды
+        /// </summary>
+        public virtual void Cancel()
+        {
+            CancelationTokenSourceToCancelCommandExecution.Cancel();
+            IsCanceled = true;
+        }
+        /// <summary>
+        /// Немедленное прекращение выполнения команды, без установки статуса отменено
+        /// </summary>
+        protected void Stop()
+        {
+            CancelationTokenSourceToCancelCommandExecution.Cancel();
+        }
+
     }
 
 }
