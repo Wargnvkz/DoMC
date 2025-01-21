@@ -414,21 +414,21 @@ namespace DoMCLib.Classes
             return true;
         }
 
-        public bool SetLCBWorkingParameters(IMainController Controller, ILogger WorkingLog)
+        /*public bool SetLCBWorkingParameters(IMainController Controller, ILogger WorkingLog)
         {
             WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек рабочего режима в БУС");
             if (!Controller.CreateCommandInstance(typeof(LCBModule.SetModuleWorkingParametersCommand))
                 .Wait<object>(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out _))
             //if (!WaitForCommand<LCBModule.SetModuleWorkingParametersCommand, SetReadingParametersCommandResult>(Controller, WorkingLog, this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, "Передача настроек рабочего режима в БУС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
             {
-                /*if (result != null)
+                if (result != null)
                 {
 
-                }*/
+                }
             }
 
             return true;
-        }
+        }*/
 
         public bool ReadSockets(IMainController Controller, ILogger WorkingLog, bool IsExternalRead, int? socketNumber = null)
         {
@@ -437,7 +437,7 @@ namespace DoMCLib.Classes
             {
                 if (!socketNumber.HasValue)
                 {
-                    if(Controller.CreateCommandInstance(typeof(SendReadSocketsWithExternalSignalCommand),typeof(CCDCardDataModule))
+                    if (Controller.CreateCommandInstance(typeof(SendReadSocketsWithExternalSignalCommand), typeof(CCDCardDataModule))
                         .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _))
                     {
                         return true;
@@ -539,7 +539,7 @@ namespace DoMCLib.Classes
             var timeout = 2;
             return Controller.CreateCommandInstance(typeof(TestConnectionCardsCommand), typeof(CCDCardDataModule))
                         .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
-               // WaitForCommand<CCDCardDataModule.TestConnectionCardsCommand, CCDCardDataModule, CCDCardDataCommandResponse>(Controller, WorkingLog, this, timeout, "", LoggerLevel.Critical, out result);
+            // WaitForCommand<CCDCardDataModule.TestConnectionCardsCommand, CCDCardDataModule, CCDCardDataCommandResponse>(Controller, WorkingLog, this, timeout, "", LoggerLevel.Critical, out result);
         }
         public bool ResetCards(IMainController Controller, ILogger WorkingLog, int? EquipmentSocketNumber = null)
         {
@@ -548,7 +548,7 @@ namespace DoMCLib.Classes
             {
                 return Controller.CreateCommandInstance(typeof(GetSocketsImagesDataCommand), typeof(CCDCardDataModule))
                         .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out GetImageDataCommandResponse result);
-                
+
                 //return WaitForCommand<CCDCardDataModule.ResetCardsCommand, CCDCardDataModule, CCDCardDataCommandResponse>(Controller, WorkingLog, this, timeout, "", LoggerLevel.Critical, out CCDCardDataCommandResponse result);
             }
             else

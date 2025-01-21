@@ -276,7 +276,7 @@ namespace DoMC
             if (ActiveDevices.HasFlag(WorkingModule.LCB))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля БУС и загрузка конфигурации");
-                if (!Context.SetLCBWorkingParameters(Controller, WorkingLog))
+                /*if (!Context.SetLCBWorkingParameters(Controller, WorkingLog))
                 {
                     //WorkingLog.Add(LoggerLevel.Critical, $"Ошибка ({loadresult}) при запуске БУС. Остановка работы");
                     //InterfaceDataExchange.Errors.LCBDoesNotRespond = true;
@@ -287,7 +287,7 @@ namespace DoMC
                 {
                     //InterfaceDataExchange.Errors.LCBDoesNotRespond = false;
                 }
-
+                */
 
                 var startLCBEWorkModeTime = DateTime.Now;
                 /*InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBWorkModeRequest);

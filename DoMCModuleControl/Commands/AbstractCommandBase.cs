@@ -239,7 +239,7 @@ namespace DoMCModuleControl.Commands
         /// Если команда не запущена, то запускает ее
         /// </summary>
         /// <param name="TimeoutInSeconds">Таймаут в секундах, -1 без таймаута</param>
-        public virtual bool Wait<T>(object? InputData, int TimeoutInSeconds, out T outputData) where T:class
+        public virtual bool Wait<T>(object? InputData, int TimeoutInSeconds, out T outputData)
         {
             try
             {
@@ -247,11 +247,11 @@ namespace DoMCModuleControl.Commands
                 var resultExpositionCommand = Wait(TimeoutInSeconds);
                 if (resultExpositionCommand == null)
                 {
-                    outputData = null;
+                    outputData = default;
                 }
                 else
                 {
-                    outputData = resultExpositionCommand as T;
+                    outputData = (T)resultExpositionCommand;
                 }
                 return WasCompletedSuccessfully();
                 // return true;
@@ -260,7 +260,7 @@ namespace DoMCModuleControl.Commands
             {
                 ExecuteCommand(InputData);
                 Task.Delay(100).Wait();
-                outputData = null;
+                outputData = default;
                 return true;
             }
         }

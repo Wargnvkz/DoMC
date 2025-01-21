@@ -397,352 +397,349 @@ namespace DoMCLib.Classes.Module.LCB
             Received
         }
 
-    }
 
-    public class SetLCBCurrentCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public bool IsSuccessful { get; private set; }
 
-        public SetLCBCurrentCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, typeof(int), typeof(bool)) { }
-
-        protected override void Executing()
+        public class SetLCBCurrentCommand : WaitingCommandBase
         {
-            var module = (LCBModule)Module;
-            var current = (int)InputData!;
-            module.SetLCBCurrent(current);
-        }
+            private bool AnswerReceived = false;
+            public bool IsSuccessful { get; private set; }
 
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.SetLEDCurrentResponse.ToString()))
+            public SetLCBCurrentCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, typeof(int), typeof(bool)) { }
+
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                IsSuccessful = (bool)data!;
+                var module = (LCBModule)Module;
+                var current = (int)InputData!;
+                module.SetLCBCurrent(current);
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.SetLEDCurrentResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    IsSuccessful = (bool)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = IsSuccessful;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class GetLCBCurrentCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public int Current { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = IsSuccessful;
-        }
-    }
+            public GetLCBCurrentCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, null, typeof(int)) { }
 
-    public class GetLCBCurrentCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public int Current { get; private set; }
-
-        public GetLCBCurrentCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, null, typeof(int)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            module.GetLCBCurrent();
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.GetLEDCurrentResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                Current = (int)data!;
+                var module = (LCBModule)Module;
+                module.GetLCBCurrent();
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.GetLEDCurrentResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    Current = (int)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = Current;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class SetLCBMovementParametersCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public bool IsSuccessful { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = Current;
-        }
-    }
+            public SetLCBMovementParametersCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, typeof((int PreformLength, int DelayLength)), typeof(bool)) { }
 
-    public class SetLCBMovementParametersCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public bool IsSuccessful { get; private set; }
-
-        public SetLCBMovementParametersCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, typeof((int PreformLength, int DelayLength)), typeof(bool)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            var input = ((int PreformLength, int DelayLength))InputData!;
-            module.SetLCBMovementParameters(input.PreformLength, input.DelayLength);
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.SetLCBMovementParametersResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                IsSuccessful = (bool)data!;
+                var module = (LCBModule)Module;
+                var input = ((int PreformLength, int DelayLength))InputData!;
+                module.SetLCBMovementParameters(input.PreformLength, input.DelayLength);
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.SetLCBMovementParametersResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    IsSuccessful = (bool)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = IsSuccessful;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class GetLCBMovementParametersCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public LEDMovementParameters Parameters { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = IsSuccessful;
-        }
-    }
+            public GetLCBMovementParametersCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, null, typeof(LEDMovementParameters)) { }
 
-    public class GetLCBMovementParametersCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public LEDMovementParameters Parameters { get; private set; }
-
-        public GetLCBMovementParametersCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, null, typeof(LEDMovementParameters)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            module.GetLCBMovementParameters();
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.GetLCBMovementParametersResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                Parameters = (LEDMovementParameters)data!;
+                var module = (LCBModule)Module;
+                module.GetLCBMovementParameters();
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.GetLCBMovementParametersResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    Parameters = (LEDMovementParameters)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = Parameters;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class SetLCBEquipmentStatusCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public bool IsSuccessful { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = Parameters;
-        }
-    }
+            public SetLCBEquipmentStatusCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, typeof(LEDEquimpentStatus), typeof(bool)) { }
 
-    public class SetLCBEquipmentStatusCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public bool IsSuccessful { get; private set; }
-
-        public SetLCBEquipmentStatusCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, typeof(LEDEquimpentStatus), typeof(bool)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            var status = (LEDEquimpentStatus)InputData!;
-            module.SetLCBEquipmentStatus(status);
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.SetLCBEquipmentStatusResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                IsSuccessful = (bool)data!;
+                var module = (LCBModule)Module;
+                var status = (LEDEquimpentStatus)InputData!;
+                module.SetLCBEquipmentStatus(status);
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.SetLCBEquipmentStatusResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    IsSuccessful = (bool)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = IsSuccessful;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class GetLCBEquipmentStatusCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public LEDEquimpentStatus EquipmentStatus { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = IsSuccessful;
-        }
-    }
+            public GetLCBEquipmentStatusCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, null, typeof(LEDEquimpentStatus)) { }
 
-    public class GetLCBEquipmentStatusCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public LEDEquimpentStatus EquipmentStatus { get; private set; }
-
-        public GetLCBEquipmentStatusCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, null, typeof(LEDEquimpentStatus)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            module.GetLCBEquipmentStatus();
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.GetLCBEquipmentStatusResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                EquipmentStatus = (LEDEquimpentStatus)data!;
+                var module = (LCBModule)Module;
+                module.GetLCBEquipmentStatus();
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.GetLCBEquipmentStatusResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    EquipmentStatus = (LEDEquimpentStatus)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = EquipmentStatus;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class SetLCBWorkModeCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public bool IsSuccessful { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = EquipmentStatus;
-        }
-    }
+            public SetLCBWorkModeCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, null, typeof(bool)) { }
 
-    public class SetLCBWorkModeCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public bool IsSuccessful { get; private set; }
-
-        public SetLCBWorkModeCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, null, typeof(bool)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            module.SetLCBWorkMode();
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.SetLCBWorkModeResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                IsSuccessful = (bool)data!;
+                var module = (LCBModule)Module;
+                module.SetLCBWorkMode();
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.SetLCBWorkModeResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    IsSuccessful = (bool)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = IsSuccessful;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class SetLCBNonWorkModeCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public bool IsSuccessful { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = IsSuccessful;
-        }
-    }
+            public SetLCBNonWorkModeCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, null, typeof(bool)) { }
 
-    public class SetLCBNonWorkModeCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public bool IsSuccessful { get; private set; }
-
-        public SetLCBNonWorkModeCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, null, typeof(bool)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            module.SetLCBNonWorkMode();
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.SetLCBWorkModeResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                IsSuccessful = (bool)data!;
+                var module = (LCBModule)Module;
+                module.SetLCBNonWorkMode();
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.SetLCBWorkModeResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    IsSuccessful = (bool)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = IsSuccessful;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class GetLCBMaxPositionCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public int MaxPosition { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = IsSuccessful;
-        }
-    }
+            public GetLCBMaxPositionCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, null, typeof(int)) { }
 
-    public class GetLCBMaxPositionCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public int MaxPosition { get; private set; }
-
-        public GetLCBMaxPositionCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, null, typeof(int)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            module.GetLCBMaxPosition();
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.GetLCBMaxHorizontalStrokeResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                MaxPosition = (int)data!;
+                var module = (LCBModule)Module;
+                module.GetLCBMaxPosition();
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.GetLCBMaxHorizontalStrokeResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    MaxPosition = (int)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = MaxPosition;
             }
         }
 
-        protected override bool MakeDecisionIsCommandCompleteFunc()
+        public class GetLCBCurrentPositionCommand : WaitingCommandBase
         {
-            return AnswerReceived;
-        }
+            private bool AnswerReceived = false;
+            public int CurrentPosition { get; private set; }
 
-        protected override void PrepareOutputData()
-        {
-            OutputData = MaxPosition;
-        }
-    }
+            public GetLCBCurrentPositionCommand(IMainController mainController, AbstractModuleBase module)
+                : base(mainController, module, null, typeof(int)) { }
 
-    public class GetLCBCurrentPositionCommand : WaitingCommandBase
-    {
-        private bool AnswerReceived = false;
-        public int CurrentPosition { get; private set; }
-
-        public GetLCBCurrentPositionCommand(IMainController mainController, AbstractModuleBase module)
-            : base(mainController, module, null, typeof(int)) { }
-
-        protected override void Executing()
-        {
-            var module = (LCBModule)Module;
-            module.GetLCBCurrentPosition();
-        }
-
-        protected override void NotificationReceived(string notificationName, object? data)
-        {
-            if (notificationName.Contains(LEDCommandType.GetLCBCurrentHorizontalStrokeResponse.ToString()))
+            protected override void Executing()
             {
-                AnswerReceived = true;
-                CurrentPosition = (int)data!;
+                var module = (LCBModule)Module;
+                module.GetLCBCurrentPosition();
+            }
+
+            protected override void NotificationReceived(string notificationName, object? data)
+            {
+                if (notificationName.Contains(LEDCommandType.GetLCBCurrentHorizontalStrokeResponse.ToString()))
+                {
+                    AnswerReceived = true;
+                    CurrentPosition = (int)data!;
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return AnswerReceived;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = CurrentPosition;
             }
         }
-
-        protected override bool MakeDecisionIsCommandCompleteFunc()
-        {
-            return AnswerReceived;
-        }
-
-        protected override void PrepareOutputData()
-        {
-            OutputData = CurrentPosition;
-        }
     }
-
-
-
-
 }
