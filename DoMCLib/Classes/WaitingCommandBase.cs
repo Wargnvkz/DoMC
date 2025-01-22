@@ -19,18 +19,21 @@ namespace DoMCLib.Classes
         public override object? Wait(int timeoutInSeconds)
         {
             if (HasStopedAlready()) return null;
+            Controller.GetLogger(Module.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.FullDetailedInformation, $"Запуск команды {CommandName}.");
             bool NoNeedToWaitMore = false;
             try
             {
                 Controller.GetObserver().NotificationReceivers += NotificationReceived;
                 if (HasNotBeenRunningYet())
                     ExecuteCommand();
+                Controller.GetLogger(Module.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.FullDetailedInformation, $"Ожидание результатов выполнения кода команды {CommandName}.");
                 var start = DateTime.Now;
                 while (!NoNeedToWaitMore && (DateTime.Now - start).TotalSeconds < timeoutInSeconds && !CancelationTokenSourceToCancelCommandExecution.IsCancellationRequested && !IsError)
                 {
                     NoNeedToWaitMore = MakeDecisionIsCommandCompleteFunc();
                     if (NoNeedToWaitMore)
                     {
+                        Controller.GetLogger(Module.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.FullDetailedInformation, $"Результаты вполнения команды {CommandName} получены.");
                         Stop();
                         break;
                     }
@@ -39,6 +42,7 @@ namespace DoMCLib.Classes
             }
             finally
             {
+                Controller.GetLogger(Module.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.FullDetailedInformation, $"Команда {CommandName} завершена.");
                 Controller.GetObserver().NotificationReceivers -= NotificationReceived;
             }
             PrepareOutputData();

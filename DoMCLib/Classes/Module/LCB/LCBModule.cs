@@ -361,13 +361,13 @@ namespace DoMCLib.Classes.Module.LCB
                                 break;
                             case (int)LEDCommandType.GetLCBMaxHorizontalStrokeResponse://0x8a:
                                 {
-                                    var maxStrokeImpulses = BitConverter.ToUInt16(cmd.Data, 0);
+                                    var maxStrokeImpulses = (int)BitConverter.ToUInt16(cmd.Data, 0);
                                     CurrentObserver.Notify(this, LEDCommandType.GetLCBMaxHorizontalStrokeResponse.ToString(), EventType.Received.ToString(), maxStrokeImpulses);
                                 }
                                 break;
                             case (int)LEDCommandType.GetLCBCurrentHorizontalStrokeResponse: //0x8b
                                 {
-                                    var curStrokeImpulses = BitConverter.ToUInt16(cmd.Data, 0);
+                                    var curStrokeImpulses = (int)BitConverter.ToUInt16(cmd.Data, 0);
                                     CurrentObserver.Notify(this, LEDCommandType.GetLCBCurrentHorizontalStrokeResponse.ToString(), EventType.Received.ToString(), curStrokeImpulses);
                                 }
                                 break;

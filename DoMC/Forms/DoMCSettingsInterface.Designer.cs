@@ -29,18 +29,18 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series19 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series20 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series21 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series22 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series23 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series24 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series25 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series26 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series27 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
             menuStrip1 = new MenuStrip();
             miSettings = new ToolStripMenuItem();
             miLEDSettings = new ToolStripMenuItem();
@@ -84,7 +84,37 @@
             chFirstSocket = new ColumnHeader();
             chLastSocket = new ColumnHeader();
             tbGetStandard = new TabPage();
-            tbTest = new TabPage();
+            tbTestLCB = new TabPage();
+            tbCCDTest = new TabPage();
+            tbTestImages = new TabPage();
+            tbRDP = new TabPage();
+            lblTestRDPBStatus = new Label();
+            lvTestRDPBStatuses = new ListView();
+            columnHeader1 = new ColumnHeader();
+            columnHeader2 = new ColumnHeader();
+            btnTestRDPBSendCommand = new Button();
+            txbTestRDPBManualCommand = new TextBox();
+            lblTestRDPBCommand = new Label();
+            txbTestRDPBCoolingBlocksStatus = new TextBox();
+            cbTestRDPBCoolingBlocksQuantity = new ComboBox();
+            lblCoolingBlockQuantity = new Label();
+            btnTestRDPBN90 = new Button();
+            btnTestRDPBN83 = new Button();
+            btnTestRDPBN82 = new Button();
+            btnTestRDPBN81 = new Button();
+            btnTestRDPBN80 = new Button();
+            btnRDPBTestConnect = new Button();
+            tbDB = new TabPage();
+            btnRestoreRemoteDB = new Button();
+            btnRestoreLocalDB = new Button();
+            btnMoveToArchive = new Button();
+            btnTestDBRemoteRecreate = new Button();
+            btnTestDBLocalRecreate = new Button();
+            btnTestDBRemote = new Button();
+            btnTestDBLocal = new Button();
+            tbArchive = new TabPage();
+            tbSettingsCheck = new TabPage();
+            xtbTest = new TabPage();
             cbTestCCDMaxPointShow = new CheckBox();
             ssFooter = new StatusStrip();
             tslTestCCDCardReadStatus = new ToolStripStatusLabel();
@@ -113,7 +143,7 @@
             label1 = new Label();
             cbTest_ExternalStart = new CheckBox();
             btnTest_ReadAllSocket = new Button();
-            tbLEDControl = new TabPage();
+            xtbLEDControl = new TabPage();
             panel4 = new Panel();
             btnLCBSaveToConfig = new Button();
             btnLCBLoadFromConfig = new Button();
@@ -190,41 +220,14 @@
             btnTestLCBSetAll = new Button();
             btnTestLCBInit = new Button();
             cbTestLCBSyncrosignal = new CheckBox();
-            tbTestImages = new TabPage();
-            tbRDP = new TabPage();
-            lblTestRDPBStatus = new Label();
-            lvTestRDPBStatuses = new ListView();
-            columnHeader1 = new ColumnHeader();
-            columnHeader2 = new ColumnHeader();
-            btnTestRDPBSendCommand = new Button();
-            txbTestRDPBManualCommand = new TextBox();
-            lblTestRDPBCommand = new Label();
-            txbTestRDPBCoolingBlocksStatus = new TextBox();
-            cbTestRDPBCoolingBlocksQuantity = new ComboBox();
-            lblCoolingBlockQuantity = new Label();
-            btnTestRDPBN90 = new Button();
-            btnTestRDPBN83 = new Button();
-            btnTestRDPBN82 = new Button();
-            btnTestRDPBN81 = new Button();
-            btnTestRDPBN80 = new Button();
-            btnRDPBTestConnect = new Button();
-            tbDB = new TabPage();
-            btnRestoreRemoteDB = new Button();
-            btnRestoreLocalDB = new Button();
-            btnMoveToArchive = new Button();
-            btnTestDBRemoteRecreate = new Button();
-            btnTestDBLocalRecreate = new Button();
-            btnTestDBRemote = new Button();
-            btnTestDBLocal = new Button();
-            tbArchive = new TabPage();
-            tbCCDTest = new TabPage();
-            tbTestLCB_uc = new TabPage();
-            tbSettingsCheck = new TabPage();
             timer1 = new System.Windows.Forms.Timer(components);
+            tbTestRDPB_uc = new TabPage();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tbSettingsStatus.SuspendLayout();
-            tbTest.SuspendLayout();
+            tbRDP.SuspendLayout();
+            tbDB.SuspendLayout();
+            xtbTest.SuspendLayout();
             ssFooter.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chTestStandard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)chTestDiff).BeginInit();
@@ -233,7 +236,7 @@
             ((System.ComponentModel.ISupportInitialize)pbTestStandard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pbTestDifference).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pbTestReadImage).BeginInit();
-            tbLEDControl.SuspendLayout();
+            xtbLEDControl.SuspendLayout();
             panel4.SuspendLayout();
             pnlTestLCBSetWorkMode.SuspendLayout();
             panel3.SuspendLayout();
@@ -244,8 +247,6 @@
             gbLEDs.SuspendLayout();
             gbTestLCBInputs.SuspendLayout();
             gbTestLCBOutputs.SuspendLayout();
-            tbRDP.SuspendLayout();
-            tbDB.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -464,15 +465,16 @@
             tabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl1.Controls.Add(tbSettingsStatus);
             tabControl1.Controls.Add(tbGetStandard);
-            tabControl1.Controls.Add(tbTest);
-            tabControl1.Controls.Add(tbLEDControl);
+            tabControl1.Controls.Add(tbTestLCB);
+            tabControl1.Controls.Add(tbCCDTest);
             tabControl1.Controls.Add(tbTestImages);
-            tabControl1.Controls.Add(tbRDP);
+            tabControl1.Controls.Add(tbTestRDPB_uc);
             tabControl1.Controls.Add(tbDB);
             tabControl1.Controls.Add(tbArchive);
-            tabControl1.Controls.Add(tbCCDTest);
-            tabControl1.Controls.Add(tbTestLCB_uc);
             tabControl1.Controls.Add(tbSettingsCheck);
+            tabControl1.Controls.Add(xtbTest);
+            tabControl1.Controls.Add(xtbLEDControl);
+            tabControl1.Controls.Add(tbRDP);
             tabControl1.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
             tabControl1.Location = new Point(0, 43);
             tabControl1.Margin = new Padding(4, 5, 4, 5);
@@ -595,42 +597,366 @@
             tbGetStandard.Text = "Получение эталона";
             tbGetStandard.UseVisualStyleBackColor = true;
             // 
-            // tbTest
+            // tbTestLCB
             // 
-            tbTest.Controls.Add(cbTestCCDMaxPointShow);
-            tbTest.Controls.Add(ssFooter);
-            tbTest.Controls.Add(lblTimeImageProcess);
-            tbTest.Controls.Add(cbInvertColors);
-            tbTest.Controls.Add(btnCycleStop);
-            tbTest.Controls.Add(btnCycleStart);
-            tbTest.Controls.Add(chTestStandard);
-            tbTest.Controls.Add(chTestDiff);
-            tbTest.Controls.Add(lblNumLineCaption);
-            tbTest.Controls.Add(cbFullMax);
-            tbTest.Controls.Add(cbVertical);
-            tbTest.Controls.Add(numFrame);
-            tbTest.Controls.Add(chTestReadLine);
-            tbTest.Controls.Add(lblTestStandard);
-            tbTest.Controls.Add(lblTestDifference);
-            tbTest.Controls.Add(lblTestRead);
-            tbTest.Controls.Add(pbTestStandard);
-            tbTest.Controls.Add(pbTestDifference);
-            tbTest.Controls.Add(pbTestReadImage);
-            tbTest.Controls.Add(btnTest_ReadSelectedSocket);
-            tbTest.Controls.Add(lblTestSelectedSocket);
-            tbTest.Controls.Add(lblTestSelectedSocketLabel);
-            tbTest.Controls.Add(pnlTestSockets);
-            tbTest.Controls.Add(lblStatus);
-            tbTest.Controls.Add(label1);
-            tbTest.Controls.Add(cbTest_ExternalStart);
-            tbTest.Controls.Add(btnTest_ReadAllSocket);
-            tbTest.Location = new Point(4, 29);
-            tbTest.Margin = new Padding(4, 5, 4, 5);
-            tbTest.Name = "tbTest";
-            tbTest.Size = new Size(1808, 1033);
-            tbTest.TabIndex = 2;
-            tbTest.Text = "xТест ПЗС";
-            tbTest.UseVisualStyleBackColor = true;
+            tbTestLCB.Location = new Point(4, 29);
+            tbTestLCB.Margin = new Padding(3, 4, 3, 4);
+            tbTestLCB.Name = "tbTestLCB";
+            tbTestLCB.Size = new Size(1808, 1033);
+            tbTestLCB.TabIndex = 11;
+            tbTestLCB.Text = "Тест БУС*";
+            tbTestLCB.UseVisualStyleBackColor = true;
+            // 
+            // tbCCDTest
+            // 
+            tbCCDTest.Location = new Point(4, 29);
+            tbCCDTest.Margin = new Padding(3, 4, 3, 4);
+            tbCCDTest.Name = "tbCCDTest";
+            tbCCDTest.Size = new Size(1808, 1033);
+            tbCCDTest.TabIndex = 9;
+            tbCCDTest.Text = "Тест ПЗС*";
+            tbCCDTest.UseVisualStyleBackColor = true;
+            // 
+            // tbTestImages
+            // 
+            tbTestImages.Location = new Point(4, 29);
+            tbTestImages.Margin = new Padding(4, 5, 4, 5);
+            tbTestImages.Name = "tbTestImages";
+            tbTestImages.Size = new Size(1808, 1033);
+            tbTestImages.TabIndex = 5;
+            tbTestImages.Text = "Тест изображений";
+            tbTestImages.UseVisualStyleBackColor = true;
+            // 
+            // tbRDP
+            // 
+            tbRDP.Controls.Add(lblTestRDPBStatus);
+            tbRDP.Controls.Add(lvTestRDPBStatuses);
+            tbRDP.Controls.Add(btnTestRDPBSendCommand);
+            tbRDP.Controls.Add(txbTestRDPBManualCommand);
+            tbRDP.Controls.Add(lblTestRDPBCommand);
+            tbRDP.Controls.Add(txbTestRDPBCoolingBlocksStatus);
+            tbRDP.Controls.Add(cbTestRDPBCoolingBlocksQuantity);
+            tbRDP.Controls.Add(lblCoolingBlockQuantity);
+            tbRDP.Controls.Add(btnTestRDPBN90);
+            tbRDP.Controls.Add(btnTestRDPBN83);
+            tbRDP.Controls.Add(btnTestRDPBN82);
+            tbRDP.Controls.Add(btnTestRDPBN81);
+            tbRDP.Controls.Add(btnTestRDPBN80);
+            tbRDP.Controls.Add(btnRDPBTestConnect);
+            tbRDP.Location = new Point(4, 29);
+            tbRDP.Margin = new Padding(4, 5, 4, 5);
+            tbRDP.Name = "tbRDP";
+            tbRDP.Size = new Size(1808, 1033);
+            tbRDP.TabIndex = 6;
+            tbRDP.Text = "xТест бракера";
+            tbRDP.UseVisualStyleBackColor = true;
+            // 
+            // lblTestRDPBStatus
+            // 
+            lblTestRDPBStatus.AutoSize = true;
+            lblTestRDPBStatus.Location = new Point(666, 16);
+            lblTestRDPBStatus.Margin = new Padding(4, 0, 4, 0);
+            lblTestRDPBStatus.Name = "lblTestRDPBStatus";
+            lblTestRDPBStatus.Size = new Size(143, 20);
+            lblTestRDPBStatus.TabIndex = 13;
+            lblTestRDPBStatus.Text = "Статусы бракера:";
+            // 
+            // lvTestRDPBStatuses
+            // 
+            lvTestRDPBStatuses.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
+            lvTestRDPBStatuses.Location = new Point(670, 49);
+            lvTestRDPBStatuses.Margin = new Padding(4, 5, 4, 5);
+            lvTestRDPBStatuses.Name = "lvTestRDPBStatuses";
+            lvTestRDPBStatuses.Size = new Size(708, 437);
+            lvTestRDPBStatuses.TabIndex = 12;
+            lvTestRDPBStatuses.UseCompatibleStateImageBehavior = false;
+            lvTestRDPBStatuses.View = View.Details;
+            // 
+            // columnHeader1
+            // 
+            columnHeader1.Text = "Параметр";
+            columnHeader1.Width = 200;
+            // 
+            // columnHeader2
+            // 
+            columnHeader2.Text = "Значение";
+            columnHeader2.Width = 289;
+            // 
+            // btnTestRDPBSendCommand
+            // 
+            btnTestRDPBSendCommand.Location = new Point(432, 609);
+            btnTestRDPBSendCommand.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBSendCommand.Name = "btnTestRDPBSendCommand";
+            btnTestRDPBSendCommand.Size = new Size(123, 51);
+            btnTestRDPBSendCommand.TabIndex = 11;
+            btnTestRDPBSendCommand.Text = "Послать";
+            btnTestRDPBSendCommand.UseVisualStyleBackColor = true;
+            btnTestRDPBSendCommand.Click += btnTestRDPBSendCommand_Click;
+            // 
+            // txbTestRDPBManualCommand
+            // 
+            txbTestRDPBManualCommand.Location = new Point(12, 616);
+            txbTestRDPBManualCommand.Margin = new Padding(4, 5, 4, 5);
+            txbTestRDPBManualCommand.Name = "txbTestRDPBManualCommand";
+            txbTestRDPBManualCommand.Size = new Size(409, 26);
+            txbTestRDPBManualCommand.TabIndex = 10;
+            // 
+            // lblTestRDPBCommand
+            // 
+            lblTestRDPBCommand.AutoSize = true;
+            lblTestRDPBCommand.Location = new Point(12, 584);
+            lblTestRDPBCommand.Margin = new Padding(4, 0, 4, 0);
+            lblTestRDPBCommand.Name = "lblTestRDPBCommand";
+            lblTestRDPBCommand.Size = new Size(147, 20);
+            lblTestRDPBCommand.TabIndex = 9;
+            lblTestRDPBCommand.Text = "Команда в бракер";
+            // 
+            // txbTestRDPBCoolingBlocksStatus
+            // 
+            txbTestRDPBCoolingBlocksStatus.BackColor = SystemColors.Control;
+            txbTestRDPBCoolingBlocksStatus.Enabled = false;
+            txbTestRDPBCoolingBlocksStatus.Location = new Point(146, 509);
+            txbTestRDPBCoolingBlocksStatus.Margin = new Padding(4, 5, 4, 5);
+            txbTestRDPBCoolingBlocksStatus.Name = "txbTestRDPBCoolingBlocksStatus";
+            txbTestRDPBCoolingBlocksStatus.Size = new Size(70, 26);
+            txbTestRDPBCoolingBlocksStatus.TabIndex = 8;
+            // 
+            // cbTestRDPBCoolingBlocksQuantity
+            // 
+            cbTestRDPBCoolingBlocksQuantity.FormattingEnabled = true;
+            cbTestRDPBCoolingBlocksQuantity.Items.AddRange(new object[] { "3", "4" });
+            cbTestRDPBCoolingBlocksQuantity.Location = new Point(12, 509);
+            cbTestRDPBCoolingBlocksQuantity.Margin = new Padding(4, 5, 4, 5);
+            cbTestRDPBCoolingBlocksQuantity.Name = "cbTestRDPBCoolingBlocksQuantity";
+            cbTestRDPBCoolingBlocksQuantity.Size = new Size(124, 28);
+            cbTestRDPBCoolingBlocksQuantity.TabIndex = 7;
+            cbTestRDPBCoolingBlocksQuantity.SelectedIndexChanged += cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged;
+            // 
+            // lblCoolingBlockQuantity
+            // 
+            lblCoolingBlockQuantity.AutoSize = true;
+            lblCoolingBlockQuantity.Location = new Point(12, 483);
+            lblCoolingBlockQuantity.Margin = new Padding(4, 0, 4, 0);
+            lblCoolingBlockQuantity.Name = "lblCoolingBlockQuantity";
+            lblCoolingBlockQuantity.Size = new Size(292, 20);
+            lblCoolingBlockQuantity.TabIndex = 6;
+            lblCoolingBlockQuantity.Text = "Число позиций охлаждающего блока";
+            // 
+            // btnTestRDPBN90
+            // 
+            btnTestRDPBN90.Location = new Point(12, 402);
+            btnTestRDPBN90.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN90.Name = "btnTestRDPBN90";
+            btnTestRDPBN90.Size = new Size(204, 54);
+            btnTestRDPBN90.TabIndex = 5;
+            btnTestRDPBN90.Text = "(Получить статистику) N90->";
+            btnTestRDPBN90.UseVisualStyleBackColor = true;
+            btnTestRDPBN90.Click += btnTestRDPBN90_Click;
+            // 
+            // btnTestRDPBN83
+            // 
+            btnTestRDPBN83.Location = new Point(12, 340);
+            btnTestRDPBN83.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN83.Name = "btnTestRDPBN83";
+            btnTestRDPBN83.Size = new Size(204, 54);
+            btnTestRDPBN83.TabIndex = 4;
+            btnTestRDPBN83.Text = "(Выключить бракер) N83->";
+            btnTestRDPBN83.UseVisualStyleBackColor = true;
+            btnTestRDPBN83.Click += btnTestRDPBN83_Click;
+            // 
+            // btnTestRDPBN82
+            // 
+            btnTestRDPBN82.Location = new Point(12, 276);
+            btnTestRDPBN82.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN82.Name = "btnTestRDPBN82";
+            btnTestRDPBN82.Size = new Size(204, 54);
+            btnTestRDPBN82.TabIndex = 3;
+            btnTestRDPBN82.Text = "(Включить бракер) N82->";
+            btnTestRDPBN82.UseVisualStyleBackColor = true;
+            btnTestRDPBN82.Click += btnTestRDPBN82_Click;
+            // 
+            // btnTestRDPBN81
+            // 
+            btnTestRDPBN81.Location = new Point(12, 214);
+            btnTestRDPBN81.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN81.Name = "btnTestRDPBN81";
+            btnTestRDPBN81.Size = new Size(204, 54);
+            btnTestRDPBN81.TabIndex = 2;
+            btnTestRDPBN81.Text = "(Съем плохой) N81->";
+            btnTestRDPBN81.UseVisualStyleBackColor = true;
+            btnTestRDPBN81.Click += btnTestRDPBN81_Click;
+            // 
+            // btnTestRDPBN80
+            // 
+            btnTestRDPBN80.Location = new Point(12, 150);
+            btnTestRDPBN80.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN80.Name = "btnTestRDPBN80";
+            btnTestRDPBN80.Size = new Size(204, 54);
+            btnTestRDPBN80.TabIndex = 1;
+            btnTestRDPBN80.Text = "(Съем ОК) N80->";
+            btnTestRDPBN80.UseVisualStyleBackColor = true;
+            btnTestRDPBN80.Click += btnTestRDPBN80_Click;
+            // 
+            // btnRDPBTestConnect
+            // 
+            btnRDPBTestConnect.Location = new Point(12, 5);
+            btnRDPBTestConnect.Margin = new Padding(4, 5, 4, 5);
+            btnRDPBTestConnect.Name = "btnRDPBTestConnect";
+            btnRDPBTestConnect.Size = new Size(204, 93);
+            btnRDPBTestConnect.TabIndex = 0;
+            btnRDPBTestConnect.Text = "Подключение";
+            btnRDPBTestConnect.UseVisualStyleBackColor = true;
+            btnRDPBTestConnect.Click += btnRDPBTestConnect_Click;
+            // 
+            // tbDB
+            // 
+            tbDB.Controls.Add(btnRestoreRemoteDB);
+            tbDB.Controls.Add(btnRestoreLocalDB);
+            tbDB.Controls.Add(btnMoveToArchive);
+            tbDB.Controls.Add(btnTestDBRemoteRecreate);
+            tbDB.Controls.Add(btnTestDBLocalRecreate);
+            tbDB.Controls.Add(btnTestDBRemote);
+            tbDB.Controls.Add(btnTestDBLocal);
+            tbDB.Location = new Point(4, 29);
+            tbDB.Margin = new Padding(4, 5, 4, 5);
+            tbDB.Name = "tbDB";
+            tbDB.Size = new Size(1808, 1033);
+            tbDB.TabIndex = 7;
+            tbDB.Text = "База данных";
+            tbDB.UseVisualStyleBackColor = true;
+            // 
+            // btnRestoreRemoteDB
+            // 
+            btnRestoreRemoteDB.Location = new Point(632, 154);
+            btnRestoreRemoteDB.Margin = new Padding(4, 5, 4, 5);
+            btnRestoreRemoteDB.Name = "btnRestoreRemoteDB";
+            btnRestoreRemoteDB.Size = new Size(290, 97);
+            btnRestoreRemoteDB.TabIndex = 6;
+            btnRestoreRemoteDB.Text = "Восстановить удаленную базу данных";
+            btnRestoreRemoteDB.UseVisualStyleBackColor = true;
+            btnRestoreRemoteDB.Click += btnRestoreRemoteDB_Click;
+            // 
+            // btnRestoreLocalDB
+            // 
+            btnRestoreLocalDB.Location = new Point(632, 21);
+            btnRestoreLocalDB.Margin = new Padding(4, 5, 4, 5);
+            btnRestoreLocalDB.Name = "btnRestoreLocalDB";
+            btnRestoreLocalDB.Size = new Size(290, 97);
+            btnRestoreLocalDB.TabIndex = 5;
+            btnRestoreLocalDB.Text = "Восстановить локальную базу данных";
+            btnRestoreLocalDB.UseVisualStyleBackColor = true;
+            btnRestoreLocalDB.Click += btnRestoreLocalDB_Click;
+            // 
+            // btnMoveToArchive
+            // 
+            btnMoveToArchive.Location = new Point(972, 93);
+            btnMoveToArchive.Margin = new Padding(4, 5, 4, 5);
+            btnMoveToArchive.Name = "btnMoveToArchive";
+            btnMoveToArchive.Size = new Size(290, 97);
+            btnMoveToArchive.TabIndex = 4;
+            btnMoveToArchive.Text = "Переместить данные в архив";
+            btnMoveToArchive.UseVisualStyleBackColor = true;
+            btnMoveToArchive.Click += btnMoveToArchive_Click;
+            // 
+            // btnTestDBRemoteRecreate
+            // 
+            btnTestDBRemoteRecreate.Location = new Point(332, 154);
+            btnTestDBRemoteRecreate.Margin = new Padding(4, 5, 4, 5);
+            btnTestDBRemoteRecreate.Name = "btnTestDBRemoteRecreate";
+            btnTestDBRemoteRecreate.Size = new Size(290, 97);
+            btnTestDBRemoteRecreate.TabIndex = 3;
+            btnTestDBRemoteRecreate.Text = "Пересоздать удаленную базу данных";
+            btnTestDBRemoteRecreate.UseVisualStyleBackColor = true;
+            btnTestDBRemoteRecreate.Click += btnTestDBRemoteRecreate_Click;
+            // 
+            // btnTestDBLocalRecreate
+            // 
+            btnTestDBLocalRecreate.Location = new Point(332, 21);
+            btnTestDBLocalRecreate.Margin = new Padding(4, 5, 4, 5);
+            btnTestDBLocalRecreate.Name = "btnTestDBLocalRecreate";
+            btnTestDBLocalRecreate.Size = new Size(290, 97);
+            btnTestDBLocalRecreate.TabIndex = 2;
+            btnTestDBLocalRecreate.Text = "Пересоздать локальную базу данных";
+            btnTestDBLocalRecreate.UseVisualStyleBackColor = true;
+            btnTestDBLocalRecreate.Click += btnTestDBLocalRecreate_Click;
+            // 
+            // btnTestDBRemote
+            // 
+            btnTestDBRemote.Location = new Point(32, 154);
+            btnTestDBRemote.Margin = new Padding(4, 5, 4, 5);
+            btnTestDBRemote.Name = "btnTestDBRemote";
+            btnTestDBRemote.Size = new Size(290, 97);
+            btnTestDBRemote.TabIndex = 1;
+            btnTestDBRemote.Text = "Проверить базу данных архива";
+            btnTestDBRemote.UseVisualStyleBackColor = true;
+            btnTestDBRemote.Click += btnTestDBRemote_Click;
+            // 
+            // btnTestDBLocal
+            // 
+            btnTestDBLocal.Location = new Point(32, 21);
+            btnTestDBLocal.Margin = new Padding(4, 5, 4, 5);
+            btnTestDBLocal.Name = "btnTestDBLocal";
+            btnTestDBLocal.Size = new Size(290, 97);
+            btnTestDBLocal.TabIndex = 0;
+            btnTestDBLocal.Text = "Проверить локальную базу данных";
+            btnTestDBLocal.UseVisualStyleBackColor = true;
+            btnTestDBLocal.Click += btnTestDBLocal_Click;
+            // 
+            // tbArchive
+            // 
+            tbArchive.Location = new Point(4, 29);
+            tbArchive.Margin = new Padding(3, 4, 3, 4);
+            tbArchive.Name = "tbArchive";
+            tbArchive.Size = new Size(1808, 1033);
+            tbArchive.TabIndex = 8;
+            tbArchive.Text = "Архив съемов";
+            tbArchive.UseVisualStyleBackColor = true;
+            // 
+            // tbSettingsCheck
+            // 
+            tbSettingsCheck.Location = new Point(4, 29);
+            tbSettingsCheck.Name = "tbSettingsCheck";
+            tbSettingsCheck.Size = new Size(1808, 1033);
+            tbSettingsCheck.TabIndex = 12;
+            tbSettingsCheck.Text = "Проверка настроек";
+            tbSettingsCheck.UseVisualStyleBackColor = true;
+            // 
+            // xtbTest
+            // 
+            xtbTest.Controls.Add(cbTestCCDMaxPointShow);
+            xtbTest.Controls.Add(ssFooter);
+            xtbTest.Controls.Add(lblTimeImageProcess);
+            xtbTest.Controls.Add(cbInvertColors);
+            xtbTest.Controls.Add(btnCycleStop);
+            xtbTest.Controls.Add(btnCycleStart);
+            xtbTest.Controls.Add(chTestStandard);
+            xtbTest.Controls.Add(chTestDiff);
+            xtbTest.Controls.Add(lblNumLineCaption);
+            xtbTest.Controls.Add(cbFullMax);
+            xtbTest.Controls.Add(cbVertical);
+            xtbTest.Controls.Add(numFrame);
+            xtbTest.Controls.Add(chTestReadLine);
+            xtbTest.Controls.Add(lblTestStandard);
+            xtbTest.Controls.Add(lblTestDifference);
+            xtbTest.Controls.Add(lblTestRead);
+            xtbTest.Controls.Add(pbTestStandard);
+            xtbTest.Controls.Add(pbTestDifference);
+            xtbTest.Controls.Add(pbTestReadImage);
+            xtbTest.Controls.Add(btnTest_ReadSelectedSocket);
+            xtbTest.Controls.Add(lblTestSelectedSocket);
+            xtbTest.Controls.Add(lblTestSelectedSocketLabel);
+            xtbTest.Controls.Add(pnlTestSockets);
+            xtbTest.Controls.Add(lblStatus);
+            xtbTest.Controls.Add(label1);
+            xtbTest.Controls.Add(cbTest_ExternalStart);
+            xtbTest.Controls.Add(btnTest_ReadAllSocket);
+            xtbTest.Location = new Point(4, 29);
+            xtbTest.Margin = new Padding(4, 5, 4, 5);
+            xtbTest.Name = "xtbTest";
+            xtbTest.Size = new Size(1808, 1033);
+            xtbTest.TabIndex = 2;
+            xtbTest.Text = "xТест ПЗС";
+            xtbTest.UseVisualStyleBackColor = true;
             // 
             // cbTestCCDMaxPointShow
             // 
@@ -708,52 +1034,52 @@
             // 
             // chTestStandard
             // 
-            chartArea7.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea7.Name = "ChartArea1";
-            chTestStandard.ChartAreas.Add(chartArea7);
+            chartArea1.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea1.Name = "ChartArea1";
+            chTestStandard.ChartAreas.Add(chartArea1);
             chTestStandard.Location = new Point(1260, 616);
             chTestStandard.Margin = new Padding(4, 5, 4, 5);
             chTestStandard.Name = "chTestStandard";
             chTestStandard.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series19.ChartArea = "ChartArea1";
-            series19.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series19.Name = "Series1";
-            series20.ChartArea = "ChartArea1";
-            series20.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series20.Name = "Series2";
-            series21.ChartArea = "ChartArea1";
-            series21.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series21.Name = "Series3";
-            series21.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            chTestStandard.Series.Add(series19);
-            chTestStandard.Series.Add(series20);
-            chTestStandard.Series.Add(series21);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Name = "Series1";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Name = "Series2";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series3.Name = "Series3";
+            series3.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestStandard.Series.Add(series1);
+            chTestStandard.Series.Add(series2);
+            chTestStandard.Series.Add(series3);
             chTestStandard.Size = new Size(398, 301);
             chTestStandard.TabIndex = 38;
             chTestStandard.Text = "chart1";
             // 
             // chTestDiff
             // 
-            chartArea8.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea8.Name = "ChartArea1";
-            chTestDiff.ChartAreas.Add(chartArea8);
+            chartArea2.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea2.Name = "ChartArea1";
+            chTestDiff.ChartAreas.Add(chartArea2);
             chTestDiff.Location = new Point(876, 621);
             chTestDiff.Margin = new Padding(4, 5, 4, 5);
             chTestDiff.Name = "chTestDiff";
             chTestDiff.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series22.ChartArea = "ChartArea1";
-            series22.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series22.Name = "Series1";
-            series23.ChartArea = "ChartArea1";
-            series23.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series23.Name = "Series2";
-            series24.ChartArea = "ChartArea1";
-            series24.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series24.Name = "Series3";
-            series24.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            chTestDiff.Series.Add(series22);
-            chTestDiff.Series.Add(series23);
-            chTestDiff.Series.Add(series24);
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series4.Name = "Series1";
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series5.Name = "Series2";
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series6.Name = "Series3";
+            series6.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestDiff.Series.Add(series4);
+            chTestDiff.Series.Add(series5);
+            chTestDiff.Series.Add(series6);
             chTestDiff.Size = new Size(392, 301);
             chTestDiff.TabIndex = 37;
             chTestDiff.Text = "chart1";
@@ -801,26 +1127,26 @@
             // 
             // chTestReadLine
             // 
-            chartArea9.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea9.Name = "ChartArea1";
-            chTestReadLine.ChartAreas.Add(chartArea9);
+            chartArea3.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea3.Name = "ChartArea1";
+            chTestReadLine.ChartAreas.Add(chartArea3);
             chTestReadLine.Location = new Point(436, 616);
             chTestReadLine.Margin = new Padding(4, 5, 4, 5);
             chTestReadLine.Name = "chTestReadLine";
             chTestReadLine.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series25.ChartArea = "ChartArea1";
-            series25.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series25.Name = "Series1";
-            series26.ChartArea = "ChartArea1";
-            series26.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series26.Name = "Series2";
-            series27.ChartArea = "ChartArea1";
-            series27.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series27.Name = "Series3";
-            series27.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            chTestReadLine.Series.Add(series25);
-            chTestReadLine.Series.Add(series26);
-            chTestReadLine.Series.Add(series27);
+            series7.ChartArea = "ChartArea1";
+            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series7.Name = "Series1";
+            series8.ChartArea = "ChartArea1";
+            series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series8.Name = "Series2";
+            series9.ChartArea = "ChartArea1";
+            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series9.Name = "Series3";
+            series9.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestReadLine.Series.Add(series7);
+            chTestReadLine.Series.Add(series8);
+            chTestReadLine.Series.Add(series9);
             chTestReadLine.Size = new Size(468, 301);
             chTestReadLine.TabIndex = 31;
             chTestReadLine.Text = "chart1";
@@ -966,25 +1292,25 @@
             btnTest_ReadAllSocket.Text = "Читать все гнезда";
             btnTest_ReadAllSocket.UseVisualStyleBackColor = true;
             // 
-            // tbLEDControl
+            // xtbLEDControl
             // 
-            tbLEDControl.Controls.Add(panel4);
-            tbLEDControl.Controls.Add(btnTestLCBStop);
-            tbLEDControl.Controls.Add(pnlTestLCBSetWorkMode);
-            tbLEDControl.Controls.Add(panel3);
-            tbLEDControl.Controls.Add(panel2);
-            tbLEDControl.Controls.Add(panel1);
-            tbLEDControl.Controls.Add(pnlTestLCBCurrent);
-            tbLEDControl.Controls.Add(pnlTestLCBStatus);
-            tbLEDControl.Controls.Add(btnTestLCBInit);
-            tbLEDControl.Controls.Add(cbTestLCBSyncrosignal);
-            tbLEDControl.Location = new Point(4, 29);
-            tbLEDControl.Margin = new Padding(4, 5, 4, 5);
-            tbLEDControl.Name = "tbLEDControl";
-            tbLEDControl.Size = new Size(1808, 1033);
-            tbLEDControl.TabIndex = 4;
-            tbLEDControl.Text = "xТест БУС";
-            tbLEDControl.UseVisualStyleBackColor = true;
+            xtbLEDControl.Controls.Add(panel4);
+            xtbLEDControl.Controls.Add(btnTestLCBStop);
+            xtbLEDControl.Controls.Add(pnlTestLCBSetWorkMode);
+            xtbLEDControl.Controls.Add(panel3);
+            xtbLEDControl.Controls.Add(panel2);
+            xtbLEDControl.Controls.Add(panel1);
+            xtbLEDControl.Controls.Add(pnlTestLCBCurrent);
+            xtbLEDControl.Controls.Add(pnlTestLCBStatus);
+            xtbLEDControl.Controls.Add(btnTestLCBInit);
+            xtbLEDControl.Controls.Add(cbTestLCBSyncrosignal);
+            xtbLEDControl.Location = new Point(4, 29);
+            xtbLEDControl.Margin = new Padding(4, 5, 4, 5);
+            xtbLEDControl.Name = "xtbLEDControl";
+            xtbLEDControl.Size = new Size(1808, 1033);
+            xtbLEDControl.TabIndex = 4;
+            xtbLEDControl.Text = "xТест БУС";
+            xtbLEDControl.UseVisualStyleBackColor = true;
             // 
             // panel4
             // 
@@ -1875,334 +2201,19 @@
             cbTestLCBSyncrosignal.Text = "Синхросигнал";
             cbTestLCBSyncrosignal.UseVisualStyleBackColor = true;
             // 
-            // tbTestImages
-            // 
-            tbTestImages.Location = new Point(4, 29);
-            tbTestImages.Margin = new Padding(4, 5, 4, 5);
-            tbTestImages.Name = "tbTestImages";
-            tbTestImages.Size = new Size(1808, 1033);
-            tbTestImages.TabIndex = 5;
-            tbTestImages.Text = "Тест изображений";
-            tbTestImages.UseVisualStyleBackColor = true;
-            // 
-            // tbRDP
-            // 
-            tbRDP.Controls.Add(lblTestRDPBStatus);
-            tbRDP.Controls.Add(lvTestRDPBStatuses);
-            tbRDP.Controls.Add(btnTestRDPBSendCommand);
-            tbRDP.Controls.Add(txbTestRDPBManualCommand);
-            tbRDP.Controls.Add(lblTestRDPBCommand);
-            tbRDP.Controls.Add(txbTestRDPBCoolingBlocksStatus);
-            tbRDP.Controls.Add(cbTestRDPBCoolingBlocksQuantity);
-            tbRDP.Controls.Add(lblCoolingBlockQuantity);
-            tbRDP.Controls.Add(btnTestRDPBN90);
-            tbRDP.Controls.Add(btnTestRDPBN83);
-            tbRDP.Controls.Add(btnTestRDPBN82);
-            tbRDP.Controls.Add(btnTestRDPBN81);
-            tbRDP.Controls.Add(btnTestRDPBN80);
-            tbRDP.Controls.Add(btnRDPBTestConnect);
-            tbRDP.Location = new Point(4, 29);
-            tbRDP.Margin = new Padding(4, 5, 4, 5);
-            tbRDP.Name = "tbRDP";
-            tbRDP.Size = new Size(1808, 1033);
-            tbRDP.TabIndex = 6;
-            tbRDP.Text = "Тест бракера";
-            tbRDP.UseVisualStyleBackColor = true;
-            // 
-            // lblTestRDPBStatus
-            // 
-            lblTestRDPBStatus.AutoSize = true;
-            lblTestRDPBStatus.Location = new Point(666, 16);
-            lblTestRDPBStatus.Margin = new Padding(4, 0, 4, 0);
-            lblTestRDPBStatus.Name = "lblTestRDPBStatus";
-            lblTestRDPBStatus.Size = new Size(143, 20);
-            lblTestRDPBStatus.TabIndex = 13;
-            lblTestRDPBStatus.Text = "Статусы бракера:";
-            // 
-            // lvTestRDPBStatuses
-            // 
-            lvTestRDPBStatuses.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
-            lvTestRDPBStatuses.Location = new Point(670, 49);
-            lvTestRDPBStatuses.Margin = new Padding(4, 5, 4, 5);
-            lvTestRDPBStatuses.Name = "lvTestRDPBStatuses";
-            lvTestRDPBStatuses.Size = new Size(708, 437);
-            lvTestRDPBStatuses.TabIndex = 12;
-            lvTestRDPBStatuses.UseCompatibleStateImageBehavior = false;
-            lvTestRDPBStatuses.View = View.Details;
-            // 
-            // columnHeader1
-            // 
-            columnHeader1.Text = "Параметр";
-            columnHeader1.Width = 200;
-            // 
-            // columnHeader2
-            // 
-            columnHeader2.Text = "Значение";
-            columnHeader2.Width = 289;
-            // 
-            // btnTestRDPBSendCommand
-            // 
-            btnTestRDPBSendCommand.Location = new Point(432, 609);
-            btnTestRDPBSendCommand.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBSendCommand.Name = "btnTestRDPBSendCommand";
-            btnTestRDPBSendCommand.Size = new Size(123, 51);
-            btnTestRDPBSendCommand.TabIndex = 11;
-            btnTestRDPBSendCommand.Text = "Послать";
-            btnTestRDPBSendCommand.UseVisualStyleBackColor = true;
-            btnTestRDPBSendCommand.Click += btnTestRDPBSendCommand_Click;
-            // 
-            // txbTestRDPBManualCommand
-            // 
-            txbTestRDPBManualCommand.Location = new Point(12, 616);
-            txbTestRDPBManualCommand.Margin = new Padding(4, 5, 4, 5);
-            txbTestRDPBManualCommand.Name = "txbTestRDPBManualCommand";
-            txbTestRDPBManualCommand.Size = new Size(409, 26);
-            txbTestRDPBManualCommand.TabIndex = 10;
-            // 
-            // lblTestRDPBCommand
-            // 
-            lblTestRDPBCommand.AutoSize = true;
-            lblTestRDPBCommand.Location = new Point(12, 584);
-            lblTestRDPBCommand.Margin = new Padding(4, 0, 4, 0);
-            lblTestRDPBCommand.Name = "lblTestRDPBCommand";
-            lblTestRDPBCommand.Size = new Size(147, 20);
-            lblTestRDPBCommand.TabIndex = 9;
-            lblTestRDPBCommand.Text = "Команда в бракер";
-            // 
-            // txbTestRDPBCoolingBlocksStatus
-            // 
-            txbTestRDPBCoolingBlocksStatus.BackColor = SystemColors.Control;
-            txbTestRDPBCoolingBlocksStatus.Enabled = false;
-            txbTestRDPBCoolingBlocksStatus.Location = new Point(146, 509);
-            txbTestRDPBCoolingBlocksStatus.Margin = new Padding(4, 5, 4, 5);
-            txbTestRDPBCoolingBlocksStatus.Name = "txbTestRDPBCoolingBlocksStatus";
-            txbTestRDPBCoolingBlocksStatus.Size = new Size(70, 26);
-            txbTestRDPBCoolingBlocksStatus.TabIndex = 8;
-            // 
-            // cbTestRDPBCoolingBlocksQuantity
-            // 
-            cbTestRDPBCoolingBlocksQuantity.FormattingEnabled = true;
-            cbTestRDPBCoolingBlocksQuantity.Items.AddRange(new object[] { "3", "4" });
-            cbTestRDPBCoolingBlocksQuantity.Location = new Point(12, 509);
-            cbTestRDPBCoolingBlocksQuantity.Margin = new Padding(4, 5, 4, 5);
-            cbTestRDPBCoolingBlocksQuantity.Name = "cbTestRDPBCoolingBlocksQuantity";
-            cbTestRDPBCoolingBlocksQuantity.Size = new Size(124, 28);
-            cbTestRDPBCoolingBlocksQuantity.TabIndex = 7;
-            cbTestRDPBCoolingBlocksQuantity.SelectedIndexChanged += cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged;
-            // 
-            // lblCoolingBlockQuantity
-            // 
-            lblCoolingBlockQuantity.AutoSize = true;
-            lblCoolingBlockQuantity.Location = new Point(12, 483);
-            lblCoolingBlockQuantity.Margin = new Padding(4, 0, 4, 0);
-            lblCoolingBlockQuantity.Name = "lblCoolingBlockQuantity";
-            lblCoolingBlockQuantity.Size = new Size(292, 20);
-            lblCoolingBlockQuantity.TabIndex = 6;
-            lblCoolingBlockQuantity.Text = "Число позиций охлаждающего блока";
-            // 
-            // btnTestRDPBN90
-            // 
-            btnTestRDPBN90.Location = new Point(12, 402);
-            btnTestRDPBN90.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN90.Name = "btnTestRDPBN90";
-            btnTestRDPBN90.Size = new Size(204, 54);
-            btnTestRDPBN90.TabIndex = 5;
-            btnTestRDPBN90.Text = "(Получить статистику) N90->";
-            btnTestRDPBN90.UseVisualStyleBackColor = true;
-            btnTestRDPBN90.Click += btnTestRDPBN90_Click;
-            // 
-            // btnTestRDPBN83
-            // 
-            btnTestRDPBN83.Location = new Point(12, 340);
-            btnTestRDPBN83.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN83.Name = "btnTestRDPBN83";
-            btnTestRDPBN83.Size = new Size(204, 54);
-            btnTestRDPBN83.TabIndex = 4;
-            btnTestRDPBN83.Text = "(Выключить бракер) N83->";
-            btnTestRDPBN83.UseVisualStyleBackColor = true;
-            btnTestRDPBN83.Click += btnTestRDPBN83_Click;
-            // 
-            // btnTestRDPBN82
-            // 
-            btnTestRDPBN82.Location = new Point(12, 276);
-            btnTestRDPBN82.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN82.Name = "btnTestRDPBN82";
-            btnTestRDPBN82.Size = new Size(204, 54);
-            btnTestRDPBN82.TabIndex = 3;
-            btnTestRDPBN82.Text = "(Включить бракер) N82->";
-            btnTestRDPBN82.UseVisualStyleBackColor = true;
-            btnTestRDPBN82.Click += btnTestRDPBN82_Click;
-            // 
-            // btnTestRDPBN81
-            // 
-            btnTestRDPBN81.Location = new Point(12, 214);
-            btnTestRDPBN81.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN81.Name = "btnTestRDPBN81";
-            btnTestRDPBN81.Size = new Size(204, 54);
-            btnTestRDPBN81.TabIndex = 2;
-            btnTestRDPBN81.Text = "(Съем плохой) N81->";
-            btnTestRDPBN81.UseVisualStyleBackColor = true;
-            btnTestRDPBN81.Click += btnTestRDPBN81_Click;
-            // 
-            // btnTestRDPBN80
-            // 
-            btnTestRDPBN80.Location = new Point(12, 150);
-            btnTestRDPBN80.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN80.Name = "btnTestRDPBN80";
-            btnTestRDPBN80.Size = new Size(204, 54);
-            btnTestRDPBN80.TabIndex = 1;
-            btnTestRDPBN80.Text = "(Съем ОК) N80->";
-            btnTestRDPBN80.UseVisualStyleBackColor = true;
-            btnTestRDPBN80.Click += btnTestRDPBN80_Click;
-            // 
-            // btnRDPBTestConnect
-            // 
-            btnRDPBTestConnect.Location = new Point(12, 5);
-            btnRDPBTestConnect.Margin = new Padding(4, 5, 4, 5);
-            btnRDPBTestConnect.Name = "btnRDPBTestConnect";
-            btnRDPBTestConnect.Size = new Size(204, 93);
-            btnRDPBTestConnect.TabIndex = 0;
-            btnRDPBTestConnect.Text = "Подключение";
-            btnRDPBTestConnect.UseVisualStyleBackColor = true;
-            btnRDPBTestConnect.Click += btnRDPBTestConnect_Click;
-            // 
-            // tbDB
-            // 
-            tbDB.Controls.Add(btnRestoreRemoteDB);
-            tbDB.Controls.Add(btnRestoreLocalDB);
-            tbDB.Controls.Add(btnMoveToArchive);
-            tbDB.Controls.Add(btnTestDBRemoteRecreate);
-            tbDB.Controls.Add(btnTestDBLocalRecreate);
-            tbDB.Controls.Add(btnTestDBRemote);
-            tbDB.Controls.Add(btnTestDBLocal);
-            tbDB.Location = new Point(4, 29);
-            tbDB.Margin = new Padding(4, 5, 4, 5);
-            tbDB.Name = "tbDB";
-            tbDB.Size = new Size(1808, 1033);
-            tbDB.TabIndex = 7;
-            tbDB.Text = "База данных";
-            tbDB.UseVisualStyleBackColor = true;
-            // 
-            // btnRestoreRemoteDB
-            // 
-            btnRestoreRemoteDB.Location = new Point(632, 154);
-            btnRestoreRemoteDB.Margin = new Padding(4, 5, 4, 5);
-            btnRestoreRemoteDB.Name = "btnRestoreRemoteDB";
-            btnRestoreRemoteDB.Size = new Size(290, 97);
-            btnRestoreRemoteDB.TabIndex = 6;
-            btnRestoreRemoteDB.Text = "Восстановить удаленную базу данных";
-            btnRestoreRemoteDB.UseVisualStyleBackColor = true;
-            btnRestoreRemoteDB.Click += btnRestoreRemoteDB_Click;
-            // 
-            // btnRestoreLocalDB
-            // 
-            btnRestoreLocalDB.Location = new Point(632, 21);
-            btnRestoreLocalDB.Margin = new Padding(4, 5, 4, 5);
-            btnRestoreLocalDB.Name = "btnRestoreLocalDB";
-            btnRestoreLocalDB.Size = new Size(290, 97);
-            btnRestoreLocalDB.TabIndex = 5;
-            btnRestoreLocalDB.Text = "Восстановить локальную базу данных";
-            btnRestoreLocalDB.UseVisualStyleBackColor = true;
-            btnRestoreLocalDB.Click += btnRestoreLocalDB_Click;
-            // 
-            // btnMoveToArchive
-            // 
-            btnMoveToArchive.Location = new Point(972, 93);
-            btnMoveToArchive.Margin = new Padding(4, 5, 4, 5);
-            btnMoveToArchive.Name = "btnMoveToArchive";
-            btnMoveToArchive.Size = new Size(290, 97);
-            btnMoveToArchive.TabIndex = 4;
-            btnMoveToArchive.Text = "Переместить данные в архив";
-            btnMoveToArchive.UseVisualStyleBackColor = true;
-            btnMoveToArchive.Click += btnMoveToArchive_Click;
-            // 
-            // btnTestDBRemoteRecreate
-            // 
-            btnTestDBRemoteRecreate.Location = new Point(332, 154);
-            btnTestDBRemoteRecreate.Margin = new Padding(4, 5, 4, 5);
-            btnTestDBRemoteRecreate.Name = "btnTestDBRemoteRecreate";
-            btnTestDBRemoteRecreate.Size = new Size(290, 97);
-            btnTestDBRemoteRecreate.TabIndex = 3;
-            btnTestDBRemoteRecreate.Text = "Пересоздать удаленную базу данных";
-            btnTestDBRemoteRecreate.UseVisualStyleBackColor = true;
-            btnTestDBRemoteRecreate.Click += btnTestDBRemoteRecreate_Click;
-            // 
-            // btnTestDBLocalRecreate
-            // 
-            btnTestDBLocalRecreate.Location = new Point(332, 21);
-            btnTestDBLocalRecreate.Margin = new Padding(4, 5, 4, 5);
-            btnTestDBLocalRecreate.Name = "btnTestDBLocalRecreate";
-            btnTestDBLocalRecreate.Size = new Size(290, 97);
-            btnTestDBLocalRecreate.TabIndex = 2;
-            btnTestDBLocalRecreate.Text = "Пересоздать локальную базу данных";
-            btnTestDBLocalRecreate.UseVisualStyleBackColor = true;
-            btnTestDBLocalRecreate.Click += btnTestDBLocalRecreate_Click;
-            // 
-            // btnTestDBRemote
-            // 
-            btnTestDBRemote.Location = new Point(32, 154);
-            btnTestDBRemote.Margin = new Padding(4, 5, 4, 5);
-            btnTestDBRemote.Name = "btnTestDBRemote";
-            btnTestDBRemote.Size = new Size(290, 97);
-            btnTestDBRemote.TabIndex = 1;
-            btnTestDBRemote.Text = "Проверить базу данных архива";
-            btnTestDBRemote.UseVisualStyleBackColor = true;
-            btnTestDBRemote.Click += btnTestDBRemote_Click;
-            // 
-            // btnTestDBLocal
-            // 
-            btnTestDBLocal.Location = new Point(32, 21);
-            btnTestDBLocal.Margin = new Padding(4, 5, 4, 5);
-            btnTestDBLocal.Name = "btnTestDBLocal";
-            btnTestDBLocal.Size = new Size(290, 97);
-            btnTestDBLocal.TabIndex = 0;
-            btnTestDBLocal.Text = "Проверить локальную базу данных";
-            btnTestDBLocal.UseVisualStyleBackColor = true;
-            btnTestDBLocal.Click += btnTestDBLocal_Click;
-            // 
-            // tbArchive
-            // 
-            tbArchive.Location = new Point(4, 29);
-            tbArchive.Margin = new Padding(3, 4, 3, 4);
-            tbArchive.Name = "tbArchive";
-            tbArchive.Size = new Size(1808, 1033);
-            tbArchive.TabIndex = 8;
-            tbArchive.Text = "Архив съемов";
-            tbArchive.UseVisualStyleBackColor = true;
-            // 
-            // tbCCDTest
-            // 
-            tbCCDTest.Location = new Point(4, 29);
-            tbCCDTest.Margin = new Padding(3, 4, 3, 4);
-            tbCCDTest.Name = "tbCCDTest";
-            tbCCDTest.Size = new Size(1808, 1033);
-            tbCCDTest.TabIndex = 9;
-            tbCCDTest.Text = "Тест ПЗС uc";
-            tbCCDTest.UseVisualStyleBackColor = true;
-            // 
-            // tbTestLCB_uc
-            // 
-            tbTestLCB_uc.Location = new Point(4, 29);
-            tbTestLCB_uc.Margin = new Padding(3, 4, 3, 4);
-            tbTestLCB_uc.Name = "tbTestLCB_uc";
-            tbTestLCB_uc.Size = new Size(1808, 1033);
-            tbTestLCB_uc.TabIndex = 11;
-            tbTestLCB_uc.Text = "Тест БУС uc";
-            tbTestLCB_uc.UseVisualStyleBackColor = true;
-            // 
-            // tbSettingsCheck
-            // 
-            tbSettingsCheck.Location = new Point(4, 29);
-            tbSettingsCheck.Name = "tbSettingsCheck";
-            tbSettingsCheck.Size = new Size(1808, 1033);
-            tbSettingsCheck.TabIndex = 12;
-            tbSettingsCheck.Text = "Проверка настроек";
-            tbSettingsCheck.UseVisualStyleBackColor = true;
-            // 
             // timer1
             // 
             timer1.Enabled = true;
             timer1.Tick += timer1_Tick;
+            // 
+            // tbTestRDPB_uc
+            // 
+            tbTestRDPB_uc.Location = new Point(4, 29);
+            tbTestRDPB_uc.Name = "tbTestRDPB_uc";
+            tbTestRDPB_uc.Size = new Size(1808, 1033);
+            tbTestRDPB_uc.TabIndex = 13;
+            tbTestRDPB_uc.Text = "*Тест бракера";
+            tbTestRDPB_uc.UseVisualStyleBackColor = true;
             // 
             // DoMCSettingsInterface
             // 
@@ -2224,8 +2235,11 @@
             tabControl1.ResumeLayout(false);
             tbSettingsStatus.ResumeLayout(false);
             tbSettingsStatus.PerformLayout();
-            tbTest.ResumeLayout(false);
-            tbTest.PerformLayout();
+            tbRDP.ResumeLayout(false);
+            tbRDP.PerformLayout();
+            tbDB.ResumeLayout(false);
+            xtbTest.ResumeLayout(false);
+            xtbTest.PerformLayout();
             ssFooter.ResumeLayout(false);
             ssFooter.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)chTestStandard).EndInit();
@@ -2235,8 +2249,8 @@
             ((System.ComponentModel.ISupportInitialize)pbTestStandard).EndInit();
             ((System.ComponentModel.ISupportInitialize)pbTestDifference).EndInit();
             ((System.ComponentModel.ISupportInitialize)pbTestReadImage).EndInit();
-            tbLEDControl.ResumeLayout(false);
-            tbLEDControl.PerformLayout();
+            xtbLEDControl.ResumeLayout(false);
+            xtbLEDControl.PerformLayout();
             panel4.ResumeLayout(false);
             pnlTestLCBSetWorkMode.ResumeLayout(false);
             panel3.ResumeLayout(false);
@@ -2254,9 +2268,6 @@
             gbTestLCBInputs.PerformLayout();
             gbTestLCBOutputs.ResumeLayout(false);
             gbTestLCBOutputs.PerformLayout();
-            tbRDP.ResumeLayout(false);
-            tbRDP.PerformLayout();
-            tbDB.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2276,7 +2287,7 @@
         private System.Windows.Forms.ColumnHeader chMac;
         private System.Windows.Forms.ColumnHeader chFirstSocket;
         private System.Windows.Forms.ColumnHeader chLastSocket;
-        private System.Windows.Forms.TabPage tbTest;
+        private System.Windows.Forms.TabPage xtbTest;
         private System.Windows.Forms.Button btnTest_ReadAllSocket;
         private System.Windows.Forms.CheckBox cbTest_ExternalStart;
         private System.Windows.Forms.Label lblStatus;
@@ -2304,7 +2315,7 @@
         private System.Windows.Forms.NumericUpDown numFrame;
         private System.Windows.Forms.DataVisualization.Charting.Chart chTestStandard;
         private System.Windows.Forms.DataVisualization.Charting.Chart chTestDiff;
-        private System.Windows.Forms.TabPage tbLEDControl;
+        private System.Windows.Forms.TabPage xtbLEDControl;
         private System.Windows.Forms.Button btnCycleStart;
         private System.Windows.Forms.Button btnCycleStop;
         private System.Windows.Forms.TabPage tbTestImages;
@@ -2440,8 +2451,9 @@
         private Button btnTestLCBSetAll;
         private Button btnTestLCBInit;
         private CheckBox cbTestLCBSyncrosignal;
-        private TabPage tbTestLCB_uc;
+        private TabPage tbTestLCB;
         private TabPage tbSettingsCheck;
+        private TabPage tbTestRDPB_uc;
     }
 }
 

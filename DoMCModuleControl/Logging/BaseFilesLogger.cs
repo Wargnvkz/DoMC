@@ -77,7 +77,7 @@ namespace DoMCModuleControl.Logging
                 ChangeDate();
                 StringBuilder sb = new StringBuilder();
 
-                sb.Append(DateTime.Now.ToString("dd-MM-yyyy HH\\:mm\\:ss    "));
+                sb.Append(DateTime.Now.ToString("dd-MM-yyyy HH\\:mm\\:ss.fff    "));
 
                 sb.Append(Message);
                 var msg = sb.ToString();

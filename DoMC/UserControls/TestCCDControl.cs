@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace DoMC.Forms
 {
-    public partial class TestCCDInterface : UserControl, IDisposable
+    public partial class TestCCDControl : UserControl, IDisposable
     {
         bool IsCycleStarted = false;
         IMainController MainController;
@@ -43,7 +43,7 @@ namespace DoMC.Forms
         bool TestCCDIsReading;
         IDoMCSettingsUpdatedProvider SettingsUpdateProvider;
         DoMCLib.Classes.DoMCApplicationContext CurrentContext;
-        public TestCCDInterface(IMainController Controller, ILogger logger, DoMC.Classes.IDoMCSettingsUpdatedProvider settingsUpdateProvider)
+        public TestCCDControl(IMainController Controller, ILogger logger, DoMC.Classes.IDoMCSettingsUpdatedProvider settingsUpdateProvider)
         {
             InitializeComponent();
             MainController = Controller;

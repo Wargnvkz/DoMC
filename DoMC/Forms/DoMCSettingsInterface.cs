@@ -58,7 +58,7 @@ namespace DoMC
 
         //ModelCommandProcessor contextProcessor;
 
-        TestCCDInterface TestCCDInterfaceView;
+        TestCCDControl TestCCDInterfaceView;
         GetCCDStandardInterface GetCCDStandardInterface;
         TestLCBInterface TestLCBInterface;
         CheckSettings CheckSettingsInterface;
@@ -154,7 +154,7 @@ namespace DoMC
             var bmpGraphics = Graphics.FromImage(bmpCheckSign);
             bmpGraphics.DrawString("✓", new Font("Arial", 300), new SolidBrush(Color.LimeGreen), new PointF(0, 0));
 
-            TestCCDInterfaceView = new TestCCDInterface(Controller, WorkingLog, this);
+            TestCCDInterfaceView = new TestCCDControl(Controller, WorkingLog, this);
             tbCCDTest.Controls.Add(TestCCDInterfaceView);
             TestCCDInterfaceView.Size = tbCCDTest.ClientSize;
 
@@ -163,8 +163,8 @@ namespace DoMC
             GetCCDStandardInterface.Size = tbCCDTest.ClientSize;
 
             TestLCBInterface = new TestLCBInterface(Controller, WorkingLog, this);
-            tbTestLCB_uc.Controls.Add(TestLCBInterface);
-            TestLCBInterface.Size = tbTestLCB_uc.ClientSize;
+            tbTestLCB.Controls.Add(TestLCBInterface);
+            TestLCBInterface.Size = tbTestLCB.ClientSize;
 
 
             CheckSettingsInterface = new CheckSettings(Controller, WorkingLog, this);

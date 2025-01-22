@@ -131,11 +131,11 @@ namespace DoMCModuleControl.Commands
             Error = null;
             try
             {
-                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Начало выполнения {CommandName}.");
+                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Начало выполнения кода команды {CommandName}.");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Started}", InputData);
                 if (InputType != null && InputData == null) throw new InvalidOperationException($"Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
                 Executing();
-                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Команды {CommandName} выполнена");
+                Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Выполнение кода команды {CommandName} завершено");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Suceeded}", OutputData);
                 IsRunning = false;
                 IsCompleteSuccessfully = true;

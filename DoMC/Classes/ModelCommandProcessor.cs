@@ -15,7 +15,7 @@ using DoMCApplicationContext = DoMCLib.Classes.DoMCApplicationContext;
 
 namespace DoMC.Classes
 {
-    public class ModelCommandProcessor
+   /* public class ModelCommandProcessor
     {
         IMainController Controller;
         DoMCApplicationContext Context;
@@ -199,5 +199,5 @@ namespace DoMC.Classes
             }
             return null;
         }
-    }
+    }*/
 }

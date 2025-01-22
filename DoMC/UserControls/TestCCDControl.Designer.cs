@@ -1,6 +1,6 @@
 ﻿namespace DoMC.Forms
 {
-    partial class TestCCDInterface
+    partial class TestCCDControl
     {
         /// <summary> 
         /// Обязательная переменная конструктора.
@@ -403,7 +403,7 @@
             cbTestCCDMaxPointShow.Text = "Показать максимальную точку";
             cbTestCCDMaxPointShow.UseVisualStyleBackColor = true;
             // 
-            // TestCCDInterface
+            // TestCCDControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -433,7 +433,7 @@
             Controls.Add(label1);
             Controls.Add(cbTest_ExternalStart);
             Controls.Add(btnTest_ReadAllSocket);
-            Name = "TestCCDInterface";
+            Name = "TestCCDControl";
             Size = new Size(1683, 902);
             Resize += TestCCDInterface_Resize;
             ((System.ComponentModel.ISupportInitialize)chTestStandard).EndInit();

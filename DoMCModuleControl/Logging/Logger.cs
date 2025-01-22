@@ -18,7 +18,7 @@ namespace DoMCModuleControl.Logging
             if (baseLogger == null) throw new ArgumentNullException(nameof(baseLogger));
             ModuleName = moduleName;
             BaseLogger = baseLogger;
-            MaxLogginLevel = LoggerLevel.Information;
+            MaxLogginLevel = LoggerLevel.FullDetailedInformation;
         }
 
         public void Add(LoggerLevel level, string Message)

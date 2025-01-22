@@ -14,6 +14,7 @@ using DoMCLib.Classes.Module.CCD;
 using DoMC.Tools;
 using DoMCLib.Classes.Module.LCB;
 using static DoMCLib.Classes.Module.LCB.LCBModule;
+using System.Security.Cryptography;
 
 namespace DoMC.UserControls
 {
@@ -34,9 +35,16 @@ namespace DoMC.UserControls
         bool LCBSettingsPreformLengthGotFromConfig = false;
         bool LCBSettingsDelayLengthGotFromConfig = false;
 
+        CheckBox[] TestLCBOutputs;
+        CheckBox[] TestLCBInputs;
+        CheckBox[] TestLCBLEDs;
+
+
+
         public TestLCBInterface(IMainController Controller, ILogger logger, DoMC.Classes.IDoMCSettingsUpdatedProvider settingsUpdateProvider)
         {
             InitializeComponent();
+            InitControls();
             MainController = Controller;
             WorkingLog = logger;
             SettingsUpdateProvider = settingsUpdateProvider;
@@ -85,10 +93,17 @@ namespace DoMC.UserControls
 
         }
 
-        #region TestLCB
-        CheckBox[] TestLCBOutputs;
-        CheckBox[] TestLCBInputs;
-        CheckBox[] TestLCBLEDs;
+        private void InitControls()
+        {
+
+            TestLCBOutputs = new CheckBox[] { cbTestLCBOutput0, cbTestLCBOutput1, cbTestLCBOutput2, cbTestLCBOutput3, cbTestLCBOutput4, cbTestLCBOutput5 };
+            TestLCBInputs = new CheckBox[] { cbTestLCBInput0, cbTestLCBInput1, cbTestLCBInput2, cbTestLCBInput3, cbTestLCBInput4, cbTestLCBInput5, cbTestLCBInput6, cbTestLCBInput7 };
+            TestLCBLEDs = new CheckBox[] { cbTestLCBLED0, cbTestLCBLED1, cbTestLCBLED2, cbTestLCBLED3, cbTestLCBLED4, cbTestLCBLED5, cbTestLCBLED6, cbTestLCBLED7, cbTestLCBLED8, cbTestLCBLED9, cbTestLCBLED10, cbTestLCBLED11 };
+
+        }
+
+
+
         private void btnTestLCBReadStatuses_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
@@ -337,8 +352,8 @@ namespace DoMC.UserControls
             SetImpulsesToTextBoxes(txbTestLCBPreformLength, txbTestLCBPreformLengthMm, LEDParameters.PreformLengthImpulses);
             SetImpulsesToTextBoxes(txbTestLCBDelayLength, txbTestLCBDelayLengthMm, LEDParameters.DelayLengthImpulses);
 
-            txbTestLCBPreformLength.Text = LEDParameters.PreformLengthImpulses.ToString();
-            txbTestLCBDelayLength.Text = LEDParameters.DelayLengthImpulses.ToString();
+            //txbTestLCBPreformLength.Text = LEDParameters.PreformLengthImpulses.ToString();
+            //txbTestLCBDelayLength.Text = LEDParameters.DelayLengthImpulses.ToString();
 
         }
 
@@ -592,17 +607,40 @@ namespace DoMC.UserControls
             }
         }
 
-        #endregion TestLCB
 
 
         private void btnLCBSaveToConfig_Click(object sender, EventArgs e)
         {
-
+            if (!int.TryParse(txbTestLCBPreformLength.Text, out int preformLength))
+            {
+                MessageBox.Show("Значение длины преформы в импульсах должно быть целым числом");
+                txbTestLCBPreformLength.Focus();
+                return;
+            }
+            if (!int.TryParse(txbTestLCBDelayLength.Text, out int delayLength))
+            {
+                MessageBox.Show("Значение расстояния задержки в импульсах должно быть целым числом");
+                txbTestLCBDelayLength.Focus();
+                return;
+            }
+            if (!int.TryParse(txbTestLCBCurrent.Text, out int current))
+            {
+                MessageBox.Show("Значение тока должно быть целым числом");
+                txbTestLCBCurrent.Focus();
+                return;
+            }
+            if (CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings == null)
+                CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings = new LCBSettings() { LCBKoefficient = 75.2 };
+            CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LEDCurrent = current;
+            CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.DelayLength = delayLength;
+            CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.PreformLength = preformLength;
         }
 
         private void btnLCBLoadFromConfig_Click(object sender, EventArgs e)
         {
-
+            txbTestLCBCurrent.Text = CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LEDCurrent.ToString();
+            SetImpulsesToTextBoxes(txbTestLCBPreformLength, txbTestLCBPreformLengthMm, CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.PreformLength);
+            SetImpulsesToTextBoxes(txbTestLCBDelayLength, txbTestLCBDelayLengthMm, CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.DelayLength);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
