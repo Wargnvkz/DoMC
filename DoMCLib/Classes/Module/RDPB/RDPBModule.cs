@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -202,7 +203,7 @@ namespace DoMCLib.Classes.Module.RDPB
                     var AnswerString = Encoding.ASCII.GetString(msgarr);
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получено от бракера: <{AnswerString.Trim()}>");
                     var result = CurrentStatus.ChangeFromString(AnswerString);
-                    mainController.GetObserver().Notify(this, "StatusChanged", result.ToString(), CurrentStatus);
+                    mainController.GetObserver().Notify(this, CurrentStatus.CommandType.ToString(), result.ToString(), CurrentStatus);
                 }
                 while (buffer.Length > 0);
             }

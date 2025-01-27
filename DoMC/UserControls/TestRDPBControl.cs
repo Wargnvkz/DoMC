@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using DoMC.Classes;
 using DoMCLib.Classes.Module.LCB;
 using static DoMCLib.Classes.Module.LCB.LCBModule;
+using DoMCLib.Classes.Module.RDPB.Classes;
 
 namespace DoMC.UserControls
 {
@@ -23,6 +24,9 @@ namespace DoMC.UserControls
         Observer CurrentObserver;
         DoMCLib.Classes.DoMCApplicationContext CurrentContext;
         bool TestRDPBConnected = false;
+        private RDPBStatus CurrentStatus;
+        bool IsStarted = false;
+
         public TestRDPBControl(IMainController Controller, ILogger logger, DoMC.Classes.IDoMCSettingsUpdatedProvider settingsUpdateProvider)
         {
             InitializeComponent();
@@ -38,17 +42,30 @@ namespace DoMC.UserControls
         }
         private void Observer_NotificationReceivers(string EventName, object? data)
         {
-            if (EventName.EndsWith($"{LEDCommandType.LEDSynchrosignalResponse}.{EventType.Received}"))
+            var EventNameParts = EventName.Split('.');
+            if (EventNameParts[0] == nameof(DoMCLib.Classes.Module.RDPB.RDPBModule))
             {
-                LastSinchrosignal = DateTime.Now;
+                if (Enum.TryParse(EventNameParts[2], out StatusStringProccessResult result))
+                {
+                    if (result == StatusStringProccessResult.OK)
+                    {
+                        if (Enum.TryParse(EventNameParts[1], out RDPBCommandType command))
+                        {
+                            if (data is RDPBStatus cs)
+                            {
+                                CurrentStatus = cs;
+                            }
+                        }
+                    }
+                }
             }
         }
 
         private void SettingsUpdateProvider_SettingsUpdated(object? sender, EventArgs e)
         {
             var context = SettingsUpdateProvider.GetContext();
-            if (TestLCBConnected)
-                TestLCBStop();
+            if (TestRDPBConnected)
+                TestRDPBStop();
             ApplyNewContext(context);
         }
         private void OnDispose(object? sender, EventArgs e)
@@ -63,30 +80,39 @@ namespace DoMC.UserControls
             }
             catch { }
         }
+        private void ApplyNewContext(DoMCLib.Classes.DoMCApplicationContext context)
+        {
+            CurrentContext = context;
+            FillPage();
+        }
+        private void FillPage()
+        {
+
+        }
 
         private void TestRDPBStop()
         {
-            
-            Context.SendCommand(ModuleCommand.RDPBStop);
-            if (!Context.RDPBCurrentStatus.IsStarted)
+            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StopCommand));
+            cmd.ExecuteCommand();
+            if (!IsStarted)
             {
                 TestRDPBConnected = false;
                 btnRDPBTestConnect.BackColor = SystemColors.Control;
                 btnRDPBTestConnect.Text = "Подключить";
             }
-            
+
         }
         private void TestRDPBStart()
         {
-            
-            Context.SendCommand(ModuleCommand.RDPBStart);
-            if (Context.RDPBCurrentStatus.IsStarted)
+            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StopCommand));
+            cmd.ExecuteCommand();
+            if (IsStarted)
             {
                 TestRDPBConnected = true;
                 btnRDPBTestConnect.BackColor = Color.Green;
                 btnRDPBTestConnect.Text = "Отключить";
             }
-            
+
         }
 
         private void btnRDPBTestConnect_Click(object sender, EventArgs e)
@@ -104,9 +130,13 @@ namespace DoMC.UserControls
 
         private void btnTestRDPBN80_Click(object sender, EventArgs e)
         {
-            
+
             if (!TestRDPBConnected) return;
             this.Enabled = false;
+            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SendSetIsOkCommand));
+
+
+
             Context.SendCommand(ModuleCommand.RDPBSetIsOK);
             var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetIsOK && Context.RDPBCurrentStatus.IsCurrentStatusActual());
             if (!res)
@@ -117,12 +147,12 @@ namespace DoMC.UserControls
             }
             TestRDPBStatusFill();
             this.Enabled = true;
-            
+
         }
 
         private void btnTestRDPBN81_Click(object sender, EventArgs e)
         {
-            
+
             //if (!TestRDPBConnected) return;
             this.Enabled = false;
             Context.SendCommand(ModuleCommand.RDPBSetIsBad);
@@ -135,12 +165,12 @@ namespace DoMC.UserControls
             }
             TestRDPBStatusFill();
             this.Enabled = true;
-            
+
         }
 
         private void btnTestRDPBN82_Click(object sender, EventArgs e)
         {
-            
+
             if (!TestRDPBConnected) return;
             Context.SendCommand(ModuleCommand.RDPBOn);
             var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.On);
@@ -152,12 +182,12 @@ namespace DoMC.UserControls
             }
             TestRDPBStatusFill();
             this.Enabled = true;
-            
+
         }
 
         private void btnTestRDPBN83_Click(object sender, EventArgs e)
         {
-            
+
             if (!TestRDPBConnected) return;
             this.Enabled = false;
             Context.SendCommand(ModuleCommand.RDPBOff);
@@ -170,12 +200,12 @@ namespace DoMC.UserControls
             }
             TestRDPBStatusFill();
             this.Enabled = true;
-            
+
         }
 
         private void btnTestRDPBN90_Click(object sender, EventArgs e)
         {
-            
+
             if (!TestRDPBConnected) return;
             this.Enabled = false;
             Context.SendCommand(ModuleCommand.RDPBGetParameters);
@@ -188,34 +218,34 @@ namespace DoMC.UserControls
             }
             TestRDPBStatusFill();
             this.Enabled = true;
-            
+
         }
 
         private void btnTestRDPBSendCommand_Click(object sender, EventArgs e)
         {
-            
+
             if (!TestRDPBConnected) return;
             Context.RDPBCurrentStatus.ManualCommand = txbTestRDPBManualCommand.Text;
             Context.SendCommand(ModuleCommand.RDPBSendManualCommand);
             Thread.Sleep(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds / 10);
             TestRDPBStatusFill();
-            
+
         }
 
         private void cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+
             if (!TestRDPBConnected) return;
             Context.RDPBCurrentStatus.CoolingBlocksQuantityToSet = int.Parse(cbTestRDPBCoolingBlocksQuantity.SelectedItem?.ToString() ?? "0");
             Context.SendCommand(ModuleCommand.RDPBSetCoolingBlockQuantity);
             UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetCoolingBlocks && Context.RDPBCurrentStatus.IsParametersActual());
             TestRDPBStatusFill();
-            
+
         }
 
         private void TestRDPBStatusFill()
         {
-            
+
             lvTestRDPBStatuses.Items.Clear();
             lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[]{"Короб",
                 Context.RDPBCurrentStatus.BoxDirection == DoMCLib.Classes.BoxDirectionType.Left ? "Левый" :
@@ -242,7 +272,7 @@ namespace DoMC.UserControls
                 "Неизвестная ошибка"
             }));
             txbTestRDPBCoolingBlocksStatus.Text = Context.RDPBCurrentStatus.CoolingBlocksQuantity.ToString();
-            
+
         }
 
     }
