@@ -87,23 +87,7 @@
             tbTestLCB = new TabPage();
             tbCCDTest = new TabPage();
             tbTestImages = new TabPage();
-            tbRDP = new TabPage();
-            lblTestRDPBStatus = new Label();
-            lvTestRDPBStatuses = new ListView();
-            columnHeader1 = new ColumnHeader();
-            columnHeader2 = new ColumnHeader();
-            btnTestRDPBSendCommand = new Button();
-            txbTestRDPBManualCommand = new TextBox();
-            lblTestRDPBCommand = new Label();
-            txbTestRDPBCoolingBlocksStatus = new TextBox();
-            cbTestRDPBCoolingBlocksQuantity = new ComboBox();
-            lblCoolingBlockQuantity = new Label();
-            btnTestRDPBN90 = new Button();
-            btnTestRDPBN83 = new Button();
-            btnTestRDPBN82 = new Button();
-            btnTestRDPBN81 = new Button();
-            btnTestRDPBN80 = new Button();
-            btnRDPBTestConnect = new Button();
+            tbTestRDPB_uc = new TabPage();
             tbDB = new TabPage();
             btnRestoreRemoteDB = new Button();
             btnRestoreLocalDB = new Button();
@@ -220,12 +204,27 @@
             btnTestLCBSetAll = new Button();
             btnTestLCBInit = new Button();
             cbTestLCBSyncrosignal = new CheckBox();
+            tbRDP = new TabPage();
+            lblTestRDPBStatus = new Label();
+            lvTestRDPBStatuses = new ListView();
+            columnHeader1 = new ColumnHeader();
+            columnHeader2 = new ColumnHeader();
+            btnTestRDPBSendCommand = new Button();
+            txbTestRDPBManualCommand = new TextBox();
+            lblTestRDPBCommand = new Label();
+            txbTestRDPBCoolingBlocksStatus = new TextBox();
+            cbTestRDPBCoolingBlocksQuantity = new ComboBox();
+            lblCoolingBlockQuantity = new Label();
+            btnTestRDPBN90 = new Button();
+            btnTestRDPBN83 = new Button();
+            btnTestRDPBN82 = new Button();
+            btnTestRDPBN81 = new Button();
+            btnTestRDPBN80 = new Button();
+            btnRDPBTestConnect = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
-            tbTestRDPB_uc = new TabPage();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tbSettingsStatus.SuspendLayout();
-            tbRDP.SuspendLayout();
             tbDB.SuspendLayout();
             xtbTest.SuspendLayout();
             ssFooter.SuspendLayout();
@@ -247,6 +246,7 @@
             gbLEDs.SuspendLayout();
             gbTestLCBInputs.SuspendLayout();
             gbTestLCBOutputs.SuspendLayout();
+            tbRDP.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -627,186 +627,14 @@
             tbTestImages.Text = "Тест изображений";
             tbTestImages.UseVisualStyleBackColor = true;
             // 
-            // tbRDP
+            // tbTestRDPB_uc
             // 
-            tbRDP.Controls.Add(lblTestRDPBStatus);
-            tbRDP.Controls.Add(lvTestRDPBStatuses);
-            tbRDP.Controls.Add(btnTestRDPBSendCommand);
-            tbRDP.Controls.Add(txbTestRDPBManualCommand);
-            tbRDP.Controls.Add(lblTestRDPBCommand);
-            tbRDP.Controls.Add(txbTestRDPBCoolingBlocksStatus);
-            tbRDP.Controls.Add(cbTestRDPBCoolingBlocksQuantity);
-            tbRDP.Controls.Add(lblCoolingBlockQuantity);
-            tbRDP.Controls.Add(btnTestRDPBN90);
-            tbRDP.Controls.Add(btnTestRDPBN83);
-            tbRDP.Controls.Add(btnTestRDPBN82);
-            tbRDP.Controls.Add(btnTestRDPBN81);
-            tbRDP.Controls.Add(btnTestRDPBN80);
-            tbRDP.Controls.Add(btnRDPBTestConnect);
-            tbRDP.Location = new Point(4, 29);
-            tbRDP.Margin = new Padding(4, 5, 4, 5);
-            tbRDP.Name = "tbRDP";
-            tbRDP.Size = new Size(1808, 1033);
-            tbRDP.TabIndex = 6;
-            tbRDP.Text = "xТест бракера";
-            tbRDP.UseVisualStyleBackColor = true;
-            // 
-            // lblTestRDPBStatus
-            // 
-            lblTestRDPBStatus.AutoSize = true;
-            lblTestRDPBStatus.Location = new Point(666, 16);
-            lblTestRDPBStatus.Margin = new Padding(4, 0, 4, 0);
-            lblTestRDPBStatus.Name = "lblTestRDPBStatus";
-            lblTestRDPBStatus.Size = new Size(143, 20);
-            lblTestRDPBStatus.TabIndex = 13;
-            lblTestRDPBStatus.Text = "Статусы бракера:";
-            // 
-            // lvTestRDPBStatuses
-            // 
-            lvTestRDPBStatuses.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
-            lvTestRDPBStatuses.Location = new Point(670, 49);
-            lvTestRDPBStatuses.Margin = new Padding(4, 5, 4, 5);
-            lvTestRDPBStatuses.Name = "lvTestRDPBStatuses";
-            lvTestRDPBStatuses.Size = new Size(708, 437);
-            lvTestRDPBStatuses.TabIndex = 12;
-            lvTestRDPBStatuses.UseCompatibleStateImageBehavior = false;
-            lvTestRDPBStatuses.View = View.Details;
-            // 
-            // columnHeader1
-            // 
-            columnHeader1.Text = "Параметр";
-            columnHeader1.Width = 200;
-            // 
-            // columnHeader2
-            // 
-            columnHeader2.Text = "Значение";
-            columnHeader2.Width = 289;
-            // 
-            // btnTestRDPBSendCommand
-            // 
-            btnTestRDPBSendCommand.Location = new Point(432, 609);
-            btnTestRDPBSendCommand.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBSendCommand.Name = "btnTestRDPBSendCommand";
-            btnTestRDPBSendCommand.Size = new Size(123, 51);
-            btnTestRDPBSendCommand.TabIndex = 11;
-            btnTestRDPBSendCommand.Text = "Послать";
-            btnTestRDPBSendCommand.UseVisualStyleBackColor = true;
-            btnTestRDPBSendCommand.Click += btnTestRDPBSendCommand_Click;
-            // 
-            // txbTestRDPBManualCommand
-            // 
-            txbTestRDPBManualCommand.Location = new Point(12, 616);
-            txbTestRDPBManualCommand.Margin = new Padding(4, 5, 4, 5);
-            txbTestRDPBManualCommand.Name = "txbTestRDPBManualCommand";
-            txbTestRDPBManualCommand.Size = new Size(409, 26);
-            txbTestRDPBManualCommand.TabIndex = 10;
-            // 
-            // lblTestRDPBCommand
-            // 
-            lblTestRDPBCommand.AutoSize = true;
-            lblTestRDPBCommand.Location = new Point(12, 584);
-            lblTestRDPBCommand.Margin = new Padding(4, 0, 4, 0);
-            lblTestRDPBCommand.Name = "lblTestRDPBCommand";
-            lblTestRDPBCommand.Size = new Size(147, 20);
-            lblTestRDPBCommand.TabIndex = 9;
-            lblTestRDPBCommand.Text = "Команда в бракер";
-            // 
-            // txbTestRDPBCoolingBlocksStatus
-            // 
-            txbTestRDPBCoolingBlocksStatus.BackColor = SystemColors.Control;
-            txbTestRDPBCoolingBlocksStatus.Enabled = false;
-            txbTestRDPBCoolingBlocksStatus.Location = new Point(146, 509);
-            txbTestRDPBCoolingBlocksStatus.Margin = new Padding(4, 5, 4, 5);
-            txbTestRDPBCoolingBlocksStatus.Name = "txbTestRDPBCoolingBlocksStatus";
-            txbTestRDPBCoolingBlocksStatus.Size = new Size(70, 26);
-            txbTestRDPBCoolingBlocksStatus.TabIndex = 8;
-            // 
-            // cbTestRDPBCoolingBlocksQuantity
-            // 
-            cbTestRDPBCoolingBlocksQuantity.FormattingEnabled = true;
-            cbTestRDPBCoolingBlocksQuantity.Items.AddRange(new object[] { "3", "4" });
-            cbTestRDPBCoolingBlocksQuantity.Location = new Point(12, 509);
-            cbTestRDPBCoolingBlocksQuantity.Margin = new Padding(4, 5, 4, 5);
-            cbTestRDPBCoolingBlocksQuantity.Name = "cbTestRDPBCoolingBlocksQuantity";
-            cbTestRDPBCoolingBlocksQuantity.Size = new Size(124, 28);
-            cbTestRDPBCoolingBlocksQuantity.TabIndex = 7;
-            cbTestRDPBCoolingBlocksQuantity.SelectedIndexChanged += cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged;
-            // 
-            // lblCoolingBlockQuantity
-            // 
-            lblCoolingBlockQuantity.AutoSize = true;
-            lblCoolingBlockQuantity.Location = new Point(12, 483);
-            lblCoolingBlockQuantity.Margin = new Padding(4, 0, 4, 0);
-            lblCoolingBlockQuantity.Name = "lblCoolingBlockQuantity";
-            lblCoolingBlockQuantity.Size = new Size(292, 20);
-            lblCoolingBlockQuantity.TabIndex = 6;
-            lblCoolingBlockQuantity.Text = "Число позиций охлаждающего блока";
-            // 
-            // btnTestRDPBN90
-            // 
-            btnTestRDPBN90.Location = new Point(12, 402);
-            btnTestRDPBN90.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN90.Name = "btnTestRDPBN90";
-            btnTestRDPBN90.Size = new Size(204, 54);
-            btnTestRDPBN90.TabIndex = 5;
-            btnTestRDPBN90.Text = "(Получить статистику) N90->";
-            btnTestRDPBN90.UseVisualStyleBackColor = true;
-            btnTestRDPBN90.Click += btnTestRDPBN90_Click;
-            // 
-            // btnTestRDPBN83
-            // 
-            btnTestRDPBN83.Location = new Point(12, 340);
-            btnTestRDPBN83.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN83.Name = "btnTestRDPBN83";
-            btnTestRDPBN83.Size = new Size(204, 54);
-            btnTestRDPBN83.TabIndex = 4;
-            btnTestRDPBN83.Text = "(Выключить бракер) N83->";
-            btnTestRDPBN83.UseVisualStyleBackColor = true;
-            btnTestRDPBN83.Click += btnTestRDPBN83_Click;
-            // 
-            // btnTestRDPBN82
-            // 
-            btnTestRDPBN82.Location = new Point(12, 276);
-            btnTestRDPBN82.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN82.Name = "btnTestRDPBN82";
-            btnTestRDPBN82.Size = new Size(204, 54);
-            btnTestRDPBN82.TabIndex = 3;
-            btnTestRDPBN82.Text = "(Включить бракер) N82->";
-            btnTestRDPBN82.UseVisualStyleBackColor = true;
-            btnTestRDPBN82.Click += btnTestRDPBN82_Click;
-            // 
-            // btnTestRDPBN81
-            // 
-            btnTestRDPBN81.Location = new Point(12, 214);
-            btnTestRDPBN81.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN81.Name = "btnTestRDPBN81";
-            btnTestRDPBN81.Size = new Size(204, 54);
-            btnTestRDPBN81.TabIndex = 2;
-            btnTestRDPBN81.Text = "(Съем плохой) N81->";
-            btnTestRDPBN81.UseVisualStyleBackColor = true;
-            btnTestRDPBN81.Click += btnTestRDPBN81_Click;
-            // 
-            // btnTestRDPBN80
-            // 
-            btnTestRDPBN80.Location = new Point(12, 150);
-            btnTestRDPBN80.Margin = new Padding(4, 5, 4, 5);
-            btnTestRDPBN80.Name = "btnTestRDPBN80";
-            btnTestRDPBN80.Size = new Size(204, 54);
-            btnTestRDPBN80.TabIndex = 1;
-            btnTestRDPBN80.Text = "(Съем ОК) N80->";
-            btnTestRDPBN80.UseVisualStyleBackColor = true;
-            btnTestRDPBN80.Click += btnTestRDPBN80_Click;
-            // 
-            // btnRDPBTestConnect
-            // 
-            btnRDPBTestConnect.Location = new Point(12, 5);
-            btnRDPBTestConnect.Margin = new Padding(4, 5, 4, 5);
-            btnRDPBTestConnect.Name = "btnRDPBTestConnect";
-            btnRDPBTestConnect.Size = new Size(204, 93);
-            btnRDPBTestConnect.TabIndex = 0;
-            btnRDPBTestConnect.Text = "Подключение";
-            btnRDPBTestConnect.UseVisualStyleBackColor = true;
-            btnRDPBTestConnect.Click += btnRDPBTestConnect_Click;
+            tbTestRDPB_uc.Location = new Point(4, 29);
+            tbTestRDPB_uc.Name = "tbTestRDPB_uc";
+            tbTestRDPB_uc.Size = new Size(1808, 1033);
+            tbTestRDPB_uc.TabIndex = 13;
+            tbTestRDPB_uc.Text = "*Тест бракера";
+            tbTestRDPB_uc.UseVisualStyleBackColor = true;
             // 
             // tbDB
             // 
@@ -918,7 +746,7 @@
             tbSettingsCheck.Name = "tbSettingsCheck";
             tbSettingsCheck.Size = new Size(1808, 1033);
             tbSettingsCheck.TabIndex = 12;
-            tbSettingsCheck.Text = "Проверка настроек";
+            tbSettingsCheck.Text = "*Проверка настроек";
             tbSettingsCheck.UseVisualStyleBackColor = true;
             // 
             // xtbTest
@@ -2201,19 +2029,191 @@
             cbTestLCBSyncrosignal.Text = "Синхросигнал";
             cbTestLCBSyncrosignal.UseVisualStyleBackColor = true;
             // 
+            // tbRDP
+            // 
+            tbRDP.Controls.Add(lblTestRDPBStatus);
+            tbRDP.Controls.Add(lvTestRDPBStatuses);
+            tbRDP.Controls.Add(btnTestRDPBSendCommand);
+            tbRDP.Controls.Add(txbTestRDPBManualCommand);
+            tbRDP.Controls.Add(lblTestRDPBCommand);
+            tbRDP.Controls.Add(txbTestRDPBCoolingBlocksStatus);
+            tbRDP.Controls.Add(cbTestRDPBCoolingBlocksQuantity);
+            tbRDP.Controls.Add(lblCoolingBlockQuantity);
+            tbRDP.Controls.Add(btnTestRDPBN90);
+            tbRDP.Controls.Add(btnTestRDPBN83);
+            tbRDP.Controls.Add(btnTestRDPBN82);
+            tbRDP.Controls.Add(btnTestRDPBN81);
+            tbRDP.Controls.Add(btnTestRDPBN80);
+            tbRDP.Controls.Add(btnRDPBTestConnect);
+            tbRDP.Location = new Point(4, 29);
+            tbRDP.Margin = new Padding(4, 5, 4, 5);
+            tbRDP.Name = "tbRDP";
+            tbRDP.Size = new Size(1808, 1033);
+            tbRDP.TabIndex = 6;
+            tbRDP.Text = "xТест бракера";
+            tbRDP.UseVisualStyleBackColor = true;
+            // 
+            // lblTestRDPBStatus
+            // 
+            lblTestRDPBStatus.AutoSize = true;
+            lblTestRDPBStatus.Location = new Point(666, 16);
+            lblTestRDPBStatus.Margin = new Padding(4, 0, 4, 0);
+            lblTestRDPBStatus.Name = "lblTestRDPBStatus";
+            lblTestRDPBStatus.Size = new Size(143, 20);
+            lblTestRDPBStatus.TabIndex = 13;
+            lblTestRDPBStatus.Text = "Статусы бракера:";
+            // 
+            // lvTestRDPBStatuses
+            // 
+            lvTestRDPBStatuses.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
+            lvTestRDPBStatuses.Location = new Point(670, 49);
+            lvTestRDPBStatuses.Margin = new Padding(4, 5, 4, 5);
+            lvTestRDPBStatuses.Name = "lvTestRDPBStatuses";
+            lvTestRDPBStatuses.Size = new Size(708, 437);
+            lvTestRDPBStatuses.TabIndex = 12;
+            lvTestRDPBStatuses.UseCompatibleStateImageBehavior = false;
+            lvTestRDPBStatuses.View = View.Details;
+            // 
+            // columnHeader1
+            // 
+            columnHeader1.Text = "Параметр";
+            columnHeader1.Width = 200;
+            // 
+            // columnHeader2
+            // 
+            columnHeader2.Text = "Значение";
+            columnHeader2.Width = 289;
+            // 
+            // btnTestRDPBSendCommand
+            // 
+            btnTestRDPBSendCommand.Location = new Point(432, 609);
+            btnTestRDPBSendCommand.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBSendCommand.Name = "btnTestRDPBSendCommand";
+            btnTestRDPBSendCommand.Size = new Size(123, 51);
+            btnTestRDPBSendCommand.TabIndex = 11;
+            btnTestRDPBSendCommand.Text = "Послать";
+            btnTestRDPBSendCommand.UseVisualStyleBackColor = true;
+            btnTestRDPBSendCommand.Click += btnTestRDPBSendCommand_Click;
+            // 
+            // txbTestRDPBManualCommand
+            // 
+            txbTestRDPBManualCommand.Location = new Point(12, 616);
+            txbTestRDPBManualCommand.Margin = new Padding(4, 5, 4, 5);
+            txbTestRDPBManualCommand.Name = "txbTestRDPBManualCommand";
+            txbTestRDPBManualCommand.Size = new Size(409, 26);
+            txbTestRDPBManualCommand.TabIndex = 10;
+            // 
+            // lblTestRDPBCommand
+            // 
+            lblTestRDPBCommand.AutoSize = true;
+            lblTestRDPBCommand.Location = new Point(12, 584);
+            lblTestRDPBCommand.Margin = new Padding(4, 0, 4, 0);
+            lblTestRDPBCommand.Name = "lblTestRDPBCommand";
+            lblTestRDPBCommand.Size = new Size(147, 20);
+            lblTestRDPBCommand.TabIndex = 9;
+            lblTestRDPBCommand.Text = "Команда в бракер";
+            // 
+            // txbTestRDPBCoolingBlocksStatus
+            // 
+            txbTestRDPBCoolingBlocksStatus.BackColor = SystemColors.Control;
+            txbTestRDPBCoolingBlocksStatus.Enabled = false;
+            txbTestRDPBCoolingBlocksStatus.Location = new Point(146, 509);
+            txbTestRDPBCoolingBlocksStatus.Margin = new Padding(4, 5, 4, 5);
+            txbTestRDPBCoolingBlocksStatus.Name = "txbTestRDPBCoolingBlocksStatus";
+            txbTestRDPBCoolingBlocksStatus.Size = new Size(70, 26);
+            txbTestRDPBCoolingBlocksStatus.TabIndex = 8;
+            // 
+            // cbTestRDPBCoolingBlocksQuantity
+            // 
+            cbTestRDPBCoolingBlocksQuantity.FormattingEnabled = true;
+            cbTestRDPBCoolingBlocksQuantity.Items.AddRange(new object[] { "3", "4" });
+            cbTestRDPBCoolingBlocksQuantity.Location = new Point(12, 509);
+            cbTestRDPBCoolingBlocksQuantity.Margin = new Padding(4, 5, 4, 5);
+            cbTestRDPBCoolingBlocksQuantity.Name = "cbTestRDPBCoolingBlocksQuantity";
+            cbTestRDPBCoolingBlocksQuantity.Size = new Size(124, 28);
+            cbTestRDPBCoolingBlocksQuantity.TabIndex = 7;
+            cbTestRDPBCoolingBlocksQuantity.SelectedIndexChanged += cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged;
+            // 
+            // lblCoolingBlockQuantity
+            // 
+            lblCoolingBlockQuantity.AutoSize = true;
+            lblCoolingBlockQuantity.Location = new Point(12, 483);
+            lblCoolingBlockQuantity.Margin = new Padding(4, 0, 4, 0);
+            lblCoolingBlockQuantity.Name = "lblCoolingBlockQuantity";
+            lblCoolingBlockQuantity.Size = new Size(292, 20);
+            lblCoolingBlockQuantity.TabIndex = 6;
+            lblCoolingBlockQuantity.Text = "Число позиций охлаждающего блока";
+            // 
+            // btnTestRDPBN90
+            // 
+            btnTestRDPBN90.Location = new Point(12, 402);
+            btnTestRDPBN90.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN90.Name = "btnTestRDPBN90";
+            btnTestRDPBN90.Size = new Size(204, 54);
+            btnTestRDPBN90.TabIndex = 5;
+            btnTestRDPBN90.Text = "(Получить статистику) N90->";
+            btnTestRDPBN90.UseVisualStyleBackColor = true;
+            btnTestRDPBN90.Click += btnTestRDPBN90_Click;
+            // 
+            // btnTestRDPBN83
+            // 
+            btnTestRDPBN83.Location = new Point(12, 340);
+            btnTestRDPBN83.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN83.Name = "btnTestRDPBN83";
+            btnTestRDPBN83.Size = new Size(204, 54);
+            btnTestRDPBN83.TabIndex = 4;
+            btnTestRDPBN83.Text = "(Выключить бракер) N83->";
+            btnTestRDPBN83.UseVisualStyleBackColor = true;
+            btnTestRDPBN83.Click += btnTestRDPBN83_Click;
+            // 
+            // btnTestRDPBN82
+            // 
+            btnTestRDPBN82.Location = new Point(12, 276);
+            btnTestRDPBN82.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN82.Name = "btnTestRDPBN82";
+            btnTestRDPBN82.Size = new Size(204, 54);
+            btnTestRDPBN82.TabIndex = 3;
+            btnTestRDPBN82.Text = "(Включить бракер) N82->";
+            btnTestRDPBN82.UseVisualStyleBackColor = true;
+            btnTestRDPBN82.Click += btnTestRDPBN82_Click;
+            // 
+            // btnTestRDPBN81
+            // 
+            btnTestRDPBN81.Location = new Point(12, 214);
+            btnTestRDPBN81.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN81.Name = "btnTestRDPBN81";
+            btnTestRDPBN81.Size = new Size(204, 54);
+            btnTestRDPBN81.TabIndex = 2;
+            btnTestRDPBN81.Text = "(Съем плохой) N81->";
+            btnTestRDPBN81.UseVisualStyleBackColor = true;
+            btnTestRDPBN81.Click += btnTestRDPBN81_Click;
+            // 
+            // btnTestRDPBN80
+            // 
+            btnTestRDPBN80.Location = new Point(12, 150);
+            btnTestRDPBN80.Margin = new Padding(4, 5, 4, 5);
+            btnTestRDPBN80.Name = "btnTestRDPBN80";
+            btnTestRDPBN80.Size = new Size(204, 54);
+            btnTestRDPBN80.TabIndex = 1;
+            btnTestRDPBN80.Text = "(Съем ОК) N80->";
+            btnTestRDPBN80.UseVisualStyleBackColor = true;
+            btnTestRDPBN80.Click += btnTestRDPBN80_Click;
+            // 
+            // btnRDPBTestConnect
+            // 
+            btnRDPBTestConnect.Location = new Point(12, 5);
+            btnRDPBTestConnect.Margin = new Padding(4, 5, 4, 5);
+            btnRDPBTestConnect.Name = "btnRDPBTestConnect";
+            btnRDPBTestConnect.Size = new Size(204, 93);
+            btnRDPBTestConnect.TabIndex = 0;
+            btnRDPBTestConnect.Text = "Подключение";
+            btnRDPBTestConnect.UseVisualStyleBackColor = true;
+            btnRDPBTestConnect.Click += btnRDPBTestConnect_Click;
+            // 
             // timer1
             // 
             timer1.Enabled = true;
             timer1.Tick += timer1_Tick;
-            // 
-            // tbTestRDPB_uc
-            // 
-            tbTestRDPB_uc.Location = new Point(4, 29);
-            tbTestRDPB_uc.Name = "tbTestRDPB_uc";
-            tbTestRDPB_uc.Size = new Size(1808, 1033);
-            tbTestRDPB_uc.TabIndex = 13;
-            tbTestRDPB_uc.Text = "*Тест бракера";
-            tbTestRDPB_uc.UseVisualStyleBackColor = true;
             // 
             // DoMCSettingsInterface
             // 
@@ -2235,8 +2235,6 @@
             tabControl1.ResumeLayout(false);
             tbSettingsStatus.ResumeLayout(false);
             tbSettingsStatus.PerformLayout();
-            tbRDP.ResumeLayout(false);
-            tbRDP.PerformLayout();
             tbDB.ResumeLayout(false);
             xtbTest.ResumeLayout(false);
             xtbTest.PerformLayout();
@@ -2268,6 +2266,8 @@
             gbTestLCBInputs.PerformLayout();
             gbTestLCBOutputs.ResumeLayout(false);
             gbTestLCBOutputs.PerformLayout();
+            tbRDP.ResumeLayout(false);
+            tbRDP.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }

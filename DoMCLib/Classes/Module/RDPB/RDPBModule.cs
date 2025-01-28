@@ -19,14 +19,14 @@ namespace DoMCLib.Classes.Module.RDPB
     /// </summary>
     public partial class RDPBModule : AbstractModuleBase
     {
-        public DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig config;
+        private DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig Config;
         private IMainController mainController;
         TcpClient client;
         IPEndPoint remoteIP;
         private byte[] buffer;
         public bool IsConnected;
         private int MachineNumber = 1;
-        private RDPBStatus CurrentStatus;
+        private RDPBStatus CurrentStatus=new RDPBStatus();
 
         private TimeSpan Timeout = new TimeSpan(0, 0, 5);
 
@@ -43,6 +43,14 @@ namespace DoMCLib.Classes.Module.RDPB
             mainController = MainController;
             WorkingLog = mainController.GetLogger(this.GetType().Name);
             WorkingLog.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
+        }
+        public void SetConfig(DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig config)
+        {
+            var wasConnected = IsConnected;
+            if (wasConnected) Stop();
+            Config = config;
+            remoteIP = new IPEndPoint(IPAddress.Parse(Config.IP), Config.Port);
+            if (wasConnected) Start();
         }
 
         public void Start()
@@ -212,6 +220,7 @@ namespace DoMCLib.Classes.Module.RDPB
         private void RDPBProcessDataThreadProc()
         {
             //while (IsStarted)
+            IsStarted = true;
             while (!cancelationTockenSource.Token.IsCancellationRequested)
             {
 
@@ -227,7 +236,6 @@ namespace DoMCLib.Classes.Module.RDPB
                 }
 
             }
-            IsStarted = true;
         }
 
         public void Dispose()

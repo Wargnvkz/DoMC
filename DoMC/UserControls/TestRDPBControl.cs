@@ -13,6 +13,7 @@ using DoMC.Classes;
 using DoMCLib.Classes.Module.LCB;
 using static DoMCLib.Classes.Module.LCB.LCBModule;
 using DoMCLib.Classes.Module.RDPB.Classes;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DoMC.UserControls
 {
@@ -42,7 +43,7 @@ namespace DoMC.UserControls
         }
         private void Observer_NotificationReceivers(string EventName, object? data)
         {
-            var EventNameParts = EventName.Split('.');
+            /*var EventNameParts = EventName.Split('.');
             if (EventNameParts[0] == nameof(DoMCLib.Classes.Module.RDPB.RDPBModule))
             {
                 if (Enum.TryParse(EventNameParts[2], out StatusStringProccessResult result))
@@ -58,7 +59,7 @@ namespace DoMC.UserControls
                         }
                     }
                 }
-            }
+            }*/
         }
 
         private void SettingsUpdateProvider_SettingsUpdated(object? sender, EventArgs e)
@@ -83,36 +84,57 @@ namespace DoMC.UserControls
         private void ApplyNewContext(DoMCLib.Classes.DoMCApplicationContext context)
         {
             CurrentContext = context;
+            SetRDPBParameters();
             FillPage();
         }
         private void FillPage()
         {
 
         }
+        private void SendCommands(Type Command, object data = null)
+        {
+            var cmd = MainController.CreateCommandInstance(Command);
+            var res = cmd.Wait(data, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds*100, out CurrentStatus);
+            if (!res)
+            {
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                TestRDPBStop();
+            }
+            TestRDPBStatusFill();
 
+        }
         private void TestRDPBStop()
         {
             var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StopCommand));
-            cmd.ExecuteCommand();
-            if (!IsStarted)
+            var res = cmd.Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out object? _);
+            if (res)
             {
                 TestRDPBConnected = false;
                 btnRDPBTestConnect.BackColor = SystemColors.Control;
                 btnRDPBTestConnect.Text = "Подключить";
             }
-
+            else
+            {
+                DisplayMessage.Show("Ошибка при отлючении","Ошибка");
+            }
         }
         private void TestRDPBStart()
         {
-            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StopCommand));
-            cmd.ExecuteCommand();
-            if (IsStarted)
+            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StartCommand));
+            var res = cmd.Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out object? _);
+            if (res)
             {
                 TestRDPBConnected = true;
                 btnRDPBTestConnect.BackColor = Color.Green;
                 btnRDPBTestConnect.Text = "Отключить";
             }
-
+            else
+            {
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                DisplayMessage.Show("Не удалось подключиться к бракеру","Ошибка");
+            }
         }
 
         private void btnRDPBTestConnect_Click(object sender, EventArgs e)
@@ -128,17 +150,10 @@ namespace DoMC.UserControls
             }
         }
 
-        private void btnTestRDPBN80_Click(object sender, EventArgs e)
+        private void SetRDPBParameters()
         {
-
-            if (!TestRDPBConnected) return;
-            this.Enabled = false;
-            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SendSetIsOkCommand));
-
-
-
-            Context.SendCommand(ModuleCommand.RDPBSetIsOK);
-            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetIsOK && Context.RDPBCurrentStatus.IsCurrentStatusActual());
+            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.LoadConfigurationToModuleCommand));
+            var res = cmd.Wait(CurrentContext.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out bool result);
             if (!res)
             {
                 btnRDPBTestConnect.BackColor = Color.Red;
@@ -146,132 +161,86 @@ namespace DoMC.UserControls
                 TestRDPBStop();
             }
             TestRDPBStatusFill();
-            this.Enabled = true;
+        }
 
+        private void btnTestRDPBN80_Click(object sender, EventArgs e)
+        {
+            if (!TestRDPBConnected) return;
+            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SendSetIsOkCommand));
         }
 
         private void btnTestRDPBN81_Click(object sender, EventArgs e)
         {
-
-            //if (!TestRDPBConnected) return;
-            this.Enabled = false;
-            Context.SendCommand(ModuleCommand.RDPBSetIsBad);
-            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetIsBad && Context.RDPBCurrentStatus.IsCurrentStatusActual());
-            if (!res)
-            {
-                btnRDPBTestConnect.BackColor = Color.Red;
-                TestRDPBConnected = false;
-                TestRDPBStop();
-            }
-            TestRDPBStatusFill();
-            this.Enabled = true;
+            if (!TestRDPBConnected) return;
+            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SendSetIsBadCommand));
 
         }
 
         private void btnTestRDPBN82_Click(object sender, EventArgs e)
         {
-
             if (!TestRDPBConnected) return;
-            Context.SendCommand(ModuleCommand.RDPBOn);
-            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.On);
-            if (!res)
-            {
-                btnRDPBTestConnect.BackColor = Color.Red;
-                TestRDPBConnected = false;
-                TestRDPBStop();
-            }
-            TestRDPBStatusFill();
-            this.Enabled = true;
+            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.TurnOnCommand));
 
         }
 
         private void btnTestRDPBN83_Click(object sender, EventArgs e)
         {
-
             if (!TestRDPBConnected) return;
-            this.Enabled = false;
-            Context.SendCommand(ModuleCommand.RDPBOff);
-            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.Off);
-            if (!res)
-            {
-                btnRDPBTestConnect.BackColor = Color.Red;
-                TestRDPBConnected = false;
-                TestRDPBStop();
-            }
-            TestRDPBStatusFill();
-            this.Enabled = true;
+            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.TurnOffCommand));
 
         }
 
         private void btnTestRDPBN90_Click(object sender, EventArgs e)
         {
-
             if (!TestRDPBConnected) return;
-            this.Enabled = false;
-            Context.SendCommand(ModuleCommand.RDPBGetParameters);
-            var res = UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.GetParameters && Context.RDPBCurrentStatus.IsParametersActual());
-            if (!res)
-            {
-                btnRDPBTestConnect.BackColor = Color.Red;
-                TestRDPBConnected = false;
-                TestRDPBStop();
-            }
-            TestRDPBStatusFill();
-            this.Enabled = true;
+            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.GetParametersCommand));
 
         }
 
         private void btnTestRDPBSendCommand_Click(object sender, EventArgs e)
         {
-
             if (!TestRDPBConnected) return;
-            Context.RDPBCurrentStatus.ManualCommand = txbTestRDPBManualCommand.Text;
-            Context.SendCommand(ModuleCommand.RDPBSendManualCommand);
-            Thread.Sleep(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds / 10);
-            TestRDPBStatusFill();
+            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SendManualCommand), txbTestRDPBManualCommand.Text);
 
         }
 
         private void cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged(object sender, EventArgs e)
         {
-
             if (!TestRDPBConnected) return;
-            Context.RDPBCurrentStatus.CoolingBlocksQuantityToSet = int.Parse(cbTestRDPBCoolingBlocksQuantity.SelectedItem?.ToString() ?? "0");
-            Context.SendCommand(ModuleCommand.RDPBSetCoolingBlockQuantity);
-            UserInterfaceControls.Wait(Context.Configuration.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, () => Context.RDPBCurrentStatus.SentCommandType == DoMCLib.Classes.RDPBCommandType.SetCoolingBlocks && Context.RDPBCurrentStatus.IsParametersActual());
-            TestRDPBStatusFill();
+            var CoolingBlocksQuantityToSet = int.Parse(cbTestRDPBCoolingBlocksQuantity.SelectedItem?.ToString() ?? "0");
+            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SetCoolingBlockQuantityCommand), CoolingBlocksQuantityToSet);
 
         }
 
         private void TestRDPBStatusFill()
         {
-
             lvTestRDPBStatuses.Items.Clear();
+            if (CurrentStatus == null) return;
             lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[]{"Короб",
-                Context.RDPBCurrentStatus.BoxDirection == DoMCLib.Classes.BoxDirectionType.Left ? "Левый" :
-                Context.RDPBCurrentStatus.BoxDirection == DoMCLib.Classes.BoxDirectionType.Right ? "Правый" :
+                CurrentStatus.BoxDirection == BoxDirectionType.Left ? "Левый" :
+                CurrentStatus.BoxDirection == BoxDirectionType.Right ? "Правый" :
                 "Неизвестно"
             }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Номер короба", Context.RDPBCurrentStatus.BoxNumber.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Бракер ", (Context.RDPBCurrentStatus.BlockIsOn ? "Включен" : "Выключен") }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Охлаждающих блоков", Context.RDPBCurrentStatus.CoolingBlocksQuantity.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Номер цикла", Context.RDPBCurrentStatus.CycleNumber.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Забракованных съемов", Context.RDPBCurrentStatus.BadSetQuantityInBox.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Хороших съемов", Context.RDPBCurrentStatus.GoodSetQuantityInBox.ToString() }));
-            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Съемов в коробе", Context.RDPBCurrentStatus.SetQuantityInBox.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Номер короба", CurrentStatus.BoxNumber.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Бракер ", (CurrentStatus.BlockIsOn ? "Включен" : "Выключен") }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Охлаждающих блоков", CurrentStatus.CoolingBlocksQuantity.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Номер цикла", CurrentStatus.CycleNumber.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Забракованных съемов", CurrentStatus.BadSetQuantityInBox.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Хороших съемов", CurrentStatus.GoodSetQuantityInBox.ToString() }));
+            lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[] { "Съемов в коробе", CurrentStatus.SetQuantityInBox.ToString() }));
             lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[]{"Направление ленты",
-                Context.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Stoped ? "Стоит" :
-                Context.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Left ? "Влево" :
-                Context.RDPBCurrentStatus.TransporterSide == DoMCLib.Classes.RDPBTransporterSide.Right ? "Вправо" :
+                CurrentStatus.TransporterSide == RDPBTransporterSide.Stoped ? "Стоит" :
+                CurrentStatus.TransporterSide == RDPBTransporterSide.Left ? "Влево" :
+                CurrentStatus.TransporterSide == RDPBTransporterSide.Right ? "Вправо" :
                 "Ошибка датчика"
             }));
             lvTestRDPBStatuses.Items.Add(new ListViewItem(new string[]{"Ошибки",
-                Context.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.NoErrors ? "Ошибок нет" :
-                Context.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.TransporterDriveUnit ? "Авария привода конвейера" :
-                Context.RDPBCurrentStatus.Errors == DoMCLib.Classes.RDPBErrors.SensorOfInitialState ? "Авария датчика исходного состояния" :
+                CurrentStatus.Errors == RDPBErrors.NoErrors ? "Ошибок нет" :
+                CurrentStatus.Errors == RDPBErrors.TransporterDriveUnit ? "Авария привода конвейера" :
+                CurrentStatus.Errors == RDPBErrors.SensorOfInitialState ? "Авария датчика исходного состояния" :
                 "Неизвестная ошибка"
             }));
-            txbTestRDPBCoolingBlocksStatus.Text = Context.RDPBCurrentStatus.CoolingBlocksQuantity.ToString();
+            txbTestRDPBCoolingBlocksStatus.Text = CurrentStatus.CoolingBlocksQuantity.ToString();
 
         }
 

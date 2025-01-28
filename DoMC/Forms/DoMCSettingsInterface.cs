@@ -62,6 +62,7 @@ namespace DoMC
         GetCCDStandardInterface GetCCDStandardInterface;
         TestLCBInterface TestLCBInterface;
         CheckSettings CheckSettingsInterface;
+        TestRDPBControl TestRDPBControlInterface;
         bool MovingCyclesToArchive = false;
 
         public event EventHandler SettingsUpdated;
@@ -170,6 +171,11 @@ namespace DoMC
             CheckSettingsInterface = new CheckSettings(Controller, WorkingLog, this);
             tbSettingsCheck.Controls.Add(CheckSettingsInterface);
             CheckSettingsInterface.Size = tbSettingsCheck.ClientSize;
+
+            TestRDPBControlInterface = new TestRDPBControl(Controller, WorkingLog, this);
+            tbTestRDPB_uc.Controls.Add(TestRDPBControlInterface);
+            TestRDPBControlInterface.Size = tbTestRDPB_uc.ClientSize;
+
 
             FillSettingPage();
         }
@@ -1689,7 +1695,7 @@ namespace DoMC
 
         private void SetImpulsesToTextBoxes(TextBox impTxb, TextBox mmTxb, double impulses)
         {
-            
+
             /*if (mmTxb != null)
             {
                 if ((InterfaceDataExchange?.Configuration?.LCBSettings.LCBKoefficient ?? 0) > 0)

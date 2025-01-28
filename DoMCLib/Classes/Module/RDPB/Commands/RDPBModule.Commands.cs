@@ -42,42 +42,36 @@ namespace DoMCLib.Classes.Module.RDPB
                 OutputData = status;
             }
         }
-        public class LoadConfigurationCommand : AbstractCommandBase
+        public class LoadConfigurationToModuleCommand : WaitingCommandBase// AbstractCommandBase
         {
-            bool requestGot = false;
-            RDPBStatus status = null;
-            public LoadConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(RemoveDefectedPreformBlockConfig), typeof(RDPBStatus)) { }
-            protected override void Executing() => ((RDPBModule)Module).config = (DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig)InputData;
-           /* protected override bool MakeDecisionIsCommandCompleteFunc()
+            RDPBModule module;
+            bool? wasConnected;
+            public LoadConfigurationToModuleCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(RemoveDefectedPreformBlockConfig), typeof(bool)) { }
+            protected override void Executing()
             {
-                return requestGot;
+                module = (RDPBModule)Module;
+                wasConnected = module.IsConnected;
+                module.SetConfig((DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig)InputData);
+            }
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return wasConnected.HasValue && wasConnected.Value == module.IsConnected;
             }
 
             protected override void NotificationReceived(string NotificationName, object? data)
             {
-                var parts = NotificationName.Split('.');
-                if (parts[0] == nameof(RDPBModule))
-                {
-                    if (parts[1] == RDPBCommandType.<>.ToString())
-                    {
-                        if (parts[2] == StatusStringProccessResult.OK.ToString())
-                        {
-                            status = (RDPBStatus)data!;
-                            requestGot = true;
-                        }
-                    }
-                }
+
             }
             protected override void PrepareOutputData()
             {
-                OutputData = status;
-            }*/
+                OutputData = wasConnected.HasValue && wasConnected.Value == module.IsConnected;
+            }
         }
-        public class MakeBlockSendWorkingStateCommand : WaitingCommandBase //AbstractCommandBase
+        public class GetParametersCommand : WaitingCommandBase //AbstractCommandBase
         {
             bool requestGot = false;
             RDPBStatus status = null;
-            public MakeBlockSendWorkingStateCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(RDPBStatus)) { }
+            public GetParametersCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(RDPBStatus)) { }
 
             protected override void Executing() => ((RDPBModule)Module).Send(RDPBCommandType.GetParameters);
 
@@ -125,8 +119,11 @@ namespace DoMCLib.Classes.Module.RDPB
                 var parts = NotificationName.Split('.');
                 if (parts[0] == nameof(RDPBModule))
                 {
-                    status = (RDPBStatus)data!;
-                    requestGot = true;
+                    if (parts[2] == StatusStringProccessResult.OK.ToString())
+                    {
+                        status = (RDPBStatus)data!;
+                        requestGot = true;
+                    }
                 }
             }
             protected override void PrepareOutputData()
@@ -199,68 +196,53 @@ namespace DoMCLib.Classes.Module.RDPB
                 OutputData = status;
             }
         }
-        public class StartCommand : AbstractCommandBase
+        public class StartCommand : WaitingCommandBase// AbstractCommandBase
         {
-            bool requestGot = false;
-            RDPBStatus status = null;
-            public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(RDPBStatus)) { }
-            protected override void Executing() => ((RDPBModule)Module).Start();
-            /*protected override bool MakeDecisionIsCommandCompleteFunc()
+            RDPBModule module;
+            public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(bool)) { }
+            protected override void Executing()
             {
-                return requestGot;
+                module = (RDPBModule)Module;
+                module.Start();
+            }
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return module?.IsConnected ?? false;
             }
 
             protected override void NotificationReceived(string NotificationName, object? data)
             {
-                var parts = NotificationName.Split('.');
-                if (parts[0] == nameof(RDPBModule))
-                {
-                    if (parts[1] == RDPBCommandType.<>.ToString())
-                    {
-                        if (parts[2] == StatusStringProccessResult.OK.ToString())
-                        {
-                            status = (RDPBStatus)data!;
-                            requestGot = true;
-                        }
-                    }
-                }
+
             }
             protected override void PrepareOutputData()
             {
-                OutputData = status;
-            }*/
+                OutputData = module?.IsConnected ?? false;
+            }
+
         }
-        public class StopCommand : AbstractCommandBase
+        public class StopCommand : WaitingCommandBase //AbstractCommandBase
         {
-            bool requestGot = false;
-            RDPBStatus status = null;
-            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(RDPBStatus)) { }
-
-            protected override void Executing() => ((RDPBModule)Module).Stop();
-            /*protected override bool MakeDecisionIsCommandCompleteFunc()
+            RDPBModule module;
+            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(bool)) { }
+            protected override void Executing()
             {
-                return requestGot;
+                module = (RDPBModule)Module;
+                module.Stop();
+            }
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return !module?.IsConnected ?? false;
             }
 
             protected override void NotificationReceived(string NotificationName, object? data)
             {
-                var parts = NotificationName.Split('.');
-                if (parts[0] == nameof(RDPBModule))
-                {
-                    if (parts[1] == RDPBCommandType.<>.ToString())
-                    {
-                        if (parts[2] == StatusStringProccessResult.OK.ToString())
-                        {
-                            status = (RDPBStatus)data!;
-                            requestGot = true;
-                        }
-                    }
-                }
+
             }
             protected override void PrepareOutputData()
             {
-                OutputData = status;
-            }*/
+                OutputData = !module?.IsConnected ?? false;
+            }
+
         }
         public class TurnOffCommand : WaitingCommandBase //AbstractCommandBase
         {

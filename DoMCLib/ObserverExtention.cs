@@ -16,7 +16,7 @@ namespace DoMCLib
         }
         public static string GetEventName(AbstractModuleBase module, string Operation, string eventType)
         {
-            return $"{module}.{Operation}.{eventType}";
+            return $"{module?.GetType().Name ?? ""}.{Operation}.{eventType}";
         }
     }
 }

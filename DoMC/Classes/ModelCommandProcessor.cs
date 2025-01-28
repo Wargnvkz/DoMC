@@ -139,7 +139,7 @@ namespace DoMC.Classes
         }
         public bool LoadConfigurationRDPB()
         {
-            var LoadConfigurationCmd = Controller.CreateCommandInstance(typeof(RDPBModule.LoadConfigurationCommand));
+            var LoadConfigurationCmd = Controller.CreateCommandInstance(typeof(RDPBModule.LoadConfigurationToModuleCommand));
             if (LoadConfigurationCmd == null) return false;
             LoadConfigurationCmd.ExecuteCommandAsync(Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig).Wait();
             return LoadConfigurationCmd.WasCompletedSuccessfully();

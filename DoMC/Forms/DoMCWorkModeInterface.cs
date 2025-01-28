@@ -1618,9 +1618,9 @@ namespace DoMC
                     this.Show();
                 }
             }
-            catch
+            catch(Exception ex)
             {
-
+                DisplayMessage.Show(ex.Message+ex.StackTrace,"Ошибка");
             }
 
         }

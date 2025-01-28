@@ -86,6 +86,7 @@
             btnTestRDPBSendCommand.TabIndex = 25;
             btnTestRDPBSendCommand.Text = "Послать";
             btnTestRDPBSendCommand.UseVisualStyleBackColor = true;
+            btnTestRDPBSendCommand.Click += btnTestRDPBSendCommand_Click;
             // 
             // txbTestRDPBManualCommand
             // 
@@ -124,6 +125,7 @@
             cbTestRDPBCoolingBlocksQuantity.Name = "cbTestRDPBCoolingBlocksQuantity";
             cbTestRDPBCoolingBlocksQuantity.Size = new Size(124, 23);
             cbTestRDPBCoolingBlocksQuantity.TabIndex = 21;
+            cbTestRDPBCoolingBlocksQuantity.SelectedIndexChanged += cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged;
             // 
             // lblCoolingBlockQuantity
             // 
@@ -144,6 +146,7 @@
             btnTestRDPBN90.TabIndex = 19;
             btnTestRDPBN90.Text = "(Получить статистику) N90->";
             btnTestRDPBN90.UseVisualStyleBackColor = true;
+            btnTestRDPBN90.Click += btnTestRDPBN90_Click;
             // 
             // btnTestRDPBN83
             // 
@@ -154,6 +157,7 @@
             btnTestRDPBN83.TabIndex = 18;
             btnTestRDPBN83.Text = "(Выключить бракер) N83->";
             btnTestRDPBN83.UseVisualStyleBackColor = true;
+            btnTestRDPBN83.Click += btnTestRDPBN83_Click;
             // 
             // btnTestRDPBN82
             // 
@@ -164,6 +168,7 @@
             btnTestRDPBN82.TabIndex = 17;
             btnTestRDPBN82.Text = "(Включить бракер) N82->";
             btnTestRDPBN82.UseVisualStyleBackColor = true;
+            btnTestRDPBN82.Click += btnTestRDPBN82_Click;
             // 
             // btnTestRDPBN81
             // 
@@ -174,6 +179,7 @@
             btnTestRDPBN81.TabIndex = 16;
             btnTestRDPBN81.Text = "(Съем плохой) N81->";
             btnTestRDPBN81.UseVisualStyleBackColor = true;
+            btnTestRDPBN81.Click += btnTestRDPBN81_Click;
             // 
             // btnTestRDPBN80
             // 
@@ -184,6 +190,7 @@
             btnTestRDPBN80.TabIndex = 15;
             btnTestRDPBN80.Text = "(Съем ОК) N80->";
             btnTestRDPBN80.UseVisualStyleBackColor = true;
+            btnTestRDPBN80.Click += btnTestRDPBN80_Click;
             // 
             // btnRDPBTestConnect
             // 
@@ -194,6 +201,7 @@
             btnRDPBTestConnect.TabIndex = 14;
             btnRDPBTestConnect.Text = "Подключение";
             btnRDPBTestConnect.UseVisualStyleBackColor = true;
+            btnRDPBTestConnect.Click += btnRDPBTestConnect_Click;
             // 
             // TestRDPBControl
             // 
