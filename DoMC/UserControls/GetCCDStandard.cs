@@ -132,46 +132,52 @@ namespace DoMC.UserControls
             ProgressbarStep = 0;
             if (CurrentContext.StartCCD(MainController, WorkingLog, ChosenSocketNumber.Value - 1))
             {
-                ProgressbarStep++;
-                if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false, ChosenSocketNumber.Value - 1))
+                try
                 {
                     ProgressbarStep++;
-                    if (CurrentContext.SetFastRead(MainController, WorkingLog, ChosenSocketNumber.Value - 1))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false, ChosenSocketNumber.Value - 1))
                     {
                         ProgressbarStep++;
-                        for (int i = 0; i < ImagesToMakeStandard; i++)
+                        if (CurrentContext.SetFastRead(MainController, WorkingLog, ChosenSocketNumber.Value - 1))
                         {
-                            if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalRead, ChosenSocketNumber.Value - 1))
+                            ProgressbarStep++;
+                            for (int i = 0; i < ImagesToMakeStandard; i++)
                             {
-                                ProgressbarStep++;
-                                var si = CurrentContext.ReadSocketsImages(MainController, WorkingLog, ChosenSocketNumber.Value - 1);
-                                ProgressbarStep++;
-                                if (si == null || si.Data == null) break;
-                                var errorCards = errorReadingData.ErrorCards();
-                                if (errorCards.Count > 0)
+                                if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalRead, ChosenSocketNumber.Value - 1))
                                 {
-                                    for (int c = 0; c < errorCards.Count; c++)
+                                    ProgressbarStep++;
+                                    var si = CurrentContext.GetSocketsImages(MainController, WorkingLog, ChosenSocketNumber.Value - 1);
+                                    ProgressbarStep++;
+                                    if (si == null || si.Data == null) break;
+                                    var errorCards = errorReadingData.ErrorCards();
+                                    if (errorCards.Count > 0)
                                     {
-                                        CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
+                                        for (int c = 0; c < errorCards.Count; c++)
+                                        {
+                                            CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
+                                        }
                                     }
+                                    if (si.Data[ChosenSocketNumber.Value - 1] == null)
+                                    {
+                                        //TODO: вывести ошибку чтения
+                                        continue;
+                                    }
+                                    SingleSocketImages[i] = si.Data[ChosenSocketNumber.Value - 1].Image;
+                                    var sbmp = ImageTools.DrawImage(SingleSocketImages[i], false);
+                                    StandardPictures[i].Image = sbmp;
                                 }
-                                if (si.Data[ChosenSocketNumber.Value - 1] == null)
-                                {
-                                    //TODO: вывести ошибку чтения
-                                    continue;
-                                }
-                                SingleSocketImages[i] = si.Data[ChosenSocketNumber.Value - 1].Image;
-                                var sbmp = ImageTools.DrawImage(SingleSocketImages[i], false);
-                                StandardPictures[i].Image = sbmp;
                             }
+                            var existImages = SingleSocketImages.Where(ssi => ssi != null).ToArray();
+                            var avgImg = ImageTools.CalculateAverage(existImages);
+                            CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[ChosenSocketNumber.Value - 1].StandardImage = avgImg;
+                            CurrentContext.Configuration.SaveProcessingDataSettings();
                         }
-                        var existImages = SingleSocketImages.Where(ssi => ssi != null).ToArray();
-                        var avgImg = ImageTools.CalculateAverage(existImages);
-                        CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[ChosenSocketNumber.Value - 1].StandardImage = avgImg;
-                        CurrentContext.Configuration.SaveProcessingDataSettings();
                     }
                 }
-                CurrentContext.StopCCD(MainController, WorkingLog, ChosenSocketNumber.Value - 1);
+                finally
+                {
+                    CurrentContext.StopCCD(MainController, WorkingLog, ChosenSocketNumber.Value - 1);
+                }
             }
             StandardIsReading = false;
             RenewList();
@@ -197,58 +203,64 @@ namespace DoMC.UserControls
             if (CurrentContext.StartCCD(MainController, WorkingLog))
             {
                 ProgressbarStep++;
-                if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false))
+                try
                 {
-                    ProgressbarStep++;
-                    if (CurrentContext.SetFastRead(MainController, WorkingLog))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false))
                     {
                         ProgressbarStep++;
-                        for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                        if (CurrentContext.SetFastRead(MainController, WorkingLog))
                         {
-                            img[socketNum] = new short[ImagesToMakeStandard][,];
-                        }
-                        for (int repeat = 0; repeat < ImagesToMakeStandard; repeat++)
-                        {
-                            if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalRead))
+                            ProgressbarStep++;
+                            for (int socketNum = 0; socketNum < socketMax; socketNum++)
                             {
-                                ProgressbarStep++;
-                                var si = CurrentContext.ReadSocketsImages(MainController, WorkingLog);
-                                ProgressbarStep++;
-                                if (si == null) throw new Exception();
-                                if (si.Data == null) throw new Exception();
-                                if (si.Data.Length != socketMax) throw new Exception();
-                                for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                                img[socketNum] = new short[ImagesToMakeStandard][,];
+                            }
+                            for (int repeat = 0; repeat < ImagesToMakeStandard; repeat++)
+                            {
+                                if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalRead))
                                 {
-                                    if (si.Data[socketNum] != null)
-                                        img[socketNum][repeat] = si.Data[socketNum].Image;
-                                    var errorCards = errorReadingData.ErrorCards();
-                                    if (errorCards.Count > 0)
+                                    ProgressbarStep++;
+                                    var si = CurrentContext.GetSocketsImages(MainController, WorkingLog);
+                                    ProgressbarStep++;
+                                    if (si == null) throw new Exception();
+                                    if (si.Data == null) throw new Exception();
+                                    if (si.Data.Length != socketMax) throw new Exception();
+                                    for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                     {
-                                        for (int c = 0; c < errorCards.Count; c++)
+                                        if (si.Data[socketNum] != null)
+                                            img[socketNum][repeat] = si.Data[socketNum].Image;
+                                        var errorCards = errorReadingData.ErrorCards();
+                                        if (errorCards.Count > 0)
                                         {
-                                            CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
+                                            for (int c = 0; c < errorCards.Count; c++)
+                                            {
+                                                CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
+                                            }
                                         }
+
                                     }
-
                                 }
+                                StandardPictures[repeat].Image = bmpCheckSign;
                             }
-                            StandardPictures[repeat].Image = bmpCheckSign;
-                        }
-                        for (int socketNum = 0; socketNum < socketMax; socketNum++)
-                        {
-                            if (img[socketNum].Any(im => im == null))
+                            for (int socketNum = 0; socketNum < socketMax; socketNum++)
                             {
-                                CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
-                                continue;
+                                if (img[socketNum].Any(im => im == null))
+                                {
+                                    CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
+                                    continue;
+                                }
+                                var avgImg = ImageTools.CalculateAverage(img[socketNum]);
+                                CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
                             }
-                            var avgImg = ImageTools.CalculateAverage(img[socketNum]);
-                            CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
-                        }
 
+                            CurrentContext.Configuration.SaveProcessingDataSettings();
+                        }
                     }
                 }
-                CurrentContext.StopCCD(MainController, WorkingLog);
-                CurrentContext.Configuration.SaveProcessingDataSettings();
+                finally
+                {
+                    CurrentContext.StopCCD(MainController, WorkingLog);
+                }
                 pbAverage.Image = bmpCheckSign;
                 StandardIsReading = false;
                 RenewList();

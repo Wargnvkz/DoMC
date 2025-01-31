@@ -94,7 +94,7 @@ namespace DoMC.UserControls
         private void SendCommands(Type Command, object data = null)
         {
             var cmd = MainController.CreateCommandInstance(Command);
-            var res = cmd.Wait(data, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds*100, out CurrentStatus);
+            var res = cmd.Wait(data, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out CurrentStatus);
             if (!res)
             {
                 btnRDPBTestConnect.BackColor = Color.Red;
@@ -116,7 +116,7 @@ namespace DoMC.UserControls
             }
             else
             {
-                DisplayMessage.Show("Ошибка при отлючении","Ошибка");
+                DisplayMessage.Show("Ошибка при отлючении", "Ошибка");
             }
         }
         private void TestRDPBStart()
@@ -133,7 +133,7 @@ namespace DoMC.UserControls
             {
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                DisplayMessage.Show("Не удалось подключиться к бракеру","Ошибка");
+                DisplayMessage.Show("Не удалось подключиться к бракеру", "Ошибка");
             }
         }
 

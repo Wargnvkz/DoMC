@@ -46,10 +46,10 @@ namespace DoMCLib.Classes
                 Controller.GetObserver().NotificationReceivers -= NotificationReceived;
             }
             PrepareOutputData();
-            if (NoNeedToWaitMore)
+            //if (NoNeedToWaitMore)
                 return OutputData;
-            else
-                return null;
+            //else
+            //    return null;
         }
 
         protected abstract void NotificationReceived(string NotificationName, object? data);

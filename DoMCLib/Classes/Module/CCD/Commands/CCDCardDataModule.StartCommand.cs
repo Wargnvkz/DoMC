@@ -27,8 +27,18 @@ namespace DoMCLib.Classes.Module.CCD
                     if (cardParameters.Count == 0) throw new DoMCNoSocketsAllowedToReadException();
                     for (int i = 0; i < cardParameters.Count; i++)
                     {
-                        result.SetCardRequested(cardParameters[i].Item1);
-                        module.tcpClients[cardParameters[i].Item1].Start();
+                        var n = i;
+                        new Task(() =>
+                        {
+                            try
+                            {
+                                result.SetCardRequested(cardParameters[n].Item1);
+                                module.tcpClients[cardParameters[n].Item1].Start();
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+                        }).Start();
                     }
                 }
                 else

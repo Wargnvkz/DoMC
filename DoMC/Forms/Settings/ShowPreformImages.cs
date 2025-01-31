@@ -1,4 +1,6 @@
-﻿using DoMCLib.Tools;
+﻿using DoMCLib.Configuration;
+using DoMCLib.Tools;
+using DoMCModuleControl;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -38,14 +40,48 @@ namespace DoMCLib.Forms
         private DoMCLib.Configuration.ImageProcessParameters ImageProcessParameters;
 
         DefectMethod CalculationMethod = DefectMethod.PlainDifference;
+        Observer Observer;
 
         public ShowPreformImages()
         {
             InitializeComponent();
             timer.Start();
+            Disposed += ShowPreformImages_Disposed;
 
             Prepare();
         }
+
+        private void ShowPreformImages_Disposed(object? sender, EventArgs e)
+        {
+            if (Observer != null)
+            {
+                Observer.NotificationReceivers -= Observer_NotificationReceivers;
+            }
+        }
+        public void SetObserver(Observer observer)
+        {
+            Observer = observer;
+            Observer.NotificationReceivers += Observer_NotificationReceivers;
+        }
+
+        private void Observer_NotificationReceivers(string arg1, object? arg2)
+        {
+            if (arg1 == EventNamesList.InterfaceImagesSelected)
+            {
+                if (arg2 != null)
+                {
+                    var data = ((short[,] Image, short[,] Standard, ImageProcessParameters ipp))arg2;
+                    this.Invoke(new Action(() =>
+                    {
+                        SetImage(data.Image);
+                        SetStandardImage(data.Standard);
+                        SetImageProcessParameters(data.ipp);
+                        CalcImages();
+                    }));
+                }
+            }
+        }
+
         public void Prepare()
         {
             var screen = Screen.FromControl(this);
@@ -326,7 +362,7 @@ namespace DoMCLib.Forms
                 {
                     ReadLine = LineFrom2D(ImageToDraw, linen);
                     StandardLine = LineFrom2D(StandardImageToDraw, linen);
-                    DiffLine = LineFrom2D(ImageProcessResult.ResultImage, linen);
+                    DiffLine = LineFrom2D(ImageProcessResult?.ResultImage??null, linen);
                 }
             }
 

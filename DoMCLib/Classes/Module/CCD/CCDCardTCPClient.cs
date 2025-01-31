@@ -48,7 +48,7 @@ namespace DoMCLib.Classes.Module.CCD
         byte[] ReadBuffer = new byte[0];
         //public long TotalReadBytes;
         //public int ReadDataTimeoutSeconds = 30;
-        public int ConnectionTimeoutInMilliseconds = 2000;
+        public int ConnectionTimeoutInMilliseconds = 4000;
         public bool IsConnected { get; private set; }
         private bool IsCardNumberUsed = false;
         public string IPAddr { get; private set; }
@@ -145,7 +145,6 @@ namespace DoMCLib.Classes.Module.CCD
             if (TCPClientImageDataConnection == null) throw new ArgumentException("");
             try
             {
-
                 var ip = GetServerIPAddressSocketData(Socket);
                 N = 1;
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Начало чтения гнезда {Socket}. Адрес: {ip}");
@@ -199,7 +198,7 @@ namespace DoMCLib.Classes.Module.CCD
                     N = 11;
 
                 } while (socketReadData.ImageDataRead < SocketWorkStatus.ProperImageSizeInBytes &&
-                         (DateTime.Now - startedAt).TotalMilliseconds < msTimeout &&
+                         (DateTime.Now - startedAt).TotalSeconds < msTimeout &&
                          !cancellationToken.IsCancellationRequested);
 
                 if (cancellationToken.IsCancellationRequested)

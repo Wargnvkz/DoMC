@@ -77,7 +77,6 @@ namespace DoMC
         {
             Context = (DoMCLib.Classes.DoMCApplicationContext)data;
             Controller = controller;
-            Controller = controller;
             WorkingLog = controller.GetLogger("SettingInterface");
             observer = controller.GetObserver();
             //Context = context;
@@ -123,15 +122,16 @@ namespace DoMC
             try
             {
                 checkpreformalgorithmsForm = new DoMCLib.Forms.ShowPreformImages();
+                checkpreformalgorithmsForm.SetObserver(observer);
                 //checkpreformalgorithmsForm.WindowState = FormWindowState.Maximized;
                 checkpreformalgorithmsForm.TopLevel = false;
-                checkpreformalgorithmsForm.Parent = tbTestImages;
+                checkpreformalgorithmsForm.Parent = tbShowPreformImages;
                 checkpreformalgorithmsForm.Visible = true;
                 checkpreformalgorithmsForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
 
 
                 var k = 0.8f;
-                var screenpoint = tbTestImages.PointToScreen(new Point(0, 0));
+                var screenpoint = tbShowPreformImages.PointToScreen(new Point(0, 0));
                 var thisscreen = Screen.FromControl(this);
                 var screenrect = thisscreen.WorkingArea;
 
@@ -1924,21 +1924,21 @@ namespace DoMC
 
         private void btnMoveToArchive_Click(object sender, EventArgs e)
         {
-            /*
+
             if (MovingCyclesToArchive)
             {
                 MovingCyclesToArchive = false;
-                Context.SendCommand(ModuleCommand.ArchiveDBStop);
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule.StartCommand))?.ExecuteCommand();
                 btnMoveToArchive.BackColor = SystemColors.Control;
 
             }
             else
             {
                 MovingCyclesToArchive = true;
-                Context.SendCommand(ModuleCommand.ArchiveDBStart);
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule.StopCommand))?.ExecuteCommand();
                 btnMoveToArchive.BackColor = Color.DarkGreen;
             }
-            */
+
         }
 
         private void дополнительныеПараметрыToolStripMenuItem_Click(object sender, EventArgs e)

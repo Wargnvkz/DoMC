@@ -71,33 +71,15 @@
             tsmiTechnicalData = new ToolStripMenuItem();
             tsmiReadImageStatistics = new ToolStripMenuItem();
             tabControl1 = new TabControl();
-            tbSettingsStatus = new TabPage();
-            btnCheckSettings = new Button();
-            btnSettingsCheckCardStatus = new Button();
-            lblSocketSettings = new Label();
-            pnlSockets = new Panel();
-            lblCaptionDoMCCards = new Label();
-            lvDoMCCards = new ListView();
-            chN = new ColumnHeader();
-            chIsActive = new ColumnHeader();
-            chMac = new ColumnHeader();
-            chFirstSocket = new ColumnHeader();
-            chLastSocket = new ColumnHeader();
+            tbSettingsCheck = new TabPage();
             tbGetStandard = new TabPage();
             tbTestLCB = new TabPage();
             tbCCDTest = new TabPage();
-            tbTestImages = new TabPage();
+            tbShowPreformImages = new TabPage();
             tbTestRDPB_uc = new TabPage();
             tbDB = new TabPage();
-            btnRestoreRemoteDB = new Button();
-            btnRestoreLocalDB = new Button();
             btnMoveToArchive = new Button();
-            btnTestDBRemoteRecreate = new Button();
-            btnTestDBLocalRecreate = new Button();
-            btnTestDBRemote = new Button();
-            btnTestDBLocal = new Button();
             tbArchive = new TabPage();
-            tbSettingsCheck = new TabPage();
             xtbTest = new TabPage();
             cbTestCCDMaxPointShow = new CheckBox();
             ssFooter = new StatusStrip();
@@ -221,10 +203,21 @@
             btnTestRDPBN81 = new Button();
             btnTestRDPBN80 = new Button();
             btnRDPBTestConnect = new Button();
+            tbSettingsStatus = new TabPage();
+            btnCheckSettings = new Button();
+            btnSettingsCheckCardStatus = new Button();
+            lblSocketSettings = new Label();
+            pnlSockets = new Panel();
+            lblCaptionDoMCCards = new Label();
+            lvDoMCCards = new ListView();
+            chN = new ColumnHeader();
+            chIsActive = new ColumnHeader();
+            chMac = new ColumnHeader();
+            chFirstSocket = new ColumnHeader();
+            chLastSocket = new ColumnHeader();
             timer1 = new System.Windows.Forms.Timer(components);
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
-            tbSettingsStatus.SuspendLayout();
             tbDB.SuspendLayout();
             xtbTest.SuspendLayout();
             ssFooter.SuspendLayout();
@@ -247,6 +240,7 @@
             gbTestLCBInputs.SuspendLayout();
             gbTestLCBOutputs.SuspendLayout();
             tbRDP.SuspendLayout();
+            tbSettingsStatus.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -463,18 +457,18 @@
             // tabControl1
             // 
             tabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            tabControl1.Controls.Add(tbSettingsStatus);
+            tabControl1.Controls.Add(tbSettingsCheck);
             tabControl1.Controls.Add(tbGetStandard);
             tabControl1.Controls.Add(tbTestLCB);
             tabControl1.Controls.Add(tbCCDTest);
-            tabControl1.Controls.Add(tbTestImages);
+            tabControl1.Controls.Add(tbShowPreformImages);
             tabControl1.Controls.Add(tbTestRDPB_uc);
             tabControl1.Controls.Add(tbDB);
             tabControl1.Controls.Add(tbArchive);
-            tabControl1.Controls.Add(tbSettingsCheck);
             tabControl1.Controls.Add(xtbTest);
             tabControl1.Controls.Add(xtbLEDControl);
             tabControl1.Controls.Add(tbRDP);
+            tabControl1.Controls.Add(tbSettingsStatus);
             tabControl1.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
             tabControl1.Location = new Point(0, 43);
             tabControl1.Margin = new Padding(4, 5, 4, 5);
@@ -484,108 +478,14 @@
             tabControl1.TabIndex = 2;
             tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
             // 
-            // tbSettingsStatus
+            // tbSettingsCheck
             // 
-            tbSettingsStatus.Controls.Add(btnCheckSettings);
-            tbSettingsStatus.Controls.Add(btnSettingsCheckCardStatus);
-            tbSettingsStatus.Controls.Add(lblSocketSettings);
-            tbSettingsStatus.Controls.Add(pnlSockets);
-            tbSettingsStatus.Controls.Add(lblCaptionDoMCCards);
-            tbSettingsStatus.Controls.Add(lvDoMCCards);
-            tbSettingsStatus.Location = new Point(4, 29);
-            tbSettingsStatus.Margin = new Padding(4, 5, 4, 5);
-            tbSettingsStatus.Name = "tbSettingsStatus";
-            tbSettingsStatus.Padding = new Padding(4, 5, 4, 5);
-            tbSettingsStatus.Size = new Size(1808, 1033);
-            tbSettingsStatus.TabIndex = 0;
-            tbSettingsStatus.Text = "Состояние настроек";
-            tbSettingsStatus.UseVisualStyleBackColor = true;
-            // 
-            // btnCheckSettings
-            // 
-            btnCheckSettings.Location = new Point(918, 574);
-            btnCheckSettings.Margin = new Padding(3, 4, 3, 4);
-            btnCheckSettings.Name = "btnCheckSettings";
-            btnCheckSettings.Size = new Size(232, 63);
-            btnCheckSettings.TabIndex = 7;
-            btnCheckSettings.Text = "Проверить настройки";
-            btnCheckSettings.UseVisualStyleBackColor = true;
-            btnCheckSettings.Click += btnCheckSettings_Click;
-            // 
-            // btnSettingsCheckCardStatus
-            // 
-            btnSettingsCheckCardStatus.Location = new Point(14, 574);
-            btnSettingsCheckCardStatus.Margin = new Padding(3, 4, 3, 4);
-            btnSettingsCheckCardStatus.Name = "btnSettingsCheckCardStatus";
-            btnSettingsCheckCardStatus.Size = new Size(308, 63);
-            btnSettingsCheckCardStatus.TabIndex = 6;
-            btnSettingsCheckCardStatus.Text = "Проверка работы плат";
-            btnSettingsCheckCardStatus.UseVisualStyleBackColor = true;
-            btnSettingsCheckCardStatus.Click += btnSettingsCheckCardStatus_Click;
-            // 
-            // lblSocketSettings
-            // 
-            lblSocketSettings.AutoSize = true;
-            lblSocketSettings.Location = new Point(914, 5);
-            lblSocketSettings.Margin = new Padding(4, 0, 4, 0);
-            lblSocketSettings.Name = "lblSocketSettings";
-            lblSocketSettings.Size = new Size(145, 20);
-            lblSocketSettings.TabIndex = 5;
-            lblSocketSettings.Text = "Параметры гнезд";
-            // 
-            // pnlSockets
-            // 
-            pnlSockets.Location = new Point(920, 38);
-            pnlSockets.Margin = new Padding(4, 5, 4, 5);
-            pnlSockets.Name = "pnlSockets";
-            pnlSockets.Size = new Size(393, 528);
-            pnlSockets.TabIndex = 4;
-            // 
-            // lblCaptionDoMCCards
-            // 
-            lblCaptionDoMCCards.AutoSize = true;
-            lblCaptionDoMCCards.Location = new Point(10, 5);
-            lblCaptionDoMCCards.Margin = new Padding(4, 0, 4, 0);
-            lblCaptionDoMCCards.Name = "lblCaptionDoMCCards";
-            lblCaptionDoMCCards.Size = new Size(225, 20);
-            lblCaptionDoMCCards.TabIndex = 3;
-            lblCaptionDoMCCards.Text = "Используемы платы чтения:";
-            // 
-            // lvDoMCCards
-            // 
-            lvDoMCCards.Columns.AddRange(new ColumnHeader[] { chN, chIsActive, chMac, chFirstSocket, chLastSocket });
-            lvDoMCCards.Location = new Point(14, 38);
-            lvDoMCCards.Margin = new Padding(4, 5, 4, 5);
-            lvDoMCCards.Name = "lvDoMCCards";
-            lvDoMCCards.Size = new Size(894, 526);
-            lvDoMCCards.TabIndex = 2;
-            lvDoMCCards.UseCompatibleStateImageBehavior = false;
-            lvDoMCCards.View = View.Details;
-            // 
-            // chN
-            // 
-            chN.Text = "№ платы";
-            chN.Width = 80;
-            // 
-            // chIsActive
-            // 
-            chIsActive.Text = "Активно";
-            chIsActive.Width = 100;
-            // 
-            // chMac
-            // 
-            chMac.Text = "Физический адрес";
-            chMac.Width = 160;
-            // 
-            // chFirstSocket
-            // 
-            chFirstSocket.Text = "Первое гнездо";
-            chFirstSocket.Width = 120;
-            // 
-            // chLastSocket
-            // 
-            chLastSocket.Text = "Последнее гнездо";
-            chLastSocket.Width = 120;
+            tbSettingsCheck.Location = new Point(4, 29);
+            tbSettingsCheck.Name = "tbSettingsCheck";
+            tbSettingsCheck.Size = new Size(1808, 1033);
+            tbSettingsCheck.TabIndex = 12;
+            tbSettingsCheck.Text = "*Проверка настроек";
+            tbSettingsCheck.UseVisualStyleBackColor = true;
             // 
             // tbGetStandard
             // 
@@ -617,15 +517,16 @@
             tbCCDTest.Text = "Тест ПЗС*";
             tbCCDTest.UseVisualStyleBackColor = true;
             // 
-            // tbTestImages
+            // tbShowPreformImages
             // 
-            tbTestImages.Location = new Point(4, 29);
-            tbTestImages.Margin = new Padding(4, 5, 4, 5);
-            tbTestImages.Name = "tbTestImages";
-            tbTestImages.Size = new Size(1808, 1033);
-            tbTestImages.TabIndex = 5;
-            tbTestImages.Text = "Тест изображений";
-            tbTestImages.UseVisualStyleBackColor = true;
+            tbShowPreformImages.Font = new Font("Segoe UI", 9F);
+            tbShowPreformImages.Location = new Point(4, 29);
+            tbShowPreformImages.Margin = new Padding(4, 5, 4, 5);
+            tbShowPreformImages.Name = "tbShowPreformImages";
+            tbShowPreformImages.Size = new Size(1808, 1033);
+            tbShowPreformImages.TabIndex = 5;
+            tbShowPreformImages.Text = "Тест изображений";
+            tbShowPreformImages.UseVisualStyleBackColor = true;
             // 
             // tbTestRDPB_uc
             // 
@@ -638,13 +539,7 @@
             // 
             // tbDB
             // 
-            tbDB.Controls.Add(btnRestoreRemoteDB);
-            tbDB.Controls.Add(btnRestoreLocalDB);
             tbDB.Controls.Add(btnMoveToArchive);
-            tbDB.Controls.Add(btnTestDBRemoteRecreate);
-            tbDB.Controls.Add(btnTestDBLocalRecreate);
-            tbDB.Controls.Add(btnTestDBRemote);
-            tbDB.Controls.Add(btnTestDBLocal);
             tbDB.Location = new Point(4, 29);
             tbDB.Margin = new Padding(4, 5, 4, 5);
             tbDB.Name = "tbDB";
@@ -653,31 +548,9 @@
             tbDB.Text = "База данных";
             tbDB.UseVisualStyleBackColor = true;
             // 
-            // btnRestoreRemoteDB
-            // 
-            btnRestoreRemoteDB.Location = new Point(632, 154);
-            btnRestoreRemoteDB.Margin = new Padding(4, 5, 4, 5);
-            btnRestoreRemoteDB.Name = "btnRestoreRemoteDB";
-            btnRestoreRemoteDB.Size = new Size(290, 97);
-            btnRestoreRemoteDB.TabIndex = 6;
-            btnRestoreRemoteDB.Text = "Восстановить удаленную базу данных";
-            btnRestoreRemoteDB.UseVisualStyleBackColor = true;
-            btnRestoreRemoteDB.Click += btnRestoreRemoteDB_Click;
-            // 
-            // btnRestoreLocalDB
-            // 
-            btnRestoreLocalDB.Location = new Point(632, 21);
-            btnRestoreLocalDB.Margin = new Padding(4, 5, 4, 5);
-            btnRestoreLocalDB.Name = "btnRestoreLocalDB";
-            btnRestoreLocalDB.Size = new Size(290, 97);
-            btnRestoreLocalDB.TabIndex = 5;
-            btnRestoreLocalDB.Text = "Восстановить локальную базу данных";
-            btnRestoreLocalDB.UseVisualStyleBackColor = true;
-            btnRestoreLocalDB.Click += btnRestoreLocalDB_Click;
-            // 
             // btnMoveToArchive
             // 
-            btnMoveToArchive.Location = new Point(972, 93);
+            btnMoveToArchive.Location = new Point(9, 5);
             btnMoveToArchive.Margin = new Padding(4, 5, 4, 5);
             btnMoveToArchive.Name = "btnMoveToArchive";
             btnMoveToArchive.Size = new Size(290, 97);
@@ -685,50 +558,6 @@
             btnMoveToArchive.Text = "Переместить данные в архив";
             btnMoveToArchive.UseVisualStyleBackColor = true;
             btnMoveToArchive.Click += btnMoveToArchive_Click;
-            // 
-            // btnTestDBRemoteRecreate
-            // 
-            btnTestDBRemoteRecreate.Location = new Point(332, 154);
-            btnTestDBRemoteRecreate.Margin = new Padding(4, 5, 4, 5);
-            btnTestDBRemoteRecreate.Name = "btnTestDBRemoteRecreate";
-            btnTestDBRemoteRecreate.Size = new Size(290, 97);
-            btnTestDBRemoteRecreate.TabIndex = 3;
-            btnTestDBRemoteRecreate.Text = "Пересоздать удаленную базу данных";
-            btnTestDBRemoteRecreate.UseVisualStyleBackColor = true;
-            btnTestDBRemoteRecreate.Click += btnTestDBRemoteRecreate_Click;
-            // 
-            // btnTestDBLocalRecreate
-            // 
-            btnTestDBLocalRecreate.Location = new Point(332, 21);
-            btnTestDBLocalRecreate.Margin = new Padding(4, 5, 4, 5);
-            btnTestDBLocalRecreate.Name = "btnTestDBLocalRecreate";
-            btnTestDBLocalRecreate.Size = new Size(290, 97);
-            btnTestDBLocalRecreate.TabIndex = 2;
-            btnTestDBLocalRecreate.Text = "Пересоздать локальную базу данных";
-            btnTestDBLocalRecreate.UseVisualStyleBackColor = true;
-            btnTestDBLocalRecreate.Click += btnTestDBLocalRecreate_Click;
-            // 
-            // btnTestDBRemote
-            // 
-            btnTestDBRemote.Location = new Point(32, 154);
-            btnTestDBRemote.Margin = new Padding(4, 5, 4, 5);
-            btnTestDBRemote.Name = "btnTestDBRemote";
-            btnTestDBRemote.Size = new Size(290, 97);
-            btnTestDBRemote.TabIndex = 1;
-            btnTestDBRemote.Text = "Проверить базу данных архива";
-            btnTestDBRemote.UseVisualStyleBackColor = true;
-            btnTestDBRemote.Click += btnTestDBRemote_Click;
-            // 
-            // btnTestDBLocal
-            // 
-            btnTestDBLocal.Location = new Point(32, 21);
-            btnTestDBLocal.Margin = new Padding(4, 5, 4, 5);
-            btnTestDBLocal.Name = "btnTestDBLocal";
-            btnTestDBLocal.Size = new Size(290, 97);
-            btnTestDBLocal.TabIndex = 0;
-            btnTestDBLocal.Text = "Проверить локальную базу данных";
-            btnTestDBLocal.UseVisualStyleBackColor = true;
-            btnTestDBLocal.Click += btnTestDBLocal_Click;
             // 
             // tbArchive
             // 
@@ -739,15 +568,6 @@
             tbArchive.TabIndex = 8;
             tbArchive.Text = "Архив съемов";
             tbArchive.UseVisualStyleBackColor = true;
-            // 
-            // tbSettingsCheck
-            // 
-            tbSettingsCheck.Location = new Point(4, 29);
-            tbSettingsCheck.Name = "tbSettingsCheck";
-            tbSettingsCheck.Size = new Size(1808, 1033);
-            tbSettingsCheck.TabIndex = 12;
-            tbSettingsCheck.Text = "*Проверка настроек";
-            tbSettingsCheck.UseVisualStyleBackColor = true;
             // 
             // xtbTest
             // 
@@ -2210,6 +2030,109 @@
             btnRDPBTestConnect.UseVisualStyleBackColor = true;
             btnRDPBTestConnect.Click += btnRDPBTestConnect_Click;
             // 
+            // tbSettingsStatus
+            // 
+            tbSettingsStatus.Controls.Add(btnCheckSettings);
+            tbSettingsStatus.Controls.Add(btnSettingsCheckCardStatus);
+            tbSettingsStatus.Controls.Add(lblSocketSettings);
+            tbSettingsStatus.Controls.Add(pnlSockets);
+            tbSettingsStatus.Controls.Add(lblCaptionDoMCCards);
+            tbSettingsStatus.Controls.Add(lvDoMCCards);
+            tbSettingsStatus.Location = new Point(4, 29);
+            tbSettingsStatus.Margin = new Padding(4, 5, 4, 5);
+            tbSettingsStatus.Name = "tbSettingsStatus";
+            tbSettingsStatus.Padding = new Padding(4, 5, 4, 5);
+            tbSettingsStatus.Size = new Size(1808, 1033);
+            tbSettingsStatus.TabIndex = 0;
+            tbSettingsStatus.Text = "xСостояние настроек";
+            tbSettingsStatus.UseVisualStyleBackColor = true;
+            // 
+            // btnCheckSettings
+            // 
+            btnCheckSettings.Location = new Point(918, 574);
+            btnCheckSettings.Margin = new Padding(3, 4, 3, 4);
+            btnCheckSettings.Name = "btnCheckSettings";
+            btnCheckSettings.Size = new Size(232, 63);
+            btnCheckSettings.TabIndex = 7;
+            btnCheckSettings.Text = "Проверить настройки";
+            btnCheckSettings.UseVisualStyleBackColor = true;
+            btnCheckSettings.Click += btnCheckSettings_Click;
+            // 
+            // btnSettingsCheckCardStatus
+            // 
+            btnSettingsCheckCardStatus.Location = new Point(14, 574);
+            btnSettingsCheckCardStatus.Margin = new Padding(3, 4, 3, 4);
+            btnSettingsCheckCardStatus.Name = "btnSettingsCheckCardStatus";
+            btnSettingsCheckCardStatus.Size = new Size(308, 63);
+            btnSettingsCheckCardStatus.TabIndex = 6;
+            btnSettingsCheckCardStatus.Text = "Проверка работы плат";
+            btnSettingsCheckCardStatus.UseVisualStyleBackColor = true;
+            btnSettingsCheckCardStatus.Click += btnSettingsCheckCardStatus_Click;
+            // 
+            // lblSocketSettings
+            // 
+            lblSocketSettings.AutoSize = true;
+            lblSocketSettings.Location = new Point(914, 5);
+            lblSocketSettings.Margin = new Padding(4, 0, 4, 0);
+            lblSocketSettings.Name = "lblSocketSettings";
+            lblSocketSettings.Size = new Size(145, 20);
+            lblSocketSettings.TabIndex = 5;
+            lblSocketSettings.Text = "Параметры гнезд";
+            // 
+            // pnlSockets
+            // 
+            pnlSockets.Location = new Point(920, 38);
+            pnlSockets.Margin = new Padding(4, 5, 4, 5);
+            pnlSockets.Name = "pnlSockets";
+            pnlSockets.Size = new Size(393, 528);
+            pnlSockets.TabIndex = 4;
+            // 
+            // lblCaptionDoMCCards
+            // 
+            lblCaptionDoMCCards.AutoSize = true;
+            lblCaptionDoMCCards.Location = new Point(10, 5);
+            lblCaptionDoMCCards.Margin = new Padding(4, 0, 4, 0);
+            lblCaptionDoMCCards.Name = "lblCaptionDoMCCards";
+            lblCaptionDoMCCards.Size = new Size(225, 20);
+            lblCaptionDoMCCards.TabIndex = 3;
+            lblCaptionDoMCCards.Text = "Используемы платы чтения:";
+            // 
+            // lvDoMCCards
+            // 
+            lvDoMCCards.Columns.AddRange(new ColumnHeader[] { chN, chIsActive, chMac, chFirstSocket, chLastSocket });
+            lvDoMCCards.Location = new Point(14, 38);
+            lvDoMCCards.Margin = new Padding(4, 5, 4, 5);
+            lvDoMCCards.Name = "lvDoMCCards";
+            lvDoMCCards.Size = new Size(894, 526);
+            lvDoMCCards.TabIndex = 2;
+            lvDoMCCards.UseCompatibleStateImageBehavior = false;
+            lvDoMCCards.View = View.Details;
+            // 
+            // chN
+            // 
+            chN.Text = "№ платы";
+            chN.Width = 80;
+            // 
+            // chIsActive
+            // 
+            chIsActive.Text = "Активно";
+            chIsActive.Width = 100;
+            // 
+            // chMac
+            // 
+            chMac.Text = "Физический адрес";
+            chMac.Width = 160;
+            // 
+            // chFirstSocket
+            // 
+            chFirstSocket.Text = "Первое гнездо";
+            chFirstSocket.Width = 120;
+            // 
+            // chLastSocket
+            // 
+            chLastSocket.Text = "Последнее гнездо";
+            chLastSocket.Width = 120;
+            // 
             // timer1
             // 
             timer1.Enabled = true;
@@ -2233,8 +2156,6 @@
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             tabControl1.ResumeLayout(false);
-            tbSettingsStatus.ResumeLayout(false);
-            tbSettingsStatus.PerformLayout();
             tbDB.ResumeLayout(false);
             xtbTest.ResumeLayout(false);
             xtbTest.PerformLayout();
@@ -2268,6 +2189,8 @@
             gbTestLCBOutputs.PerformLayout();
             tbRDP.ResumeLayout(false);
             tbRDP.PerformLayout();
+            tbSettingsStatus.ResumeLayout(false);
+            tbSettingsStatus.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2318,7 +2241,7 @@
         private System.Windows.Forms.TabPage xtbLEDControl;
         private System.Windows.Forms.Button btnCycleStart;
         private System.Windows.Forms.Button btnCycleStop;
-        private System.Windows.Forms.TabPage tbTestImages;
+        private System.Windows.Forms.TabPage tbShowPreformImages;
         private System.Windows.Forms.CheckBox cbInvertColors;
         private System.Windows.Forms.StatusStrip ssFooter;
         private System.Windows.Forms.ToolStripStatusLabel tslTestCCDCardReadStatus;
@@ -2344,10 +2267,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.TabPage tbDB;
-        private System.Windows.Forms.Button btnTestDBRemote;
-        private System.Windows.Forms.Button btnTestDBLocal;
-        private System.Windows.Forms.Button btnTestDBRemoteRecreate;
-        private System.Windows.Forms.Button btnTestDBLocalRecreate;
         private System.Windows.Forms.CheckBox cbTestCCDMaxPointShow;
         private System.Windows.Forms.ToolStripMenuItem miPhysicToDisplaySocket;
         private System.Windows.Forms.ToolStripMenuItem конфигурацияToolStripMenuItem;
@@ -2366,8 +2285,6 @@
         private System.Windows.Forms.ToolStripMenuItem miRDPBLogsArchive;
         private System.Windows.Forms.ToolStripMenuItem miDBLogsArchive;
         private System.Windows.Forms.Button btnMoveToArchive;
-        private System.Windows.Forms.Button btnRestoreRemoteDB;
-        private System.Windows.Forms.Button btnRestoreLocalDB;
         private System.Windows.Forms.ToolStripMenuItem дополнительныеПараметрыToolStripMenuItem;
         private System.Windows.Forms.TabPage tbArchive;
         private System.Windows.Forms.Label lblTimeImageProcess;

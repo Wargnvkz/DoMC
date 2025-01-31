@@ -36,6 +36,7 @@ namespace DoMCLib.Classes
         }
         public bool IsImageGood(short[,] std, short[,] img, ImageProcessParameters ipp, out short[,] ResultImg, out Point MaxCoord)
         {
+            
             short[][,] res;
             if (Operations != null)
             {

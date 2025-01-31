@@ -100,6 +100,88 @@ namespace DoMCLib.Classes.Module.CCD
             }
         }
 
+        public class GetSingleSocketImageDataCommand : WaitingCommandBase
+        {
+            GetImageDataCommandResponse result = new GetImageDataCommandResponse();
+            CancellationTokenSource[] cancellationTokenSources = new CancellationTokenSource[12];
+            public GetSingleSocketImageDataCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof((DoMCApplicationContext, int)), typeof(GetImageDataCommandResponse)) { }
+            protected override void Executing()
+            {
+                var module = (CCDCardDataModule)Module;
+                var contextSocket = ((DoMCApplicationContext, int)?)InputData;
+                if (contextSocket != null)
+                {
+                    var context = contextSocket.Value.Item1;
+                    var equipmentSocketNumber = contextSocket.Value.Item2;
+                    var workingCard = context.GetWorkingPhysicalSocket(equipmentSocketNumber);
+                    result.SetCardRequested(workingCard.CCDCardNumber);
+                    cancellationTokenSources[workingCard.CCDCardNumber] = new CancellationTokenSource();
+                    module.tcpClients[workingCard.CCDCardNumber].SendCommandGetAllSocketImages(CancelationTokenSourceToCancelCommandExecution.Token);
+                    StartReadAllSockets(workingCard.CCDCardNumber, context, module);
+                }
+                else
+                {
+
+                }
+
+            }
+            private void StartReadAllSockets(int cardnumber, DoMCApplicationContext context, CCDCardDataModule module)
+            {
+                var task = new Task(() =>
+                {
+                    for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
+                    {
+                        var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
+                        if (ReadResult)
+                        {
+                            TCPCardSocket cardSocket = new TCPCardSocket(cardnumber, socket);
+                            var equipmentSocket = context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
+                            result.SetSocketReadData(equipmentSocket - 1, data);
+                        }
+                        else
+                        {
+                            result.SetCardError(cardnumber);
+                        }
+                    }
+                    result.SetCardCompleteSuccessfully(cardnumber);
+                }, cancellationTokenSources[cardnumber].Token);
+                task.Start();
+            }
+
+
+            protected override void NotificationReceived(string NotificationName, object? data)
+            {
+                if (NotificationName.Contains("ResponseGetSocketsImages"))
+                {
+                    var CardAnswerResults = (CCDCardAnswerResults)data;
+                    if (CardAnswerResults == null) return;
+                    result.SetCardAnswered(CardAnswerResults.CardNumber - 1);
+                    result.SetCardError(CardAnswerResults.CardNumber - 1);
+                    cancellationTokenSources[CardAnswerResults.CardNumber].Cancel();
+                }
+            }
+
+            protected override bool MakeDecisionIsCommandCompleteFunc()
+            {
+                return result.GetCardsNotStopped().Count() == 0;
+            }
+
+            protected override void PrepareOutputData()
+            {
+                OutputData = result;
+
+            }
+
+            public override void Cancel()
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    cancellationTokenSources[i]?.Cancel();
+                }
+                base.Cancel();
+            }
+        }
+
     }
 
 }

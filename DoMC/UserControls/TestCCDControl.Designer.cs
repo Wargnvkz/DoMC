@@ -28,18 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series13 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series14 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series15 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series16 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series17 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series18 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
             cbInvertColors = new CheckBox();
             btnCycleStop = new Button();
             btnCycleStart = new Button();
@@ -85,6 +85,7 @@
             cbInvertColors.TabIndex = 94;
             cbInvertColors.Text = "Инверсия цветов";
             cbInvertColors.UseVisualStyleBackColor = true;
+            cbInvertColors.CheckedChanged += cbInvertColors_CheckedChanged;
             // 
             // btnCycleStop
             // 
@@ -95,6 +96,7 @@
             btnCycleStop.TabIndex = 93;
             btnCycleStop.Text = " Остановка цикла";
             btnCycleStop.UseVisualStyleBackColor = true;
+            btnCycleStop.Click += btnCycleStop_Click;
             // 
             // btnCycleStart
             // 
@@ -105,55 +107,56 @@
             btnCycleStart.TabIndex = 92;
             btnCycleStart.Text = "Запуск цикла";
             btnCycleStart.UseVisualStyleBackColor = true;
+            btnCycleStart.Click += btnCycleStartStop_Click;
             // 
             // chTestStandard
             // 
-            chartArea4.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea4.Name = "ChartArea1";
-            chTestStandard.ChartAreas.Add(chartArea4);
+            chartArea1.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea1.Name = "ChartArea1";
+            chTestStandard.ChartAreas.Add(chartArea1);
             chTestStandard.Location = new Point(1257, 585);
             chTestStandard.Margin = new Padding(5);
             chTestStandard.Name = "chTestStandard";
             chTestStandard.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series10.ChartArea = "ChartArea1";
-            series10.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series10.Name = "Series1";
-            series11.ChartArea = "ChartArea1";
-            series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series11.Name = "Series2";
-            series12.ChartArea = "ChartArea1";
-            series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series12.Name = "Series3";
-            series12.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            chTestStandard.Series.Add(series10);
-            chTestStandard.Series.Add(series11);
-            chTestStandard.Series.Add(series12);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Name = "Series1";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Name = "Series2";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series3.Name = "Series3";
+            series3.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestStandard.Series.Add(series1);
+            chTestStandard.Series.Add(series2);
+            chTestStandard.Series.Add(series3);
             chTestStandard.Size = new Size(398, 287);
             chTestStandard.TabIndex = 91;
             chTestStandard.Text = "chart1";
             // 
             // chTestDiff
             // 
-            chartArea5.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea5.Name = "ChartArea1";
-            chTestDiff.ChartAreas.Add(chartArea5);
+            chartArea2.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea2.Name = "ChartArea1";
+            chTestDiff.ChartAreas.Add(chartArea2);
             chTestDiff.Location = new Point(873, 589);
             chTestDiff.Margin = new Padding(5);
             chTestDiff.Name = "chTestDiff";
             chTestDiff.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series13.ChartArea = "ChartArea1";
-            series13.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series13.Name = "Series1";
-            series14.ChartArea = "ChartArea1";
-            series14.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series14.Name = "Series2";
-            series15.ChartArea = "ChartArea1";
-            series15.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series15.Name = "Series3";
-            series15.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            chTestDiff.Series.Add(series13);
-            chTestDiff.Series.Add(series14);
-            chTestDiff.Series.Add(series15);
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series4.Name = "Series1";
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series5.Name = "Series2";
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series6.Name = "Series3";
+            series6.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestDiff.Series.Add(series4);
+            chTestDiff.Series.Add(series5);
+            chTestDiff.Series.Add(series6);
             chTestDiff.Size = new Size(392, 287);
             chTestDiff.TabIndex = 90;
             chTestDiff.Text = "chart1";
@@ -204,26 +207,26 @@
             // 
             // chTestReadLine
             // 
-            chartArea6.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
-            chartArea6.Name = "ChartArea1";
-            chTestReadLine.ChartAreas.Add(chartArea6);
+            chartArea3.AlignmentOrientation = System.Windows.Forms.DataVisualization.Charting.AreaAlignmentOrientations.Horizontal;
+            chartArea3.Name = "ChartArea1";
+            chTestReadLine.ChartAreas.Add(chartArea3);
             chTestReadLine.Location = new Point(434, 585);
             chTestReadLine.Margin = new Padding(5);
             chTestReadLine.Name = "chTestReadLine";
             chTestReadLine.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Bright;
-            series16.ChartArea = "ChartArea1";
-            series16.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series16.Name = "Series1";
-            series17.ChartArea = "ChartArea1";
-            series17.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series17.Name = "Series2";
-            series18.ChartArea = "ChartArea1";
-            series18.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series18.Name = "Series3";
-            series18.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            chTestReadLine.Series.Add(series16);
-            chTestReadLine.Series.Add(series17);
-            chTestReadLine.Series.Add(series18);
+            series7.ChartArea = "ChartArea1";
+            series7.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series7.Name = "Series1";
+            series8.ChartArea = "ChartArea1";
+            series8.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series8.Name = "Series2";
+            series9.ChartArea = "ChartArea1";
+            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series9.Name = "Series3";
+            series9.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            chTestReadLine.Series.Add(series7);
+            chTestReadLine.Series.Add(series8);
+            chTestReadLine.Series.Add(series9);
             chTestReadLine.Size = new Size(468, 287);
             chTestReadLine.TabIndex = 85;
             chTestReadLine.Text = "chart1";
@@ -402,6 +405,7 @@
             cbTestCCDMaxPointShow.TabIndex = 96;
             cbTestCCDMaxPointShow.Text = "Показать максимальную точку";
             cbTestCCDMaxPointShow.UseVisualStyleBackColor = true;
+            cbTestCCDMaxPointShow.CheckedChanged += cbTestCCDMaxPointShow_CheckedChanged;
             // 
             // TestCCDControl
             // 

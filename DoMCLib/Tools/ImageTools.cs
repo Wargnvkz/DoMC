@@ -1054,6 +1054,7 @@ namespace DoMCLib.Tools
         }
         public static short Average(short[,] img, Rectangle? rect = null)
         {
+            if (img == null) return 0;
             Rectangle r;
             if (rect == null)
                 r = new Rectangle(0, 0, 511, 511);
@@ -1084,6 +1085,7 @@ namespace DoMCLib.Tools
         public static ImageProcessResult CheckIfSocketGood(short[,] Current, short[,] StandardImage, ImageProcessParameters ipp)
         {
             var result = new ImageProcessResult();
+            result.IsSocketGood = true;
             result.SocketErrorType = ImageErrorType.None;
             if (ipp.Decisions != null)
             {
@@ -1095,8 +1097,8 @@ namespace DoMCLib.Tools
                     {
                         result.IsSocketGood = false;
                         result.SocketErrorType |= ipp.Decisions[i].Result == DecisionActionResult.Defect ? ImageErrorType.Defect : ImageErrorType.Average;
-                        result.MaxDeviationPoint = maxCoord;
                     }
+                    result.MaxDeviationPoint = maxCoord;
                     if (i == 0) result.ResultImage = resImg;
 
                 }
@@ -1259,24 +1261,19 @@ namespace DoMCLib.Tools
             }
             return res;*/
         }
-    }
-
-    public static class ImageTools<T>
-    {
-        public static T[] GetColumn(T[,] matrix, int columnNumber)
+        public static short[] GetColumn(short[,] matrix, int columnNumber)
         {
             return Enumerable.Range(0, matrix.GetLength(0))
                     .Select(x => matrix[x, columnNumber])
                     .ToArray();
         }
 
-        public static T[] GetRow(T[,] matrix, int rowNumber)
+        public static short[] GetRow(short[,] matrix, int rowNumber)
         {
             return Enumerable.Range(0, matrix.GetLength(1))
                     .Select(x => matrix[rowNumber, x])
                     .ToArray();
         }
-
     }
 
     public class Deviation

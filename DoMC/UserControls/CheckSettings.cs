@@ -24,6 +24,7 @@ namespace DoMC.UserControls
         IDoMCSettingsUpdatedProvider SettingsUpdateProvider;
         DoMCLib.Classes.DoMCApplicationContext CurrentContext;
         bool?[] CardsChecks = new bool?[12];
+        int checkTimeout = 5;
         public CheckSettings(IMainController Controller, ILogger logger, DoMC.Classes.IDoMCSettingsUpdatedProvider settingsUpdateProvider)
         {
             InitializeComponent();
@@ -85,6 +86,15 @@ namespace DoMC.UserControls
                     }
                 }
             }
+            else
+            {
+                for (int i = 0; i < result.requested.Length; i++)
+                {
+                    CardsChecks[i] = false;
+                }
+
+            }
+            FillPage();
 
         }
 
