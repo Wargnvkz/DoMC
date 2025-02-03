@@ -1,4 +1,5 @@
 ﻿using DoMCLib.Classes.Configuration;
+using DoMCLib.Classes.Module.ArchiveDB;
 using DoMCLib.Classes.Module.LCB;
 using DoMCLib.Tools;
 using System;
@@ -25,10 +26,7 @@ namespace DoMCLib.Configuration
         public DoMCStandardRecalculationSettings StandardRecalculationParameters = new DoMCStandardRecalculationSettings();
 
         public RemoveDefectedPreformBlockConfig RemoveDefectedPreformBlockConfig = new RemoveDefectedPreformBlockConfig();
-
-        public string LocalDataStoragePath = "";
-
-        public string RemoteDataStoragePath = "";
+        public ArchiveDBConfiguration ArchiveDBConfig = new ArchiveDBConfiguration();
 
         public TimeoutOfActions Timeouts = new TimeoutOfActions();
         /// <summary>
@@ -52,7 +50,7 @@ namespace DoMCLib.Configuration
         }
         public bool IsDBSettingsSet()
         {
-            return !string.IsNullOrWhiteSpace(LocalDataStoragePath) && !string.IsNullOrWhiteSpace(RemoteDataStoragePath) && Timeouts != null && Timeouts.DelayBeforeMoveDataToArchiveTimeInSeconds > 0;
+            return !string.IsNullOrWhiteSpace(ArchiveDBConfig.LocalDBPath) && !string.IsNullOrWhiteSpace(ArchiveDBConfig.ArchiveDBPath) && Timeouts != null && Timeouts.DelayBeforeMoveDataToArchiveTimeInSeconds > 0;
         }
 
     }

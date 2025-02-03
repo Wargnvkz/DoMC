@@ -1,4 +1,5 @@
 ﻿using DoMCLib.Classes.Module.RDPB;
+using DoMCLib.Configuration;
 using DoMCLib.DB;
 using DoMCModuleControl;
 using DoMCModuleControl.Logging;
@@ -34,11 +35,10 @@ namespace DoMCLib.Classes.Module.ArchiveDB
 
         private void ObserverForDataStorage_NotificationReceived(string Name, object? data)
         {
-            switch (Name)
+            if (Name == DoMCApplicationContext.ConfigurationUpdateEventName)
             {
-                //TODO: найти сообщениня совместимые с текущей работой переноса, а несовместимые и передать их наверх в приложение
-                case "":
-                    break;
+                var cfg = data as ApplicationConfiguration;
+                SetConfiguration(cfg.HardwareSettings.ArchiveDBConfig);
             }
         }
 
@@ -84,7 +84,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
                         {
                             WorkingLog.Add(LoggerLevel.Information, "Начало переноса прошлых данных");
                             TimeLastLocalToRemoteCheck = DateTime.Now;
-                            Storage.MoveFromLocalToRemoteWithDutyCycle(Configuration.ArchiveRecordAgeSeconds, 300, 60);
+                            Storage.MoveFromLocalToRemoteWithDutyCycle(Configuration.ArchiveRecordAgeSeconds, Configuration.DutyCycleInSeconds, Configuration.BeforeAndAfterErrorInSeconds);
                             WorkingLog.Add(LoggerLevel.Information, "Перенос данных в архив завершен");
                         }
                         else
@@ -103,6 +103,6 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             }
             IsStarted = false;
         }
-       
+
     }
 }

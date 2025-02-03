@@ -655,5 +655,20 @@ namespace DoMC.UserControls
 
             }
         }
+
+        private void txbInput_DoubleClick(object sender, EventArgs e)
+        {
+            var txb = (sender as TextBox);
+            string title = "";
+            if (txb == txbTestLCBCurrent) title = "тока";
+            if (txb == txbTestLCBDelayLength) title = "длина задержка";
+            if (txb == txbTestLCBDelayLengthMm) title = "длина задержки в мм";
+            if (txb == txbTestLCBPreformLength) title = "длина преформы в имп";
+            if (txb == txbTestLCBPreformLengthMm) title = "длина преформы в мм";
+            int.TryParse(txb.Text, out int Current);
+            var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, Current);
+            if (newvalue >= 0)
+                txb.Text = newvalue.ToString();
+        }
     }
 }

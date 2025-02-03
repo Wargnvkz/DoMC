@@ -26,17 +26,14 @@ namespace DoMC
 {
     public partial class DoMCWorkModeInterface : Form, IDoMCSettingsUpdatedProvider, IMainUserInterface
     {
+
         int CardTimeout = 30000;
         bool IsConfigurationLoadedSuccessfully;
+        bool IsWorkingModeStarted;
 
-        /*Panel[] WorkModeStandardSettingsSocketsPanelList;
-        int[] SocketErrorStatus;*/
+
         SocketStatuses socketStatuses;
 
-        /* DateTime dtArchiveFrom, dtArchiveTo;
-         List<DisplayCycleData> ArchiveCycles;
-         List<CycleData> LocalArchiveCycles;
-         List<CycleData> RemoteArchiveCycles;*/
         int[] ErrorsBySockets = new int[96];
 
         Thread WorkingThread;
@@ -69,10 +66,20 @@ namespace DoMC
 
         public event EventHandler SettingsUpdated;
 
+
+        ButtonsPresses[] switches;
+
+
         public DoMCWorkModeInterface()
         {
             InitializeComponent();
             Application.ThreadException += Application_ThreadException;
+            switches = new ButtonsPresses[] {
+                new ButtonsPresses(){ Button= pbStartStop, ButtonPressed=false },
+                new ButtonsPresses(){ Button= pbRDPB,ButtonPressed=false },
+                new ButtonsPresses(){ Button=pbLocalDB ,ButtonPressed=false},
+                new ButtonsPresses(){ Button=pbRemoteDB, ButtonPressed=false }
+            };
 
         }
         public void SetMainController(IMainController controller, object? data)
@@ -85,7 +92,6 @@ namespace DoMC
             //Context = config;
             WorkingLog.Add(LoggerLevel.Critical, "Запуск интерфейса настройки");
             observer.NotificationReceivers += Observer_NotificationReceivers;
-            CreateDataExchange();
             DevicesControlInit();
             PressAllDevicesButton();
             ShowDevicesButtonStatuses();
@@ -99,7 +105,7 @@ namespace DoMC
                 if (config == null) return;
                 if (this.InvokeRequired)
                 {
-                    archiveForm?.SetParameters(config.HardwareSettings.LocalDataStoragePath, config.HardwareSettings.RemoteDataStoragePath);
+                    archiveForm?.SetParameters(config.HardwareSettings.ArchiveDBConfig.LocalDBPath, config.HardwareSettings.ArchiveDBConfig.ArchiveDBPath);
                     //this.Invoke(new Action(() => PreparationsAfterChangingConfig()));
                 }
                 else
@@ -107,14 +113,6 @@ namespace DoMC
                     //PreparationsAfterChangingConfig();
                 }
             }
-        }
-
-        private void CreateDataExchange()
-        {
-            WorkingLog.Add(LoggerLevel.Critical, "Старт");
-
-            WorkingLog.Add(LoggerLevel.Critical, "Загрузка конфигурации");
-
         }
 
         private void DevicesControlInit()
@@ -185,7 +183,7 @@ namespace DoMC
 
         private void LoadArchiveTab()
         {
-            archiveForm = new DoMC.Forms.DoMCArchiveForm(Controller, Context.Configuration.HardwareSettings.LocalDataStoragePath, Context.Configuration.HardwareSettings.RemoteDataStoragePath);
+            archiveForm = new DoMC.Forms.DoMCArchiveForm(Controller, Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath, Context.Configuration.HardwareSettings.ArchiveDBConfig.ArchiveDBPath);
             archiveForm.TopLevel = false;
             archiveForm.Parent = tbpArchive;
             archiveForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -451,36 +449,36 @@ namespace DoMC
             // InterfaceDataExchange.SendCommand(ModuleCommand.ArchiveDBStop);
 
             pbStartStop.IsPressed = false;
-
+            StopModules();
         }
 
         public void StartFailed()
         {
-            /* InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
+             InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
              pbStartStop.BackColor = Color.Red;
              pbStartStop.IsPressed = false;
-            */
+            
         }
 
         private void StartReading()
         {
-            /*WorkingLog.Add(LoggerLevel.Critical,"Запуск чтения");
+            WorkingLog.Add(LoggerLevel.Critical,"Запуск чтения");
              InterfaceDataExchange.IsWorkingModeStarted = true;
              InterfaceDataExchange.WasErrorWhileWorked = false;
              InterfaceDataExchange.CCDDataEchangeStatuses.FastRead = true;
              ForceStop = false;
              WorkingThread = new Thread(WorkProc);
              WorkingThread.Start();
-            */
+            
         }
         private void StopReading()
         {
-            /*
+            
             InterfaceDataExchange.IsWorkingModeStarted = false;
             WorkingThread?.Abort();
            WorkingLog.Add(LoggerLevel.Critical,"Остановка работы");
             InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
-            */
+            
         }
 
 
@@ -1461,9 +1459,9 @@ namespace DoMC
 
         private void pbDevices_Click(object sender, EventArgs e)
         {
-            /*
+
             GetIsDevicesButtonWorking();
-            if (InterfaceDataExchange.IsWorkingModeStarted)
+            if (IsWorkingModeStarted)
             {
                 if (ActiveDevices.HasFlag(WorkingModule.RDPB))
                 {
@@ -1478,7 +1476,7 @@ namespace DoMC
                     StopRDPB();
                 }
             }
-            */
+
         }
 
         private void UnPressDevice(WorkingModule wm)
@@ -1488,19 +1486,47 @@ namespace DoMC
 
         private void DoMCWorkModeInterface_FormClosed(object sender, FormClosedEventArgs e)
         {
-            /*
+
             try
             {
                 StopWork();
             }
             catch { }
-            InterfaceDataExchange.SendCommand(ModuleCommand.StopModuleWork);
+
+
+        }
+        private void StopModules()
+        {
             try
             {
-                WorkingLog?.StopLog();
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.CCD.CCDCardDataModule.StopCommand)).ExecuteCommand();
             }
             catch { }
-            */
+            try
+            {
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.LCB.LCBModule.LCBStopCommand)).ExecuteCommand();
+            }
+            catch { }
+            try
+            {
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StopCommand)).ExecuteCommand();
+            }
+            catch { }
+            try
+            {
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.LCB.LCBModule.LCBStopCommand)).ExecuteCommand();
+            }
+            catch { }
+            try
+            {
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.DB.DBModule.StopCommand)).ExecuteCommand();
+            }
+            catch { }
+            try
+            {
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule.StopCommand)).ExecuteCommand();
+            }
+            catch { }
         }
 
         private void tabWorkAndArchive_DrawItem(object sender, DrawItemEventArgs e)
@@ -1618,9 +1644,9 @@ namespace DoMC
                     this.Show();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                DisplayMessage.Show(ex.Message+ex.StackTrace,"Ошибка");
+                DisplayMessage.Show(ex.Message + ex.StackTrace, "Ошибка");
             }
 
         }
@@ -1800,5 +1826,11 @@ namespace DoMC
         RecalcStandards,
         SaveConfiguration,
         ClearMemory
+    }
+
+    public class ButtonsPresses
+    {
+        public PressButton Button;
+        public bool ButtonPressed;
     }
 }
