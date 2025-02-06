@@ -249,7 +249,7 @@ namespace DoMC
                     }
                     var AvgIm = ImageTools.CalculateAverage(ImagesForStandards.ToArray());
                     socket.TempAverageImage = AvgIm;
-                    socket.StandardImage = AvgIm;
+                    socket.StandardImages = AvgIm;
                 }
                 if (!CreateStandardError)
                 {

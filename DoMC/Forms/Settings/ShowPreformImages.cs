@@ -350,7 +350,7 @@ namespace DoMCLib.Forms
                     {
                         var sum = 0;
                         for (int y = 0; y < 512; y++)
-                            sum += StandardImage[y, x];
+                            sum += StandardImages[y, x];
                         StandardLine[x] = (short)(sum / 512);
                     }
                     for (int x = 0; x < 512; x++)

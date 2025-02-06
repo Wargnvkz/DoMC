@@ -8,15 +8,14 @@ namespace DoMCLib.Classes.Configuration.CCD
     {
         public DateTime CycleCCDDateTime;
         public DateTime TimeLCBSyncSignalGot;
-        public short[][,] WorkModeImages;
+        public short[][,] CurrentImages;
         public short[][,] Differences;
-        public short[][,] StandardImage;
+        public short[][,] StandardImages;
         public bool[] IsSocketGood; //Хорошая ли преформа
         public bool[] IsSocketHasImage; //Есть ли изображение
         public bool[] SocketsToCheck; //Нужно ли проверять гнездо
         public bool[] LEDStatuses; // горит ли светодиод
         public bool LEDStatusesAdded = false; // прочитаны ли статусы светодиодов
-        public bool[] SocketsToSave; // Гнезда, которые надо сохранить. Берется из конфигурации
         public static readonly int DefaultLEDQnt = 12;
         public short MaxDeviation;
         public Point MaxDeviationPoint;

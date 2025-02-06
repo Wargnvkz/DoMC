@@ -19,7 +19,7 @@ namespace DoMCLib.Forms
             get
             {
                 var cfg = _Configuration.Clone();
-                cfg.ImageProcess = _Configuration.ImageProcess.Clone();
+                cfg.ImageCheckingParameters = _Configuration.ImageCheckingParameters.Clone();
                 cfg.ReadingParameters.Exposition = Exposition;
                 cfg.ReadingParameters.FilterModule = FilterModule;
                 cfg.ReadingParameters.FrameDuration = FrameDuration;
@@ -31,7 +31,7 @@ namespace DoMCLib.Forms
             {
                 var cfg = value.Clone();
                 _Configuration = cfg;
-                _Configuration.ImageProcess = cfg.ImageProcess.Clone();
+                _Configuration.ImageCheckingParameters = cfg.ImageCheckingParameters.Clone();
                 Exposition = cfg.ReadingParameters.Exposition;
                 FilterModule = cfg.ReadingParameters.FilterModule;
                 FrameDuration = cfg.ReadingParameters.FrameDuration;
@@ -210,10 +210,10 @@ namespace DoMCLib.Forms
         {
 
             var form = new DoMCImageProcessSettingsForm();
-            form.ImageProcessParameters = _Configuration.ImageProcess.Clone();
+            form.ImageProcessParameters = _Configuration.ImageCheckingParameters.Clone();
             if (form.ShowDialog() == DialogResult.OK)
             {
-                _Configuration.ImageProcess = form.ImageProcessParameters.Clone();
+                _Configuration.ImageCheckingParameters = form.ImageProcessParameters.Clone();
             }
 
         }

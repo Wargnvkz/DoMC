@@ -40,7 +40,7 @@ namespace DoMCLib.Configuration
                 CCDSocketParameters[i].ReadingParameters != null &&
                 CCDSocketParameters[i].ReadingParameters.FrameDuration != 0 &&
                 CCDSocketParameters[i].ReadingParameters.Exposition != 0 &&
-                CCDSocketParameters[i].ImageProcess != null;
+                CCDSocketParameters[i].ImageCheckingParameters != null;
             }
             return result;
         }

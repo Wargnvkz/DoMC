@@ -12,7 +12,7 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
         public int CoolingBlocksQuantity;
         public int CoolingBlocksQuantityToSet;
         //Ответ на хороший/плохой съем
-        public RDPBTransporterSide TransporterSide = RDPBTransporterSide.Stoped;
+        public RDPBTransporterSide TransporterSide = RDPBTransporterSide.NotSet;
         public RDPBErrors Errors = RDPBErrors.NoErrors;
         public BoxDirectionType BoxDirection = BoxDirectionType.Left;
         public bool BlockIsOn;

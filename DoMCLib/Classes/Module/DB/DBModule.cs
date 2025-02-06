@@ -103,9 +103,9 @@ namespace DoMCLib.Classes.Module.DB
                         WorkingLog.Add(LoggerLevel.Information, $"Съем {cycle.CycleCCDDateTime}. Начало сохранения съема");
                         var cycleData = CycleData.ConvertFromCycleImageCCD(cycle);
 
-                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Съем {cycle.CycleCCDDateTime}. Изображения: " + ArrayTools.BoolArrayToHex(cycle.WorkModeImages.Select(wi => wi != null).ToArray()));
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Съем {cycle.CycleCCDDateTime}. Изображения: " + ArrayTools.BoolArrayToHex(cycle.CurrentImages.Select(wi => wi != null).ToArray()));
                         WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Съем {cycle.CycleCCDDateTime}. Разница: " + ArrayTools.BoolArrayToHex(cycle.Differences.Select(wi => wi != null).ToArray()));
-                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Съем {cycle.CycleCCDDateTime}. Эталон: " + ArrayTools.BoolArrayToHex(cycle.StandardImage.Select(wi => wi != null).ToArray()));
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Съем {cycle.CycleCCDDateTime}. Эталон: " + ArrayTools.BoolArrayToHex(cycle.StandardImages.Select(wi => wi != null).ToArray()));
 
 
                         Storage.LocalSaveCycleAndImagesOfActiveSockets(cycleData);

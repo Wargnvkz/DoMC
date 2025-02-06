@@ -1111,7 +1111,7 @@ namespace DoMCLib.Tools
             //if (socket == null) return;
 
             //получаем разницу текущего изображения с эталоном
-            var diffImg = ImageTools.GetDifference(Current, StandardImage);
+            var diffImg = ImageTools.GetDifference(Current, StandardImages);
 
             //считаем среднее, на случай если отличается цвет, но дефектов нет
             var average = ImageTools.Average(diffImg, ipp.GetRectangle());

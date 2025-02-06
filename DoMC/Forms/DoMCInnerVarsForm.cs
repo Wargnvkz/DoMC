@@ -23,7 +23,7 @@ namespace DoMC
         private void timer1_Tick(object sender, EventArgs e)
         {
             listBox1.Items.Clear();
-            /*listBox1.Items.Add("LEDStatus.TimeSyncSignalGot: " + DoMC.LEDStatus.TimeSyncSignalGot);
+            /*listBox1.Items.Add("LEDStatus.TimeSyncSignalGotForShowInCycle: " + DoMC.LEDStatus.TimeSyncSignalGotForShowInCycle);
             listBox1.Items.Add("LEDStatus.TimePreviousSyncSignalGot: " + DoMC.LEDStatus.TimePreviousSyncSignalGot);
             listBox1.Items.Add("Timings.CCDStart: " + DoMC.Timings.CCDStart);
             listBox1.Items.Add("Timings.CCDEnd: " + DoMC.Timings.CCDEnd);

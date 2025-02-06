@@ -130,7 +130,7 @@ namespace DoMCLib.Forms
             {
                 SocketConfigurations[SocketN] = new SocketParameters();
             }
-            if (SocketConfigurations[SocketN].ImageProcess == null) SocketConfigurations[SocketN].ImageProcess = new Configuration.ImageProcessParameters();
+            if (SocketConfigurations[SocketN].ImageCheckingParameters == null) SocketConfigurations[SocketN].ImageCheckingParameters = new Configuration.ImageProcessParameters();
             if (SocketConfigurations[SocketN].ReadingParameters == null) SocketConfigurations[SocketN].ReadingParameters = new SocketReadingParameters();
 
             if (SocketConfigurations[SocketN] != null)

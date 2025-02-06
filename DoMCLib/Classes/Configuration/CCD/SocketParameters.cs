@@ -12,11 +12,11 @@ namespace DoMCLib.Classes.Configuration.CCD
     public class SocketParameters
     {
         public SocketReadingParameters ReadingParameters;
-        public ImageProcessParameters ImageProcess;
+        public ImageProcessParameters ImageCheckingParameters;
         public SocketParameters Clone()
         {
             var cfg = new SocketParameters();
-            cfg.ImageProcess = ImageProcess.Clone();
+            cfg.ImageCheckingParameters = ImageCheckingParameters.Clone();
             cfg.ReadingParameters = ReadingParameters.Clone();
             return cfg;
         }

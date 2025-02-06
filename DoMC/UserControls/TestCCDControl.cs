@@ -456,7 +456,7 @@ namespace DoMC.Forms
             if (TestReadImage != null && TestReadImage != null)
             {
                 TestDiffImage = ImageTools.GetDifference(TestStandardImage, TestReadImage);
-                var ipp = CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[TestSocketNumberSelected].ImageProcess;
+                var ipp = CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[TestSocketNumberSelected].ImageCheckingParameters;
 
 
                 var SocketCheckResults = ImageTools.CheckIfSocketGood(TestReadImage, TestStandardImage, ipp);
@@ -771,7 +771,7 @@ namespace DoMC.Forms
                     }
                     else
                     {
-                        SocketCheckResults[i] = ImageTools.CheckIfSocketGood(AllImages[i], CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i].StandardImage, CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[i].ImageProcess);
+                        SocketCheckResults[i] = ImageTools.CheckIfSocketGood(AllImages[i], CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i].StandardImage, CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[i].ImageCheckingParameters);
                         if (SocketCheckResults[i].IsSocketGood)
                         {
                             IsSocketsReadAndGood[i] = 1;

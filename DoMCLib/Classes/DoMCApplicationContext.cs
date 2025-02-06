@@ -115,125 +115,7 @@ namespace DoMCLib.Classes
             }
             return result;
         }
-        /*
-        /// <summary>
-        /// Запустить команду для связанного с ней модуля с ожиданием
-        /// </summary>
-        /// <typeparam name="T1">Тип команды</typeparam>
-        /// <typeparam name="T2">Тип возвращаемого значения</typeparam>
-        /// <param name="InputData">Входные данные для команды</param>
-        /// <param name="TimeoutInSeconds">Таймаут ожидания команды</param>
-        /// <param name="LogMessage">Сообщение в лог о начале выполнения команды</param>
-        /// <param name="LogMessageLevel">уровень сообщения в лог о начале выполнения команды</param>
-        /// <param name="outputData">возвращаемые данные от команды</param>
-        /// <returns></returns>
-        public static bool WaitForCommand<T1>(IMainController Controller, ILogger WorkingLog, object? InputData, int TimeoutInSeconds, string LogMessage, LoggerLevel LogMessageLevel)
-            where T1 : AbstractCommandBase
-        {
-            WorkingLog.Add(LogMessageLevel, LogMessage);
-
-            var CommandInstance = Controller.CreateCommandInstance(typeof(T1));
-            if (CommandInstance == null)
-            {
-                return false;
-            };
-            try
-            {
-                CommandInstance.Wait(InputData, TimeoutInSeconds);
-                return CommandInstance.WasCompletedSuccessfully();
-
-            }
-            catch (NotImplementedException)
-            {
-                CommandInstance.ExecuteCommand(InputData);
-                Task.Delay(100).Wait();
-                return true;
-            }
-        }
-        /// <summary>
-        /// Запустить команду для связанного с ней модуля с ожиданием
-        /// </summary>
-        /// <typeparam name="T1">Тип команды</typeparam>
-        /// <typeparam name="T2">Тип возвращаемого значения</typeparam>
-        /// <param name="InputData">Входные данные для команды</param>
-        /// <param name="TimeoutInSeconds">Таймаут ожидания команды</param>
-        /// <param name="LogMessage">Сообщение в лог о начале выполнения команды</param>
-        /// <param name="LogMessageLevel">уровень сообщения в лог о начале выполнения команды</param>
-        /// <param name="outputData">возвращаемые данные от команды</param>
-        /// <returns></returns>
-        public static bool WaitForCommand<T1, T2>(IMainController Controller, ILogger WorkingLog, object? InputData, int TimeoutInSeconds, string LogMessage, LoggerLevel LogMessageLevel, out T2? outputData)
-            where T1 : AbstractCommandBase
-            where T2 : class
-        {
-            WorkingLog.Add(LogMessageLevel, LogMessage);
-
-            var CommandInstance = Controller.CreateCommandInstance(typeof(T1));
-            if (CommandInstance == null)
-            {
-                outputData = null;
-                return false;
-            }
-            try
-            {
-                var resultExpositionCommand = CommandInstance.Wait(InputData, TimeoutInSeconds);
-                if (resultExpositionCommand == null)
-                {
-                    outputData = null;
-                }
-                else
-                {
-                    outputData = resultExpositionCommand as T2;
-                }
-                return CommandInstance.WasCompletedSuccessfully();
-                // return true;
-            }
-            catch (NotImplementedException)
-            {
-                CommandInstance.ExecuteCommand(InputData);
-                Task.Delay(100).Wait();
-                outputData = null;
-                return true;
-            }
-        }
-        /// <summary>
-        /// Запустить команду для связанного с ней модуля с ожиданием
-        /// </summary>
-        /// <typeparam name="T1">Тип команды</typeparam>
-        /// <typeparam name="T2">Тип модуля</typeparam>
-        /// <typeparam name="T3">Тип возвращаемого значения</typeparam>
-        /// <param name="InputData">Входные данные для команды</param>
-        /// <param name="TimeoutInSeconds">Таймаут ожидания команды</param>
-        /// <param name="LogMessage">Сообщение в лог о начале выполнения команды</param>
-        /// <param name="LogMessageLevel">уровень сообщения в лог о начале выполнения команды</param>
-        /// <param name="outputData">возвращаемые данные от команды</param>
-        /// <returns></returns>
-        public static bool WaitForCommand<T1, T2, T3>(IMainController Controller, ILogger WorkingLog, object? InputData, int TimeoutInSeconds, string LogMessage, LoggerLevel LogMessageLevel, out T3? outputData)
-            where T1 : AbstractCommandBase
-            where T2 : AbstractModuleBase
-            where T3 : class
-        {
-            WorkingLog.Add(LogMessageLevel, LogMessage);
-
-            var CommandInstance = Controller.CreateCommandInstance(typeof(T1), typeof(T2));
-            if (CommandInstance == null)
-            {
-                outputData = null;
-                return false;
-            }
-            try
-            {
-                var resultExpositionCommand = CommandInstance.Wait(InputData, TimeoutInSeconds);
-                outputData = resultExpositionCommand as T3;
-                return CommandInstance.WasCompletedSuccessfully();
-            }
-            catch (NotImplementedException)
-            {
-                CommandInstance.ExecuteCommand(InputData);
-                Task.Delay(100).Wait();
-                outputData = null;
-                return true;
-            }
-        }*/
+        
         public bool StartCCD(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null)
         {
             if (SocketNumber == null)
@@ -363,25 +245,7 @@ namespace DoMCLib.Classes
                     }
                 }
 
-                /*
-                if (!WaitForCommand<CCDCardDataModule.SetExpositionToSingleSocketCommand, SetReadingParametersCommandResult>(Controller, WorkingLog, (this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, "Передача настроек экспозиции гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
-                {
-                    if (result != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                    }
-                    return false;
-                }
-
-
-                if (!WaitForCommand<CCDCardDataModule.SetReadingParametersToSingleSocketCommand, SetReadingParametersCommandResult>(Controller, WorkingLog, (this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, "Передача настроек чтения гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? setReadingParametersResult))
-                {
-                    if (setReadingParametersResult != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", setReadingParametersResult.CardsNotAnswered())}) не отвечают");
-                    }
-                    return false;
-                }*/
+               
             }
             return true;
         }
@@ -413,22 +277,6 @@ namespace DoMCLib.Classes
             }
             return true;
         }
-
-        /*public bool SetLCBWorkingParameters(IMainController Controller, ILogger WorkingLog)
-        {
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек рабочего режима в БУС");
-            if (!Controller.CreateCommandInstance(typeof(LCBModule.SetModuleWorkingParametersCommand))
-                .Wait<object>(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out _))
-            //if (!WaitForCommand<LCBModule.SetModuleWorkingParametersCommand, SetReadingParametersCommandResult>(Controller, WorkingLog, this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, "Передача настроек рабочего режима в БУС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
-            {
-                if (result != null)
-                {
-
-                }
-            }
-
-            return true;
-        }*/
 
         public bool ReadSockets(IMainController Controller, ILogger WorkingLog, bool IsExternalRead, int? socketNumber = null)
         {
