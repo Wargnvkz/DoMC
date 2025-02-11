@@ -30,6 +30,8 @@ using static DoMCLib.Classes.Module.LCB.LCBModule;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using DoMCLib.Classes.Module.RDPB.Classes;
 using System.Diagnostics;
+using DoMC.Tools;
+using System.Configuration;
 
 namespace DoMC
 {
@@ -89,6 +91,10 @@ namespace DoMC
         LCBStatus LCBStatus = new LCBStatus();
 
         int MaxDegreeOfParallelism = 16;
+        bool WasErrorWhileWorked = false;
+
+        int DBCyclesCCDLeftInQueue = 0;
+        (Exception, DateTime) LastDBException;
 
         public DoMCWorkModeInterface()
         {
@@ -160,7 +166,31 @@ namespace DoMC
             {
                 if (eventNameParts[0] == nameof(RDPBModule))
                 {
-                    RDPBCurrentStatus = (RDPBStatus)data;
+                    if (Enum.TryParse(eventNameParts[1], out RDPBCommandType commandType))
+                    {
+                        RDPBCurrentStatus = (RDPBStatus)data;
+                    }
+                    else { }
+                }
+                if (eventNameParts[0] == nameof(DBModule))
+                {
+                    if (eventNameParts[1] == "CycleSave")
+                    {
+                        switch (eventNameParts[2])
+                        {
+                            case "Error":
+
+                                LastDBException = ((Exception)data, DateTime.Now);
+                                break;
+
+                            case "NonSaved":
+
+                                DBCyclesCCDLeftInQueue = (int)data;
+
+                                break;
+
+                        }
+                    }
                 }
             }
         }
@@ -206,6 +236,7 @@ namespace DoMC
                 }
             }
         }
+
         private void PressAllDevicesButton()
         {
             ActiveDevices = 0;
@@ -215,6 +246,7 @@ namespace DoMC
             }
             SetWorkingStatusesOfDevicesButtons();
         }
+
         private void SetWorkingStatusesOfDevicesButtons()
         {
             foreach (WorkingModule wm in Enum.GetValues(typeof(WorkingModule)))
@@ -229,7 +261,6 @@ namespace DoMC
                 }
             }
         }
-
 
         private void LoadArchiveTab()
         {
@@ -281,7 +312,7 @@ namespace DoMC
 
         private void btnStartStop_Click(object sender, EventArgs e)
         {
-            if (Context.IsInWorkingMode)
+            if (IsWorkingModeStarted)
             {
                 StopWork();
             }
@@ -305,8 +336,16 @@ namespace DoMC
             string ErrorMsg;
             WorkingLog.Add(LoggerLevel.Critical, "");
             IsConfigurationLoadedSuccessfully = false;
+            WasErrorWhileWorked = false;
 
             WorkingLog.Add(LoggerLevel.Critical, "Загрузка конфигурации гнезд");
+            if (!Context.StartCCD(Controller, WorkingLog))
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка при подключении к платам ПЗС");
+                //Errors.CCDNotRespond = true;
+                //DoMCNotAbleLoadConfigurationErrorMessage(loadresult);
+                return false;
+            }
 
             if (!Context.LoadCCDConfiguration(Controller, WorkingLog, true))
             {
@@ -319,12 +358,21 @@ namespace DoMC
             {
                 //Errors.CCDNotRespond = false;
             }
+            if (!Context.SetFastRead(Controller, WorkingLog))
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка при подключении к платам ПЗС");
+                //Errors.CCDNotRespond = true;
+                //DoMCNotAbleLoadConfigurationErrorMessage(loadresult);
+                return false;
+            }
+
 
             //Errors.LCBDoesNotRespond = false;
             if (ActiveDevices.HasFlag(WorkingModule.LCB))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля БУС и загрузка конфигурации");
-                /*if (!Context.SetLCBWorkingParameters(Controller, WorkingLog))
+
+                if (!Context.StartLCB(Controller, WorkingLog))
                 {
                     //WorkingLog.Add(LoggerLevel.Critical, $"Ошибка ({loadresult}) при запуске БУС. Остановка работы");
                     //Errors.LCBDoesNotRespond = true;
@@ -335,24 +383,23 @@ namespace DoMC
                 {
                     //Errors.LCBDoesNotRespond = false;
                 }
-                */
+
 
                 var startLCBEWorkModeTime = DateTime.Now;
-                /*InterfaceDataExchange.SendCommand(ModuleCommand.SetLCBWorkModeRequest);
-                var res = UserInterfaceControls.Wait(CardTimeout, () => InterfaceDataExchange.LEDStatus.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBWorkModeResponse && InterfaceDataExchange.LEDStatus.LastCommandResponseReceived > startLCBEWorkModeTime);
-                if (!res)
+                if (!SetWorkingModeLCB())
                 {
                     WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при запуске БУС в работу. Остановка работы");
                     return false;
-                }*/
+                }
             }
-            /*IsConfigurationLoadedSuccessfully = true;
+            IsConfigurationLoadedSuccessfully = true;
             if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
             {
 
                 WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля работы с базой данных");
-                InterfaceDataExchange.SendCommand(ModuleCommand.DBStart);
-                if (Errors.NoLocalSQL)
+                Controller.CreateCommandInstance(typeof(DBModule.SetConfigurationCommand)).ExecuteCommand(Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath);
+                Controller.CreateCommandInstance(typeof(DBModule.StartCommand)).ExecuteCommand();
+                /*if (Errors.NoLocalSQL)
                 {
                     ErrorMsg = "Ошибка при запуске модуля работы с базой данных";
                     WorkingLog.Add(LoggerLevel.Critical, ErrorMsg);
@@ -365,7 +412,7 @@ namespace DoMC
                     }
                     WorkingLog.Add(LoggerLevel.Critical, "Ошибка пропущена");
 
-                }
+                }*/
             }
             else
             {
@@ -375,7 +422,8 @@ namespace DoMC
             if (ActiveDevices.HasFlag(WorkingModule.RemoteDB))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля работы с базой данных архива");
-                InterfaceDataExchange.SendCommand(ModuleCommand.ArchiveDBStart);
+                Controller.CreateCommandInstance(typeof(ArchiveDBModule.SetConfigurationCommand)).ExecuteCommand(Context.Configuration.HardwareSettings.ArchiveDBConfig);
+                Controller.CreateCommandInstance(typeof(ArchiveDBModule.StartCommand)).ExecuteCommand();
                 if (Errors.NoRemoteSQL)
                 {
                     ErrorMsg = "Ошибка при запуске модуля работы с архивом";
@@ -402,13 +450,12 @@ namespace DoMC
                     return false;
                 }
             }
-            InterfaceDataExchange.CCDDataEchangeStatuses.ExternalStart = true;
-            InterfaceDataExchange.CCDDataEchangeStatuses.FastRead = true;
-            pbStartStop.Text = "Стоп";
-            InterfaceDataExchange.IsWorkingModeStarted = true;
-            pbStartStop.BackColor = Color.Green;
-            */
 
+            pbStartStop.Text = "Стоп";
+            IsWorkingModeStarted = true;
+            pbStartStop.BackColor = Color.Green;
+
+            IsConfigurationLoadedSuccessfully = true;
             return true;
         }
 
@@ -458,6 +505,17 @@ namespace DoMC
             */
         }
 
+        private bool SetNonWorkingModeLCB()
+        {
+            return Controller.CreateCommandInstance(typeof(LCBModule.SetLCBNonWorkModeCommand)).Wait(null, Context.Configuration.HardwareSettings.Timeouts.WaitForLCBCardAnswerTimeoutInSeconds, out object? _);
+
+        }
+        private bool SetWorkingModeLCB()
+        {
+            return Controller.CreateCommandInstance(typeof(LCBModule.SetLCBWorkModeCommand)).Wait(null, Context.Configuration.HardwareSettings.Timeouts.WaitForLCBCardAnswerTimeoutInSeconds, out object? _);
+
+        }
+
         private void StopWork()
         {
             Context.IsInWorkingMode = false;
@@ -489,7 +547,7 @@ namespace DoMC
             //InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
             Thread.Sleep(200);
 
-
+            SetNonWorkingModeLCB();
 
             StopRDPB();
 
@@ -498,6 +556,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Остановка базы данных архива");
             // InterfaceDataExchange.SendCommand(ModuleCommand.ArchiveDBStop);
 
+
             pbStartStop.IsPressed = false;
             StopModules();
         }
@@ -505,8 +564,11 @@ namespace DoMC
         public void StartFailed()
         {
             Controller.CreateCommandInstance(typeof(CCDCardDataModule.StopCommand)).ExecuteCommand();
+            Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand)).ExecuteCommand();
+            Controller.CreateCommandInstance(typeof(RDPBModule.StopCommand)).ExecuteCommand();
             pbStartStop.BackColor = Color.Red;
             pbStartStop.IsPressed = false;
+            StopModules();
 
         }
 
@@ -524,7 +586,11 @@ namespace DoMC
         {
 
             IsWorkingModeStarted = false;
-            WorkingThread?.Abort();
+            try
+            {
+                WorkingThread?.Abort();
+            }
+            catch { }
             WorkingLog.Add(LoggerLevel.Critical, "Остановка работы");
             Context.StopCCD(Controller, WorkingLog);
 
@@ -574,8 +640,8 @@ namespace DoMC
                     CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
                     CurrentCycleCCD.IsSocketHasImage = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
 
-                    Context.Configuration.HardwareSettings.SocketsToCheck = new bool[96];
-                    Array.Copy(Context.Configuration.HardwareSettings.SocketsToCheck, Context.Configuration.HardwareSettings.SocketsToCheck, 96);
+                    //Context.Configuration.HardwareSettings.SocketsToCheck = new bool[96];
+                    //Array.Copy(Context.Configuration.HardwareSettings.SocketsToCheck, Context.Configuration.HardwareSettings.SocketsToCheck, 96);
 
                     // Если рабочий режим не запущен или система не может работать, потому что не загружена конфигурация, останавливаем и выходим с ошибкой
                     if (!IsWorkingModeStarted || !IsConfigurationLoadedSuccessfully)
@@ -738,8 +804,17 @@ namespace DoMC
                         //Если пришел, то ошибку убираем
                         Errors.LCBDoesNotSendSync = false;
                         Errors.MissedSyncrosignalCounter = 0;
+                        if (LCBStatus.TimeOfLCBSynchrosignal == DateTime.MinValue)
+                        {
+                            LCBStatus.TimeSyncSignalGotForShowInCycle = CCDEnd.AddSeconds(-5);
+
+                        }
+                        else
+                        {
+                            LCBStatus.TimeSyncSignalGotForShowInCycle = LCBStatus.TimeOfLCBSynchrosignal;
+                        }
                     }
-                    var CycleCCDDateTime = LCBStatus.TimeOfLCBSynchrosignal;
+                    var CycleCCDDateTime = LCBStatus.TimeSyncSignalGotForShowInCycle;
 
                     //Если прошло меньше 1 секунды между синхросигналом и ответом о завершении, то в программе ошибка
                     WorkingLog.Add(LoggerLevel.Critical, $"Время начала чтения: {CCDStart:dd-MM-yyyy HH\\:mm\\:ss.fff}");
@@ -762,7 +837,7 @@ namespace DoMC
                     WorkingLog.Add(LoggerLevel.Critical, "Запрос на получение изображений гнезд");
                     //Запрашиваем сами изображения гнезд
                     var images = Context.GetSocketsImages(Controller, WorkingLog);
-                    WasLastOperationSuccessful = images.completedSuccessfully.All(c => c);
+                    WasLastOperationSuccessful = images.CardsAnswered().Count == 0;// .completedSuccessfully.All(c => c);
 
                     //если не получили или в модуле ПЗС ошибка, то выставляем ошибку
                     if (!WasLastOperationSuccessful)
@@ -829,7 +904,7 @@ namespace DoMC
                     }
 
                     //сохраняем изображения в данные текущего цикла
-                    CurrentCycleCCD.CurrentImages = images?.Data?.Select(d => d.Image).ToArray() ?? new short[0][,];
+                    CurrentCycleCCD.CurrentImages = images?.Data?.Select(d => d?.Image ?? null).ToArray() ?? new short[0][,];
 
                     //если получены данные о состоянии светодиодов, то
                     if (LCBStatus.LastLedStatusesGotTime >= LCBStatus.TimeSyncSignalGotForShowInCycle)
@@ -895,70 +970,69 @@ namespace DoMC
                         //сохраняем изображения эталонов во все гнезда
                         //сохраняем изображения эталонов во все гнезда
                         SetStandardForAllCurrentCCDSockets(CurrentCycleCCD);
-                        CheckIfSocketHasImage(CurrentCycleCCD);
+                        CheckIfSocketsHasImage(CurrentCycleCCD);
                         var IsAllHaveImages = CurrentCycleCCD.IsSocketHasImage.All(p => p);
                         WorkingLog.Add(LoggerLevel.Critical, "Наличие эталонов: " + System.String.Join("", CurrentCycleCCD.StandardImages.Select((si, i) => $"{(si == null ? 0 : 1)}{(i % 6 == 5)}")));
 
-                        InterfaceDataExchange.CheckIfSocketHasImage();
-                        var IsAllHaveImages = InterfaceDataExchange.CurrentCycleCCD.IsSocketHasImage.All(p => p);
-                        WorkingLog.Add(LoggerLevel.Critical, "Наличие изображений: " + InterfaceDataExchange.BoolArrayToHex(InterfaceDataExchange.CurrentCycleCCD.IsSocketHasImage) + InterfaceDataExchange.FalseBoolIndexPlus1(InterfaceDataExchange.CurrentCycleCCD.IsSocketHasImage));
+                        WorkingLog.Add(LoggerLevel.Critical, "Наличие изображений: " + System.String.Join("", CurrentCycleCCD.CurrentImages.Select((ci, i) => $"{(ci == null ? 0 : 1)}{(i % 6 == 5)}")));
+                        WorkingLog.Add(LoggerLevel.Critical, "Наличие изображений по платам: " + System.String.Join("", CurrentCycleCCD.CurrentImages.Select((ci, i) => new { CardSocket = new TCPCardSocket(Context.EquipmentSocket2CardSocket[i]), HasImage = ci != null }).OrderBy(i => i.CardSocket.CCDCardNumber).ThenBy(i => i.CardSocket.InnerSocketNumber).Select((r, i) => $"{(r.HasImage ? "1" : "0")}{(i % 8 == 0 ? " " : "")}")));
 
-                        InterfaceDataExchange.CheckIfAllSocketsGood();
+                        CheckIfAllSocketsGood(CurrentCycleCCD);
 
-                        if (!InterfaceDataExchange.Configuration.RegisterEmptyImages)
+                        if (!Context.Configuration.HardwareSettings.RegisterEmptyImages)
                         {
-                            for (int i = 0; i < InterfaceDataExchange.Configuration.SocketQuantity; i++)
+                            for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
                             {
-                                if (!InterfaceDataExchange.CurrentCycleCCD.IsSocketHasImage[i])
+                                if (!CurrentCycleCCD.IsSocketHasImage[i])
                                 {
-                                    InterfaceDataExchange.CurrentCycleCCD.IsSocketGood[i] = true;
+                                    CurrentCycleCCD.IsSocketGood[i] = true;
                                 }
                             }
                         }
 
-                        var IsSetBad = InterfaceDataExchange.CurrentCycleCCD.IsSocketGood.Any(p => !p);
-                        WorkingLog.Add(LoggerLevel.Critical, "Хорошие гнезда: " + InterfaceDataExchange.BoolArrayToHex(InterfaceDataExchange.CurrentCycleCCD.IsSocketGood));
+                        var IsSetBad = CurrentCycleCCD.IsSocketGood.Any(p => !p);
+                        WorkingLog.Add(LoggerLevel.Critical, "Хорошие гнезда: " + System.String.Join("", CurrentCycleCCD.IsSocketGood.Select((ci, i) => $"{(ci == null ? 0 : 1)}{(i % 6 == 5)}")));
 
-                        InterfaceDataExchange.Timings.CCDImagesProcessEnded = DateTime.Now;
-                        WorkingLog.Add(LoggerLevel.Critical, "Эталоны 9: " + InterfaceDataExchange.SocketStandardExist());
+                        Timings.CCDImagesProcessEnded = DateTime.Now;
 
+                        //Проверить, работает ли бракер, если он был включен
                         bool RDPBResult = true;
 
-                        if (InterfaceDataExchange.RDPBCurrentStatus.IsStarted)
+                        if (RDPBCurrentStatus.IsStarted)
                         {
-                            if (InterfaceDataExchange.RDPBCurrentStatus.BlockIsOn != ((ActiveDevices & WorkingModule.RDPB) == WorkingModule.RDPB))
+                            if (RDPBCurrentStatus.BlockIsOn != ((ActiveDevices & WorkingModule.RDPB) == WorkingModule.RDPB))
                             {
-                                InterfaceDataExchange.RDPBCurrentStatus.ErrorCounter++;
-                                WorkingLog.Add(LoggerLevel.Critical, $"Состояние бракера не соответствует состоянию выбранному пользователем. Проход: {InterfaceDataExchange.RDPBCurrentStatus.ErrorCounter}");
-                                if (InterfaceDataExchange.RDPBCurrentStatus.ErrorCounter > 2)
+                                RDPBCurrentStatus.ErrorCounter++;
+                                WorkingLog.Add(LoggerLevel.Critical, $"Состояние бракера не соответствует состоянию выбранному пользователем. Проход: {RDPBCurrentStatus.ErrorCounter}");
+                                if (RDPBCurrentStatus.ErrorCounter > 2)
                                 {
                                     if ((ActiveDevices & WorkingModule.RDPB) == WorkingModule.RDPB)
                                     {
                                         WorkingLog.Add(LoggerLevel.Critical, "Бракер выключен, но должен быть включен. Включаю бракер");
-                                        InterfaceDataExchange.SendCommand(ModuleCommand.RDPBOn);
+                                        Controller.CreateCommandInstance(typeof(RDPBModule.TurnOnCommand)).ExecuteCommand();
                                     }
                                     else
                                     {
                                         WorkingLog.Add(LoggerLevel.Critical, "Бракер включен, но должен выключен. Выключаю бракер");
-                                        InterfaceDataExchange.SendCommand(ModuleCommand.RDPBOff);
+                                        Controller.CreateCommandInstance(typeof(RDPBModule.TurnOffCommand)).ExecuteCommand();
                                     }
                                 }
                             }
                             else
                             {
-                                InterfaceDataExchange.RDPBCurrentStatus.ErrorCounter = 0;
+                                RDPBCurrentStatus.ErrorCounter = 0;
                             }
                             WorkingStep = WorkStep.RDPBSend;
 
                             // сообщить бракеру о съеме
                             if (IsSetBad && IsAllHaveImages)
                             {
-                                if (InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.SendBadCycleToRDPB)
+                                if (Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.SendBadCycleToRDPB)
                                 {
                                     WorkingLog.Add(LoggerLevel.Critical, "Съем: Плохой");
                                     try
                                     {
-                                        InterfaceDataExchange.SendCommand(ModuleCommand.RDPBSetIsBad);
+                                        Controller.CreateCommandInstance(typeof(RDPBModule.SendSetIsBadCommand)).ExecuteCommand();
                                     }
                                     catch
                                     {
@@ -970,15 +1044,15 @@ namespace DoMC
                                     WorkingLog.Add(LoggerLevel.Critical, "Съем: Плохой (но посылаем, что хороший)");
                                     try
                                     {
-                                        InterfaceDataExchange.SendCommand(ModuleCommand.RDPBSetIsOK);
+                                        Controller.CreateCommandInstance(typeof(RDPBModule.SendSetIsOkCommand)).ExecuteCommand();
                                     }
                                     catch
                                     {
                                         RDPBResult = false;
                                     }
                                 }
-                                InterfaceDataExchange.RDPBCurrentStatus.CurrentBoxDefectCycles++;
-                                InterfaceDataExchange.RDPBCurrentStatus.TotalDefectCycles++;
+                                RDPBCurrentStatus.CurrentBoxDefectCycles++;
+                                RDPBCurrentStatus.TotalDefectCycles++;
                             }
                             else
                             {
@@ -993,7 +1067,7 @@ namespace DoMC
                                 }
                                 try
                                 {
-                                    InterfaceDataExchange.SendCommand(ModuleCommand.RDPBSetIsOK);
+                                    Controller.CreateCommandInstance(typeof(RDPBModule.SendSetIsOkCommand)).ExecuteCommand();
                                 }
                                 catch
                                 {
@@ -1011,81 +1085,64 @@ namespace DoMC
                                 Errors.RemovingDefectedPreformsBlockError = false;
                             }
 
-                            var RDPBResponded = UserInterfaceControls.Wait(
-                                    InterfaceDataExchange.Configuration.Timeouts.WaitForRDPBCardAnswerTimeout,
-                                    () => InterfaceDataExchange.RDPBCurrentStatus.TimeLastSent < InterfaceDataExchange.RDPBCurrentStatus.TimeLastReceived
-                                    );
-
-                            if (!RDPBResponded)
-                            {
-                                WorkingLog.Add(LoggerLevel.Critical, "Бракер не ответил");
-                                DevicesErrors |= WorkingModule.RDPB;
-                            }
-                            else
-                            {
-                                DevicesErrors &= ~WorkingModule.RDPB;
-                            }
-
-                            var boxdir = InterfaceDataExchange.RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Left ? "Левый" : (
-                                InterfaceDataExchange.RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Right ? "Правый" :
-                                (InterfaceDataExchange.RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Stoped ? "Стоит" : "Ошибка"));
+                            var boxdir = RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Left ? "Левый" : (
+                                RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Right ? "Правый" :
+                                (RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Stoped ? "Стоит" : "Ошибка"));
                             WorkingLog.Add(LoggerLevel.Critical, "Короб: " + boxdir);
 
-                            InterfaceDataExchange.RDPBCurrentStatus.CurrentTransporterSide = InterfaceDataExchange.RDPBCurrentStatus.TransporterSide;
+                            RDPBCurrentStatus.CurrentTransporterSide = RDPBCurrentStatus.TransporterSide;
 
-                            if (InterfaceDataExchange.RDPBCurrentStatus.PreviousDirection != RDPBTransporterSide.NotSet && InterfaceDataExchange.RDPBCurrentStatus.PreviousDirection != InterfaceDataExchange.RDPBCurrentStatus.CurrentTransporterSide)
+                            if (RDPBCurrentStatus.PreviousDirection != RDPBTransporterSide.NotSet && RDPBCurrentStatus.PreviousDirection != RDPBCurrentStatus.CurrentTransporterSide)
                             {
                                 var box = new DoMCLib.Classes.Box();
-                                box.BadCyclesCount = InterfaceDataExchange.RDPBCurrentStatus.CurrentBoxDefectCycles;
+                                box.BadCyclesCount = RDPBCurrentStatus.CurrentBoxDefectCycles;
                                 box.CompletedTime = DateTime.Now;
-                                box.TransporterSide = InterfaceDataExchange.RDPBCurrentStatus.PreviousDirection;
+                                box.TransporterSide = RDPBCurrentStatus.PreviousDirection;
 
-                                InterfaceDataExchange.RDPBCurrentStatus.CurrentBoxDefectCycles = 0;
+                                RDPBCurrentStatus.CurrentBoxDefectCycles = 0;
                                 WorkingLog.Add(LoggerLevel.Critical, "Смена короба");
                                 lastBoxRead = DateTime.MinValue;
                                 if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
                                 {
                                     WorkingLog.Add(LoggerLevel.Critical, "Создаем новый короб");
-                                    InterfaceDataExchange.Boxes.Enqueue(box);
+                                    Controller.CreateCommandInstance(typeof(DBModule.EnqueueBoxDateCommand)).ExecuteCommand(box);
+
                                 }
                             }
 
 
-                            if (InterfaceDataExchange.RDPBCurrentStatus.CoolingBlocksQuantity != InterfaceDataExchange.Configuration.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity)
+                            if (RDPBCurrentStatus.CoolingBlocksQuantity != Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity)
                             {
-                                InterfaceDataExchange.SendCommand(ModuleCommand.RDPBSetCoolingBlockQuantity);
+                                Controller.CreateCommandInstance(typeof(RDPBModule.SetCoolingBlockQuantityCommand)).ExecuteCommand(Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity);
                             }
                         }
-                        WorkingLog.Add(LoggerLevel.Critical, "Эталоны 10: " + InterfaceDataExchange.SocketStandardExist());
-                        InterfaceDataExchange.CurrentCycleCCD.TransporterSide = InterfaceDataExchange.RDPBCurrentStatus.CurrentTransporterSide;
+                        CurrentCycleCCD.TransporterSide = RDPBCurrentStatus.CurrentTransporterSide;
                         if (IsAllHaveImages)
                         {
                             WorkingStep = WorkStep.RecalcStandards;
 
-                            InterfaceDataExchange.Timings.CCDEtalonsRecalculateStarted = DateTime.Now;
+                            Timings.CCDEtalonsRecalculateStarted = DateTime.Now;
                             WorkingLog.Add(LoggerLevel.Critical, "Перерасчет эталонов");
-                            InterfaceDataExchange.RecalcAllStandards();
+                            RecalcAllStandards(CurrentCycleCCD);
                         }
                         else
                         {
                             WorkingLog.Add(LoggerLevel.Critical, "Эталоны не пересчитываем");
 
                         }
-                        WorkingLog.Add(LoggerLevel.Critical, "Эталоны 11: " + InterfaceDataExchange.SocketStandardExist());
 
                         WorkingStep = WorkStep.SaveConfiguration;
 
                         WorkingLog.Add(LoggerLevel.Critical, "Сохранение текущей конфигурации");
-                        InterfaceDataExchange.Configuration.Save();
-                        InterfaceDataExchange.Timings.CCDEtalonsRecalculateEnded = DateTime.Now;
-                        WorkingLog.Add(LoggerLevel.Critical, "Эталоны 12: " + InterfaceDataExchange.SocketStandardExist());
+                        Context.Configuration.SaveProcessingDataSettings();
+                        Timings.CCDEtalonsRecalculateEnded = DateTime.Now;
 
                         // запоминаем время завершения обработки изображений
-                        InterfaceDataExchange.CCDDataEchangeStatuses.StopProcessImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
-                        var ProcessDuration = InterfaceDataExchange.CCDDataEchangeStatuses.ProcessDuration * 1e-4;
+                        //Timings.StopProcessImages = InterfaceDataExchange.PreciseTimer.ElapsedTicks;
+                        //var ProcessDuration = InterfaceDataExchange.CCDDataEchangeStatuses.ProcessDuration * 1e-4;
 
                         //Если к этому моменту в очереди циклов больше 10 циклов, значит они не успевают сохраняться в базу данных или БД не работает
-                        if (InterfaceDataExchange.CyclesCCD.Count > 10)
+                        if (DBCyclesCCDLeftInQueue > 10)
                         {
                             Errors.NotEnoughTimeToProcessSQL = true;
                         }
@@ -1094,34 +1151,39 @@ namespace DoMC
                             Errors.NotEnoughTimeToProcessSQL = false;
                         }
 
-                        if (!Errors.NoLocalSQL)
+                        if (!Errors.NoLocalSQL && ((ActiveDevices & WorkingModule.LocalDB) == WorkingModule.LocalDB))
                         {
-                            try
+                            if (DBCyclesCCDLeftInQueue < 20)
                             {
-                                WorkingStep = WorkStep.SendToDB;
-
-                                // ставим текущий цикл в общую очередь циклов для сохранения
-                                InterfaceDataExchange.CyclesCCD.Enqueue(InterfaceDataExchange.CurrentCycleCCD);
-                                WorkingLog.Add(LoggerLevel.Critical, $"Данные съема поставлены в очередь на запись. В очереди {InterfaceDataExchange.CyclesCCD.Count} элемент(а,ов)");
-                            }
-                            catch (Exception ex)
-                            {
-                                WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при постановке в очередь ({ex.Message}).");
-                                if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
+                                try
                                 {
-                                    InterfaceDataExchange.WasErrorWhileWorked = true;
-                                    MessageBox.Show(ex.Message, "Ошибка передачи в БД", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                    continue;
+                                    WorkingStep = WorkStep.SendToDB;
+
+                                    // ставим текущий цикл в общую очередь циклов для сохранения
+                                    Controller.CreateCommandInstance(typeof(DBModule.EnqueueCycleDateCommand)).ExecuteCommand(CurrentCycleCCD);
+
+                                    WorkingLog.Add(LoggerLevel.Critical, $"Данные съема поставлены в очередь на запись. В очереди {DBCyclesCCDLeftInQueue} элемент(а,ов)");
                                 }
+                                catch (Exception ex)
+                                {
+                                    WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при постановке в очередь ({ex.Message}).");
+                                    if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
+                                    {
+                                        WasErrorWhileWorked = true;
+                                        MessageBox.Show(ex.Message, "Ошибка передачи в БД", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        continue;
+                                    }
+
+                                }
+                            }
+                            else
+                            {
 
                             }
                         }
 
-                        WorkingLog.Add(LoggerLevel.Critical, "Эталоны 13: " + InterfaceDataExchange.SocketStandardExist());
-
-
-                        var afterSync = InterfaceDataExchange.LEDStatus.TimeSyncSignalGot; // Время получения сихроимпульса
-                                                                                           // Если был синхроимпульс пока мы обрабатывали, значит мы не успеваем и второй съем не читался вообще
+                        var afterSync = LCBStatus.TimePreviousSyncSignalGot; // Время получения сихроимпульса
+                                                                             // Если был синхроимпульс пока мы обрабатывали, значит мы не успеваем и второй съем не читался вообще
 
                         if (afterSync != beforeSync)
                         {
@@ -1136,9 +1198,9 @@ namespace DoMC
                         //WorkingLog.Add("Эталоны 14: " + InterfaceDataExchange.SocketStandardExist());
 
                         //добавляем результаты проверки гнезд в список
-                        socketStatuses.Add(InterfaceDataExchange.CurrentCycleCCD.TimeLCBSyncSignalGot, InterfaceDataExchange.CurrentCycleCCD.IsSocketGood);
-                        for (int i = 0; i < InterfaceDataExchange.CurrentCycleCCD.IsSocketGood.Length; i++)
-                            if (!InterfaceDataExchange.CurrentCycleCCD.IsSocketGood[i])
+                        socketStatuses.Add(CurrentCycleCCD.TimeLCBSyncSignalGot, CurrentCycleCCD.IsSocketGood);
+                        for (int i = 0; i < CurrentCycleCCD.IsSocketGood.Length; i++)
+                            if (!CurrentCycleCCD.IsSocketGood[i])
                                 ErrorsBySockets[i]++;
 
                     }
@@ -1149,12 +1211,12 @@ namespace DoMC
                         if (!Errors.LCBDoesNotRespond)
                         {
                             Errors.LCBDoesNotSendSync = true;
-                            InterfaceDataExchange.ReconnectToLCB();
+                            ReconnectToLCB();
                             Errors.MissedSyncrosignalCounter = 0;
                         }
                     }
                     //WorkingLog.Add("Эталоны 16: " + InterfaceDataExchange.SocketStandardExist());
-                    InterfaceDataExchange.RDPBCurrentStatus.PreviousDirection = InterfaceDataExchange.RDPBCurrentStatus.CurrentTransporterSide;
+                    RDPBCurrentStatus.PreviousDirection = RDPBCurrentStatus.CurrentTransporterSide;
 
                     WorkingStep = WorkStep.ClearMemory;
                     WorkingLog.Add(LoggerLevel.Critical, "Очистка неиспользуемой памяти");
@@ -1165,14 +1227,15 @@ namespace DoMC
             catch (ThreadAbortException taex)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Работа принудительно остановлена. Сохранение текущей конфигурации");
-                InterfaceDataExchange.Configuration.Save();
+                Context.Configuration.SaveProcessingDataSettings();
             }
             catch (Exception ex)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при работе.", ex);
+                WasErrorWhileWorked = true;
             }
             // если была критическая ошибка, останавливаем работу
-            if (InterfaceDataExchange.WasErrorWhileWorked)
+            if (WasErrorWhileWorked)
             {
                 ForceStop = true;
             }
@@ -1180,15 +1243,15 @@ namespace DoMC
 
         private void GetWorkModeStandard_Click(object sender, EventArgs e)
         {
-            var ctrl = (Control)sender;
+            /*var ctrl = (Control)sender;
             var socketnumber = (int)ctrl.Tag;
-            if (InterfaceDataExchange.CurrentCycleCCD != null)
+            if (CurrentCycleCCD != null)
             {
                 var sf = new DoMCInterface.ShowFrameForm();
-                sf.Text = "Цикл: " + InterfaceDataExchange.CurrentCycleCCD.CycleCCDDateTime.ToString() + " Номер гнезда: " + socketnumber;
-                sf.Image = InterfaceDataExchange.CurrentCycleCCD.Differences[socketnumber - 1];
+                sf.Text = "Цикл: " + CurrentCycleCCD.CycleCCDDateTime.ToString() + " Номер гнезда: " + socketnumber;
+                sf.Image = CurrentCycleCCD.Differences[socketnumber - 1];
                 sf.Show();
-            }
+            }*/
         }
 
         private void miLoadStandard_Click(object sender, EventArgs e)
@@ -1409,6 +1472,15 @@ namespace DoMC
                 StopWork();
                 ForceStop = false;
             }
+            if (RDPBCurrentStatus.IsTimeout)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Бракер не ответил");
+                DevicesErrors |= WorkingModule.RDPB;
+            }
+            else
+            {
+                DevicesErrors &= ~WorkingModule.RDPB;
+            }
 
         }
 
@@ -1532,17 +1604,17 @@ namespace DoMC
             catch { }
             try
             {
+                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.LCB.LCBModule.SetLCBNonWorkModeCommand)).ExecuteCommand();
+            }
+            catch { }
+            try
+            {
                 Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.LCB.LCBModule.LCBStopCommand)).ExecuteCommand();
             }
             catch { }
             try
             {
                 Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StopCommand)).ExecuteCommand();
-            }
-            catch { }
-            try
-            {
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.LCB.LCBModule.LCBStopCommand)).ExecuteCommand();
             }
             catch { }
             try
@@ -1767,7 +1839,20 @@ namespace DoMC
                 }
             });
         }
-
+        public void CheckIfAllSocketsGood(CycleImagesCCD CurrentCycleCCD)
+        {
+            Parallel.For(0, CurrentCycleCCD.CurrentImages.Length, new ParallelOptions() { MaxDegreeOfParallelism = this.MaxDegreeOfParallelism }, i =>
+            {
+                try
+                {
+                    CheckIfSocketGood(CurrentCycleCCD, i);
+                }
+                catch (Exception ex)
+                {
+                    WorkingLog?.Add(LoggerLevel.Critical, $"Ошибка при проверке гнезда {i + 1}. ", ex);
+                }
+            });
+        }
         public void CheckIfSocketGood(CycleImagesCCD CurrentCycleCCD, int EquipmentSocketNumber)
         {
             try
@@ -1813,7 +1898,7 @@ namespace DoMC
             }
         }
 
-        public void CheckIfSocketHasImage(CycleImagesCCD CurrentCycleCCD)
+        public void CheckIfSocketsHasImage(CycleImagesCCD CurrentCycleCCD)
         {
             Parallel.For(0, CurrentCycleCCD.CurrentImages.Length, new ParallelOptions() { MaxDegreeOfParallelism = this.MaxDegreeOfParallelism }, i =>
             {
@@ -1831,19 +1916,12 @@ namespace DoMC
                     && (CurrentCycleCCD.LEDStatuses == null
                     || CurrentCycleCCD.LEDStatuses[LEDLineNumber]))
                 {
-                    //есть ли конфигурация этого гнезда
-                    if (Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[EquipmentSocketNumber] != null)
-                    {
-                        var socket = Context.Configuration.SocketToCardSocketConfigurations[EquipmentSocketNumber];
-                        if (socket == null) return;
+                    var result = DoMCLib.Tools.ImageTools.Average(
+                        CurrentCycleCCD.CurrentImages[EquipmentSocketNumber],
+                        Context.Configuration.ReadingSocketsSettings.CCDSocketParameters[EquipmentSocketNumber].ImageCheckingParameters.GetRectangle());
 
-                        var result = DoMCLib.Tools.ImageTools.Average(
-                            CurrentCycleCCD.CurrentImages[EquipmentSocketNumber], 
-                            Context.Configuration.SocketToCardSocketConfigurations[EquipmentSocketNumber].ImageProcessParameters.GetRectangle());
+                    CurrentCycleCCD.IsSocketHasImage[EquipmentSocketNumber] = result > Context.Configuration.HardwareSettings.AverageToHaveImage;
 
-                        CurrentCycleCCD.IsSocketHasImage[EquipmentSocketNumber] = result > Context.Configuration.AverageToHaveImage;
-
-                    }
                 }
                 else
                 {
@@ -1859,7 +1937,20 @@ namespace DoMC
             }
 
         }
-
+        public void RecalcAllStandards(CycleImagesCCD CurrentCycleCCD)
+        {
+            Parallel.For(0, CurrentCycleCCD.CurrentImages.Length, new ParallelOptions() { MaxDegreeOfParallelism = this.MaxDegreeOfParallelism }, i =>
+            {
+                try
+                {
+                    RecalcStandard(CurrentCycleCCD, i);
+                }
+                catch (Exception ex)
+                {
+                    WorkingLog?.Add(LoggerLevel.Critical, $"Ошибка при перерасчете эталона гнезда {i + 1}. ", ex);
+                }
+            });
+        }
         public void RecalcStandard(CycleImagesCCD CurrentCycleCCD, int EquipmentSocketNumber)
         {
 
@@ -1881,6 +1972,12 @@ namespace DoMC
         {
             var newImg = ImageTools.ImageCopy(Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[EquipmentSocketNumber].StandardImage);
             CurrentCycleCCD.StandardImages[EquipmentSocketNumber] = newImg;
+        }
+        public void ReconnectToLCB()
+        {
+            Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand)).ExecuteCommand();
+            System.Threading.Thread.Sleep(10);
+            Controller.CreateCommandInstance(typeof(LCBModule.LCBStartCommand)).ExecuteCommand();
         }
     }
 

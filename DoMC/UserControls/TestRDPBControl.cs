@@ -153,7 +153,7 @@ namespace DoMC.UserControls
         private void SetRDPBParameters()
         {
             var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.LoadConfigurationToModuleCommand));
-            var res = cmd.Wait(CurrentContext.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out bool result);
+            var res = cmd.Wait(CurrentContext.Configuration, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out bool result);
             if (!res)
             {
                 btnRDPBTestConnect.BackColor = Color.Red;

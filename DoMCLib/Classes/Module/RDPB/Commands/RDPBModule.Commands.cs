@@ -1,5 +1,6 @@
 ﻿using DoMCLib.Classes.Configuration;
 using DoMCLib.Classes.Module.RDPB.Classes;
+using DoMCLib.Configuration;
 using DoMCModuleControl;
 using DoMCModuleControl.Commands;
 using DoMCModuleControl.Modules;
@@ -46,12 +47,12 @@ namespace DoMCLib.Classes.Module.RDPB
         {
             RDPBModule module;
             bool? wasConnected;
-            public LoadConfigurationToModuleCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(RemoveDefectedPreformBlockConfig), typeof(bool)) { }
+            public LoadConfigurationToModuleCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCLib.Configuration.ApplicationConfiguration), typeof(bool)) { }
             protected override void Executing()
             {
                 module = (RDPBModule)Module;
                 wasConnected = module.IsConnected;
-                module.SetConfig((DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig)InputData);
+                module.SetConfig((ApplicationConfiguration)InputData);
             }
             protected override bool MakeDecisionIsCommandCompleteFunc()
             {

@@ -25,16 +25,12 @@ namespace DoMCLib.DB
             public List<CycleDataSocket> SocketImages { get; set; }
             [DataMember]
             [FileStorageHeader]
-            public byte[] SocketsToSave { get; set; }
-            [DataMember]
-            [FileStorageHeader]
             public string TransporterSide { get; set; }
 
             public static CycleData FromDBCycleData(DB.CycleData cd)
             {
                 var res = new CycleData();
                 res.IsSocketsGood = ArrayTools.BoolArray2ByteArray(cd.IsSocketsGood);
-                res.SocketsToSave = ArrayTools.BoolArray2ByteArray(cd.SocketsToSave);
                 res.IsSocketActive = ArrayTools.BoolArray2ByteArray(cd.IsSocketActive);
 
                 res.TransporterSide = cd.TransporterSide;
@@ -51,7 +47,6 @@ namespace DoMCLib.DB
             {
                 var res = new CycleData();
                 res.IsSocketsGood = ArrayTools.BoolArray2ByteArray(cd.IsSocketsGood);
-                res.SocketsToSave = ArrayTools.BoolArray2ByteArray(cd.SocketsToSave);
                 res.IsSocketActive = ArrayTools.BoolArray2ByteArray(cd.IsSocketActive);
 
                 res.TransporterSide = cd.TransporterSide;
@@ -69,7 +64,6 @@ namespace DoMCLib.DB
             {
                 var res = new DB.CycleData();
                 res.IsSocketsGood = ArrayTools.ByteArray2BoolArray(cd.IsSocketsGood);
-                res.SocketsToSave = ArrayTools.ByteArray2BoolArray(cd.SocketsToSave);
                 res.IsSocketActive = ArrayTools.ByteArray2BoolArray(cd.IsSocketActive);
                 res.TransporterSide = cd.TransporterSide;
                 res.CycleDateTime = cd.CycleDateTime;
@@ -85,7 +79,6 @@ namespace DoMCLib.DB
             {
                 var res = new DB.CycleData();
                 res.IsSocketsGood = ArrayTools.ByteArray2BoolArray(cd.IsSocketsGood);
-                res.SocketsToSave = ArrayTools.ByteArray2BoolArray(cd.SocketsToSave);
                 res.IsSocketActive = ArrayTools.ByteArray2BoolArray(cd.IsSocketActive);
 
                 res.TransporterSide = cd.TransporterSide;

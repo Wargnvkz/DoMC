@@ -92,7 +92,7 @@ namespace DoMC.Classes
             return startCmd.WasCompletedSuccessfully();
         }
 
-        public bool StopLCB()
+        public bool SetNonWorkingModeLCB()
         {
             var StopCmd = Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand));
             if (StopCmd == null) return false;

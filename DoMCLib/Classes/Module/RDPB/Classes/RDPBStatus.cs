@@ -70,9 +70,9 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
             return TimeCommandSent < TimeParametersGot;
         }
 
-        public void SetTimeout(int Timeoutms)
+        public void SetTimeout(int TimeoutInms)
         {
-            RDPBTimeout = Timeoutms * 10000;
+            RDPBTimeout = TimeoutInms * 10000;
         }
 
         // Данные в сети в тексте по 4 байта в Hex с пробелами
@@ -255,13 +255,14 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
                             int.TryParse(parts[3], System.Globalization.NumberStyles.HexNumber, null, out this.GoodSetQuantityInBox);
                             int.TryParse(parts[4], System.Globalization.NumberStyles.HexNumber, null, out this.BadSetQuantityInBox);
                             SetTimeParametersGot();
+                            SetTimeCurrentStatusGot();
 
                         }
                         break;
                     case RDPBCommandType.SetCoolingBlocks:
                         {
                             int.TryParse(parts[1].ToString(), out this.CoolingBlocksQuantity);
-
+                            SetTimeCurrentStatusGot();
                         }
                         break;
                 }

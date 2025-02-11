@@ -267,17 +267,10 @@ namespace DoMCLib.DB
                         try
                         {
                             WorkingLog?.Add(LoggerLevel.FullDetailedInformation, "Хорошие гнезда:" + ArrayTools.BoolArrayToHex(cycle.IsSocketsGood));
-                            WorkingLog?.Add(LoggerLevel.FullDetailedInformation, "Сохраняемые гнезда:" + ArrayTools.BoolArrayToHex(cycle.SocketsToSave));
                             WorkingLog?.Add(LoggerLevel.FullDetailedInformation, "Изображение гнезд:" + ((cycle.SocketImages != null && cycle.SocketImages.Count > 0) ? ArrayTools.BoolArrayToHex(Enumerable.Range(1, 96).Select(sn => cycle.SocketImages.Find(si => si.SocketNumber == sn) != null).ToArray()) : ""));
                         }
                         catch { }
                         var localCycleID = cycle.CycleID;
-                        var toSave = cycle.SocketsToSave.ToArray();
-                        for (int i = 0; i < cycle.IsSocketsGood.Length; i++)
-                        {
-                            toSave[i] |= !cycle.IsSocketsGood[i];
-                        }
-                        cycle.SocketImages = cycle.SocketImages.Where(im => toSave[im.SocketNumber - 1]).ToList();
                         cycle.SocketImages.ForEach(si => si.IsSocketActive = true);
 
                         if (RemoteStorage != null)

@@ -15,7 +15,6 @@ namespace DoMCLib.DB
         public bool[] IsSocketsGood;
         public bool[] IsSocketActive;
         public List<CycleDataSocket> SocketImages;
-        public bool[] SocketsToSave;
         public string TransporterSide;
 
         public static CycleData ConvertFromCycleImageCCD(CycleImagesCCD ci)
@@ -64,7 +63,6 @@ namespace DoMCLib.DB
             cd.IsSocketsGood = new bool[n];
             cd.IsSocketActive = cd.SocketImages.Select(si => si.IsSocketActive).ToArray();
             Array.Copy(ci.IsSocketGood, 0, cd.IsSocketsGood, 0, n);
-            cd.SocketsToSave = ci.SocketsToSave.ToArray();
             switch (ci.TransporterSide)
             {
                 case RDPBTransporterSide.Left:

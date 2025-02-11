@@ -1,4 +1,6 @@
-﻿using DoMCLib.Classes.Module.RDPB.Classes;
+﻿using DoMCLib.Classes.Configuration;
+using DoMCLib.Classes.Module.RDPB.Classes;
+using DoMCLib.Configuration;
 using DoMCModuleControl;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
@@ -19,7 +21,7 @@ namespace DoMCLib.Classes.Module.RDPB
     /// </summary>
     public partial class RDPBModule : AbstractModuleBase
     {
-        private DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig Config;
+        private DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig RDPBConfig;
         private IMainController mainController;
         TcpClient client;
         IPEndPoint remoteIP;
@@ -44,12 +46,13 @@ namespace DoMCLib.Classes.Module.RDPB
             WorkingLog = mainController.GetLogger(this.GetType().Name);
             WorkingLog.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
         }
-        public void SetConfig(DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig config)
+        public void SetConfig(ApplicationConfiguration config)
         {
             var wasConnected = IsConnected;
             if (wasConnected) Stop();
-            Config = config;
-            remoteIP = new IPEndPoint(IPAddress.Parse(Config.IP), Config.Port);
+            RDPBConfig = config.HardwareSettings.RemoveDefectedPreformBlockConfig;
+            remoteIP = new IPEndPoint(IPAddress.Parse(RDPBConfig.IP), RDPBConfig.Port);
+            CurrentStatus.SetTimeout(config.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds);
             if (wasConnected) Start();
         }
 

@@ -138,23 +138,27 @@ namespace DoMC
             TestCCDInterfaceView = new TestCCDControl(Controller, WorkingLog, this);
             tbCCDTest.Controls.Add(TestCCDInterfaceView);
             TestCCDInterfaceView.Size = tbCCDTest.ClientSize;
+            TestCCDInterfaceView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
             GetCCDStandardInterface = new GetCCDStandardInterface(Controller, WorkingLog, this);
             tbGetStandard.Controls.Add(GetCCDStandardInterface);
             GetCCDStandardInterface.Size = tbCCDTest.ClientSize;
+            GetCCDStandardInterface.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
             TestLCBInterface = new TestLCBInterface(Controller, WorkingLog, this);
             tbTestLCB.Controls.Add(TestLCBInterface);
             TestLCBInterface.Size = tbTestLCB.ClientSize;
-
+            TestLCBInterface.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
             CheckSettingsInterface = new CheckSettings(Controller, WorkingLog, this);
             tbSettingsCheck.Controls.Add(CheckSettingsInterface);
             CheckSettingsInterface.Size = tbSettingsCheck.ClientSize;
+            CheckSettingsInterface.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
             TestRDPBControlInterface = new TestRDPBControl(Controller, WorkingLog, this);
             tbTestRDPB_uc.Controls.Add(TestRDPBControlInterface);
             TestRDPBControlInterface.Size = tbTestRDPB_uc.ClientSize;
+            TestRDPBControlInterface.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
 
             FillSettingPage();
@@ -176,7 +180,7 @@ namespace DoMC
         private void FillSettingPage()
         {
             SettingsUpdated?.Invoke(this, new EventArgs());
-            
+
             miLEDSettings.Checked = Context.Configuration.ReadingSocketsSettings.IsLCBSettingsSet();
             miReadParameters.Checked = Context.Configuration.ReadingSocketsSettings.IsReadingParametersSet();
             miStandardRecalcSetting.Checked = Context.Configuration.HardwareSettings.IsStandardRecalculationSettingsSet();
@@ -221,7 +225,7 @@ namespace DoMC
 
 
         #endregion Settings
-               
+
 
         private void DoMCMainInterface_FormClosed(object sender, FormClosedEventArgs e)
         {
@@ -411,8 +415,8 @@ namespace DoMC
 
         }
 
-               
-        
+
+
         private void соответствиеГнездToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -467,7 +471,7 @@ namespace DoMC
 
         }
 
-        
+
         private enum SettingsPageSocketsStatus
         {
             IsSocketSettingsOk,
@@ -583,7 +587,7 @@ namespace DoMC
             //statFrom.Show();
         }
 
-       
+
 
         public DoMCLib.Classes.DoMCApplicationContext GetContext()
         {
