@@ -224,7 +224,11 @@ namespace DoMCLib.Classes.Module.CCD
             catch (Exception ex)
             {
                 WorkingLog.Add(LoggerLevel.Critical, $"Плата: {CardNumber}. Гнездо: {Socket}. Чтение гнезда завершено с ошибкой. {ex.Message}");
-                var sz = TCPClientImageDataConnection.AvailableBytes();
+                /*try
+                {
+                    var sz = TCPClientImageDataConnection.AvailableBytes();
+                }
+                catch { }*/
                 Controller.GetObserver().Notify($"{this.GetType().Name}.GetImageDataFromSocketAsync.Error", (CardNumber, Socket, socketReadData.ImageDataRead));
                 return false;
             }

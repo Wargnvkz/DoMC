@@ -123,6 +123,7 @@ namespace DoMC
             DevicesControlInit();
             PressAllDevicesButton();
             ShowDevicesButtonStatuses();
+            LoadArchiveTab();
         }
 
         private void Observer_NotificationReceivers(string EventName, object? data)
@@ -497,17 +498,16 @@ namespace DoMC
 
         private void StopRDPB()
         {
-            /*
-             * WorkingLog.Add(LoggerLevel.Critical,"Отключение бракёра");
-             InterfaceDataExchange.SendCommand(ModuleCommand.RDPBOff);
-            WorkingLog.Add(LoggerLevel.Critical,"Остановка модуля бракера");
-             InterfaceDataExchange.SendCommand(ModuleCommand.RDPBStop);
-            */
+
+            WorkingLog.Add(LoggerLevel.Critical, "Отключение бракёра");
+            Controller.CreateCommandInstance(typeof(RDPBModule.StopCommand)).ExecuteCommand();
+            //InterfaceDataExchange.SendCommand(ModuleCommand.RDPBOff);
+
         }
 
-        private bool SetNonWorkingModeLCB()
+        private void SetNonWorkingModeLCB()
         {
-            return Controller.CreateCommandInstance(typeof(LCBModule.SetLCBNonWorkModeCommand)).Wait(null, Context.Configuration.HardwareSettings.Timeouts.WaitForLCBCardAnswerTimeoutInSeconds, out object? _);
+            Controller.CreateCommandInstance(typeof(LCBModule.SetLCBNonWorkModeCommand)).ExecuteCommand();
 
         }
         private bool SetWorkingModeLCB()
@@ -640,8 +640,8 @@ namespace DoMC
                     CurrentCycleCCD.IsSocketGood = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
                     CurrentCycleCCD.IsSocketHasImage = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
 
-                    //Context.Configuration.HardwareSettings.SocketsToCheck = new bool[96];
-                    //Array.Copy(Context.Configuration.HardwareSettings.SocketsToCheck, Context.Configuration.HardwareSettings.SocketsToCheck, 96);
+                    CurrentCycleCCD.SocketsToCheck = new bool[96];
+                    Array.Copy(Context.Configuration.HardwareSettings.SocketsToCheck, CurrentCycleCCD.SocketsToCheck, 96);
 
                     // Если рабочий режим не запущен или система не может работать, потому что не загружена конфигурация, останавливаем и выходим с ошибкой
                     if (!IsWorkingModeStarted || !IsConfigurationLoadedSuccessfully)
@@ -662,7 +662,8 @@ namespace DoMC
                     WorkingLog.Add(LoggerLevel.Critical, "Запуск ожидания результатов чтения");
 
                     //Запрашиваем чтение ПЗС матриц по внешнему имульсу
-                    WasLastOperationSuccessful = Context.ReadSockets(Controller, WorkingLog, true);
+                    //WasLastOperationSuccessful = Context.ReadSockets(Controller, WorkingLog, true);
+                    WasLastOperationSuccessful = Context.ReadSockets(Controller, WorkingLog, false);
                     //Ждем пока произойдет чтение
                     CCDEnd = DateTime.Now;
                     // Если таймаут то говорим, что ошибка и выходим
@@ -1690,22 +1691,10 @@ namespace DoMC
 
         private void DoMCWorkModeInterface_FormClosing(object sender, FormClosingEventArgs e)
         {
-            /*
-            try
+            if (MessageBox.Show("Вы уверены, что хотите выйти из программы ПМК", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
-                if (InterfaceDataExchange.IsWorkingModeStarted)
-                {
-                    if (MessageBox.Show("ПМК запущено. Вы уверены, что хотите закрыть окно рабочего режима", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                    {
-                        e.Cancel = true;
-                    }
-                }
+                e.Cancel = true;
             }
-            catch
-            {
-
-            }
-            */
         }
 
         private void miInnerVariables_Click(object sender, EventArgs e)

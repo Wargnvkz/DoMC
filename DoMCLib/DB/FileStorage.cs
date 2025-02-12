@@ -267,6 +267,8 @@ namespace DoMCLib.DB
         protected static string SaveFileUncompressed(T data, string path, string fileExtenstion)
         {
             var fileName = CreateFileName(data);
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
             fileName = Path.Combine(path, AddExtension(fileName, fileExtenstion));
             using (var file = File.OpenWrite(fileName))
             {

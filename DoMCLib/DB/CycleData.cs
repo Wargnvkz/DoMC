@@ -45,9 +45,9 @@ namespace DoMCLib.DB
                 var cds = new DoMCLib.DB.CycleDataSocket()
                 {
                     SocketNumber = i + 1,
-                    SocketImage = ci.CurrentImages[i],
-                    SocketStandardImage = ci.StandardImages[i],
-                    IsSocketActive = ci.SocketsToCheck[i],
+                    SocketImage = ci?.CurrentImages?[i] ?? null,
+                    SocketStandardImage = ci?.StandardImages?[i] ?? null,
+                    IsSocketActive = ci?.SocketsToCheck?[i] ?? false,
 
                     /*DeviationWindow = ci.ImageProcessParameters != null ? ci.ImageProcessParameters[i].DeviationWindow : 10,
                     MaxDeviation = ci.ImageProcessParameters != null ? ci.ImageProcessParameters[i].MaxDeviation : (short)1000,

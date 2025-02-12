@@ -33,7 +33,7 @@ namespace DoMCLib.DB
         {
             Observer = observer;
             WorkingLog = logger;
-            if (String.IsNullOrWhiteSpace(ConnectionStringLocal))
+            if (String.IsNullOrWhiteSpace(connectionStringLocal))
             {
                 LocalIsActive = false;
             }
@@ -52,7 +52,7 @@ namespace DoMCLib.DB
                     LocalIsActive = false;
                 }
             }
-            if (String.IsNullOrWhiteSpace(ConnectionStringRemote))
+            if (String.IsNullOrWhiteSpace(connectionStringRemote))
             {
                 RemoteIsActive = false;
             }

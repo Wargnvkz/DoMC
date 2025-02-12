@@ -81,6 +81,7 @@ namespace DoMCLib.DB
                 System.IO.Directory.CreateDirectory(directory);
             List<CycleDBFileHeader> fileList = new List<CycleDBFileHeader>();
             var queuePath = new Queue<string>();
+            queuePath.Enqueue(directory);
             //foreach (var InnerDirectory in directories)
             while (queuePath.Count > 0)
             {
@@ -90,9 +91,10 @@ namespace DoMCLib.DB
                 {
                     fileList.Add(new CycleDBFileHeader() { FileName = file, CycleHeader = FileStorage<CycleData>.DecomposeFileName(file) });
                 }
-                var directories = Directory.EnumerateDirectories(directory);
+                var directories = Directory.EnumerateDirectories(InnerDirectory);
                 foreach (var d in directories)
-                    queuePath.Enqueue(d);
+                    if (d != BoxDirectory)
+                        queuePath.Enqueue(d);
             }
             return fileList;
         }
