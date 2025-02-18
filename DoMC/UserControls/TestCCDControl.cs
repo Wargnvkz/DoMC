@@ -180,7 +180,7 @@ namespace DoMC.Forms
             {
                 try
                 {
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog))
                     {
                         if (CurrentContext.SetFastRead(MainController, WorkingLog))
                         {
@@ -228,7 +228,7 @@ namespace DoMC.Forms
             {
                 try
                 {
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false, SelectedSocket))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, SelectedSocket))
                     {
                         if (CurrentContext.SetFastRead(MainController, WorkingLog, SelectedSocket))
                         {
@@ -267,7 +267,7 @@ namespace DoMC.Forms
             {
                 try
                 {
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false, SelectedSocket))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, SelectedSocket))
                     {
                         if (CurrentContext.SetFastRead(MainController, WorkingLog, SelectedSocket))
                         {
@@ -492,7 +492,7 @@ namespace DoMC.Forms
             {
                 checkpreformalgorithmsForm.SetStandardImage(TestStandardImage);
                 checkpreformalgorithmsForm.SetImage(TestReadImage);
-                checkpreformalgorithmsForm.SetImageProcessParameters(InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].ImageProcessParameters);
+                checkpreformalgorithmsForm.SetImageProcessParameters(InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].ImageCheckingParameters);
                 checkpreformalgorithmsForm.RecalcAndRedrawImages();
 
             }*/

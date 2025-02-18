@@ -18,13 +18,13 @@ namespace DoMC.Classes
    /* public class ModelCommandProcessor
     {
         IMainController Controller;
-        DoMCApplicationContext Context;
+        DoMCApplicationContext CurrentContext;
         Observer observer;
         ILogger logger;
         public ModelCommandProcessor(IMainController controller, DoMCApplicationContext applicationContext)
         {
             Controller = controller;
-            Context = applicationContext;
+            CurrentContext = applicationContext;
             observer = Controller.GetObserver();
             //observer.NotificationReceivers += Observer_NotificationReceived;
             logger = Controller.GetLogger("Operations");
@@ -118,7 +118,7 @@ namespace DoMC.Classes
         {
             var setLCBConfigCommand = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBParametersForWorkingModeCommand));
             if (setLCBConfigCommand == null) return false;
-            setLCBConfigCommand.ExecuteCommandAsync(Context.Configuration.ReadingSocketsSettings.LCBSettings).Wait();
+            setLCBConfigCommand.ExecuteCommandAsync(CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings).Wait();
             if (!setLCBConfigCommand.WasCompletedSuccessfully()) return false;
 
             var setLCBMovementParametersCommand = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBMovementParametersCommand));
@@ -141,7 +141,7 @@ namespace DoMC.Classes
         {
             var LoadConfigurationCmd = Controller.CreateCommandInstance(typeof(RDPBModule.LoadConfigurationToModuleCommand));
             if (LoadConfigurationCmd == null) return false;
-            LoadConfigurationCmd.ExecuteCommandAsync(Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig).Wait();
+            LoadConfigurationCmd.ExecuteCommandAsync(CurrentContext.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig).Wait();
             return LoadConfigurationCmd.WasCompletedSuccessfully();
         }
 
@@ -151,7 +151,7 @@ namespace DoMC.Classes
             {
                 var setExpositionCommand = Controller.CreateCommandInstance(typeof(CCDCardDataModule.SendReadSocketsWithExternalSignalCommand));
                 if (setExpositionCommand == null) return false;
-                var resultExpositionCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
+                var resultExpositionCommand = setExpositionCommand.Wait(CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
                 if (resultExpositionCommand is SetReadingParametersCommandResult resultExposition)
                 {
                     var lst = resultExposition.CardsNotAnswered();
@@ -166,7 +166,7 @@ namespace DoMC.Classes
             {
                 var setExpositionCommand = Controller.CreateCommandInstance(typeof(CCDCardDataModule.SendReadSocketCommand));
                 if (setExpositionCommand == null) return false;
-                var resultExpositionCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
+                var resultExpositionCommand = setExpositionCommand.Wait(CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
                 if (resultExpositionCommand is SetReadingParametersCommandResult resultExposition)
                 {
                     var lst = resultExposition.CardsNotAnswered();
@@ -186,7 +186,7 @@ namespace DoMC.Classes
         {
             var setExpositionCommand = Controller.CreateCommandInstance(typeof(CCDCardDataModule.GetSocketsImagesDataCommand));
             if (setExpositionCommand == null) return null;
-            var resultCommand = setExpositionCommand.Wait(Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
+            var resultCommand = setExpositionCommand.Wait(CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
             if (resultCommand is GetImageDataCommandResponse resultExposition)
             {
                 var lst = resultExposition.CardsNotAnswered();

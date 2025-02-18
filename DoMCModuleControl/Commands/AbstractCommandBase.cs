@@ -253,7 +253,8 @@ namespace DoMCModuleControl.Commands
                 {
                     outputData = (T)resultExpositionCommand;
                 }
-                return WasCompletedSuccessfully();
+                var success = WasCompletedSuccessfully();
+                return success;
                 // return true;
             }
             catch (NotImplementedException)

@@ -1,5 +1,5 @@
 ﻿using DoMCLib.Configuration;
-using DoMCLib.Tools;
+using DoMC.Tools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DoMCLib.Classes.Configuration.CCD;
 
 namespace DoMCLib.Forms
 {
@@ -18,7 +19,7 @@ namespace DoMCLib.Forms
 
         private Panel[] SocketPanels;
 
-        //public Dictionary<int, CCDSocketConfiguration> SocketParameters;
+        public SocketParameters[] SocketParameters;
         public DoMCImageProcessSettingsListForm()
         {
             InitializeComponent();
@@ -26,11 +27,11 @@ namespace DoMCLib.Forms
 
         public new DialogResult ShowDialog()
         {
-            /*
-            SocketQuantity = SocketParameters.Keys.Max();
+
+            SocketQuantity = SocketParameters.Length;
             lblSocketQuantity.Text = SocketQuantity.ToString();
             SocketPanels = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets, SocketChange_Click);
-            */
+
             //ShowStatuses();
             return base.ShowDialog();
         }
@@ -43,32 +44,30 @@ namespace DoMCLib.Forms
 
         private void SocketChange_Click(object sender, EventArgs e)
         {
-            /*
+
             var ctrl = sender as Control;
             if (ctrl != null)
             {
                 var n = (int)ctrl.Tag;
                 var form = new DoMCImageProcessSettingsForm();
-                form.ImageProcessParameters = SocketParameters[n].ImageProcessParameters.Clone();
+                form.ImageCheckingParameters = SocketParameters[n].ImageCheckingParameters.Clone();
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SocketParameters[n].ImageProcessParameters = form.ImageProcessParameters.Clone();
+                    SocketParameters[n].ImageCheckingParameters = form.ImageCheckingParameters.Clone();
                 }
                 //ShowStatuses();
             }
-            */
+
         }
 
         private void btnExpandToAll_Click(object sender, EventArgs e)
         {
-            /*
-            var ip1 = SocketParameters[1].ImageProcessParameters;
-            foreach (var kv in SocketParameters)
+            var ip1 = SocketParameters[0].ImageCheckingParameters;
+            for (int i = 1; i < SocketParameters.Length; i++)
             {
-                if (kv.Key == 1) continue;
-                kv.Value.ImageProcessParameters = ip1.Clone();
+                SocketParameters[i].ImageCheckingParameters = ip1.Clone();
             }
-            */
+
         }
     }
 }

@@ -295,7 +295,7 @@ namespace DoMC.Forms
             showPreformImages.SetStandardImage(simage.SocketStandardImage);
             showPreformImages.SetImage(simage.SocketImage);
             showPreformImages.SetImageProcessParameters(simage.ImageProcessParameters.Clone());
-            /*new ImageProcessParameters()
+            /*new ImageCheckingParameters()
             {
                 DeviationWindow = simage.DeviationWindow,
                 MaxDeviation = simage.MaxDeviation,

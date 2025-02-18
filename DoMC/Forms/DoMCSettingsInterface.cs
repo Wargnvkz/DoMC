@@ -13,6 +13,7 @@ using DoMC.Forms;
 using DoMCModuleControl.UI;
 using DoMC.UserControls;
 using DoMCLib.Forms;
+using DoMCLib.Tools;
 
 namespace DoMC
 {
@@ -61,8 +62,8 @@ namespace DoMC
             Controller = controller;
             WorkingLog = controller.GetLogger("SettingInterface");
             observer = controller.GetObserver();
-            //Context = context;
-            //contextProcessor = new ModelCommandProcessor(controller, Context);
+            //CurrentContext = context;
+            //contextProcessor = new ModelCommandProcessor(controller, CurrentContext);
             WorkingLog.Add(LoggerLevel.Critical, "Запуск интерфейса настройки");
             InitControls();
             observer.NotificationReceivers += Observer_NotificationReceivers;
@@ -258,7 +259,7 @@ namespace DoMC
         private void miSaveStandard_Click(object sender, EventArgs e)
         {
 
-            var dir = System.IO.Path.Combine(Application.StartupPath, ".");// ApplicationCardParameters.StandardsPath);
+            var dir = System.IO.Path.Combine(Application.StartupPath, "");// ApplicationCardParameters.StandardsPath);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             var sd = new SaveFileDialog();
@@ -268,15 +269,15 @@ namespace DoMC
             sd.Filter = "Эталоны (*.std)|*.std|Все файлы (*.*)|*.*";
             if (sd.ShowDialog() == DialogResult.OK)
             {
-                Context.Configuration.SaveAll();
+                Context.Configuration.SaveStandardSettings(sd.FileName);
             }
 
         }
 
         private void miLoadStandard_Click(object sender, EventArgs e)
         {
-            /*
-            var dir = System.IO.Path.Combine(Application.StartupPath, ApplicationCardParameters.StandardsPath);
+
+            var dir = System.IO.Path.Combine(Application.StartupPath, "");
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             var od = new OpenFileDialog();
@@ -286,10 +287,11 @@ namespace DoMC
             od.AddExtension = true;
             if (od.ShowDialog() == DialogResult.OK)
             {
-                Context.Configuration.LoadStandard(od.FileName);
-                FillPage();
+                Context.Configuration.LoadStandardSettings(od.FileName);
+                FillSettingPage();
+                NotifyConfigurationUpdated();
             }
-            */
+
         }
 
         private void miWorkModeSettings_Click(object sender, EventArgs e)
@@ -341,7 +343,7 @@ namespace DoMC
 
             if (Context.Configuration.HardwareSettings.SocketsToCheck != null)
             {
-                //if (Context.Configuration.HardwareSettings.SocketsToCheck == null) Context.Configuration.HardwareSettings.SocketsToCheck = new bool[Context.Configuration.HardwareSettings.SocketQuantity];
+                //if (CurrentContext.Configuration.HardwareSettings.SocketsToCheck == null) CurrentContext.Configuration.HardwareSettings.SocketsToCheck = new bool[CurrentContext.Configuration.HardwareSettings.SocketQuantity];
                 var scf = new DoMCSocketOnOffForm(Context);
                 scf.SocketIsOn = Context.Configuration.HardwareSettings.SocketsToCheck;
                 scf.Text = "Включение проверки данных по гнездам";
@@ -356,14 +358,6 @@ namespace DoMC
 
         private void miWorkInterfaceStart_Click(object sender, EventArgs e)
         {
-            /*
-            TestLCBStop();
-            var wmf = new DoMCWorkModeInterface();
-            wmf.SetMemoryReference(globalMemory);
-            this.Hide();
-            wmf.ShowDialog();
-            this.Show();
-            */
         }
 
         private void miDBSettings_Click(object sender, EventArgs e)
@@ -444,7 +438,7 @@ namespace DoMC
             saveDlg.Filter = ConfigFileDialogExtentions;
             if (saveDlg.ShowDialog() == DialogResult.OK)
             {
-                Context.Configuration.SaveAll(saveDlg.FileName);
+                Context.Configuration.SaveAllConfiguration(saveDlg.FileName);
             }
 
         }
@@ -459,9 +453,10 @@ namespace DoMC
                 try
                 {
                     this.Cursor = Cursors.WaitCursor;
-                    Context.Configuration.Load(openDlg.FileName);
-                    Context.Configuration.SaveAll();
+                    Context.Configuration.LoadConfiguration(openDlg.FileName);
+                    Context.Configuration.SaveAllConfiguration();
                     NotifyConfigurationUpdated();
+                    FillSettingPage();
                 }
                 finally
                 {
@@ -583,15 +578,19 @@ namespace DoMC
 
         private void tsmiReadImageStatistics_Click(object sender, EventArgs e)
         {
-            //var statFrom = new ImageReadBytesStatiscticsForm(InterfaceDataExchange);
-            //statFrom.Show();
+            /*var statFrom = new ImageReadBytesStatiscticsForm(InterfaceDataExchange);
+            statFrom.Show();*/
         }
-
-
 
         public DoMCLib.Classes.DoMCApplicationContext GetContext()
         {
             return Context;
+        }
+
+        private void tsmiLogsArchive_Click(object sender, EventArgs e)
+        {
+            var dir = System.IO.Path.Combine(Application.StartupPath, "Logs");
+            FileAndDirectoryTools.OpenFolder(dir);
         }
 
     }

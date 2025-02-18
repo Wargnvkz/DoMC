@@ -254,8 +254,8 @@ namespace DoMCLib.Forms
                             stdimg = ImageTools.NormalizeByFibers(stdimg, ImageProcessParameters.GetRectangle(), 25000);
                             StandardImageToDraw = stdimg;
                             var diff = DoMCLib.Tools.ImageTools.GetDifference(StandardImageToDraw, ImageToDraw);
-                            //ImageToDraw = ImageTools.NormalizeByFibers(img, ImageProcessParameters.GetRectangle(), 25000);
-                            //StandardImageToDraw = ImageTools.NormalizeByFibers(OriginalStandardImage, ImageProcessParameters.GetRectangle(), 25000);
+                            //ImageToDraw = ImageTools.NormalizeByFibers(img, ImageCheckingParameters.GetRectangle(), 25000);
+                            //StandardImageToDraw = ImageTools.NormalizeByFibers(OriginalStandardImage, ImageCheckingParameters.GetRectangle(), 25000);
                             //var diff = DoMCLib.Tools.ImageTools.GetDifference(StandardImageToDraw, ImageToDraw);
 
                             ImageProcessResult.ResultImage = diff;

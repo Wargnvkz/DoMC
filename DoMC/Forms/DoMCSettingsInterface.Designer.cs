@@ -41,20 +41,10 @@
             эталонToolStripMenuItem = new ToolStripMenuItem();
             miSaveStandard = new ToolStripMenuItem();
             miLoadStandard = new ToolStripMenuItem();
-            miWorkInterfaceStart = new ToolStripMenuItem();
             конфигурацияToolStripMenuItem = new ToolStripMenuItem();
             сохранитьToolStripMenuItem = new ToolStripMenuItem();
             загрузитьToolStripMenuItem = new ToolStripMenuItem();
-            tsmiLogs = new ToolStripMenuItem();
-            miInterfaceLogs = new ToolStripMenuItem();
-            miLCBLogs = new ToolStripMenuItem();
-            miRDPBLogs = new ToolStripMenuItem();
-            miDBLogs = new ToolStripMenuItem();
             tsmiLogsArchive = new ToolStripMenuItem();
-            miMainInterfaceLogsArchive = new ToolStripMenuItem();
-            miLCBLogsArchive = new ToolStripMenuItem();
-            miRDPBLogsArchive = new ToolStripMenuItem();
-            miDBLogsArchive = new ToolStripMenuItem();
             tsmiTechnicalData = new ToolStripMenuItem();
             tsmiReadImageStatistics = new ToolStripMenuItem();
             tabControl1 = new TabControl();
@@ -67,10 +57,6 @@
             tbDB = new TabPage();
             btnMoveToArchive = new Button();
             tbArchive = new TabPage();
-            xtbTest = new TabPage();
-            xtbLEDControl = new TabPage();
-            tbRDP = new TabPage();
-            tbSettingsStatus = new TabPage();
             menuStrip1.SuspendLayout();
             tabControl1.SuspendLayout();
             tbDB.SuspendLayout();
@@ -80,7 +66,7 @@
             // 
             menuStrip1.BackColor = SystemColors.ControlDark;
             menuStrip1.Font = new Font("Segoe UI", 14F);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { miSettings, эталонToolStripMenuItem, miWorkInterfaceStart, конфигурацияToolStripMenuItem, tsmiLogs, tsmiLogsArchive, tsmiTechnicalData });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { miSettings, эталонToolStripMenuItem, конфигурацияToolStripMenuItem, tsmiLogsArchive, tsmiTechnicalData });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(9, 4, 0, 4);
@@ -174,14 +160,6 @@
             miLoadStandard.Text = "Загрузить...";
             miLoadStandard.Click += miLoadStandard_Click;
             // 
-            // miWorkInterfaceStart
-            // 
-            miWorkInterfaceStart.Name = "miWorkInterfaceStart";
-            miWorkInterfaceStart.Size = new Size(164, 29);
-            miWorkInterfaceStart.Text = "Рабочий режим";
-            miWorkInterfaceStart.Visible = false;
-            miWorkInterfaceStart.Click += miWorkInterfaceStart_Click;
-            // 
             // конфигурацияToolStripMenuItem
             // 
             конфигурацияToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { сохранитьToolStripMenuItem, загрузитьToolStripMenuItem });
@@ -203,75 +181,12 @@
             загрузитьToolStripMenuItem.Text = "Загрузить...";
             загрузитьToolStripMenuItem.Click += загрузитьToolStripMenuItem_Click;
             // 
-            // tsmiLogs
-            // 
-            tsmiLogs.DropDownItems.AddRange(new ToolStripItem[] { miInterfaceLogs, miLCBLogs, miRDPBLogs, miDBLogs });
-            tsmiLogs.Name = "tsmiLogs";
-            tsmiLogs.Size = new Size(104, 29);
-            tsmiLogs.Text = "Журналы";
-            // 
-            // miInterfaceLogs
-            // 
-            miInterfaceLogs.Name = "miInterfaceLogs";
-            miInterfaceLogs.Size = new Size(343, 30);
-            miInterfaceLogs.Text = "Работа программы";
-            miInterfaceLogs.Click += miInterfaceLogs_Click;
-            // 
-            // miLCBLogs
-            // 
-            miLCBLogs.Name = "miLCBLogs";
-            miLCBLogs.Size = new Size(343, 30);
-            miLCBLogs.Text = "Работы БУС";
-            miLCBLogs.Click += miLCBLogs_Click;
-            // 
-            // miRDPBLogs
-            // 
-            miRDPBLogs.Name = "miRDPBLogs";
-            miRDPBLogs.Size = new Size(343, 30);
-            miRDPBLogs.Text = "Работа бракёра";
-            miRDPBLogs.Click += miRDPBLogs_Click;
-            // 
-            // miDBLogs
-            // 
-            miDBLogs.Name = "miDBLogs";
-            miDBLogs.Size = new Size(343, 30);
-            miDBLogs.Text = "Работа базы данных и архива";
-            miDBLogs.Click += miDBLogs_Click;
-            // 
             // tsmiLogsArchive
             // 
-            tsmiLogsArchive.DropDownItems.AddRange(new ToolStripItem[] { miMainInterfaceLogsArchive, miLCBLogsArchive, miRDPBLogsArchive, miDBLogsArchive });
             tsmiLogsArchive.Name = "tsmiLogsArchive";
-            tsmiLogsArchive.Size = new Size(181, 29);
-            tsmiLogsArchive.Text = "Архивы журналов";
-            // 
-            // miMainInterfaceLogsArchive
-            // 
-            miMainInterfaceLogsArchive.Name = "miMainInterfaceLogsArchive";
-            miMainInterfaceLogsArchive.Size = new Size(427, 30);
-            miMainInterfaceLogsArchive.Text = "Папка журналов работы программы";
-            miMainInterfaceLogsArchive.Click += miMainInterfaceLogsArchive_Click;
-            // 
-            // miLCBLogsArchive
-            // 
-            miLCBLogsArchive.Name = "miLCBLogsArchive";
-            miLCBLogsArchive.Size = new Size(427, 30);
-            miLCBLogsArchive.Text = "Папка журналов БУС";
-            miLCBLogsArchive.Click += miLCBLogsArchive_Click;
-            // 
-            // miRDPBLogsArchive
-            // 
-            miRDPBLogsArchive.Name = "miRDPBLogsArchive";
-            miRDPBLogsArchive.Size = new Size(427, 30);
-            miRDPBLogsArchive.Text = "Папка журналов бракёра";
-            miRDPBLogsArchive.Click += miRDPBLogsArchive_Click;
-            // 
-            // miDBLogsArchive
-            // 
-            miDBLogsArchive.Name = "miDBLogsArchive";
-            miDBLogsArchive.Size = new Size(427, 30);
-            miDBLogsArchive.Text = "Папка журналов базы данных и архива";
-            miDBLogsArchive.Click += miDBLogsArchive_Click;
+            tsmiLogsArchive.Size = new Size(169, 29);
+            tsmiLogsArchive.Text = "Папка журналов";
+            tsmiLogsArchive.Click += tsmiLogsArchive_Click;
             // 
             // tsmiTechnicalData
             // 
@@ -285,6 +200,7 @@
             tsmiReadImageStatistics.Name = "tsmiReadImageStatistics";
             tsmiReadImageStatistics.Size = new Size(430, 30);
             tsmiReadImageStatistics.Text = "Окно статистики чтения изображений...";
+            tsmiReadImageStatistics.Visible = false;
             tsmiReadImageStatistics.Click += tsmiReadImageStatistics_Click;
             // 
             // tabControl1
@@ -298,10 +214,6 @@
             tabControl1.Controls.Add(tbTestRDPB_uc);
             tabControl1.Controls.Add(tbDB);
             tabControl1.Controls.Add(tbArchive);
-            tabControl1.Controls.Add(xtbTest);
-            tabControl1.Controls.Add(xtbLEDControl);
-            tabControl1.Controls.Add(tbRDP);
-            tabControl1.Controls.Add(tbSettingsStatus);
             tabControl1.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
             tabControl1.Location = new Point(0, 43);
             tabControl1.Margin = new Padding(4, 5, 4, 5);
@@ -317,7 +229,7 @@
             tbSettingsCheck.Name = "tbSettingsCheck";
             tbSettingsCheck.Size = new Size(1808, 476);
             tbSettingsCheck.TabIndex = 12;
-            tbSettingsCheck.Text = "*Проверка настроек";
+            tbSettingsCheck.Text = "Проверка настроек";
             tbSettingsCheck.UseVisualStyleBackColor = true;
             // 
             // tbGetStandard
@@ -337,7 +249,7 @@
             tbTestLCB.Name = "tbTestLCB";
             tbTestLCB.Size = new Size(1808, 476);
             tbTestLCB.TabIndex = 11;
-            tbTestLCB.Text = "Тест БУС*";
+            tbTestLCB.Text = "Тест БУС";
             tbTestLCB.UseVisualStyleBackColor = true;
             // 
             // tbCCDTest
@@ -347,7 +259,7 @@
             tbCCDTest.Name = "tbCCDTest";
             tbCCDTest.Size = new Size(1808, 476);
             tbCCDTest.TabIndex = 9;
-            tbCCDTest.Text = "Тест ПЗС*";
+            tbCCDTest.Text = "Тест ПЗС";
             tbCCDTest.UseVisualStyleBackColor = true;
             // 
             // tbShowPreformImages
@@ -367,7 +279,7 @@
             tbTestRDPB_uc.Name = "tbTestRDPB_uc";
             tbTestRDPB_uc.Size = new Size(1808, 476);
             tbTestRDPB_uc.TabIndex = 13;
-            tbTestRDPB_uc.Text = "*Тест бракера";
+            tbTestRDPB_uc.Text = "Тест бракера";
             tbTestRDPB_uc.UseVisualStyleBackColor = true;
             // 
             // tbDB
@@ -402,47 +314,6 @@
             tbArchive.Text = "Архив съемов";
             tbArchive.UseVisualStyleBackColor = true;
             // 
-            // xtbTest
-            // 
-            xtbTest.Location = new Point(4, 29);
-            xtbTest.Margin = new Padding(4, 5, 4, 5);
-            xtbTest.Name = "xtbTest";
-            xtbTest.Size = new Size(1808, 476);
-            xtbTest.TabIndex = 2;
-            xtbTest.Text = "xТест ПЗС";
-            xtbTest.UseVisualStyleBackColor = true;
-            // 
-            // xtbLEDControl
-            // 
-            xtbLEDControl.Location = new Point(4, 29);
-            xtbLEDControl.Margin = new Padding(4, 5, 4, 5);
-            xtbLEDControl.Name = "xtbLEDControl";
-            xtbLEDControl.Size = new Size(1808, 476);
-            xtbLEDControl.TabIndex = 4;
-            xtbLEDControl.Text = "xТест БУС";
-            xtbLEDControl.UseVisualStyleBackColor = true;
-            // 
-            // tbRDP
-            // 
-            tbRDP.Location = new Point(4, 29);
-            tbRDP.Margin = new Padding(4, 5, 4, 5);
-            tbRDP.Name = "tbRDP";
-            tbRDP.Size = new Size(1808, 476);
-            tbRDP.TabIndex = 6;
-            tbRDP.Text = "xТест бракера";
-            tbRDP.UseVisualStyleBackColor = true;
-            // 
-            // tbSettingsStatus
-            // 
-            tbSettingsStatus.Location = new Point(4, 29);
-            tbSettingsStatus.Margin = new Padding(4, 5, 4, 5);
-            tbSettingsStatus.Name = "tbSettingsStatus";
-            tbSettingsStatus.Padding = new Padding(4, 5, 4, 5);
-            tbSettingsStatus.Size = new Size(1808, 476);
-            tbSettingsStatus.TabIndex = 0;
-            tbSettingsStatus.Text = "xСостояние настроек";
-            tbSettingsStatus.UseVisualStyleBackColor = true;
-            // 
             // DoMCSettingsInterface
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
@@ -471,35 +342,21 @@
         private System.Windows.Forms.ToolStripMenuItem miSettings;
         private System.Windows.Forms.ToolStripMenuItem miReadParameters;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tbSettingsStatus;
-        private System.Windows.Forms.TabPage xtbTest;
         private System.Windows.Forms.ToolStripMenuItem эталонToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem miSaveStandard;
         private System.Windows.Forms.ToolStripMenuItem miLoadStandard;
         private System.Windows.Forms.ToolStripMenuItem miStandardRecalcSetting;
         private System.Windows.Forms.ToolStripMenuItem miLEDSettings;
-        private System.Windows.Forms.TabPage xtbLEDControl;
         private System.Windows.Forms.TabPage tbShowPreformImages;
         private System.Windows.Forms.ToolStripMenuItem miSetCheckSockets;
-        private System.Windows.Forms.ToolStripMenuItem miWorkInterfaceStart;
         private System.Windows.Forms.ToolStripMenuItem miDBSettings;
         private System.Windows.Forms.ToolStripMenuItem miRDPSettings;
-        private System.Windows.Forms.TabPage tbRDP;
         private System.Windows.Forms.TabPage tbDB;
         private System.Windows.Forms.ToolStripMenuItem miPhysicToDisplaySocket;
         private System.Windows.Forms.ToolStripMenuItem конфигурацияToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem сохранитьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem загрузитьToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem tsmiLogs;
-        private System.Windows.Forms.ToolStripMenuItem miInterfaceLogs;
-        private System.Windows.Forms.ToolStripMenuItem miLCBLogs;
-        private System.Windows.Forms.ToolStripMenuItem miRDPBLogs;
-        private System.Windows.Forms.ToolStripMenuItem miDBLogs;
         private System.Windows.Forms.ToolStripMenuItem tsmiLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem miMainInterfaceLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem miLCBLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem miRDPBLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem miDBLogsArchive;
         private System.Windows.Forms.Button btnMoveToArchive;
         private System.Windows.Forms.ToolStripMenuItem дополнительныеПараметрыToolStripMenuItem;
         private System.Windows.Forms.TabPage tbArchive;

@@ -35,13 +35,14 @@ namespace DoMCLib.Configuration
 
         }
 
-        public void Load()
+        public void LoadConfiguration(string filename = null)
         {
+            if (String.IsNullOrEmpty(filename)) filename = ConfigurationFilePath;
             if (File.Exists(ConfigurationFilePath))
             {
                 try
                 {
-                    using (ZipArchive archive = ZipFile.OpenRead(ConfigurationFilePath))
+                    using (ZipArchive archive = ZipFile.OpenRead(filename))
                     {
                         var metadata = ApplicationConfiguration.ReadZipEntry<dynamic>(archive, MetaDataFile);
                         int fileVersion = metadata?.FileVersion != null ? int.Parse((string)metadata.FileVersion) : 1;
@@ -61,13 +62,9 @@ namespace DoMCLib.Configuration
                     HardwareSettings = new HardwareSettings();
                     ReadingSocketsSettings = new ReadingSocketsSettings(96);
                     ProcessingDataSettings = new ProcessingDataSettings(96);
-                    SaveAll();
+                    SaveAllConfiguration(filename);
                 }
             }
-        }
-        public void Load(string filename)
-        {
-            throw new NotImplementedException();
         }
 
         private void MigrateData(int oldVersion, int newVersion)
@@ -129,40 +126,40 @@ namespace DoMCLib.Configuration
             return default;
         }
 
-        public void SaveReadingSocketsSettings()
+        public void SaveReadingSocketsSettings(string filename = null)
         {
-            UpdateZipEntry(ConfigurationFilePath, ReadingSocketsSettingsFile, ReadingSocketsSettings);
+            if (String.IsNullOrEmpty(filename)) filename = ConfigurationFilePath;
+
+            UpdateZipEntry(filename, ReadingSocketsSettingsFile, ReadingSocketsSettings);
         }
 
-        public void SaveProcessingDataSettings()
+        public void SaveProcessingDataSettings(string filename = null)
         {
-            UpdateZipEntry(ConfigurationFilePath, ProcessingDataSettingsFile, ProcessingDataSettings);
+            if (String.IsNullOrEmpty(filename)) filename = ConfigurationFilePath;
+
+            UpdateZipEntry(filename, ProcessingDataSettingsFile, ProcessingDataSettings);
         }
-        public void SaveHardwareSettings()
+        public void SaveHardwareSettings(string filename = null)
         {
-            UpdateZipEntry(ConfigurationFilePath, HardwareSettingsFile, HardwareSettings);
+            if (String.IsNullOrEmpty(filename)) filename = ConfigurationFilePath;
+
+            UpdateZipEntry(filename, HardwareSettingsFile, HardwareSettings);
         }
 
-        public void SaveAll()
+        public void SaveAllConfiguration(string filename=null)
         {
-            SaveHardwareSettings();
-            SaveReadingSocketsSettings();
-            SaveProcessingDataSettings();
-            UpdateZipEntry(ConfigurationFilePath, "metadata.json", new { FileVersion = CurrentFileVersion.ToString(), LastUpdate = DateTime.UtcNow });
-        }
-        public void SaveAll(string filename)
-        {
-            throw new NotImplementedException();
-            SaveHardwareSettings();
-            SaveReadingSocketsSettings();
-            SaveProcessingDataSettings();
-            UpdateZipEntry(ConfigurationFilePath, "metadata.json", new { FileVersion = CurrentFileVersion.ToString(), LastUpdate = DateTime.UtcNow });
+            if (String.IsNullOrEmpty(filename)) filename = ConfigurationFilePath;
+
+            SaveHardwareSettings(filename);
+            SaveReadingSocketsSettings(filename);
+            SaveProcessingDataSettings(filename);
+            UpdateZipEntry(filename, "metadata.json", new { FileVersion = CurrentFileVersion.ToString(), LastUpdate = DateTime.UtcNow });
         }
 
         public void SaveStandardSettings(string filename)
         {
-            UpdateZipEntry(filename, ProcessingDataSettingsFile, ProcessingDataSettings);
-            UpdateZipEntry(filename, ReadingSocketsSettingsFile, ReadingSocketsSettings);
+            SaveReadingSocketsSettings(filename);
+            SaveProcessingDataSettings(filename);
         }
 
         public void LoadStandardSettings(string filename)
@@ -181,7 +178,7 @@ namespace DoMCLib.Configuration
                 {
                     ReadingSocketsSettings = new ReadingSocketsSettings(96);
                     ProcessingDataSettings = new ProcessingDataSettings(96);
-                    SaveAll();
+                    SaveAllConfiguration();
                 }
             }
         }

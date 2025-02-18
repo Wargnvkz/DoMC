@@ -40,16 +40,6 @@
             miResetStatistics = new ToolStripMenuItem();
             обнулитьОбщийСчетчикСброшенныхСъемовToolStripMenuItem = new ToolStripMenuItem();
             tsmiLogsArchive = new ToolStripMenuItem();
-            miMainInterfaceLogsArchive = new ToolStripMenuItem();
-            miLCBLogsArchive = new ToolStripMenuItem();
-            miRDPBLogsArchive = new ToolStripMenuItem();
-            miDBLogsArchive = new ToolStripMenuItem();
-            tsmiLogs = new ToolStripMenuItem();
-            miInterfaceLogs = new ToolStripMenuItem();
-            miLCBLogs = new ToolStripMenuItem();
-            miRDPBLogs = new ToolStripMenuItem();
-            miDBLogs = new ToolStripMenuItem();
-            miInnerVariables = new ToolStripMenuItem();
             miSocketsSettings = new ToolStripMenuItem();
             miSettings = new ToolStripMenuItem();
             tabWorkAndArchive = new TabControl();
@@ -91,7 +81,7 @@
             msWorkingModeMenu.Font = new Font("Segoe UI", 14F);
             msWorkingModeMenu.GripStyle = ToolStripGripStyle.Visible;
             msWorkingModeMenu.ImageScalingSize = new Size(28, 28);
-            msWorkingModeMenu.Items.AddRange(new ToolStripItem[] { tsmiStandards, tsmiStatistics, tsmiLogsArchive, tsmiLogs, miInnerVariables, miSocketsSettings, miSettings });
+            msWorkingModeMenu.Items.AddRange(new ToolStripItem[] { tsmiStandards, tsmiStatistics, tsmiLogsArchive, miSocketsSettings, miSettings });
             msWorkingModeMenu.Location = new Point(0, 0);
             msWorkingModeMenu.Name = "msWorkingModeMenu";
             msWorkingModeMenu.Padding = new Padding(4, 2, 0, 2);
@@ -150,80 +140,10 @@
             // 
             // tsmiLogsArchive
             // 
-            tsmiLogsArchive.DropDownItems.AddRange(new ToolStripItem[] { miMainInterfaceLogsArchive, miLCBLogsArchive, miRDPBLogsArchive, miDBLogsArchive });
             tsmiLogsArchive.Name = "tsmiLogsArchive";
-            tsmiLogsArchive.Size = new Size(181, 34);
-            tsmiLogsArchive.Text = "Архивы журналов";
-            // 
-            // miMainInterfaceLogsArchive
-            // 
-            miMainInterfaceLogsArchive.Name = "miMainInterfaceLogsArchive";
-            miMainInterfaceLogsArchive.Size = new Size(427, 30);
-            miMainInterfaceLogsArchive.Text = "Папка журналов работы программы";
-            miMainInterfaceLogsArchive.Click += miMainInterfaceLogsArchive_Click;
-            // 
-            // miLCBLogsArchive
-            // 
-            miLCBLogsArchive.Name = "miLCBLogsArchive";
-            miLCBLogsArchive.Size = new Size(427, 30);
-            miLCBLogsArchive.Text = "Папка журналов БУС";
-            miLCBLogsArchive.Click += miLCBLogsArchive_Click;
-            // 
-            // miRDPBLogsArchive
-            // 
-            miRDPBLogsArchive.Name = "miRDPBLogsArchive";
-            miRDPBLogsArchive.Size = new Size(427, 30);
-            miRDPBLogsArchive.Text = "Папка журналов бракёра";
-            miRDPBLogsArchive.Click += miRDPBLogsArchive_Click;
-            // 
-            // miDBLogsArchive
-            // 
-            miDBLogsArchive.Name = "miDBLogsArchive";
-            miDBLogsArchive.Size = new Size(427, 30);
-            miDBLogsArchive.Text = "Папка журналов базы данных и архива";
-            miDBLogsArchive.Click += miDBLogsArchive_Click;
-            // 
-            // tsmiLogs
-            // 
-            tsmiLogs.DropDownItems.AddRange(new ToolStripItem[] { miInterfaceLogs, miLCBLogs, miRDPBLogs, miDBLogs });
-            tsmiLogs.Name = "tsmiLogs";
-            tsmiLogs.Size = new Size(104, 34);
-            tsmiLogs.Text = "Журналы";
-            // 
-            // miInterfaceLogs
-            // 
-            miInterfaceLogs.Name = "miInterfaceLogs";
-            miInterfaceLogs.Size = new Size(343, 30);
-            miInterfaceLogs.Text = "Работа программы";
-            miInterfaceLogs.Click += miInterfaceLogs_Click;
-            // 
-            // miLCBLogs
-            // 
-            miLCBLogs.Name = "miLCBLogs";
-            miLCBLogs.Size = new Size(343, 30);
-            miLCBLogs.Text = "Работы БУС";
-            miLCBLogs.Click += miLCBLogs_Click;
-            // 
-            // miRDPBLogs
-            // 
-            miRDPBLogs.Name = "miRDPBLogs";
-            miRDPBLogs.Size = new Size(343, 30);
-            miRDPBLogs.Text = "Работа бракёра";
-            miRDPBLogs.Click += miRDPBLogs_Click;
-            // 
-            // miDBLogs
-            // 
-            miDBLogs.Name = "miDBLogs";
-            miDBLogs.Size = new Size(343, 30);
-            miDBLogs.Text = "Работа базы данных и архива";
-            miDBLogs.Click += miDBLogs_Click;
-            // 
-            // miInnerVariables
-            // 
-            miInnerVariables.Name = "miInnerVariables";
-            miInnerVariables.Size = new Size(242, 34);
-            miInnerVariables.Text = "Внутренние переменные";
-            miInnerVariables.Click += miInnerVariables_Click;
+            tsmiLogsArchive.Size = new Size(169, 34);
+            tsmiLogsArchive.Text = "Папка журналов";
+            tsmiLogsArchive.Click += tsmiLogsArchive_Click;
             // 
             // miSocketsSettings
             // 
@@ -499,7 +419,7 @@
             tbpArchive.Margin = new Padding(4, 3, 4, 3);
             tbpArchive.Name = "tbpArchive";
             tbpArchive.Padding = new Padding(4, 3, 4, 3);
-            tbpArchive.Size = new Size(1387, 967);
+            tbpArchive.Size = new Size(1644, 838);
             tbpArchive.TabIndex = 1;
             tbpArchive.Text = "Архив";
             tbpArchive.UseVisualStyleBackColor = true;
@@ -571,16 +491,6 @@
         private System.Windows.Forms.Label lblCycleDurationValue;
         private System.Windows.Forms.Label lblCycleDurationCaption;
         private System.Windows.Forms.ToolStripMenuItem tsmiLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem miMainInterfaceLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem miLCBLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem miRDPBLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem miDBLogsArchive;
-        private System.Windows.Forms.ToolStripMenuItem tsmiLogs;
-        private System.Windows.Forms.ToolStripMenuItem miInterfaceLogs;
-        private System.Windows.Forms.ToolStripMenuItem miLCBLogs;
-        private System.Windows.Forms.ToolStripMenuItem miRDPBLogs;
-        private System.Windows.Forms.ToolStripMenuItem miDBLogs;
-        private System.Windows.Forms.ToolStripMenuItem miInnerVariables;
         private System.Windows.Forms.Label lblCurrentLastHourSumBadCaption;
         private System.Windows.Forms.ToolStripMenuItem обнулитьОбщийСчетчикСброшенныхСъемовToolStripMenuItem;
         private System.Windows.Forms.Label lblCurrentBoxDefectCyclesCaption;

@@ -286,7 +286,7 @@ namespace DoMCLib.Tools
   */
         public static byte[] GetBytes(decimal dec)
         {
-            //Load four 32 bit integers from the Decimal.GetBits function
+            //LoadConfiguration four 32 bit integers from the Decimal.GetBits function
             int[] bits = decimal.GetBits(dec);
             //Create a temporary list to hold the bytes
             List<byte> bytes = new List<byte>();

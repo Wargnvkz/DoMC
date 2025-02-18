@@ -21,16 +21,18 @@ namespace DoMCLib.Classes
     {
         public static string ConfigurationUpdateEventName = "ConfigurationUpdate";
         public const string FileName = "DoMC.cfg";
+        public static string StandardFolder="Standards";
         public ApplicationConfiguration Configuration { get; set; }
         /// <summary>
         /// Индекс 0 - реальное гнездо 1, то есть при получении физического номера для платы нужно использовать логический номер гнезда(нумерацию с 1 сверху вниз слева направо минус 1)
         /// </summary>
         public int[] EquipmentSocket2CardSocket;
         public bool IsInWorkingMode;
+        public LastCCDAction LastAction;
         public DoMCApplicationContext()
         {
             Configuration = new ApplicationConfiguration(FileName);
-            Configuration.Load();
+            Configuration.LoadConfiguration();
             FillEquipmentSocket2CardSocket();
         }
 
@@ -115,9 +117,10 @@ namespace DoMCLib.Classes
             }
             return result;
         }
-        
+
         public bool StartCCD(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null)
         {
+            LastAction = LastCCDAction.Starting;
             if (SocketNumber == null)
             {
                 if (!Controller.CreateCommandInstance(typeof(CCDCardDataModule.StartCommand))
@@ -156,6 +159,7 @@ namespace DoMCLib.Classes
         }
         public bool StopCCD(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null)
         {
+            LastAction = LastCCDAction.Stopping;
             if (SocketNumber == null)
             {
                 if (!Controller.CreateCommandInstance(typeof(CCDCardDataModule.StopCommand))
@@ -183,8 +187,10 @@ namespace DoMCLib.Classes
             }
             return true;
         }
-        public bool LoadCCDConfiguration(IMainController Controller, ILogger WorkingLog, bool WorkingMode, int? SocketNumber = null)
+        public bool LoadCCDConfiguration(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null)
         {
+            LastAction = LastCCDAction.LocadConfig;
+
             if (SocketNumber == null)
             {
                 {
@@ -245,7 +251,7 @@ namespace DoMCLib.Classes
                     }
                 }
 
-               
+
             }
             return true;
         }
@@ -277,10 +283,24 @@ namespace DoMCLib.Classes
             }
             return true;
         }
+        public bool SetLCBWorkingMode(IMainController Controller, ILogger WorkingLog)
+        {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Подключение к БУС");
+            var res = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBWorkModeCommand))
+                .Wait<bool>(null, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
+            return res && result;
+        }
+        public bool SetLCBNonWorkingMode(IMainController Controller, ILogger WorkingLog)
+        {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Подключение к БУС");
+            var res = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBNonWorkModeCommand))
+                .Wait<bool>(null, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
+            return res && result;
+        }
 
         public bool ReadSockets(IMainController Controller, ILogger WorkingLog, bool IsExternalRead, int? socketNumber = null)
         {
-            var timeout = Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds;
+            LastAction = LastCCDAction.Reading;
             if (IsExternalRead)
             {
                 if (!socketNumber.HasValue)
@@ -340,8 +360,9 @@ namespace DoMCLib.Classes
             return false;
         }
 
-        public GetImageDataCommandResponse GetSocketsImages(IMainController Controller, ILogger WorkingLog, int? EquipmentSocketNumber=null)
+        public GetImageDataCommandResponse GetSocketsImages(IMainController Controller, ILogger WorkingLog, int? EquipmentSocketNumber = null)
         {
+            LastAction = LastCCDAction.GettingImages;
             if (EquipmentSocketNumber == null)
             {
                 if (Controller.CreateCommandInstance(typeof(GetSocketsImagesDataCommand), typeof(CCDCardDataModule))
@@ -452,6 +473,14 @@ namespace DoMCLib.Classes
                     ReadBytes = data.ReadBytes;
                 }
             }
+        }
+        public enum LastCCDAction
+        {
+            Starting,
+            LocadConfig,
+            Reading,
+            GettingImages,
+            Stopping
         }
     }
 

@@ -210,10 +210,10 @@ namespace DoMCLib.Forms
         {
 
             var form = new DoMCImageProcessSettingsForm();
-            form.ImageProcessParameters = _Configuration.ImageCheckingParameters.Clone();
+            form.ImageCheckingParameters = _Configuration.ImageCheckingParameters.Clone();
             if (form.ShowDialog() == DialogResult.OK)
             {
-                _Configuration.ImageCheckingParameters = form.ImageProcessParameters.Clone();
+                _Configuration.ImageCheckingParameters = form.ImageCheckingParameters.Clone();
             }
 
         }

@@ -69,7 +69,7 @@ namespace DoMC
         IMainController Controller;
         ILogger WorkingLog;
         Observer observer;
-        DoMCLib.Classes.DoMCApplicationContext Context;
+        DoMCApplicationContext Context;
         DoMCArchiveForm? archiveForm = null;
 
         CycleImagesCCD? CurrentCycleData;
@@ -95,6 +95,7 @@ namespace DoMC
 
         int DBCyclesCCDLeftInQueue = 0;
         (Exception, DateTime) LastDBException;
+        int TotalDefectCycles = 0;
 
         public DoMCWorkModeInterface()
         {
@@ -115,9 +116,9 @@ namespace DoMC
             Context = (DoMCLib.Classes.DoMCApplicationContext)data;
             Controller = controller;
             Controller = controller;
-            WorkingLog = controller.GetLogger("SettingInterface");
+            WorkingLog = controller.GetLogger("WorkingMode");
             observer = controller.GetObserver();
-            //Context = config;
+            //CurrentContext = config;
             WorkingLog.Add(LoggerLevel.Critical, "Запуск интерфейса настройки");
             observer.NotificationReceivers += Observer_NotificationReceivers;
             DevicesControlInit();
@@ -335,6 +336,7 @@ namespace DoMC
         private bool PrepareToStartWork()
         {
             string ErrorMsg;
+            ResetTemporaryStatistics();
             WorkingLog.Add(LoggerLevel.Critical, "");
             IsConfigurationLoadedSuccessfully = false;
             WasErrorWhileWorked = false;
@@ -348,7 +350,7 @@ namespace DoMC
                 return false;
             }
 
-            if (!Context.LoadCCDConfiguration(Controller, WorkingLog, true))
+            if (!Context.LoadCCDConfiguration(Controller, WorkingLog))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка загрузки конфигураций гнезд. Остановка работы");
                 //Errors.CCDNotRespond = true;
@@ -662,7 +664,7 @@ namespace DoMC
                     WorkingLog.Add(LoggerLevel.Critical, "Запуск ожидания результатов чтения");
 
                     //Запрашиваем чтение ПЗС матриц по внешнему имульсу
-                    //WasLastOperationSuccessful = Context.ReadSockets(Controller, WorkingLog, true);
+                    //WasLastOperationSuccessful = CurrentContext.ReadSockets(Controller, WorkingLog, true);
                     WasLastOperationSuccessful = Context.ReadSockets(Controller, WorkingLog, false);
                     //Ждем пока произойдет чтение
                     CCDEnd = DateTime.Now;
@@ -798,7 +800,7 @@ namespace DoMC
                         Errors.LCBDoesNotSendSync = true;
                         Errors.MissedSyncrosignalCounter++;
                         LCBStatus.TimePreviousSyncSignalGot = LCBStatus.TimeOfLCBSynchrosignal;
-                        LCBStatus.TimeSyncSignalGotForShowInCycle = CCDEnd.AddSeconds(-5);
+                        LCBStatus.TimeSyncSignalGotForShowInCycle = CCDStart.AddSeconds((CCDEnd - CCDStart).TotalSeconds / 2);
                     }
                     else
                     {
@@ -807,7 +809,7 @@ namespace DoMC
                         Errors.MissedSyncrosignalCounter = 0;
                         if (LCBStatus.TimeOfLCBSynchrosignal == DateTime.MinValue)
                         {
-                            LCBStatus.TimeSyncSignalGotForShowInCycle = CCDEnd.AddSeconds(-5);
+                            LCBStatus.TimeSyncSignalGotForShowInCycle = CCDStart.AddSeconds((CCDEnd - CCDStart).TotalSeconds / 2);
 
                         }
                         else
@@ -1255,10 +1257,16 @@ namespace DoMC
             }*/
         }
 
+        private void ResetTemporaryStatistics()
+        {
+            LCBStatus.TimeOfLCBSynchrosignal = DateTime.MinValue;
+            LCBStatus.TimePreviousSyncSignalGot = DateTime.MinValue;
+        }
+
         private void miLoadStandard_Click(object sender, EventArgs e)
         {
-            /*
-            var dir = System.IO.Path.Combine(Application.StartupPath, ApplicationCardParameters.StandardsPath);
+
+            var dir = System.IO.Path.Combine(Application.StartupPath, DoMCApplicationContext.StandardFolder);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             var od = new OpenFileDialog();
@@ -1268,10 +1276,10 @@ namespace DoMC
             od.AddExtension = true;
             if (od.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.LoadStandard(od.FileName);
+                Context.Configuration.LoadStandardSettings(od.FileName);
                 SetWindowStandardTitle(od.FileName);
             }
-            */
+
         }
 
 
@@ -1415,13 +1423,13 @@ namespace DoMC
                 {
                     CurrentDraw();
                     lastDrawCycleTime = CurrentCycleData?.CycleCCDDateTime ?? DateTime.MinValue;
-                    //lblCycleDurationValue.Text = Context.LEDStatus.CycleDuration().TotalSeconds.ToString("F1") + " с";
+                    lblCycleDurationValue.Text = (LCBStatus.TimeOfLCBSynchrosignal - LCBStatus.TimePreviousSyncSignalGot).TotalSeconds.ToString("F1") + " с";
 
-                    //lblCurrentBoxDefectCycles.Text = Context.RDPBCurrentStatus.CurrentBoxDefectCycles.ToString();
+                    lblCurrentBoxDefectCycles.Text = RDPBCurrentStatus.CurrentBoxDefectCycles.ToString();
                 }
-                /*if (Context.IsWorkingModeStarted)
+                if (IsWorkingModeStarted)
                 {
-                    if ((DateTime.Now - Context.LEDStatus.TimeSyncSignalGotForShowInCycle).TotalSeconds < 2)
+                    if ((DateTime.Now - LCBStatus.TimeSyncSignalGotForShowInCycle).TotalSeconds < 2)
                     {
                         pnlCurrentSockets.BackColor = Color.LightGreen;
                     }
@@ -1429,8 +1437,8 @@ namespace DoMC
                     {
                         pnlCurrentSockets.BackColor = this.BackColor;
                     }
-                }*/
-                //lblTotalDefectCycles.Text = InterfaceDataExchange.RDPBCurrentStatus.TotalDefectCycles.ToString();
+                }
+                lblTotalDefectCycles.Text = TotalDefectCycles.ToString();
 
                 /*if (InterfaceDataExchange.DataStorage != null && InterfaceDataExchange.DataStorage.LocalIsActive && (now - lastBoxRead) > lastBoxReadTime)
                 {
@@ -1645,38 +1653,6 @@ namespace DoMC
         }
 
 
-
-        private void miMainInterfaceLogsArchive_Click(object sender, EventArgs e)
-        {
-            // FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.MainSystem));
-        }
-
-        private void miLCBLogsArchive_Click(object sender, EventArgs e)
-        {
-            // FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.LCB));
-        }
-
-        private void miRDPBLogsArchive_Click(object sender, EventArgs e)
-        {
-            //FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.RDPB));
-        }
-
-        private void miDBLogsArchive_Click(object sender, EventArgs e)
-        {
-            //  FileAndDirectoryTools.OpenFolder(Log.GetPath(Log.LogModules.DB));
-        }
-
-        private void miInterfaceLogs_Click(object sender, EventArgs e)
-        {
-            // FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.MainSystem, Log.GetCurrentShiftDate()));
-        }
-
-        private void miLCBLogs_Click(object sender, EventArgs e)
-        {
-            // FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.LCB, Log.GetCurrentShiftDate()));
-
-        }
-
         private void miRDPBLogs_Click(object sender, EventArgs e)
         {
             // FileAndDirectoryTools.OpenNotepad(Log.GetLogFileName(Log.LogModules.RDPB, Log.GetCurrentShiftDate()));
@@ -1697,17 +1673,9 @@ namespace DoMC
             }
         }
 
-        private void miInnerVariables_Click(object sender, EventArgs e)
-        {
-            /*
-            var innerform = new DoMCInnerVarsForm(InterfaceDataExchange);
-            innerform.Show();
-            */
-        }
-
         private void miResetCounter_Click(object sender, EventArgs e)
         {
-            //InterfaceDataExchange.RDPBCurrentStatus.TotalDefectCycles = 0;
+            TotalDefectCycles = 0;
         }
 
         private void miSettings_Click(object sender, EventArgs e)
@@ -1742,14 +1710,13 @@ namespace DoMC
 
         private void miCreateNewStandard_Click(object sender, EventArgs e)
         {
-            /*
-            if (InterfaceDataExchange.IsWorkingModeStarted)
+
+            if (IsWorkingModeStarted)
             {
                 MessageBox.Show("ПМК запущено. Для создания эталонов нужно остановить работу ПМК", "Создание эталонов");
                 return;
             }
-            var frm = new DoMCInterface.DoMCStandardCreateInterface();
-            frm.SetMemoryReference(globalMemory);
+            var frm = new DoMCStandardCreateInterface(Controller, Context, WorkingLog);
             this.Enabled = false;
             try
             {
@@ -1760,13 +1727,13 @@ namespace DoMC
                 this.Enabled = true;
             }
             SetWindowStandardTitle();
-            */
+
         }
 
         private void miSaveStandard_Click(object sender, EventArgs e)
         {
-            /*
-            var dir = System.IO.Path.Combine(Application.StartupPath, ApplicationCardParameters.StandardsPath);
+
+            var dir = System.IO.Path.Combine(Application.StartupPath, DoMCApplicationContext.StandardFolder);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             var sd = new SaveFileDialog();
@@ -1776,10 +1743,10 @@ namespace DoMC
             sd.Filter = "Эталоны (*.std)|*.std|Все файлы (*.*)|*.*";
             if (sd.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.SaveStandard(sd.FileName);
+                Context.Configuration.SaveStandardSettings(sd.FileName);
                 SetWindowStandardTitle(sd.FileName);
             }
-            */
+
         }
 
         private void SetWindowStandardTitle(string standardName = null)
@@ -1799,14 +1766,20 @@ namespace DoMC
 
         private void miSocketsSettings_Click(object sender, EventArgs e)
         {
-            /*
+
             var form = new DoMCLib.Forms.DoMCImageProcessSettingsListForm();
-            form.SocketParameters = InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations;
+
+            form.SocketParameters = Context.Configuration.ReadingSocketsSettings.CCDSocketParameters;
             if (form.ShowDialog() == DialogResult.OK)
             {
-                InterfaceDataExchange.Configuration.Save();
+                Context.Configuration.SaveReadingSocketsSettings();
+                NotifyConfigurationUpdated();
             }
-            */
+
+        }
+        private void NotifyConfigurationUpdated()
+        {
+            observer.Notify(DoMCApplicationContext.ConfigurationUpdateEventName, Context.Configuration);
         }
 
         public DoMCApplicationContext GetContext()
@@ -1967,6 +1940,12 @@ namespace DoMC
             Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand)).ExecuteCommand();
             System.Threading.Thread.Sleep(10);
             Controller.CreateCommandInstance(typeof(LCBModule.LCBStartCommand)).ExecuteCommand();
+        }
+
+        private void tsmiLogsArchive_Click(object sender, EventArgs e)
+        {
+            var dir = System.IO.Path.Combine(Application.StartupPath, "Logs");
+            FileAndDirectoryTools.OpenFolder(dir);
         }
     }
 

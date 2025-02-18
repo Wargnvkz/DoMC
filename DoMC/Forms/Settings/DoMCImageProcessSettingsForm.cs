@@ -15,7 +15,7 @@ namespace DoMCLib.Forms
     public partial class DoMCImageProcessSettingsForm : Form
     {
 
-        public ImageProcessParameters ImageProcessParameters
+        public ImageProcessParameters ImageCheckingParameters
         {
             get
             {

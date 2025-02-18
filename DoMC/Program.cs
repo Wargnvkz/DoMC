@@ -13,7 +13,7 @@ namespace DoMC
         static void Main()
         {
             Context = new DoMCLib.Classes.DoMCApplicationContext();
-            Context.Configuration.Load();
+            Context.Configuration.LoadConfiguration();
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();

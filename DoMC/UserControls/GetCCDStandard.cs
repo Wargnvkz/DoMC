@@ -135,7 +135,7 @@ namespace DoMC.UserControls
                 try
                 {
                     ProgressbarStep++;
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false, ChosenSocketNumber.Value - 1))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, ChosenSocketNumber.Value - 1))
                     {
                         ProgressbarStep++;
                         if (CurrentContext.SetFastRead(MainController, WorkingLog, ChosenSocketNumber.Value - 1))
@@ -205,7 +205,7 @@ namespace DoMC.UserControls
                 ProgressbarStep++;
                 try
                 {
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, false))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog))
                     {
                         ProgressbarStep++;
                         if (CurrentContext.SetFastRead(MainController, WorkingLog))
