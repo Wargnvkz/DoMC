@@ -314,6 +314,7 @@
             pbRemoteDB.Size = new Size(222, 128);
             pbRemoteDB.TabIndex = 4;
             pbRemoteDB.Text = "Архив";
+            pbRemoteDB.Visible = false;
             pbRemoteDB.Click += pbDevices_Click;
             // 
             // pbRDPB

@@ -27,7 +27,6 @@ namespace DoMC
         int SocketReadRepeat = 0;
         bool SocketCreateCompleted = false;
         int CheckSignSet = -1;
-        Thread th;
         ILogger WorkingLog;
         List<Form> badforms = new List<Form>();
         int ImagesToMakeStandard = 3;
@@ -55,7 +54,6 @@ namespace DoMC
 
         private void btnCreateStandard_Click(object sender, EventArgs e)
         {
-            if (th != null && th.ThreadState == ThreadState.Running) return;
             WorkingLog?.Add(LoggerLevel.Critical, "Начало создания эталона");
             try
             {

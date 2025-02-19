@@ -2,7 +2,9 @@
 using DoMCLib.Configuration;
 using DoMCLib.DB;
 using DoMCModuleControl;
+using DoMCModuleControl.Commands;
 using DoMCModuleControl.Logging;
+using DoMCModuleControl.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,11 +88,13 @@ namespace DoMCLib.Classes.Module.ArchiveDB
                             TimeLastLocalToRemoteCheck = DateTime.Now;
                             Storage.MoveFromLocalToRemoteWithDutyCycle(Configuration.ArchiveRecordAgeSeconds, Configuration.DutyCycleInSeconds, Configuration.BeforeAndAfterErrorInSeconds);
                             WorkingLog.Add(LoggerLevel.Information, "Перенос данных в архив завершен");
+                            ObserverForDataStorage.Notify($"{this.GetType().Name}.Success",null);
                         }
                         else
                         {
                             WorkingLog.Add(LoggerLevel.Information, "Удаление данных превышающих время хранения из-за отсутствия архива");
                             Storage.LocalDeleteCyclesByTime(Configuration.ArchiveRecordAgeSeconds);
+                            ObserverForDataStorage.Notify($"{this.GetType().Name}.Deleted", null);
                         }
                     }
                 }
@@ -104,5 +108,25 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             IsStarted = false;
         }
 
+        public class SetConfigurationCommand : AbstractCommandBase
+        {
+            public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ArchiveDBConfiguration), null) { }
+            protected override void Executing() => ((ArchiveDBModule)Module).SetConfiguration((ArchiveDBConfiguration)InputData);
+        }
+        public class StartCommand : AbstractCommandBase
+        {
+            public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
+            protected override void Executing() => ((ArchiveDBModule)Module).Start();
+        }
+        public class StopCommand : AbstractCommandBase
+        {
+            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
+            protected override void Executing() => ((ArchiveDBModule)Module).Stop();
+        }
+        public class GetWorkingStatusCommand : AbstractCommandBase
+        {
+            public GetWorkingStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(bool)) { }
+            protected override void Executing() => OutputData = ((ArchiveDBModule)Module).IsStarted;
+        }
     }
 }

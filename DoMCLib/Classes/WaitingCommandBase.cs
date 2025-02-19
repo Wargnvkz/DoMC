@@ -16,9 +16,10 @@ namespace DoMCLib.Classes
             if (MakeDecisionIsCommandCompleteFunc == null) throw new ArgumentNullException(nameof(MakeDecisionIsCommandCompleteFunc));
         }
 
-        public override object? Wait(int timeoutInSeconds)
+        public override object? Wait(int timeoutInSeconds, CancellationTokenSource cancellationTokenSource = null)
         {
             if (HasStopedAlready()) return null;
+            if (cancellationTokenSource?.IsCancellationRequested ?? false) return null;
             Controller.GetLogger(Module.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.FullDetailedInformation, $"Запуск команды {CommandName}.");
             bool NoNeedToWaitMore = false;
             try
@@ -28,7 +29,13 @@ namespace DoMCLib.Classes
                     ExecuteCommand();
                 Controller.GetLogger(Module.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.FullDetailedInformation, $"Ожидание результатов выполнения кода команды {CommandName}.");
                 var start = DateTime.Now;
-                while (!NoNeedToWaitMore && (DateTime.Now - start).TotalSeconds < timeoutInSeconds && !CancelationTokenSourceToCancelCommandExecution.IsCancellationRequested && !IsError)
+                while (
+                    !NoNeedToWaitMore
+                    && (DateTime.Now - start).TotalSeconds < timeoutInSeconds
+                    && !CancelationTokenSourceToCancelCommandExecution.IsCancellationRequested
+                    && !IsError
+                    && !(cancellationTokenSource?.IsCancellationRequested??false)
+                    )
                 {
                     NoNeedToWaitMore = MakeDecisionIsCommandCompleteFunc();
                     if (NoNeedToWaitMore)
@@ -47,7 +54,7 @@ namespace DoMCLib.Classes
             }
             PrepareOutputData();
             //if (NoNeedToWaitMore)
-                return OutputData;
+            return OutputData;
             //else
             //    return null;
         }

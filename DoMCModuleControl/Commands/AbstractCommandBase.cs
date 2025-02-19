@@ -228,7 +228,7 @@ namespace DoMCModuleControl.Commands
         /// Если команда не запущена, то запускает ее
         /// </summary>
         /// <param name="TimeoutInSeconds">Таймаут в секундах, -1 без таймаута</param>
-        public virtual object? Wait(int TimeoutInSeconds)
+        public virtual object? Wait(int TimeoutInSeconds, CancellationTokenSource cancellationTokenSource = null)
         {
             // Если метод не реализован в потомке, генерируем исключение
             throw new NotImplementedException("Метод Wait не реализован для этой команды.");
@@ -239,12 +239,12 @@ namespace DoMCModuleControl.Commands
         /// Если команда не запущена, то запускает ее
         /// </summary>
         /// <param name="TimeoutInSeconds">Таймаут в секундах, -1 без таймаута</param>
-        public virtual bool Wait<T>(object? InputData, int TimeoutInSeconds, out T outputData)
+        public virtual bool Wait<T>(object? InputData, int TimeoutInSeconds, out T outputData, CancellationTokenSource cancellationTokenSource = null)
         {
             try
             {
                 SetInputData(InputData);
-                var resultExpositionCommand = Wait(TimeoutInSeconds);
+                var resultExpositionCommand = Wait(TimeoutInSeconds, cancellationTokenSource);
                 if (resultExpositionCommand == null)
                 {
                     outputData = default;

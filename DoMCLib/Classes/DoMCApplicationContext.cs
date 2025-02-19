@@ -187,7 +187,7 @@ namespace DoMCLib.Classes
             }
             return true;
         }
-        public bool LoadCCDConfiguration(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null)
+        public bool LoadCCDConfiguration(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null, CancellationTokenSource cancellationTokenSource=null)
         {
             LastAction = LastCCDAction.LocadConfig;
 
@@ -298,7 +298,7 @@ namespace DoMCLib.Classes
             return res && result;
         }
 
-        public bool ReadSockets(IMainController Controller, ILogger WorkingLog, bool IsExternalRead, int? socketNumber = null)
+        public bool ReadSockets(IMainController Controller, ILogger WorkingLog, bool IsExternalRead, int? socketNumber = null, CancellationTokenSource cancellationTokenSource = null)
         {
             LastAction = LastCCDAction.Reading;
             if (IsExternalRead)
@@ -306,7 +306,7 @@ namespace DoMCLib.Classes
                 if (!socketNumber.HasValue)
                 {
                     if (Controller.CreateCommandInstance(typeof(SendReadSocketsWithExternalSignalCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _))
+                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _, cancellationTokenSource))
                     {
                         return true;
                     }
@@ -319,7 +319,7 @@ namespace DoMCLib.Classes
                 else
                 {
                     if (Controller.CreateCommandInstance(typeof(SendReadSingleSocketWithExternalSignalCommand), typeof(CCDCardDataModule))
-                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _))
+                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _, cancellationTokenSource))
                     {
                         return true;
                     }
@@ -335,7 +335,7 @@ namespace DoMCLib.Classes
                 if (!socketNumber.HasValue)
                 {
                     if (Controller.CreateCommandInstance(typeof(SendReadSocketCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out SetReadingParametersCommandResult _))
+                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out SetReadingParametersCommandResult _, cancellationTokenSource))
                     {
                         return true;
                     }
@@ -347,7 +347,7 @@ namespace DoMCLib.Classes
                 else
                 {
                     if (Controller.CreateCommandInstance(typeof(SendReadSingleSocketCommand), typeof(CCDCardDataModule))
-                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _))
+                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _, cancellationTokenSource))
                     {
                         return true;
                     }
@@ -360,13 +360,13 @@ namespace DoMCLib.Classes
             return false;
         }
 
-        public GetImageDataCommandResponse GetSocketsImages(IMainController Controller, ILogger WorkingLog, int? EquipmentSocketNumber = null)
+        public GetImageDataCommandResponse GetSocketsImages(IMainController Controller, ILogger WorkingLog, int? EquipmentSocketNumber = null, CancellationTokenSource cancellationTokenSource = null)
         {
             LastAction = LastCCDAction.GettingImages;
             if (EquipmentSocketNumber == null)
             {
                 if (Controller.CreateCommandInstance(typeof(GetSocketsImagesDataCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out GetImageDataCommandResponse result))
+                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out GetImageDataCommandResponse result, cancellationTokenSource))
                 {
                     if (result != null)
                     {
@@ -377,7 +377,7 @@ namespace DoMCLib.Classes
             else
             {
                 if (Controller.CreateCommandInstance(typeof(GetSingleSocketImageDataCommand), typeof(CCDCardDataModule))
-                        .Wait((this, EquipmentSocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out GetImageDataCommandResponse result))
+                        .Wait((this, EquipmentSocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out GetImageDataCommandResponse result, cancellationTokenSource))
                 {
                     if (result != null)
                     {

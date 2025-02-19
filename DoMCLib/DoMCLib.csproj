@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Folder Include="Classes\Exceptions\" />
+    <Folder Include="Classes\Module\ArchiveDB\Commands\" />
     <Folder Include="Classes\Module\DB\Commands\" />
   </ItemGroup>
 

@@ -90,6 +90,7 @@ namespace DoMCLib.Tools
 
         public static short[,] ImageCopy(short[,] image)
         {
+            if (image == null) return null;
             var len = Buffer.ByteLength(image);
             short[,] newImg = new short[image.GetLength(0), image.GetLength(1)];
             Buffer.BlockCopy(image, 0, newImg, 0, len);
