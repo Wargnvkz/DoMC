@@ -49,7 +49,7 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void LoadDLLModulesTest()
         {
-            var controller = MainController.LoadDLLModules();
+            var controller = MainController.LoadDLLModulesAndRegisterCommands();
             Assert.IsNotNull(controller);
             Assert.IsNotNull(controller.GetModule(typeof(TestModule)) as TestModule);
         }
@@ -57,7 +57,7 @@ namespace DoMCModuleControl.Tests
         [TestMethod()]
         public void FindAndRegisterAllModulesTest()
         {
-            var controller = MainController.LoadDLLModules();
+            var controller = MainController.LoadDLLModulesAndRegisterCommands();
             Assert.IsNotNull(controller);
             Assert.IsNotNull(controller.GetModule(typeof(TestModule)) as TestModule);
         }

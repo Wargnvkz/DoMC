@@ -224,11 +224,6 @@ namespace DoMCLib.Classes.Module.CCD
             catch (Exception ex)
             {
                 WorkingLog.Add(LoggerLevel.Critical, $"Плата: {CardNumber}. Гнездо: {Socket}. Чтение гнезда завершено с ошибкой. {ex.Message}");
-                /*try
-                {
-                    var sz = TCPClientImageDataConnection.AvailableBytes();
-                }
-                catch { }*/
                 Controller.GetObserver().Notify($"{this.GetType().Name}.GetImageDataFromSocketAsync.Error", (CardNumber, Socket, socketReadData.ImageDataRead));
                 return false;
             }
@@ -242,8 +237,7 @@ namespace DoMCLib.Classes.Module.CCD
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Соединение закрыто.");
             }
         }
-
-
+              
         private void Disconnect()
         {
             try
@@ -415,7 +409,7 @@ namespace DoMCLib.Classes.Module.CCD
 
             for (int i = 0; i < log.Count; i++)
             {
-                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"{CardToComputer()} (CRC:{(log[i].Item2.Item2 ? "+" : $"- (0x{log[i].Item2.Item1:X2})")}): " + log[i].Item1);
+                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"{CardToComputer()} (CRC:{(log[i].Item2.Item2 ? "+" : $"- (0x{log[i].Item2.Item1:X2})")}): " + $"<{String.Join(", ",log[i].Item1.Select(i=>$"0x{i:X2}"))}");
             }
 
 
@@ -687,7 +681,7 @@ namespace DoMCLib.Classes.Module.CCD
         {
 
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
-
+            WorkingLog.Add(LoggerLevel.Information, $"Отправляется запрос на получение изображений платы {CardNumber}");
             var cfg = new CCDCardArrayRequest9();
             cfg.Address = 8;
             Send(BinaryConverter.ToBytes(cfg), cancellationToken);

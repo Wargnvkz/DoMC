@@ -31,7 +31,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
         {
             errorNotifier = new ThrottledErrorNotifier(MainController.GetObserver(), 300, 5);
             WorkingLog = MainController.GetLogger($"{this.GetType().Name}");
-            ObserverForDataStorage = new Observer(WorkingLog);
+            ObserverForDataStorage = MainController.GetObserver();//new Observer(WorkingLog);
             ObserverForDataStorage.NotificationReceivers += ObserverForDataStorage_NotificationReceived;
         }
 
@@ -88,7 +88,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
                             TimeLastLocalToRemoteCheck = DateTime.Now;
                             Storage.MoveFromLocalToRemoteWithDutyCycle(Configuration.ArchiveRecordAgeSeconds, Configuration.DutyCycleInSeconds, Configuration.BeforeAndAfterErrorInSeconds);
                             WorkingLog.Add(LoggerLevel.Information, "Перенос данных в архив завершен");
-                            ObserverForDataStorage.Notify($"{this.GetType().Name}.Success",null);
+                            ObserverForDataStorage.Notify($"{this.GetType().Name}.Success", null);
                         }
                         else
                         {

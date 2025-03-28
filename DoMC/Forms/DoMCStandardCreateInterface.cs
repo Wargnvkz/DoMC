@@ -1,5 +1,6 @@
 ﻿using DoMC;
 using DoMCLib.Classes;
+using DoMCLib.Classes.Module.CCD.Commands.Classes;
 using DoMCLib.Configuration;
 using DoMCLib.Tools;
 using DoMCModuleControl;
@@ -77,7 +78,7 @@ namespace DoMC
         {
             try
             {
-                CurrentContext.StopCCD(Controller, WorkingLog);
+                CurrentContext.StopCCD(Controller, WorkingLog, out CCDCardDataCommandResponse stopResult);
             }
             catch { }
             try
@@ -106,7 +107,7 @@ namespace DoMC
             int socketMax = CurrentContext.Configuration.HardwareSettings.SocketQuantity;
             errorReadingData.Clear();
 
-            if (CurrentContext.StartCCD(Controller, WorkingLog))
+            if (CurrentContext.StartCCD(Controller, WorkingLog, out CCDCardDataCommandResponse startResult))
             {
                 try
                 {
@@ -114,7 +115,7 @@ namespace DoMC
                     {
                         if (CurrentContext.SetLCBWorkingMode(Controller, WorkingLog))
                         {
-                            if (CurrentContext.LoadCCDConfiguration(Controller, WorkingLog))
+                            if (CurrentContext.LoadCCDConfiguration(Controller, WorkingLog,out CCDCardDataCommandResponse LoadCfgResult))
                             {
                                 if (CurrentContext.SetFastRead(Controller, WorkingLog))
                                 {
@@ -125,16 +126,16 @@ namespace DoMC
                                     int StandartImageNumReading = 0;
                                     for (int repeat = 0; repeat < MaxImagesReadToMakeStandard && StandartImageNumReading < ImagesToMakeStandard; repeat++)
                                     {
-                                        if (CurrentContext.ReadSockets(Controller, WorkingLog, true))
+                                        if (CurrentContext.ReadSockets(Controller, WorkingLog, true, out CCDCardDataCommandResponse readResult))
                                         {
-                                            var si = CurrentContext.GetSocketsImages(Controller, WorkingLog);
-                                            if (si == null) throw new Exception();
-                                            if (si.Data == null) throw new Exception();
-                                            if (si.Data.Length != socketMax) throw new Exception();
+                                            var si = CurrentContext.GetSocketsImages(Controller, WorkingLog, out GetImageDataCommandResponse getImageResult);
+                                            if (getImageResult == null) throw new Exception();
+                                            if (getImageResult.Data == null) throw new Exception();
+                                            if (getImageResult.Data.Length != socketMax) throw new Exception();
                                             for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                             {
-                                                if (si.Data[socketNum] != null)
-                                                    img[socketNum][StandartImageNumReading] = si.Data[socketNum].Image;
+                                                if (getImageResult.Data[socketNum] != null)
+                                                    img[socketNum][StandartImageNumReading] = getImageResult.Data[socketNum].Image;
                                                 var errorCards = errorReadingData.ErrorCards();
                                                 if (errorCards.Count > 0)
                                                 {
@@ -153,16 +154,17 @@ namespace DoMC
 
                                         }
                                     }
-                                    for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                                    Parallel.For(0, socketMax, socketNum =>
+                                    //for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                     {
                                         if (img[socketNum].Any(im => im == null))
                                         {
                                             CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
-                                            continue;
+                                            //continue;
                                         }
                                         var avgImg = ImageTools.CalculateAverage(img[socketNum]);
                                         CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
-                                    }
+                                    });
 
                                     CurrentContext.Configuration.SaveProcessingDataSettings();
                                     pbStandardSum.Image = bmpCheckSign;

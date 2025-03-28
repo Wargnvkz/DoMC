@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DoMCModuleControl.Logging
 {
-    public class Logger : ILogger
+    public class Logger : ILogger, IDisposable
     {
         public LoggerLevel MaxLogginLevel { get; private set; }
         public string ModuleName { get; private set; }
@@ -25,7 +25,7 @@ namespace DoMCModuleControl.Logging
         {
             if (level <= MaxLogginLevel)
             {
-                BaseLogger.AddMessage(ModuleName, Message);
+                BaseLogger?.AddMessage(ModuleName, Message);
             }
         }
 
@@ -34,7 +34,7 @@ namespace DoMCModuleControl.Logging
             if (ex == null) throw new ArgumentNullException(nameof(ex));
             if (level <= MaxLogginLevel)
             {
-                BaseLogger.AddMessage(ModuleName, $"{Message} {ex.Message} {ex.StackTrace ?? ""}");
+                BaseLogger?.AddMessage(ModuleName, $"{Message} {ex.Message} {ex.StackTrace ?? ""}");
             }
         }
 
@@ -47,8 +47,13 @@ namespace DoMCModuleControl.Logging
         {
             lock (this)
             {
-                BaseLogger.Flush(ModuleName);
+                BaseLogger?.Flush(ModuleName);
             }
+        }
+
+        public void Dispose()
+        {
+            BaseLogger = null;
         }
     }
 }

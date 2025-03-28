@@ -60,11 +60,8 @@
             lblTestSelectedSocket = new Label();
             lblTestSelectedSocketLabel = new Label();
             pnlSockets = new Panel();
-            lblStatus = new Label();
-            label1 = new Label();
             cbTest_ExternalStart = new CheckBox();
             btnTest_ReadAllSocket = new Button();
-            lblTimeImageProcess = new Label();
             cbTestCCDMaxPointShow = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)chTestStandard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)chTestDiff).BeginInit();
@@ -313,12 +310,11 @@
             // 
             // lblTestSelectedSocket
             // 
-            lblTestSelectedSocket.AutoSize = true;
             lblTestSelectedSocket.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lblTestSelectedSocket.Location = new Point(584, 10);
             lblTestSelectedSocket.Margin = new Padding(5, 0, 5, 0);
             lblTestSelectedSocket.Name = "lblTestSelectedSocket";
-            lblTestSelectedSocket.Size = new Size(15, 20);
+            lblTestSelectedSocket.Size = new Size(50, 20);
             lblTestSelectedSocket.TabIndex = 77;
             lblTestSelectedSocket.Text = "-";
             // 
@@ -340,26 +336,6 @@
             pnlSockets.Name = "pnlSockets";
             pnlSockets.Size = new Size(429, 469);
             pnlSockets.TabIndex = 75;
-            // 
-            // lblStatus
-            // 
-            lblStatus.AutoSize = true;
-            lblStatus.Location = new Point(539, 47);
-            lblStatus.Margin = new Padding(5, 0, 5, 0);
-            lblStatus.Name = "lblStatus";
-            lblStatus.Size = new Size(12, 15);
-            lblStatus.TabIndex = 74;
-            lblStatus.Text = "-";
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(445, 45);
-            label1.Margin = new Padding(5, 0, 5, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(46, 15);
-            label1.TabIndex = 73;
-            label1.Text = "Статус:";
             // 
             // cbTest_ExternalStart
             // 
@@ -383,18 +359,6 @@
             btnTest_ReadAllSocket.UseVisualStyleBackColor = true;
             btnTest_ReadAllSocket.Click += btnTest_ReadAllSockets_Click;
             // 
-            // lblTimeImageProcess
-            // 
-            lblTimeImageProcess.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            lblTimeImageProcess.AutoSize = true;
-            lblTimeImageProcess.Font = new Font("Microsoft Sans Serif", 8F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            lblTimeImageProcess.Location = new Point(9, 876);
-            lblTimeImageProcess.Margin = new Padding(5, 0, 5, 0);
-            lblTimeImageProcess.Name = "lblTimeImageProcess";
-            lblTimeImageProcess.Size = new Size(10, 13);
-            lblTimeImageProcess.TabIndex = 95;
-            lblTimeImageProcess.Text = "-";
-            // 
             // cbTestCCDMaxPointShow
             // 
             cbTestCCDMaxPointShow.AutoSize = true;
@@ -412,7 +376,6 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(cbTestCCDMaxPointShow);
-            Controls.Add(lblTimeImageProcess);
             Controls.Add(cbInvertColors);
             Controls.Add(btnCycleStop);
             Controls.Add(btnCycleStart);
@@ -433,8 +396,6 @@
             Controls.Add(lblTestSelectedSocket);
             Controls.Add(lblTestSelectedSocketLabel);
             Controls.Add(pnlSockets);
-            Controls.Add(lblStatus);
-            Controls.Add(label1);
             Controls.Add(cbTest_ExternalStart);
             Controls.Add(btnTest_ReadAllSocket);
             Name = "TestCCDControl";
@@ -473,11 +434,8 @@
         private Label lblTestSelectedSocket;
         private Label lblTestSelectedSocketLabel;
         private Panel pnlSockets;
-        private Label lblStatus;
-        private Label label1;
         private CheckBox cbTest_ExternalStart;
         private Button btnTest_ReadAllSocket;
-        private Label lblTimeImageProcess;
         private CheckBox cbTestCCDMaxPointShow;
     }
 }

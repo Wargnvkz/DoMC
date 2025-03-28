@@ -166,6 +166,7 @@ namespace DoMC
         }
         private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
+            WorkingLog.Add(LoggerLevel.Critical, "Необработанная ошибка:", e.Exception);
             if (e.Exception is DoMCException)
             {
                 DisplayMessage.Show(e.Exception.Message, "Ошибка");
@@ -231,6 +232,7 @@ namespace DoMC
         private void DoMCMainInterface_FormClosed(object sender, FormClosedEventArgs e)
         {
             observer.NotificationReceivers -= Observer_NotificationReceivers;
+            observer.Notify(DoMCApplicationContext.SettingsInterfaceClosedEventName, null);
         }
 
         #region Menu

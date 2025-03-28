@@ -43,8 +43,9 @@ namespace DoMCLib.Classes.Module.CCD
                         CancelationTokenSourceToCancelCommandExecution.Cancel();
                         return;
                     }
-                    result.SetCardAnswered(CardAnswerResults.CardNumber-1);
+                    result.SetCardAnswered(CardAnswerResults.CardNumber - 1);
                 }
+
             }
 
             protected override bool MakeDecisionIsCommandCompleteFunc()

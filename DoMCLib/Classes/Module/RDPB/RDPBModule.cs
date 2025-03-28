@@ -28,7 +28,7 @@ namespace DoMCLib.Classes.Module.RDPB
         private byte[] buffer;
         public bool IsConnected;
         private int MachineNumber = 1;
-        private RDPBStatus CurrentStatus=new RDPBStatus();
+        private RDPBStatus CurrentStatus = new RDPBStatus();
 
         private TimeSpan Timeout = new TimeSpan(0, 0, 5);
 
@@ -224,14 +224,14 @@ namespace DoMCLib.Classes.Module.RDPB
         {
             //while (IsStarted)
             IsStarted = true;
+            Start();
             while (!cancelationTockenSource.Token.IsCancellationRequested)
             {
 
                 try
                 {
                     if (DoNeedToRestart())
-                        Start();
-                    GetData();
+                        GetData();
                 }
                 catch (Exception ex)
                 {

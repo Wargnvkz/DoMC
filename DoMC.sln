@@ -15,13 +15,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{0E503F2A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMC", "DoMC\DoMC.csproj", "{C78D4114-28DA-407F-980B-AE4463A3E21C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMCModuleControlTests", "DoMCModuleControlTests\DoMCModuleControlTests.csproj", "{0DC95198-DC04-4E00-BD30-1D1AB8AD557F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCModuleControlTests", "DoMCModuleControlTests\DoMCModuleControlTests.csproj", "{0DC95198-DC04-4E00-BD30-1D1AB8AD557F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{7B513BA1-BC83-4A22-994D-A74256CA11C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMCLibTests", "DoMCLibTests\DoMCLibTests.csproj", "{D9314EC6-D68F-405D-96B7-7C4C22E52E79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCLibTests", "DoMCLibTests\DoMCLibTests.csproj", "{D9314EC6-D68F-405D-96B7-7C4C22E52E79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoMCTestingTools", "DoMCTestingTools\DoMCTestingTools.csproj", "{CA21972A-D855-4E71-98A2-CF2FA06AA695}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoMCTestingTools", "DoMCTestingTools\DoMCTestingTools.csproj", "{CA21972A-D855-4E71-98A2-CF2FA06AA695}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleTest", "SimpleTest\SimpleTest.csproj", "{AE7A00B5-9FDF-4962-B3AB-9CB039F03249}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,10 @@ Global
 		{CA21972A-D855-4E71-98A2-CF2FA06AA695}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA21972A-D855-4E71-98A2-CF2FA06AA695}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA21972A-D855-4E71-98A2-CF2FA06AA695}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE7A00B5-9FDF-4962-B3AB-9CB039F03249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE7A00B5-9FDF-4962-B3AB-9CB039F03249}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE7A00B5-9FDF-4962-B3AB-9CB039F03249}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE7A00B5-9FDF-4962-B3AB-9CB039F03249}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

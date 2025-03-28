@@ -101,7 +101,11 @@ namespace DoMCModuleControl
         public void RegisterModule(Modules.AbstractModuleBase module)
         {
             if (module != null)
-                _modules.Add(module.GetType().Name, module);
+            {
+                var modulename = module.GetType().Name;
+                if (!_modules.ContainsKey(modulename))
+                    _modules.Add(modulename, module);
+            }
         }
 
 
@@ -109,7 +113,7 @@ namespace DoMCModuleControl
         /// Создание основного контроллера с созданием модулей из библиотек в папке Modules/*.dll. Перед вызовом нужно вызвать AssemblyLoader.LoadAssembliesFromPath иначе нужные библиотеки с командами, модулями и интрефейсом не будут найдены
         /// </summary>
         /// <returns>Новый главный контроллер</returns>
-        public static MainController LoadDLLModules(object? data = null)
+        public static MainController LoadDLLModulesAndRegisterCommands(object? data = null)
         {
 
             var StartingConfiguration = GetMainApplicationConfiguration();
@@ -118,7 +122,7 @@ namespace DoMCModuleControl
             // Поиск всех сборок с модулями
             try
             {
-                AssembliesNames.AddRange(Directory.GetFiles("*.dll"));
+                AssembliesNames.AddRange(Directory.GetFiles(".", "*.dll"));
             }
             catch
             {
@@ -178,7 +182,9 @@ namespace DoMCModuleControl
                 throw new InvalidOperationException($"Тип интерфейса \"{interfaceClassName}\" не является наследником IMainUserInterface.");
             }
 
+
             var mainController = new MainController(null);
+            mainController.RegisterAllCommands();
             mainController.CreateUserInterface(UIType, data);
 
             foreach (var moduleType in ModuleTypes)
@@ -404,7 +410,7 @@ namespace DoMCModuleControl
                 }
                 throw new ArgumentNullException($"В команде \"{commandInfo.CommandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
             }
-            throw new ArgumentException($"Команда \"{commandType.Name}\" не найдена.");
+            throw new ArgumentException($"Команда \"{commandType.FullName}\" не найдена.");
         }
 
         /// <summary>

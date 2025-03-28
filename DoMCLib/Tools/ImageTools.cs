@@ -65,7 +65,7 @@ namespace DoMCLib.Tools
                 img = new short[Height, Width];
             }
             int bytetocopy = img.Length * elementLength;
-            Buffer.BlockCopy(data, 0, img, 0, bytetocopy);
+            Buffer.BlockCopy(data, 0, img, 0, Math.Min(data.Length, bytetocopy));
             return img;
         }
         public static ushort[,] ArrayToUImage(byte[] data, bool NonStandardImage = false)
@@ -1174,6 +1174,7 @@ namespace DoMCLib.Tools
 
         public static short[,] Multiply(short[,] img, double v)
         {
+            if (img == null) return null;
             var res = new short[img.GetLength(0), img.GetLength(1)];
             for (int x = 0; x <= 511; x++)
             {

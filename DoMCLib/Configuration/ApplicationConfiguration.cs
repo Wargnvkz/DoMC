@@ -146,7 +146,7 @@ namespace DoMCLib.Configuration
             UpdateZipEntry(filename, HardwareSettingsFile, HardwareSettings);
         }
 
-        public void SaveAllConfiguration(string filename=null)
+        public void SaveAllConfiguration(string filename = null)
         {
             if (String.IsNullOrEmpty(filename)) filename = ConfigurationFilePath;
 
@@ -193,5 +193,58 @@ namespace DoMCLib.Configuration
             }
         }
 
+        /*private void WriteCurrentConfigEntry<T>(string filename, T data)
+        {
+            var json = JsonConvert.SerializeObject(data);
+
+            using(var sw=new StreamWriter(filename))
+            {
+                sw.Write(json);
+            }
+        }
+        private T ReadCurrentConfigEntry<T>(string filename)
+        {
+            string json;
+            using (var sr = new StreamReader(filename))
+            {
+                json = sr.ReadToEnd();
+            }
+
+            return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                NullValueHandling = NullValueHandling.Include
+            });
+        }
+
+        public void WriteCurrentConfig()
+        {
+            WriteCurrentConfigEntry(HardwareSettingsFile,HardwareSettings);
+            WriteCurrentConfigEntry(ReadingSocketsSettingsFile, ReadingSocketsSettings);
+            WriteCurrentConfigEntry(ProcessingDataSettingsFile,ProcessingDataSettings);
+        }
+
+        public void LoadCurrentConfig()
+        {
+
+            try
+            {
+                HardwareSettings=ReadCurrentConfigEntry<HardwareSettings>(HardwareSettingsFile);
+                ReadingSocketsSettings= ReadCurrentConfigEntry<ReadingSocketsSettings>(ReadingSocketsSettingsFile);
+                ProcessingDataSettings= ReadCurrentConfigEntry<ProcessingDataSettings>(ProcessingDataSettingsFile);
+                
+            }
+            catch (FileNotFoundException ex)
+            {
+                HardwareSettings = new HardwareSettings();
+                ReadingSocketsSettings = new ReadingSocketsSettings(96);
+                ProcessingDataSettings = new ProcessingDataSettings(96);
+                WriteCurrentConfig();
+            }
+        }
+        public void SaveCurrentStandard() 
+        {
+            WriteCurrentConfigEntry(ProcessingDataSettingsFile, ProcessingDataSettings);
+        }*/
     }
 }

@@ -20,8 +20,9 @@ namespace DoMCLib.Classes
     public class DoMCApplicationContext
     {
         public static string ConfigurationUpdateEventName = "ConfigurationUpdate";
+        public static string SettingsInterfaceClosedEventName = "SettingsInterfaceClosed";
         public const string FileName = "DoMC.cfg";
-        public static string StandardFolder="Standards";
+        public static string StandardFolder = "Standards";
         public ApplicationConfiguration Configuration { get; set; }
         /// <summary>
         /// Индекс 0 - реальное гнездо 1, то есть при получении физического номера для платы нужно использовать логический номер гнезда(нумерацию с 1 сверху вниз слева направо минус 1)
@@ -118,76 +119,62 @@ namespace DoMCLib.Classes
             return result;
         }
 
-        public bool StartCCD(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null)
+        public bool StartCCD(IMainController Controller, ILogger WorkingLog, out CCDCardDataCommandResponse result, int? SocketNumber = null)
         {
             LastAction = LastCCDAction.Starting;
             if (SocketNumber == null)
             {
-                if (!Controller.CreateCommandInstance(typeof(CCDCardDataModule.StartCommand))
-                    .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse result))
-                {
-                    if (result != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                    }
-                    else
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Неизвестная ошибка.");
+                var res = Controller.CreateCommandInstance(typeof(CCDCardDataModule.StartCommand))
+                    .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
 
-                    }
-                    return false;
+                if ((result?.CardsNotAnswered().Count ?? 0) > 0)
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
                 }
+                return res;
+
             }
             else
             {
-                if (!Controller.CreateCommandInstance(typeof(CCDCardDataModule.StartSingleSocketCommand))
-                    .Wait((this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse result))
-                {
-                    if (result != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                    }
-                    else
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Неизвестная ошибка.");
+                var res = Controller.CreateCommandInstance(typeof(CCDCardDataModule.StartSingleSocketCommand))
+                    .Wait((this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
 
-                    }
-                    return false;
+                if ((result?.CardsNotAnswered().Count ?? 0) > 0)
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
                 }
+                return res;
+
             }
-            return true;
         }
-        public bool StopCCD(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null)
+        public bool StopCCD(IMainController Controller, ILogger WorkingLog, out CCDCardDataCommandResponse result, int? SocketNumber = null)
         {
             LastAction = LastCCDAction.Stopping;
             if (SocketNumber == null)
             {
-                if (!Controller.CreateCommandInstance(typeof(CCDCardDataModule.StopCommand))
-                    .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse result))
+                var res = Controller.CreateCommandInstance(typeof(CCDCardDataModule.StopCommand))
+                    .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
+                if ((result?.CardsNotAnswered().Count ?? 0) > 0)
                 {
-                    if (result != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                    }
-                    return false;
+                    WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
                 }
+                return res;
+
             }
             else
             {
-                if (!Controller.CreateCommandInstance(typeof(CCDCardDataModule.StopSingleSocketCommand))
-                    .Wait((this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse result))
+                var res = Controller.CreateCommandInstance(typeof(CCDCardDataModule.StopSingleSocketCommand))
+                    .Wait((this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
+                if ((result?.CardsNotAnswered().Count ?? 0) > 0)
                 {
-                    if (result != null)
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                    }
-                    return false;
+                    WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
                 }
+                return res;
+
 
             }
-            return true;
         }
-        public bool LoadCCDConfiguration(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null, CancellationTokenSource cancellationTokenSource=null)
+        public bool LoadCCDConfiguration(IMainController Controller, ILogger WorkingLog, out CCDCardDataCommandResponse result, int? SocketNumber = null, CancellationTokenSource cancellationTokenSource = null)
         {
             LastAction = LastCCDAction.LocadConfig;
 
@@ -195,31 +182,28 @@ namespace DoMCLib.Classes
             {
                 {
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек экспозиции гнезд в модуль плат ПЗС");
-                    if (!Controller.CreateCommandInstance(typeof(CCDCardDataModule.SetExpositionCommand))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse result))
+                    var res = Controller.CreateCommandInstance(typeof(CCDCardDataModule.SetExpositionCommand))
+                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
 
-                    //if (!WaitForCommand<CCDCardDataModule.SetExpositionCommand, SetReadingParametersCommandResult>(Controller, WorkingLog, this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, "Передача настроек экспозиции гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
+                    if ((result?.CardsNotAnswered().Count ?? 0) > 0)
                     {
-                        if (result != null)
-                        {
-                            WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                        }
-                        return false;
+                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
+                    }
+                    if (!res)
+                    {
+                        return res;
                     }
                 }
                 {
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек чтения гнезд в модуль плат ПЗС");
-                    if (!Controller.CreateCommandInstance(typeof(CCDCardDataModule.SetReadingParametersCommand))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse result))
+                    var res = Controller.CreateCommandInstance(typeof(CCDCardDataModule.SetReadingParametersCommand))
+                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
 
-                    //if (!WaitForCommand<CCDCardDataModule.SetReadingParametersCommand, SetReadingParametersCommandResult>(Controller, WorkingLog, this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, "Передача настроек чтения гнезд в модуль плат ПЗС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
+                    if ((result?.CardsNotAnswered().Count ?? 0) > 0)
                     {
-                        if (result != null)
-                        {
-                            WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                        }
-                        return false;
+                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
                     }
+                    return res;
                 }
 
             }
@@ -228,33 +212,33 @@ namespace DoMCLib.Classes
 
                 {
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек экспозиции гнезд в модуль плат ПЗС");
-                    if (!Controller.CreateCommandInstance(typeof(SetExpositionToSingleSocketCommand))
-                        .Wait((this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse result))
+                    var res = Controller.CreateCommandInstance(typeof(SetExpositionToSingleSocketCommand))
+                        .Wait((this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
+                    if ((result?.CardsNotAnswered().Count ?? 0) > 0)
                     {
-                        if (result != null)
-                        {
-                            WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                        }
-                        return false;
+                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
+                    }
+                    if (!res)
+                    {
+                        return res;
                     }
                 }
+
                 {
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек чтения гнезд в модуль плат ПЗС");
-                    if (!Controller.CreateCommandInstance(typeof(SetReadingParametersToSingleSocketCommand))
-                        .Wait((this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse result))
+                    var res = Controller.CreateCommandInstance(typeof(SetReadingParametersToSingleSocketCommand))
+                        .Wait((this, SocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result);
+                    if ((result?.CardsNotAnswered().Count ?? 0) > 0)
                     {
-                        if (result != null)
-                        {
-                            WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                        }
-                        return false;
+                        WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
                     }
+                    return res;
                 }
-
-
             }
-            return true;
         }
+
+
+
         public bool StartLCB(IMainController Controller, ILogger WorkingLog)
         {
             WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Подключение к БУС");
@@ -298,35 +282,20 @@ namespace DoMCLib.Classes
             return res && result;
         }
 
-        public bool ReadSockets(IMainController Controller, ILogger WorkingLog, bool IsExternalRead, int? socketNumber = null, CancellationTokenSource cancellationTokenSource = null)
+        public bool ReadSockets(IMainController Controller, ILogger WorkingLog, bool IsExternalRead, out CCDCardDataCommandResponse result, int? socketNumber = null, CancellationTokenSource cancellationTokenSource = null)
         {
             LastAction = LastCCDAction.Reading;
             if (IsExternalRead)
             {
                 if (!socketNumber.HasValue)
                 {
-                    if (Controller.CreateCommandInstance(typeof(SendReadSocketsWithExternalSignalCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _, cancellationTokenSource))
-                    {
-                        return true;
-                    }
-
-                    /*if (WaitForCommand<CCDCardDataModule.SendReadSocketsWithExternalSignalCommand, CCDCardDataModule, SocketStandardsImage[]>(Controller, WorkingLog, this, timeout, "", LoggerLevel.Critical, out SocketStandardsImage[] result))
-                    {
-                        return true;
-                    }*/
+                    return Controller.CreateCommandInstance(typeof(SendReadSocketsWithExternalSignalCommand), typeof(CCDCardDataModule))
+                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
                 }
                 else
                 {
-                    if (Controller.CreateCommandInstance(typeof(SendReadSingleSocketWithExternalSignalCommand), typeof(CCDCardDataModule))
-                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _, cancellationTokenSource))
-                    {
-                        return true;
-                    }
-                    /*if (WaitForCommand<CCDCardDataModule.SendReadSingleSocketWithExternalSignalCommand, CCDCardDataModule, SocketStandardsImage[]>(Controller, WorkingLog, (this, socketNumber.Value), timeout, "", LoggerLevel.Critical, out SocketStandardsImage[] result))
-                    {
-                        return true;
-                    }*/
+                    return Controller.CreateCommandInstance(typeof(SendReadSingleSocketWithExternalSignalCommand), typeof(CCDCardDataModule))
+                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
 
                 }
             }
@@ -334,59 +303,30 @@ namespace DoMCLib.Classes
             {
                 if (!socketNumber.HasValue)
                 {
-                    if (Controller.CreateCommandInstance(typeof(SendReadSocketCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out SetReadingParametersCommandResult _, cancellationTokenSource))
-                    {
-                        return true;
-                    }
-                    /*if (WaitForCommand<CCDCardDataModule.SendReadSocketCommand, CCDCardDataModule, SocketStandardsImage[]>(Controller, WorkingLog, this, timeout, "", LoggerLevel.Critical, out SocketStandardsImage[] result))
-                    {
-                        return true;
-                    }*/
+                    return Controller.CreateCommandInstance(typeof(SendReadSocketCommand), typeof(CCDCardDataModule))
+                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
                 }
                 else
                 {
-                    if (Controller.CreateCommandInstance(typeof(SendReadSingleSocketCommand), typeof(CCDCardDataModule))
-                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out CCDCardDataCommandResponse _, cancellationTokenSource))
-                    {
-                        return true;
-                    }
-                    /*if (WaitForCommand<CCDCardDataModule.SendReadSingleSocketCommand, CCDCardDataModule, SocketStandardsImage[]>(Controller, WorkingLog, (this, socketNumber.Value), timeout, "", LoggerLevel.Critical, out SocketStandardsImage[] result))
-                    {
-                        return true;
-                    }*/
+                    return Controller.CreateCommandInstance(typeof(SendReadSingleSocketCommand), typeof(CCDCardDataModule))
+                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
                 }
             }
-            return false;
         }
 
-        public GetImageDataCommandResponse GetSocketsImages(IMainController Controller, ILogger WorkingLog, int? EquipmentSocketNumber = null, CancellationTokenSource cancellationTokenSource = null)
+        public bool GetSocketsImages(IMainController Controller, ILogger WorkingLog, out GetImageDataCommandResponse result, int? EquipmentSocketNumber = null, CancellationTokenSource cancellationTokenSource = null)
         {
             LastAction = LastCCDAction.GettingImages;
             if (EquipmentSocketNumber == null)
             {
-                if (Controller.CreateCommandInstance(typeof(GetSocketsImagesDataCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out GetImageDataCommandResponse result, cancellationTokenSource))
-                {
-                    if (result != null)
-                    {
-                        return result;
-                    }
-                }
+                return Controller.CreateCommandInstance(typeof(GetSocketsImagesDataCommand), typeof(CCDCardDataModule))
+                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
             }
             else
             {
-                if (Controller.CreateCommandInstance(typeof(GetSingleSocketImageDataCommand), typeof(CCDCardDataModule))
-                        .Wait((this, EquipmentSocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out GetImageDataCommandResponse result, cancellationTokenSource))
-                {
-                    if (result != null)
-                    {
-                        return result;
-                    }
-                }
-
+                return Controller.CreateCommandInstance(typeof(GetSingleSocketImageDataCommand), typeof(CCDCardDataModule))
+                        .Wait((this, EquipmentSocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
             }
-            return null;
         }
         public bool TestCards(IMainController Controller, ILogger WorkingLog, out CCDCardDataCommandResponse result)
         {

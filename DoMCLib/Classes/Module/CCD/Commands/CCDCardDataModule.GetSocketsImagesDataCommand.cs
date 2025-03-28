@@ -3,6 +3,9 @@ using DoMCModuleControl;
 using DoMCLib.Tools;
 using DoMCLib.Classes.Module.CCD.Commands.Classes;
 using DoMCLib.Classes.Configuration.CCD;
+using DoMCModuleControl.Commands;
+using DoMCModuleControl.Logging;
+using System.Text;
 
 /// <summary>
 /// Управление получением данных из платы и передача данных в плату
@@ -20,10 +23,13 @@ namespace DoMCLib.Classes.Module.CCD
         {
             GetImageDataCommandResponse result = new GetImageDataCommandResponse();
             CancellationTokenSource[] cancellationTokenSources = new CancellationTokenSource[12];
+            ILogger WorkingLog;
             public GetSocketsImagesDataCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCApplicationContext), typeof(GetImageDataCommandResponse)) { }
             protected override void Executing()
             {
+                WorkingLog = Controller.GetLogger(this.GetType().Name);
                 var module = (CCDCardDataModule)Module;
+
                 var context = (DoMCApplicationContext)InputData;
                 if (context != null)
                 {
@@ -45,25 +51,52 @@ namespace DoMCLib.Classes.Module.CCD
             }
             private void StartReadAllSockets(int cardnumber, DoMCApplicationContext context, CCDCardDataModule module)
             {
-                var task = new Task(() =>
+                var th = new Thread((object o) =>
                 {
-                    for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
+                    bool error = false;
+                    StringBuilder sb = new StringBuilder();
+                    try
                     {
-                        var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
-                        if (ReadResult)
+                        for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
                         {
-                            TCPCardSocket cardSocket = new TCPCardSocket(cardnumber, socket);
-                            var equipmentSocket = context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
-                            result.SetSocketReadData(equipmentSocket - 1, data);
+                            StringBuilder socketSb = new StringBuilder();
+                            socketSb.Append($"Card:{cardnumber}; Socket: {socket}; ");
+                            var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds*1000, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
+                            socketSb.Append($"ReadResult: {ReadResult}; Data: {data.ImageDataRead}; Ticks: {data.ImageTicksRead}; ");
+                            if (ReadResult)
+                            {
+                                TCPCardSocket cardSocket = new TCPCardSocket(cardnumber, socket);
+                                var equipmentSocket = context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
+                                result.SetSocketReadData(equipmentSocket - 1, data);
+                                socketSb.Append($"EquipmentSocket:{equipmentSocket};");
+
+                            }
+                            else
+                            {
+                                error = true;
+                            }
+                            sb.AppendLine(socketSb.ToString());
+                            if (Environment.HasShutdownStarted)
+                            {
+                                break;
+                            }
                         }
-                        else
+                        if (error)
                         {
                             result.SetCardError(cardnumber);
                         }
+                        else
+                        {
+                            result.SetCardCompleteSuccessfully(cardnumber);
+                        }
                     }
-                    result.SetCardCompleteSuccessfully(cardnumber);
-                }, cancellationTokenSources[cardnumber].Token);
-                task.Start();
+                    catch
+                    {
+
+                    }
+                    WorkingLog.Add(LoggerLevel.FullDetailedInformation, sb.ToString());
+                });
+                th.Start();
             }
 
 
@@ -75,7 +108,7 @@ namespace DoMCLib.Classes.Module.CCD
                     if (CardAnswerResults == null) return;
                     result.SetCardAnswered(CardAnswerResults.CardNumber - 1);
                     result.SetCardError(CardAnswerResults.CardNumber - 1);
-                    cancellationTokenSources[CardAnswerResults.CardNumber].Cancel();
+                    cancellationTokenSources[CardAnswerResults.CardNumber - 1].Cancel();
                 }
             }
 
@@ -131,7 +164,7 @@ namespace DoMCLib.Classes.Module.CCD
                 {
                     for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
                     {
-                        var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
+                        var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds*1000, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
                         if (ReadResult)
                         {
                             TCPCardSocket cardSocket = new TCPCardSocket(cardnumber, socket);

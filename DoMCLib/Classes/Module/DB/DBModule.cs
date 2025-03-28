@@ -62,6 +62,7 @@ namespace DoMCLib.Classes.Module.DB
         }
         public void Start()
         {
+            if (IsStarted) return;
             Storage = new DataStorage(DBPath, null, WorkingLog, ObserverForDataStorage);
             WorkingLog.Add(LoggerLevel.Critical, "Модуль переноса данных в архив запущен");
             cancelationTockenSource = new CancellationTokenSource();
@@ -71,8 +72,13 @@ namespace DoMCLib.Classes.Module.DB
 
         public void Stop()
         {
-            cancelationTockenSource.Cancel();
-            task.Wait();
+            if (!IsStarted) return;
+            try
+            {
+                cancelationTockenSource?.Cancel();
+                task?.Wait();
+            }
+            catch { }
         }
 
         public void EnqueueCycleDate(CycleImagesCCD cd)
@@ -83,7 +89,6 @@ namespace DoMCLib.Classes.Module.DB
         public void EnqueueBoxDate(Box box)
         {
             BoxDatas.Enqueue(box);
-
         }
 
         private void Process()

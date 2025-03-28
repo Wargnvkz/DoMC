@@ -15,6 +15,7 @@ using DoMCLib.Tools;
 using DoMCLib.Classes.Module.CCD;
 using System.Net.Sockets;
 using DoMCLib.Classes;
+using DoMCLib.Classes.Module.CCD.Commands.Classes;
 
 namespace DoMC.UserControls
 {
@@ -50,6 +51,8 @@ namespace DoMC.UserControls
             bmpGraphics.DrawString("✓", new Font("Arial", 300), new SolidBrush(Color.LimeGreen), new PointF(0, 0));
             cbExternalSignalForStandard.Checked = ExternalRead;
             MainController.GetObserver().NotificationReceivers += GetCCDStandardInterface_NotificationReceivers;
+            PrograssbarMaxStep = 6 + 2 * ImagesToMakeStandard;
+
         }
 
         private void GetCCDStandardInterface_NotificationReceivers(string eventName, object? data)
@@ -130,12 +133,12 @@ namespace DoMC.UserControls
             errorReadingData.Clear();
             SingleSocketImages = new short[this.ImagesToMakeStandard][,];
             ProgressbarStep = 0;
-            if (CurrentContext.StartCCD(MainController, WorkingLog, ChosenSocketNumber.Value - 1))
+            if (CurrentContext.StartCCD(MainController, WorkingLog, out CCDCardDataCommandResponse StartResult, ChosenSocketNumber.Value - 1))
             {
                 try
                 {
                     ProgressbarStep++;
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, ChosenSocketNumber.Value - 1))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, out CCDCardDataCommandResponse LoadCfgResult, ChosenSocketNumber.Value - 1))
                     {
                         ProgressbarStep++;
                         if (CurrentContext.SetFastRead(MainController, WorkingLog, ChosenSocketNumber.Value - 1))
@@ -143,12 +146,12 @@ namespace DoMC.UserControls
                             ProgressbarStep++;
                             for (int i = 0; i < ImagesToMakeStandard; i++)
                             {
-                                if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalRead, ChosenSocketNumber.Value - 1))
+                                if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalRead, out CCDCardDataCommandResponse readResult, ChosenSocketNumber.Value - 1))
                                 {
                                     ProgressbarStep++;
-                                    var si = CurrentContext.GetSocketsImages(MainController, WorkingLog, ChosenSocketNumber.Value - 1);
+                                    var si = CurrentContext.GetSocketsImages(MainController, WorkingLog, out GetImageDataCommandResponse GetSocketResult, ChosenSocketNumber.Value - 1);
                                     ProgressbarStep++;
-                                    if (si == null || si.Data == null) break;
+                                    if (GetSocketResult == null || GetSocketResult.Data == null) break;
                                     var errorCards = errorReadingData.ErrorCards();
                                     if (errorCards.Count > 0)
                                     {
@@ -157,12 +160,12 @@ namespace DoMC.UserControls
                                             CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
                                         }
                                     }
-                                    if (si.Data[ChosenSocketNumber.Value - 1] == null)
+                                    if (GetSocketResult.Data[ChosenSocketNumber.Value - 1] == null)
                                     {
                                         //TODO: вывести ошибку чтения
                                         continue;
                                     }
-                                    SingleSocketImages[i] = si.Data[ChosenSocketNumber.Value - 1].Image;
+                                    SingleSocketImages[i] = GetSocketResult.Data[ChosenSocketNumber.Value - 1].Image;
                                     var sbmp = ImageTools.DrawImage(SingleSocketImages[i], false);
                                     StandardPictures[i].Image = sbmp;
                                 }
@@ -176,7 +179,7 @@ namespace DoMC.UserControls
                 }
                 finally
                 {
-                    CurrentContext.StopCCD(MainController, WorkingLog, ChosenSocketNumber.Value - 1);
+                    CurrentContext.StopCCD(MainController, WorkingLog, out CCDCardDataCommandResponse stopResponse, ChosenSocketNumber.Value - 1);
                 }
             }
             StandardIsReading = false;
@@ -188,7 +191,7 @@ namespace DoMC.UserControls
             {
                 PrepareProgressBar();
                 StandardIsReading = true;
-                var task = new Task(new Action(() => FullStandardGet()));
+                var task = new Task(FullStandardGet);
                 task.Start();
             }
         }
@@ -200,12 +203,28 @@ namespace DoMC.UserControls
             pbAverage.Image = null;
             errorReadingData.Clear();
             ProgressbarStep = 0;
-            if (CurrentContext.StartCCD(MainController, WorkingLog))
+            List<string> TextResults = new List<string>();
+            if (CurrentContext.StartCCD(MainController, WorkingLog, out CCDCardDataCommandResponse startResult))
             {
+                if (startResult.CardsNotAnswered().Count > 0)
+                {
+
+                    var errorCards = errorReadingData.ErrorCards();
+                    if (errorCards.Count > 0)
+                    {
+                        for (int c = 0; c < errorCards.Count; c++)
+                        {
+                            CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
+                        }
+                        var logtext = $"Не получается подключиться к платам {String.Join(",", errorCards)}.";
+                        TextResults.Add(logtext);
+                        WorkingLog.Add(LoggerLevel.Critical, logtext);
+                    }
+                }
                 ProgressbarStep++;
                 try
                 {
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog))
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, out CCDCardDataCommandResponse LoadCfgResult))
                     {
                         ProgressbarStep++;
                         if (CurrentContext.SetFastRead(MainController, WorkingLog))
@@ -217,31 +236,32 @@ namespace DoMC.UserControls
                             }
                             for (int repeat = 0; repeat < ImagesToMakeStandard; repeat++)
                             {
-                                if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalRead))
+                                if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalRead, out CCDCardDataCommandResponse readResult))
                                 {
                                     ProgressbarStep++;
-                                    var si = CurrentContext.GetSocketsImages(MainController, WorkingLog);
+                                    var si = CurrentContext.GetSocketsImages(MainController, WorkingLog, out GetImageDataCommandResponse GetSocketResult);
                                     ProgressbarStep++;
-                                    if (si == null) throw new Exception();
-                                    if (si.Data == null) throw new Exception();
-                                    if (si.Data.Length != socketMax) throw new Exception();
+                                    if (GetSocketResult == null) throw new Exception();
+                                    if (GetSocketResult.Data == null) throw new Exception();
+                                    if (GetSocketResult.Data.Length != socketMax) throw new Exception();
                                     for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                     {
-                                        if (si.Data[socketNum] != null)
-                                            img[socketNum][repeat] = si.Data[socketNum].Image;
-                                        var errorCards = errorReadingData.ErrorCards();
+                                        if (GetSocketResult.Data[socketNum] != null)
+                                            img[socketNum][repeat] = GetSocketResult.Data[socketNum].Image;
+                                        /*var errorCards = errorReadingData.ErrorCards();
                                         if (errorCards.Count > 0)
                                         {
                                             for (int c = 0; c < errorCards.Count; c++)
                                             {
                                                 CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
                                             }
-                                        }
+                                        }*/
 
                                     }
                                 }
                                 StandardPictures[repeat].Image = bmpCheckSign;
                             }
+                            ProgressbarStep++;
                             for (int socketNum = 0; socketNum < socketMax; socketNum++)
                             {
                                 if (img[socketNum].Any(im => im == null))
@@ -252,17 +272,18 @@ namespace DoMC.UserControls
                                 var avgImg = ImageTools.CalculateAverage(img[socketNum]);
                                 CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
                             }
-
+                            ProgressbarStep++;
                             CurrentContext.Configuration.SaveProcessingDataSettings();
                         }
                     }
                 }
                 finally
                 {
-                    CurrentContext.StopCCD(MainController, WorkingLog);
+                    CurrentContext.StopCCD(MainController, WorkingLog, out CCDCardDataCommandResponse stopResult);
                 }
                 pbAverage.Image = bmpCheckSign;
                 StandardIsReading = false;
+                ProgressbarStep++;
                 RenewList();
             }
         }

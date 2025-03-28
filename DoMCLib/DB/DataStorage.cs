@@ -379,8 +379,11 @@ namespace DoMCLib.DB
                 WorkingLog?.Add(LoggerLevel.Information, "Перенос съема от " + cycleMove.CycleDateTime.ToString("dd-MM-yyyy HH\\:mm\\:ss"));
                 try
                 {
-                    var filename = LocalStorage.GetFileName(cycleMove.CycleID);
-                    File.Move(Path.Combine(ConnectionStringLocal, filename), Path.Combine(ConnectionStringRemote, filename));
+                    var localfilename = LocalStorage.GetFileName(cycleMove.CycleID);
+                    var remotePath = RemoteStorage.GetPathForDate(cycleMove.CycleDateTime);
+                    if (!Directory.Exists(remotePath))
+                        Directory.CreateDirectory(remotePath);
+                    File.Move(localfilename, Path.Combine(remotePath, Path.GetFileName(localfilename)));
                 }
                 catch (Exception ex)
                 {
@@ -397,7 +400,42 @@ namespace DoMCLib.DB
                 LocalStorage.DeleteCycleByIDAndIgnoreErrors(cycleRemove.CycleID);
                 WorkingLog?.Add(LoggerLevel.Information, "Удаление съема от " + cycleRemove.CycleDateTime.ToString("dd-MM-yyyy HH\\:mm\\:ss"));
             }
+            HashSet<string> pathDatesToCheck = new HashSet<string>();
+            HashSet<string> pathMonthesToCheck = new HashSet<string>();
+            foreach (var cycle in toMove)
+            {
+                var pathElemets = LocalStorage.GetPathElemetsForDateTime(cycle.CycleDateTime);
+                var dir1 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0], pathElemets[1]);
+                var dir2 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0]);
+                if (!pathDatesToCheck.Contains(dir1)) { pathDatesToCheck.Add(dir1); }
+                if (!pathMonthesToCheck.Contains(dir2)) { pathMonthesToCheck.Add(dir2); }
+            }
+            var shift = new Shift();
+            foreach (var cycle in toRemove)
+            {
+                if (new Shift(cycle.CycleDateTime).ShiftDate == shift.ShiftDate) continue;
+                var pathElemets = LocalStorage.GetPathElemetsForDateTime(cycle.CycleDateTime);
+                var dir1 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0], pathElemets[1]);
+                var dir2 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0]);
+                if (!pathDatesToCheck.Contains(dir1)) { pathDatesToCheck.Add(dir1); }
+                if (!pathMonthesToCheck.Contains(dir2)) { pathMonthesToCheck.Add(dir2); }
+            }
+            foreach (var path in pathDatesToCheck)
+            {
+                if (!Directory.EnumerateFileSystemEntries(path).Any())
+                {
+                    Directory.Delete(path);
 
+                }
+            }
+            foreach (var path in pathMonthesToCheck)
+            {
+                if (!Directory.EnumerateFileSystemEntries(path).Any())
+                {
+                    Directory.Delete(path);
+
+                }
+            }
             try
             {
                 var boxes = LocalStorage.GetBoxesBefore(moveFrom);

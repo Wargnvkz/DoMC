@@ -16,6 +16,8 @@ using DoMCLib.Tools;
 using static DoMCLib.Classes.DoMCApplicationContext.ErrorsReadingData;
 using DoMCLib.Classes;
 using DoMCLib.Configuration;
+using DoMCLib.Classes.Module.CCD;
+using DoMCLib.Classes.Module.CCD.Commands.Classes;
 
 namespace DoMC.Forms
 {
@@ -176,11 +178,28 @@ namespace DoMC.Forms
         {
             AllImages = new short[socketMax][,];
             errorReadingData.Clear();
-            if (CurrentContext.StartCCD(MainController, WorkingLog))
+            try
             {
-                try
+                if (CurrentContext.StartCCD(MainController, WorkingLog, out CCDCardDataCommandResponse startResult))
                 {
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog))
+                    if (startResult.CardsNotAnswered().Count > 0)
+                    {
+                        var errorCards = errorReadingData.ErrorCards();
+                        var logtext = $"Не удалось подключиться к платам {String.Join(",", errorCards)}.";
+                        WorkingLog.Add(LoggerLevel.Critical, logtext);
+                        if (MessageBox.Show(logtext + " Отключить их и продолжить?", "Продолжить?", MessageBoxButtons.YesNo) == DialogResult.No)
+                        {
+                            return;
+                        }
+                        if (errorCards.Count > 0)
+                        {
+                            for (int c = 0; c < errorCards.Count; c++)
+                            {
+                                CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
+                            }
+                        }
+                    }
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, out CCDCardDataCommandResponse loadCfgResult))
                     {
                         if (CurrentContext.SetFastRead(MainController, WorkingLog))
                         {
@@ -189,16 +208,16 @@ namespace DoMC.Forms
                                 AllImages[socketNum] = null;
                             }
 
-                            if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalStart))
+                            if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalStart, out CCDCardDataCommandResponse readResult))
                             {
-                                var si = CurrentContext.GetSocketsImages(MainController, WorkingLog);
-                                if (si == null) throw new Exception();
-                                if (si.Data == null) throw new Exception();
-                                if (si.Data.Length != socketMax) throw new Exception();
+                                var imgres = CurrentContext.GetSocketsImages(MainController, WorkingLog, out GetImageDataCommandResponse ImageData);
+                                if (ImageData == null) throw new Exception();
+                                if (ImageData.Data == null) throw new Exception();
+                                if (ImageData.Data.Length != socketMax) throw new Exception();
                                 for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                 {
-                                    if (si.Data[socketNum] != null)
-                                        AllImages[socketNum] = si.Data[socketNum].Image;
+                                    if (ImageData.Data[socketNum] != null)
+                                        AllImages[socketNum] = ImageData.Data[socketNum].Image;
 
 
                                 }
@@ -207,16 +226,16 @@ namespace DoMC.Forms
                         }
                     }
                 }
-                finally
-                {
-                    CurrentContext.StopCCD(MainController, WorkingLog);
-                }
-                SetTestCCDSocketStatuses();
-
-                SetTestCCDPanelSocketStatuses();
-
             }
+            finally
+            {
+                CurrentContext.StopCCD(MainController, WorkingLog, out CCDCardDataCommandResponse stopResult);
+            }
+            SetTestCCDSocketStatuses();
+            SetTestCCDPanelSocketStatuses();
+
         }
+
 
         private void TestReadOneSocket(int SelectedSocket)
         {
@@ -224,22 +243,30 @@ namespace DoMC.Forms
             if (AllImages == null)
                 AllImages = new short[socketMax][,];
             errorReadingData.Clear();
-            if (CurrentContext.StartCCD(MainController, WorkingLog, SelectedSocket))
+
+            if (CurrentContext.StartCCD(MainController, WorkingLog, out CCDCardDataCommandResponse startResult, SelectedSocket))
             {
                 try
                 {
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, SelectedSocket))
+                    var notAnsweredCards = startResult.CardsNotAnswered();
+                    if (notAnsweredCards.Count > 0)
+                    {
+                        var logText = $"Плата {notAnsweredCards[0]} не отвечает.";
+                        DisplayMessage.Show(logText, "Ошибка");
+                        return;
+                    }
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, out CCDCardDataCommandResponse loadCfgResult, SelectedSocket))
                     {
                         if (CurrentContext.SetFastRead(MainController, WorkingLog, SelectedSocket))
                         {
-                            if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalStart, SelectedSocket))
+                            if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalStart, out CCDCardDataCommandResponse readResult, SelectedSocket))
                             {
-                                var si = CurrentContext.GetSocketsImages(MainController, WorkingLog, SelectedSocket);
-                                if (si == null) throw new Exception();
-                                if (si.Data == null) throw new Exception();
-                                if (si.Data.Length != socketMax) throw new Exception();
-                                if (si.Data[SelectedSocket] != null)
-                                    AllImages[SelectedSocket] = si.Data[SelectedSocket].Image;
+                                var getImageResult = CurrentContext.GetSocketsImages(MainController, WorkingLog, out GetImageDataCommandResponse ImagesData, SelectedSocket);
+                                if (ImagesData == null) throw new Exception();
+                                if (ImagesData.Data == null) throw new Exception();
+                                if (ImagesData.Data.Length != socketMax) throw new Exception();
+                                if (ImagesData.Data[SelectedSocket] != null)
+                                    AllImages[SelectedSocket] = ImagesData.Data[SelectedSocket].Image;
 
 
                             }
@@ -249,12 +276,14 @@ namespace DoMC.Forms
                 }
                 finally
                 {
-                    CurrentContext.StopCCD(MainController, WorkingLog);
+                    CurrentContext.StopCCD(MainController, WorkingLog, out CCDCardDataCommandResponse stopResult, SelectedSocket);
                 }
-                SetTestCCDSocketStatuses();
-
-                SetTestCCDPanelSocketStatuses();
             }
+
+            SetTestCCDSocketStatuses();
+
+            SetTestCCDPanelSocketStatuses();
+
 
         }
         private void CycleReadingProc(int SelectedSocket)
@@ -263,25 +292,32 @@ namespace DoMC.Forms
             if (AllImages == null)
                 AllImages = new short[socketMax][,];
             errorReadingData.Clear();
-            if (CurrentContext.StartCCD(MainController, WorkingLog, SelectedSocket))
+            if (CurrentContext.StartCCD(MainController, WorkingLog, out CCDCardDataCommandResponse startResult, SelectedSocket))
             {
                 try
                 {
-                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, SelectedSocket))
+                    var notAnsweredCards = startResult.CardsNotAnswered();
+                    if (notAnsweredCards.Count > 0)
+                    {
+                        var logText = $"Плата {notAnsweredCards[0]} не отвечает.";
+                        DisplayMessage.Show(logText, "Ошибка");
+                        return;
+                    }
+                    if (CurrentContext.LoadCCDConfiguration(MainController, WorkingLog, out CCDCardDataCommandResponse loadCfgResult, SelectedSocket))
                     {
                         if (CurrentContext.SetFastRead(MainController, WorkingLog, SelectedSocket))
                         {
                             while (IsCycleStarted)
                             {
 
-                                if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalStart, SelectedSocket))
+                                if (CurrentContext.ReadSockets(MainController, WorkingLog, ExternalStart, out CCDCardDataCommandResponse readResult, SelectedSocket))
                                 {
-                                    var si = CurrentContext.GetSocketsImages(MainController, WorkingLog, SelectedSocket);
-                                    if (si == null) throw new Exception();
-                                    if (si.Data == null) throw new Exception();
-                                    if (si.Data.Length != socketMax) throw new Exception();
-                                    if (si.Data[SelectedSocket] != null)
-                                        AllImages[SelectedSocket] = si.Data[SelectedSocket].Image;
+                                    var getImageResult = CurrentContext.GetSocketsImages(MainController, WorkingLog, out GetImageDataCommandResponse ImagesData, SelectedSocket);
+                                    if (ImagesData == null) throw new Exception();
+                                    if (ImagesData.Data == null) throw new Exception();
+                                    if (ImagesData.Data.Length != socketMax) throw new Exception();
+                                    if (ImagesData.Data[SelectedSocket] != null)
+                                        AllImages[SelectedSocket] = ImagesData.Data[SelectedSocket].Image;
                                     ShowSocket(SelectedSocket);
                                     Application.DoEvents();
                                 }
@@ -292,7 +328,7 @@ namespace DoMC.Forms
                 }
                 finally
                 {
-                    CurrentContext.StopCCD(MainController, WorkingLog);
+                    CurrentContext.StopCCD(MainController, WorkingLog, out CCDCardDataCommandResponse readResult);
                 }
             }
 
@@ -402,11 +438,9 @@ namespace DoMC.Forms
 
         private void numFrame_ValueChanged(object sender, EventArgs e)
         {
-            //TestTabDrawGraphLine((int)numFrame.Value);
+            TestTabDrawGraphLine((int)numFrame.Value);
             TestRedrawBitmap();
         }
-
-
 
         private short[] LineFrom2D(short[,] Image, int frame)
         {
@@ -440,62 +474,71 @@ namespace DoMC.Forms
 
             TestSocketNumberSelected = socketnumber;
             lblTestSelectedSocket.Text = (TestSocketNumberSelected + 1).ToString();
-
-            if (AllImages == null)
+            try
             {
-                //MessageBox.Show("Изображения для гнезда еще не получены");
+                if (AllImages == null)
+                {
+                    //MessageBox.Show("Изображения для гнезда еще не получены");
+                    TestBmpReadImage = null;
+                    TestBmpDiffImage = null;
+                    TestBmpStandardImage = null;
+                    TestRedrawBitmap();
+                    TestTabDrawGraphLine((int)numFrame.Value);
+                    return;
+                }
+                TestStandardImage = CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[TestSocketNumberSelected].StandardImage;
+                TestReadImage = AllImages[TestSocketNumberSelected];
+                if (TestReadImage != null && TestReadImage != null)
+                {
+                    TestDiffImage = ImageTools.GetDifference(TestStandardImage, TestReadImage);
+                    var ipp = CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[TestSocketNumberSelected].ImageCheckingParameters;
+
+
+                    var SocketCheckResults = ImageTools.CheckIfSocketGood(TestReadImage, TestStandardImage, ipp);
+                    if (!SocketCheckResults.IsSocketGood || showMaxDevPoint)
+                        TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors, SocketCheckResults.MaxDeviationPoint);
+                    else
+                        TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors);
+                    SendNotificationImagesSelected(TestReadImage, TestStandardImage, ipp);
+
+                }
+                else
+                {
+                    TestDiffImage = null;
+                    TestBmpDiffImage = null;
+                }
+
+
+                TestBmpReadImage = ImageTools.DrawImage(TestReadImage, invertColors);
+                TestBmpStandardImage = ImageTools.DrawImage(TestStandardImage, invertColors);
+
+
+
+                //var sp = InterfaceDataExchange.CCDDataEchangeStatuses.StartProcessImages;
+                //var ep = InterfaceDataExchange.CCDDataEchangeStatuses.StopProcessImages;
+
+                //lblTimeImageProcess.Text = $"Обработка изображений и принятие решения:{(ep - sp) * 1e-4:F3} мс";
+
+                //numFrame.Value = 0;
+                TestRedrawBitmap();
+                TestTabDrawGraphLine((int)numFrame.Value);
+
+                /*if (checkpreformalgorithmsForm != null)
+                {
+                    checkpreformalgorithmsForm.SetStandardImage(TestStandardImage);
+                    checkpreformalgorithmsForm.SetImage(TestReadImage);
+                    checkpreformalgorithmsForm.SetImageProcessParameters(InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].ImageCheckingParameters);
+                    checkpreformalgorithmsForm.RecalcAndRedrawImages();
+
+                }*/
+            }
+            catch
+            {
                 TestBmpReadImage = null;
                 TestBmpDiffImage = null;
                 TestBmpStandardImage = null;
                 TestRedrawBitmap();
-                TestTabDrawGraphLine((int)numFrame.Value);
-                return;
             }
-            TestStandardImage = CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[TestSocketNumberSelected].StandardImage;
-            TestReadImage = AllImages[TestSocketNumberSelected];
-            if (TestReadImage != null && TestReadImage != null)
-            {
-                TestDiffImage = ImageTools.GetDifference(TestStandardImage, TestReadImage);
-                var ipp = CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[TestSocketNumberSelected].ImageCheckingParameters;
-
-
-                var SocketCheckResults = ImageTools.CheckIfSocketGood(TestReadImage, TestStandardImage, ipp);
-                if (!SocketCheckResults.IsSocketGood || showMaxDevPoint)
-                    TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors, SocketCheckResults.MaxDeviationPoint);
-                else
-                    TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors);
-                SendNotificationImagesSelected(TestReadImage, TestStandardImage, ipp);
-
-            }
-            else
-            {
-                TestDiffImage = null;
-                TestBmpDiffImage = null;
-            }
-
-
-            TestBmpReadImage = ImageTools.DrawImage(TestReadImage, invertColors);
-            TestBmpStandardImage = ImageTools.DrawImage(TestStandardImage, invertColors);
-
-
-
-            //var sp = InterfaceDataExchange.CCDDataEchangeStatuses.StartProcessImages;
-            //var ep = InterfaceDataExchange.CCDDataEchangeStatuses.StopProcessImages;
-
-            //lblTimeImageProcess.Text = $"Обработка изображений и принятие решения:{(ep - sp) * 1e-4:F3} мс";
-
-            //numFrame.Value = 0;
-            TestRedrawBitmap();
-            TestTabDrawGraphLine((int)numFrame.Value);
-
-            /*if (checkpreformalgorithmsForm != null)
-            {
-                checkpreformalgorithmsForm.SetStandardImage(TestStandardImage);
-                checkpreformalgorithmsForm.SetImage(TestReadImage);
-                checkpreformalgorithmsForm.SetImageProcessParameters(InterfaceDataExchange.Configuration.SocketToCardSocketConfigurations[socketnumber].ImageCheckingParameters);
-                checkpreformalgorithmsForm.RecalcAndRedrawImages();
-
-            }*/
         }
 
         private void TestTabDrawGraphLine(int linen)
@@ -591,7 +634,11 @@ namespace DoMC.Forms
         private void pbTestReadImage_Paint(object sender, PaintEventArgs e)
         {
 
-            if (TestBmpReadImage == null) return;
+            if (TestBmpReadImage == null)
+            {
+                //pbTestReadImage.Image = null; 
+                return;
+            }
             e.Graphics.DrawImage(TestBmpReadImage, 0, 0, pbTestReadImage.Width, pbTestReadImage.Height);
             var lineN = (int)numFrame.Value;
             if (cbVertical.Checked)
@@ -610,7 +657,11 @@ namespace DoMC.Forms
         private void pbTestDifference_Paint(object sender, PaintEventArgs e)
         {
 
-            if (TestBmpDiffImage == null) return;
+            if (TestBmpDiffImage == null)
+            {
+                //pbTestDifference.Image = null;
+                return;
+            }
             e.Graphics.DrawImage(TestBmpDiffImage, 0, 0, pbTestDifference.Width, pbTestDifference.Height);
             var lineN = (int)numFrame.Value;
             if (cbVertical.Checked)
@@ -628,7 +679,11 @@ namespace DoMC.Forms
 
         private void pbTestStandard_Paint(object sender, PaintEventArgs e)
         {
-            if (TestBmpStandardImage == null) return;
+            if (TestBmpStandardImage == null)
+            {
+                //pbTestStandard.Image = null; 
+                return;
+            }
             e.Graphics.DrawImage(TestBmpStandardImage, 0, 0, pbTestStandard.Width, pbTestStandard.Height);
             var lineN = (int)numFrame.Value;
             if (cbVertical.Checked)
@@ -755,32 +810,39 @@ namespace DoMC.Forms
         {
             IsSocketsReadAndGood = new int[SocketQuantity];
             SocketCheckResults = new ImageProcessResult[SocketQuantity];
-            if (AllImages == null) return;
             for (int i = 0; i < SocketQuantity; i++)
             {
-                var avg = ImageTools.Average(AllImages[i]);
-                if (AllImages[i] == null)
+                try
                 {
-                    IsSocketsReadAndGood[i] = 0;
-                }
-                else
-                {
-                    if (avg < Math.Abs(CurrentContext.Configuration.HardwareSettings.AverageToHaveImage))
+                    if (AllImages[i] == null)
                     {
-                        IsSocketsReadAndGood[i] = 3;
+                        IsSocketsReadAndGood[i] = 0;
                     }
                     else
                     {
-                        SocketCheckResults[i] = ImageTools.CheckIfSocketGood(AllImages[i], CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i].StandardImage, CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[i].ImageCheckingParameters);
-                        if (SocketCheckResults[i].IsSocketGood)
+                        var avg = ImageTools.Average(AllImages[i]);
+                        if (avg < Math.Abs(CurrentContext.Configuration.HardwareSettings.AverageToHaveImage))
                         {
-                            IsSocketsReadAndGood[i] = 1;
+                            IsSocketsReadAndGood[i] = 3;
                         }
                         else
                         {
-                            IsSocketsReadAndGood[i] = 2;
+                            SocketCheckResults[i] =
+                                    ImageTools.CheckIfSocketGood(AllImages[i], CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i].StandardImage, CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[i].ImageCheckingParameters);
+                            if (SocketCheckResults[i].IsSocketGood)
+                            {
+                                IsSocketsReadAndGood[i] = 1;
+                            }
+                            else
+                            {
+                                IsSocketsReadAndGood[i] = 2;
+                            }
                         }
                     }
+                }
+                catch
+                {
+                    IsSocketsReadAndGood[i] = 3;
                 }
             }
         }

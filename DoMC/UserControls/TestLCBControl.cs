@@ -15,6 +15,7 @@ using DoMC.Tools;
 using DoMCLib.Classes.Module.LCB;
 using static DoMCLib.Classes.Module.LCB.LCBModule;
 using System.Security.Cryptography;
+using DoMCLib.Classes;
 
 namespace DoMC.UserControls
 {
@@ -51,7 +52,7 @@ namespace DoMC.UserControls
             SettingsUpdateProvider.SettingsUpdated += SettingsUpdateProvider_SettingsUpdated;
             CurrentObserver = MainController.GetObserver();
             CurrentObserver.NotificationReceivers += Observer_NotificationReceivers;
-            Disposed += OnDispose;
+            //Disposed += OnDispose;
 
             //MainController.GetObserver().NotificationReceivers += GetCCDStandardInterface_NotificationReceivers;
         }
@@ -62,6 +63,11 @@ namespace DoMC.UserControls
             {
                 LastSinchrosignal = DateTime.Now;
             }
+            if (EventName== DoMCApplicationContext.SettingsInterfaceClosedEventName)
+            {
+                TestLCBSetSettingMode();
+                TestLCBStop();
+            }
         }
 
         private void SettingsUpdateProvider_SettingsUpdated(object? sender, EventArgs e)
@@ -71,7 +77,7 @@ namespace DoMC.UserControls
                 TestLCBStop();
             ApplyNewContext(context);
         }
-        private void OnDispose(object? sender, EventArgs e)
+        /*private void OnDispose(object? sender, EventArgs e)
         {
             if (SettingsUpdateProvider != null)
             {
@@ -82,7 +88,7 @@ namespace DoMC.UserControls
                 //MainController.GetObserver().NotificationReceivers -= GetCCDStandardInterface_NotificationReceivers;
             }
             catch { }
-        }
+        }*/
         private void ApplyNewContext(DoMCLib.Classes.DoMCApplicationContext context)
         {
             CurrentContext = context;
@@ -670,5 +676,6 @@ namespace DoMC.UserControls
             if (newvalue >= 0)
                 txb.Text = newvalue.ToString();
         }
+
     }
 }

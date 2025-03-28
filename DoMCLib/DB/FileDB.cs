@@ -66,14 +66,19 @@ namespace DoMCLib.DB
             WorkingLog = log;
         }
 
-        private string GetPathForDate(DateTime time)
+        public string GetPathForDate(DateTime time)
+        {
+            var PathElements = GetPathElemetsForDateTime(time);
+            return Path.Combine(DBDirectory, PathElements[0], PathElements[1]);
+        }
+        public string[] GetPathElemetsForDateTime(DateTime time)
         {
             var shift = new Shift(time);
             var day = shift.ShiftDate.Day;
             var month = shift.ShiftDate.Month;
             var year = shift.ShiftDate.Year;
             var monthStr = $"{month:D2}.{year:D4}";
-            return Path.Combine(DBDirectory, monthStr, $"{day:D2}.{monthStr}");
+            return [monthStr, $"{day:D2}.{monthStr}"];
         }
         protected List<CycleDBFileHeader> GetDBFileHeaderList(string directory)
         {
@@ -89,7 +94,15 @@ namespace DoMCLib.DB
                 var files = System.IO.Directory.GetFiles(InnerDirectory);
                 foreach (var file in files)
                 {
-                    fileList.Add(new CycleDBFileHeader() { FileName = file, CycleHeader = FileStorage<CycleData>.DecomposeFileName(file) });
+                    try
+                    {
+                        var fileDescription = new CycleDBFileHeader() { FileName = file, CycleHeader = FileStorage<CycleData>.DecomposeFileName(file) };
+                        fileList.Add(fileDescription);
+                    }
+                    catch
+                    {
+
+                    }
                 }
                 var directories = Directory.EnumerateDirectories(InnerDirectory);
                 foreach (var d in directories)
@@ -199,8 +212,9 @@ namespace DoMCLib.DB
         public string GetFileName(long id)
         {
             var ch = CycleDataFiles.Find(f => f.CycleHeader.CycleID == id);
-            return System.IO.Path.GetFileName(ch.FileName);
+            return ch.FileName;
         }
+
         public DB.CycleData GetCycleHeaderById(long id)
         {
             var ch = CycleDataFiles.Find(f => f.CycleHeader.CycleID == id);

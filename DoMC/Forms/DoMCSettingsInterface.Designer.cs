@@ -208,8 +208,8 @@
             tabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl1.Controls.Add(tbSettingsCheck);
             tabControl1.Controls.Add(tbGetStandard);
-            tabControl1.Controls.Add(tbTestLCB);
             tabControl1.Controls.Add(tbCCDTest);
+            tabControl1.Controls.Add(tbTestLCB);
             tabControl1.Controls.Add(tbShowPreformImages);
             tabControl1.Controls.Add(tbTestRDPB_uc);
             tabControl1.Controls.Add(tbDB);

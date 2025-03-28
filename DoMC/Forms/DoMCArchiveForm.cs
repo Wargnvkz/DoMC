@@ -121,10 +121,25 @@ namespace DoMC.Forms
             {
                 for (int i = 0; i < (cycle.CycleData.IsSocketActive?.Length ?? (cycle.CycleData.IsSocketsGood?.Length ?? 0)); i++)
                 {
-                    if (!cycle.CycleData.IsSocketsGood[i] || (!cycle.IsRemote && (cycle.CycleData.IsSocketActive?[i] ?? false)))
+                    if (IsSocketHasImage(cycle, i))
+                    {
+                        if (IsSocketGood(cycle, i))
+                        {
+                            TotalShow[i]++;
+
+                        }
+                        else
+                        {
+                            Errors[i]++;
+                        }
+                    }
+                    
+
+
+                    /*if (cycle.CycleData.IsSocketsGood[i] || (!cycle.IsRemote && (cycle.CycleData.IsSocketActive?[i] ?? false)))
                         TotalShow[i]++;
                     if (!cycle.CycleData.IsSocketsGood[i])
-                        Errors[i]++;
+                        Errors[i]++;*/
                 }
             }
             var TotalMax = TotalShow.Max();
@@ -157,6 +172,14 @@ namespace DoMC.Forms
             FillBoxes();
             FillDefectsList();
 
+        }
+        private bool IsSocketGood(DisplayCycleData cycle, int Socket)
+        {
+            return cycle?.CycleData.IsSocketsGood[Socket] ?? false;
+        }
+        private bool IsSocketHasImage(DisplayCycleData cycle, int Socket)
+        {
+            return !cycle.IsRemote || (cycle?.CycleData.IsSocketActive?[Socket] ?? false);
         }
 
         private void FillBoxes()
@@ -358,7 +381,7 @@ namespace DoMC.Forms
             if (ArchiveCycles == null) return;
             var nsocket = (int)nudArchiveSocketNumber.Value;
             lvArchiveSavedSockets.Items.Clear();
-            var cyclesToShow = ArchiveCycles.Where(c => (!c.CycleData.IsSocketsGood[nsocket - 1] || (!c.IsRemote && c.CycleData.IsSocketActive[nsocket - 1])) && c.CycleData.CycleDateTime >= StartPeriod && c.CycleData.CycleDateTime < EndPeriod.AddHours(1)).OrderBy(c => c.CycleData.CycleDateTime);
+            var cyclesToShow = ArchiveCycles.Where(c => IsSocketHasImage(c, nsocket-1) && c.CycleData.CycleDateTime >= StartPeriod && c.CycleData.CycleDateTime < EndPeriod.AddHours(1)).OrderBy(c => c.CycleData.CycleDateTime);
             var badColor = Color.Red;
             var goodColor = Color.Green;
             foreach (var cycle in cyclesToShow)
@@ -423,7 +446,7 @@ namespace DoMC.Forms
                 try
                 {
                     var records = Records[dtime];// ArchiveCycles.FindAll(c => c.CycleData.CycleDateTime >= t && c.CycleData.CycleDateTime < t.Add(dt));
-                    //Records.Add(tDouble, records);
+                                                 //Records.Add(tDouble, records);
                     Total = records.Select(s => (s.CycleData.IsSocketActive?[nsocket - 1] ?? false) ? 1 : 0).Sum();
                     errsum = records.Select(s => (s.CycleData.IsSocketsGood[nsocket - 1]) ? 0 : 1).Sum();
                 }

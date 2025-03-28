@@ -19,6 +19,7 @@ namespace DoMCLib.Classes
         int AvailableBytes();
         bool CanRead();
         bool CanWrite();
+        //int Read(byte[] buffer, int offset, int size);
     }
 
 }

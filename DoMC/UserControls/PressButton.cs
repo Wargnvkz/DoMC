@@ -21,6 +21,7 @@ namespace DoMC.UserControls
         protected override void OnPaint(PaintEventArgs pevent)
         {
             base.OnPaint(pevent);
+            pevent.Graphics.SetClip(ClientRectangle);
             //var dColor = ControlPaint.Dark(BackColor);
             //var lColor = ControlPaint.Light(BackColor);
             //var lColor = LighterDarkenColorYUV(BackColor, 1.5);

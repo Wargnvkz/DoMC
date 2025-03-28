@@ -15,6 +15,7 @@
         {
             if (disposing && (components != null))
             {
+                SettingsUpdateProvider.SettingsUpdated -= SettingsUpdateProvider_SettingsUpdated;
                 components.Dispose();
             }
             base.Dispose(disposing);

@@ -1,6 +1,7 @@
 ﻿using DoMCModuleControl.Modules;
 using DoMCModuleControl;
 using DoMCLib.Classes.Module.LCB;
+using DoMCLib.Classes.Module.CCD.Commands.Classes;
 
 /// <summary>
 /// Управление получением данных из платы и передача данных в плату
@@ -12,8 +13,9 @@ namespace DoMCLib.Classes.Module.CCD
     {
         public class SendReadSocketCommand : WaitingCommandBase
         {
-            Commands.Classes.SetReadingParametersCommandResult result = new Commands.Classes.SetReadingParametersCommandResult();
-            public SendReadSocketCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCApplicationContext), typeof(Commands.Classes.SetReadingParametersCommandResult)) { }
+            //Commands.Classes.SetReadingParametersCommandResult result = new Commands.Classes.SetReadingParametersCommandResult();
+            CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
+            public SendReadSocketCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCApplicationContext), typeof(Commands.Classes.CCDCardDataCommandResponse)) { }
             protected override void Executing()
             {
                 var module = (CCDCardDataModule)Module;
@@ -39,11 +41,21 @@ namespace DoMCLib.Classes.Module.CCD
             {
                 if (NotificationName.Contains("ResponseReadSockets"))
                 {
+
+                    var CardAnswerResults = (CCDCardAnswerResults)data;
+                    if (CardAnswerResults == null) return;
+                    if (CardAnswerResults.ReadingSocketsResult == 0)
+                    {
+                        CancelationTokenSourceToCancelCommandExecution.Cancel();
+                        return;
+                    }
+                    result.SetCardAnswered(CardAnswerResults.CardNumber - 1);
+                    /*
                     var CardAnswerResults = (CCDCardAnswerResults)data;
                     if (CardAnswerResults == null) return;
                     result.SetCardAnswered(CardAnswerResults.CardNumber - 1);
                     result.SetReadResult(CardAnswerResults.CardNumber - 1, CardAnswerResults.ReadingSocketsResult == 0);
-                    result.SetAnswerTime(CardAnswerResults.CardNumber - 1, CardAnswerResults.ReadingSocketsTime);
+                    result.SetAnswerTime(CardAnswerResults.CardNumber - 1, CardAnswerResults.ReadingSocketsTime);*/
                 }
             }
 
