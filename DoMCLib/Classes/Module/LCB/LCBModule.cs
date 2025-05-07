@@ -42,7 +42,7 @@ namespace DoMCLib.Classes.Module.LCB
         ILogger WorkingLog;
         ConcurrentQueue<LEDBlockCommand> LEDOutCommands = new ConcurrentQueue<LEDBlockCommand>();
         //LCBSettings CurrentSettings;
-        //LEDDataExchangeStatus Status=new LEDDataExchangeStatus();
+        //LEDDataExchangeStatus StatusController=new LEDDataExchangeStatus();
         LCBWorkingParameters CurrentWorkingParameters = new LCBWorkingParameters();
         Task task;
         CancellationTokenSource cancellationTokenSource;

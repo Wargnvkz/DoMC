@@ -68,6 +68,7 @@ namespace DoMC
         TimeSpan lastBoxReadTime = new TimeSpan(0, 2, 0);
 
         WorkStep WorkingStep;
+        long[] WorkingStepTime = new long[Enum.GetNames(typeof(WorkStep)).Count() + 1];
 
         IMainController Controller;
         ILogger WorkingLog;
@@ -167,12 +168,15 @@ namespace DoMC
                 LCBStatus.TimePreviousSyncSignalGot = LCBStatus.TimeOfLCBSynchrosignal;
                 LCBStatus.TimeOfLCBSynchrosignal = date;
                 wasSynchro = true;
+                WorkingLog.Add(LoggerLevel.Critical, $"Пришел синхросигнал БУС.");
             }
             if (EventName.EndsWith($"{LEDCommandType.LEDStatusResponse}.{EventType.Received}"))
             {
                 var les = (LEDEquimpentStatus)data!;
                 LCBStatus.LEDStatus = les.LEDStatuses;
                 LCBStatus.LastLedStatusesGotTime = DateTime.Now;
+                WorkingLog.Add(LoggerLevel.Critical, $"Пришел статус светодиодов.");
+
             }
             var eventNameParts = EventName.Split(".");
             if (eventNameParts.Length >= 3)
@@ -182,6 +186,7 @@ namespace DoMC
                     if (Enum.TryParse(eventNameParts[1], out RDPBCommandType commandType))
                     {
                         RDPBCurrentStatus = (RDPBStatus)data;
+                        WorkingLog.Add(LoggerLevel.Critical, $"Получено от бракера {commandType}. {RDPBCurrentStatus.ToString()}");
                     }
                     else { }
                 }
@@ -194,12 +199,17 @@ namespace DoMC
                             case "Error":
 
                                 LastDBException = ((Exception)data, DateTime.Now);
+                                WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при сохранении цикла в БД");
+
                                 break;
 
                             case "NonSaved":
 
                                 DBCyclesCCDLeftInQueue = (int)data;
 
+                                break;
+                            default:
+                                WorkingLog.Add(LoggerLevel.Critical, $"Цикл сохранен в БД.");
                                 break;
 
                         }
@@ -484,9 +494,22 @@ namespace DoMC
             return true;
         }
 
+        private bool SetRDPBParameters()
+        {
+            var cmd = Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.LoadConfigurationToModuleCommand));
+            var res = cmd.Wait(Context.Configuration, Context.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out bool result);
+            return res && result;
+        }
+
         private bool StartRDPB()
         {
             string ErrorMsg = "";
+            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров работы бракёра");
+            if (!SetRDPBParameters())
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка при параметров работы бракёра");
+                return false;
+            }
             WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля бракёра");
             try
             {
@@ -691,7 +714,9 @@ namespace DoMC
                     // поставить в очередь на запись
                     //
 
+                    var startCycle = sw.ElapsedTicks;
                     WorkingStep = WorkStep.Prepare;
+                    WorkingStepTime[(int)WorkStep.Prepare] = sw.ElapsedTicks;
                     WorkingLog.Add(LoggerLevel.Critical, "Подготовка к чтению");
                     // Инициализация данных текущего цикла
                     var CurrentCycleCCD = new CycleImagesCCD();
@@ -714,6 +739,8 @@ namespace DoMC
                     }
 
                     WorkingStep = WorkStep.WaitForSyncroSignal;
+                    WorkingStepTime[(int)WorkStep.WaitForSyncroSignal] = sw.ElapsedTicks;
+
                     bool WasLastOperationSuccessful = true;
 
                     // сохраняем для проверки был ли синхросигнал
@@ -727,6 +754,10 @@ namespace DoMC
                     WasLastOperationSuccessful = Context.ReadSockets(Controller, WorkingLog, true, out CCDCardDataCommandResponse resdResult, cancellationTokenSource: WorkCancellationTokenSource);
                     //Ждем пока произойдет чтение
                     CCDEnd = DateTime.Now;
+
+                    WorkingStep = WorkStep.ReadingSocketsCompleted;
+                    WorkingStepTime[(int)WorkStep.ReadingSocketsCompleted] = sw.ElapsedTicks;
+
                     // Если таймаут то говорим, что ошибка и выходим
                     if (!WasLastOperationSuccessful && ActiveDevices.HasFlag(WorkingModule.LCB))
                     {
@@ -860,6 +891,7 @@ namespace DoMC
                         Errors.MissedSyncrosignalCounter++;
                         LCBStatus.TimePreviousSyncSignalGot = LCBStatus.TimeOfLCBSynchrosignal;
                         LCBStatus.TimeSyncSignalGotForShowInCycle = CCDStart.AddSeconds((CCDEnd - CCDStart).TotalSeconds / 2);
+                        WorkingLog.Add(LoggerLevel.Critical, $"Не обнаружен синхросигнал. Устанавливаем время синхросигнала в {LCBStatus.TimeSyncSignalGotForShowInCycle:dd-MM-yyyy HH\\:mm\\:ss.fff}");
                     }
                     else
                     {
@@ -869,7 +901,7 @@ namespace DoMC
                         if (LCBStatus.TimeOfLCBSynchrosignal == DateTime.MinValue)
                         {
                             LCBStatus.TimeSyncSignalGotForShowInCycle = CCDStart.AddSeconds((CCDEnd - CCDStart).TotalSeconds / 2);
-
+                            WorkingLog.Add(LoggerLevel.Critical, $"Синхросигнал был, но его время неизвестно. Устанавливаем время синхросигнала в {LCBStatus.TimeSyncSignalGotForShowInCycle:dd-MM-yyyy HH\\:mm\\:ss.fff}");
                         }
                         else
                         {
@@ -880,7 +912,8 @@ namespace DoMC
 
                     //Если прошло меньше 1 секунды между синхросигналом и ответом о завершении, то в программе ошибка
                     WorkingLog.Add(LoggerLevel.Critical, $"Время начала чтения: {CCDStart:dd-MM-yyyy HH\\:mm\\:ss.fff}");
-                    WorkingLog.Add(LoggerLevel.Critical, $"Время синхросигнала: {CycleCCDDateTime:dd-MM-yyyy HH\\:mm\\:ss.fff}");
+                    WorkingLog.Add(LoggerLevel.Critical, $"Время синхросигнала БУС: {LCBStatus.TimeOfLCBSynchrosignal:dd-MM-yyyy HH\\:mm\\:ss.fff}");
+                    WorkingLog.Add(LoggerLevel.Critical, $"Время синхросигнала для цикла: {CycleCCDDateTime:dd-MM-yyyy HH\\:mm\\:ss.fff}");
                     WorkingLog.Add(LoggerLevel.Critical, $"Время завершения чтения: {CCDEnd:dd-MM-yyyy HH\\:mm\\:ss.fff}");
                     /*if (Math.Abs((CCDEnd - CCDStart).TotalSeconds) < 1)
                     {
@@ -895,11 +928,15 @@ namespace DoMC
                     //WorkingLog.Add(LoggerLevel.Critical, "Эталоны 3: " + InterfaceDataExchange.SocketStandardExist());
 
                     WorkingStep = WorkStep.StartReadingImages;
+                    WorkingStepTime[(int)WorkStep.StartReadingImages] = sw.ElapsedTicks;
 
                     WorkingLog.Add(LoggerLevel.Critical, "Запрос на получение изображений гнезд");
                     //Запрашиваем сами изображения гнезд
                     var getImgSuccess = Context.GetSocketsImages(Controller, WorkingLog, out GetImageDataCommandResponse getImageResult, cancellationTokenSource: WorkCancellationTokenSource);
                     WasLastOperationSuccessful = (getImageResult?.CardsAnswered().Count ?? 0) == 0;// .completedSuccessfully.All(c => c);
+
+                    WorkingStep = WorkStep.ReadingImagesCompleted;
+                    WorkingStepTime[(int)WorkStep.ReadingImagesCompleted] = sw.ElapsedTicks;
 
                     //если не получили или в модуле ПЗС ошибка, то выставляем ошибку
                     if (!WasLastOperationSuccessful)
@@ -938,6 +975,7 @@ namespace DoMC
                     if (synchrosignalTimeAfterCCDImagesGot != synchrosignalTimeAfterCCDRead)
                     {
                         Errors.NotEnoughTimeToGetCCD = true;
+                        WorkingLog.Add(LoggerLevel.Critical, $"Был получен еще один синхросигнал. Время: {LCBStatus.TimeOfLCBSynchrosignal:dd-MM-yyyy HH\\:mm\\:ss.fff}");
 
                     }
                     else
@@ -998,6 +1036,7 @@ namespace DoMC
                     if (!Errors.CCDFrameNotReceived)
                     {
                         WorkingStep = WorkStep.SearchForDefectedPreforms;
+                        WorkingStepTime[(int)WorkStep.SearchForDefectedPreforms] = sw.ElapsedTicks;
 
                         Timings.CCDImagesProcessStarted = DateTime.Now;
 
@@ -1071,14 +1110,15 @@ namespace DoMC
                                     {
                                         WorkingLog.Add(LoggerLevel.Critical, "Бракер выключен, но должен быть включен.");
                                         //WorkingLog.Add(LoggerLevel.Critical, "Бракер выключен, но должен быть включен. Включаю бракер");
-                                        //Controller.CreateCommandInstance(typeof(RDPBModule.TurnOnCommand)).ExecuteCommand();
+                                        Controller.CreateCommandInstance(typeof(RDPBModule.TurnOnCommand)).ExecuteCommand();
                                     }
                                     else
                                     {
                                         WorkingLog.Add(LoggerLevel.Critical, "Бракер включен, но должен выключен.");
                                         //WorkingLog.Add(LoggerLevel.Critical, "Бракер включен, но должен выключен. Выключаю бракер");
-                                        //Controller.CreateCommandInstance(typeof(RDPBModule.TurnOffCommand)).ExecuteCommand();
+                                        Controller.CreateCommandInstance(typeof(RDPBModule.TurnOffCommand)).ExecuteCommand();
                                     }
+                                    RDPBCurrentStatus.ErrorCounter = 0;
                                 }
                             }
                             else
@@ -1086,6 +1126,7 @@ namespace DoMC
                                 RDPBCurrentStatus.ErrorCounter = 0;
                             }
                             WorkingStep = WorkStep.RDPBSend;
+                            WorkingStepTime[(int)WorkStep.RDPBSend] = sw.ElapsedTicks;
 
                             // сообщить бракеру о съеме
                             if (IsSetBad && IsAllHaveImages)
@@ -1183,6 +1224,7 @@ namespace DoMC
                         if (IsAllHaveImages)
                         {
                             WorkingStep = WorkStep.RecalcStandards;
+                            WorkingStepTime[(int)WorkStep.RecalcStandards] = sw.ElapsedTicks;
 
                             Timings.CCDEtalonsRecalculateStarted = DateTime.Now;
                             WorkingLog.Add(LoggerLevel.Critical, "Перерасчет эталонов");
@@ -1193,14 +1235,15 @@ namespace DoMC
                             WorkingLog.Add(LoggerLevel.Critical, "Эталоны не пересчитываем");
 
                         }
-
-                        WorkingStep = WorkStep.SaveConfiguration;
-
                         if ((DateTime.Now - lastSavedConfiguration).TotalSeconds > SaveTimeoutInSecodns)
                         {
+                            WorkingStep = WorkStep.SaveConfiguration;
+                            WorkingStepTime[(int)WorkStep.SaveConfiguration] = sw.ElapsedTicks;
+
                             WorkingLog.Add(LoggerLevel.Critical, "Сохранение текущей конфигурации");
-                            var savetask = new Task(()=> { 
-                                Context.Configuration.SaveProcessingDataSettings(); 
+                            var savetask = new Task(() =>
+                            {
+                                Context.Configuration.SaveProcessingDataSettings();
                             });
                             savetask.Start();
                             lastSavedConfiguration = DateTime.Now;
@@ -1228,6 +1271,7 @@ namespace DoMC
                                 try
                                 {
                                     WorkingStep = WorkStep.SendToDB;
+                                    WorkingStepTime[(int)WorkStep.SendToDB] = sw.ElapsedTicks;
 
                                     // ставим текущий цикл в общую очередь циклов для сохранения
                                     Controller.CreateCommandInstance(typeof(DBModule.EnqueueCycleDateCommand)).ExecuteCommand(CurrentCycleCCD);
@@ -1252,13 +1296,14 @@ namespace DoMC
                             }
                         }
 
-                        var afterSync = LCBStatus.TimePreviousSyncSignalGot; // Время получения сихроимпульса
-                                                                             // Если был синхроимпульс пока мы обрабатывали, значит мы не успеваем и второй съем не читался вообще
+                        var afterSync = LCBStatus.TimeOfLCBSynchrosignal; // Время получения сихроимпульса
+                                                                          // Если был синхроимпульс пока мы обрабатывали, значит мы не успеваем и второй съем не читался вообще
 
-                        if (afterSync != beforeSync)
+                        if (afterSync != beforeSync && afterSync != DateTime.MinValue)
                         {
                             //выставляем ошибку, что мы не успеваем обрабатывать изображения
                             Errors.NotEnoughTimeToProcessData = true;
+                            WorkingLog.Add(LoggerLevel.Critical, $"Был получен еще один синхросигнал. Время: {LCBStatus.TimeOfLCBSynchrosignal:dd-MM-yyyy HH\\:mm\\:ss.fff}");
                         }
                         else
                         {
@@ -1289,6 +1334,8 @@ namespace DoMC
                     RDPBCurrentStatus.PreviousDirection = RDPBCurrentStatus.CurrentTransporterSide;
 
                     WorkingStep = WorkStep.ClearMemory;
+                    WorkingStepTime[(int)WorkStep.ClearMemory] = sw.ElapsedTicks;
+
                     WorkingLog.Add(LoggerLevel.Critical, "Очистка неиспользуемой памяти");
                     GC.Collect();
 
@@ -1628,7 +1675,6 @@ namespace DoMC
 
         private void pbDevices_Click(object sender, EventArgs e)
         {
-
             GetIsDevicesButtonWorking();
             if (IsWorkingModeStarted)
             {
@@ -2151,15 +2197,17 @@ namespace DoMC
 
     public enum WorkStep
     {
-        Prepare,
-        WaitForSyncroSignal,
-        StartReadingImages,
-        SearchForDefectedPreforms,
-        RDPBSend,
-        SendToDB,
-        RecalcStandards,
-        SaveConfiguration,
-        ClearMemory
+        Prepare = 1,
+        WaitForSyncroSignal = 2,
+        ReadingSocketsCompleted = 3,
+        StartReadingImages = 4,
+        ReadingImagesCompleted = 5,
+        SearchForDefectedPreforms = 6,
+        RDPBSend = 7,
+        SendToDB = 8,
+        RecalcStandards = 9,
+        SaveConfiguration = 10,
+        ClearMemory = 11
     }
 
     public class ButtonsPresses

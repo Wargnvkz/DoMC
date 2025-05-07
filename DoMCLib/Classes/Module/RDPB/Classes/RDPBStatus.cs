@@ -27,6 +27,7 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
         public long TimeLastSent;
         public long TimeLastReceived;
         private long RDPBTimeout;
+        private long RDPBConnectionTimeout;
         public string ManualCommand;
         public bool IsStarted;
 
@@ -56,7 +57,7 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
         {
             get
             {
-                return TimeLastSent != 0 && !ResponseGot && (Timer.ElapsedTicks - TimeLastSent) < RDPBTimeout;
+                return TimeLastSent != 0 && !ResponseGot && (Timer.ElapsedTicks - TimeLastSent) < RDPBConnectionTimeout;
 
             }
         }
@@ -73,6 +74,7 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
         public void SetTimeout(int TimeoutInms)
         {
             RDPBTimeout = TimeoutInms * 10000;
+            RDPBConnectionTimeout = 600000000;
         }
 
         // Данные в сети в тексте по 4 байта в Hex с пробелами

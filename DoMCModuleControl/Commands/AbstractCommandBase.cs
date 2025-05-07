@@ -124,7 +124,6 @@ namespace DoMCModuleControl.Commands
         /// </summary>
         private void ExecuteCommandBase()
         {
-            //TODO: добавить логирование
             IsRunning = true;
             IsCompleteSuccessfully = false;
             IsError = false;

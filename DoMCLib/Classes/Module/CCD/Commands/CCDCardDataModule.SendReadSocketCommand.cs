@@ -13,7 +13,7 @@ namespace DoMCLib.Classes.Module.CCD
     {
         public class SendReadSocketCommand : WaitingCommandBase
         {
-            //Commands.Classes.SetReadingParametersCommandResult result = new Commands.Classes.SetReadingParametersCommandResult();
+            //API_Commands.Classes.SetReadingParametersCommandResult result = new API_Commands.Classes.SetReadingParametersCommandResult();
             CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
             public SendReadSocketCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(DoMCApplicationContext), typeof(Commands.Classes.CCDCardDataCommandResponse)) { }
             protected override void Executing()

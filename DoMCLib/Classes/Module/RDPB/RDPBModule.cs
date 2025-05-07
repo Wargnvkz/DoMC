@@ -7,6 +7,7 @@ using DoMCModuleControl.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -76,7 +77,7 @@ namespace DoMCLib.Classes.Module.RDPB
             WorkingLog.Add(LoggerLevel.Critical, "Модуль остановлен");
         }
 
-        private bool DoNeedToRestart()
+        private bool DoConnectionNeedToRestart()
         {
             if (client?.Connected ?? false)
             {
@@ -95,7 +96,7 @@ namespace DoMCLib.Classes.Module.RDPB
 
         private void MakeConnected()
         {
-            if (DoNeedToRestart())
+            if (DoConnectionNeedToRestart())
             {
                 if (client?.Connected ?? false)
                 {
@@ -129,6 +130,12 @@ namespace DoMCLib.Classes.Module.RDPB
                 var ns = client.GetStream();
                 ns.Write(bytes, 0, bytes.Length);
             }
+            else
+            {
+                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Нет подключения к бракёру");
+
+            }
+
         }
 
         public void SendManualCommandProc(string cmd)
@@ -149,96 +156,110 @@ namespace DoMCLib.Classes.Module.RDPB
 
         private void ReadNetwork()
         {
-            if (client.Connected)
+            try
             {
-                if (buffer == null) buffer = new byte[0];
-                var ns = client.GetStream();
-                while (ns.CanRead && ns.DataAvailable)
+                if (client.Connected)
                 {
-                    ns.ReadTimeout = 1;
-                    byte[] tempreadbuff = new byte[1024];
-                    var read = ns.Read(tempreadbuff, 0, 1024);
-                    if (read > 0)
+                    if (buffer == null) buffer = new byte[0];
+                    var ns = client.GetStream();
+                    while (ns.CanRead && ns.DataAvailable)
                     {
-                        var tempnextbuffer = new byte[buffer.Length + read];
-                        Array.Copy(buffer, 0, tempnextbuffer, 0, buffer.Length);
-                        Array.Copy(tempreadbuff, 0, tempnextbuffer, buffer.Length, read);
-                        buffer = tempnextbuffer;
-                        //CurrentStatus.TimeLastReceive = DateTime.Now;
-                        CurrentStatus.SetTimeLastReceived();
+                        ns.ReadTimeout = 1;
+                        byte[] tempreadbuff = new byte[1024];
+                        var read = ns.Read(tempreadbuff, 0, 1024);
+                        if (read > 0)
+                        {
+                            var tempnextbuffer = new byte[buffer.Length + read];
+                            Array.Copy(buffer, 0, tempnextbuffer, 0, buffer.Length);
+                            Array.Copy(tempreadbuff, 0, tempnextbuffer, buffer.Length, read);
+                            buffer = tempnextbuffer;
+                            //CurrentStatus.TimeLastReceive = DateTime.Now;
+                            CurrentStatus.SetTimeLastReceived();
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка при чтении данных от бракёра. ", ex);
             }
 
         }
 
         private void ProcessBuffer()
         {
-            if (buffer.Length > 0)
+            try
             {
-                do
+                if (buffer.Length > 0)
                 {
-                    var StartIndex = Array.IndexOf<byte>(buffer, 0x4E);
-                    var StopIndex = Array.IndexOf<byte>(buffer, 0x0A, StartIndex + 1);
-                    var NextStartIndex = Array.IndexOf<byte>(buffer, 0x4E, StartIndex + 1);
-                    if (StartIndex == -1 || (StopIndex == -1 && NextStartIndex != -1))
+                    do
                     {
-                        break;
-                    }
+                        var StartIndex = Array.IndexOf<byte>(buffer, 0x4E);
+                        var StopIndex = Array.IndexOf<byte>(buffer, 0x0A, StartIndex + 1);
+                        var NextStartIndex = Array.IndexOf<byte>(buffer, 0x4E, StartIndex + 1);
+                        if (StartIndex == -1 || (StopIndex == -1 && NextStartIndex != -1))
+                        {
+                            break;
+                        }
 
-                    if (NextStartIndex != -1 && NextStartIndex < StopIndex)
-                    {
-                        var nbl = buffer.Length - NextStartIndex;
-                        Array.Copy(buffer, NextStartIndex, buffer, 0, nbl);
-                        Array.Resize(ref buffer, nbl);
-                        continue;
-                    }
+                        if (NextStartIndex != -1 && NextStartIndex < StopIndex)
+                        {
+                            var nbl = buffer.Length - NextStartIndex;
+                            Array.Copy(buffer, NextStartIndex, buffer, 0, nbl);
+                            Array.Resize(ref buffer, nbl);
+                            continue;
+                        }
 
-                    int endmessage;
-                    if (StopIndex == -1)
-                    {
-                        if (NextStartIndex == -1) break;
-                        endmessage = NextStartIndex;
+                        int endmessage;
+                        if (StopIndex == -1)
+                        {
+                            if (NextStartIndex == -1) break;
+                            endmessage = NextStartIndex;
+                        }
+                        else
+                        {
+                            endmessage = StopIndex + 1;
+                        }
+                        var msglen = endmessage - StartIndex;
+                        var msgarr = new byte[msglen];
+                        Array.Copy(buffer, StartIndex, msgarr, 0, msglen);
+                        var newbufferlength = buffer.Length - endmessage;
+                        Array.Copy(buffer, endmessage, buffer, 0, newbufferlength);
+                        Array.Resize(ref buffer, newbufferlength);
+                        if (CurrentStatus == null) CurrentStatus = new RDPBStatus();
+                        var AnswerString = Encoding.ASCII.GetString(msgarr);
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получено от бракера: <{AnswerString.Trim()}>");
+                        var result = CurrentStatus.ChangeFromString(AnswerString);
+                        mainController.GetObserver().Notify(this, CurrentStatus.CommandType.ToString(), result.ToString(), CurrentStatus);
                     }
-                    else
-                    {
-                        endmessage = StopIndex + 1;
-                    }
-                    var msglen = endmessage - StartIndex;
-                    var msgarr = new byte[msglen];
-                    Array.Copy(buffer, StartIndex, msgarr, 0, msglen);
-                    var newbufferlength = buffer.Length - endmessage;
-                    Array.Copy(buffer, endmessage, buffer, 0, newbufferlength);
-                    Array.Resize(ref buffer, newbufferlength);
-                    if (CurrentStatus == null) CurrentStatus = new RDPBStatus();
-                    var AnswerString = Encoding.ASCII.GetString(msgarr);
-                    WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получено от бракера: <{AnswerString.Trim()}>");
-                    var result = CurrentStatus.ChangeFromString(AnswerString);
-                    mainController.GetObserver().Notify(this, CurrentStatus.CommandType.ToString(), result.ToString(), CurrentStatus);
+                    while (buffer.Length > 0);
                 }
-                while (buffer.Length > 0);
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка при обработке данных от бракёра. ", ex);
             }
         }
 
         private void RDPBProcessDataThreadProc()
         {
-            //while (IsStarted)
+            WorkingLog?.Add(LoggerLevel.Critical, "Запуск потока обработки модуля бракера");
             IsStarted = true;
-            Start();
             while (!cancelationTockenSource.Token.IsCancellationRequested)
             {
 
                 try
                 {
-                    if (DoNeedToRestart())
-                        GetData();
+                    MakeConnected();
+                    GetData();
                 }
                 catch (Exception ex)
                 {
                     WorkingLog?.Add(LoggerLevel.Critical, "Ошибка обработки данных бракера. ", ex);
                 }
-
             }
+            WorkingLog?.Add(LoggerLevel.Critical, "Остановка потока обработки модуля бракера.");
+            IsStarted = false;
         }
 
         public void Dispose()

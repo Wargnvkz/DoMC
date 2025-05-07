@@ -51,6 +51,7 @@ namespace DoMCLib.Classes.Module.CCD
             }
             private void StartReadAllSockets(int cardnumber, DoMCApplicationContext context, CCDCardDataModule module)
             {
+                WorkingLog.Add(LoggerLevel.Information, $"Запуск чтения для платы {cardnumber}.");
                 var th = new Thread((object o) =>
                 {
                     bool error = false;
@@ -59,15 +60,19 @@ namespace DoMCLib.Classes.Module.CCD
                     {
                         for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
                         {
+                            WorkingLog.Add(LoggerLevel.Information, $"Запуск чтения для платы {cardnumber}.");
                             StringBuilder socketSb = new StringBuilder();
+                            WorkingLog.Add(LoggerLevel.Information, $"Card:{cardnumber}; Socket: {socket}; ");
                             socketSb.Append($"Card:{cardnumber}; Socket: {socket}; ");
-                            var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds*1000, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
+                            var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds * 1000, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
+                            WorkingLog.Add(LoggerLevel.Information, $"ReadResult: {ReadResult}; Data: {data.ImageDataRead}; Ticks: {data.ImageTicksRead}; ");
                             socketSb.Append($"ReadResult: {ReadResult}; Data: {data.ImageDataRead}; Ticks: {data.ImageTicksRead}; ");
                             if (ReadResult)
                             {
                                 TCPCardSocket cardSocket = new TCPCardSocket(cardnumber, socket);
                                 var equipmentSocket = context.Configuration.HardwareSettings.CardSocket2EquipmentSocket[cardSocket.CardSocketNumber()];
                                 result.SetSocketReadData(equipmentSocket - 1, data);
+                                WorkingLog.Add(LoggerLevel.Information, $"EquipmentSocket:{equipmentSocket};");
                                 socketSb.Append($"EquipmentSocket:{equipmentSocket};");
 
                             }
@@ -94,6 +99,7 @@ namespace DoMCLib.Classes.Module.CCD
                     {
 
                     }
+                    WorkingLog.Add(LoggerLevel.Information, $"Получение изображений завершено. Результаты:");
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, sb.ToString());
                 });
                 th.Start();
@@ -164,7 +170,7 @@ namespace DoMCLib.Classes.Module.CCD
                 {
                     for (int socket = 0; socket < 8 && (!cancellationTokenSources[cardnumber].IsCancellationRequested); socket++)
                     {
-                        var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds*1000, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
+                        var ReadResult = module.tcpClients[cardnumber].GetImageDataFromSocketAsync(socket, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds * 1000, cancellationTokenSources[cardnumber].Token, out SocketReadData data);
                         if (ReadResult)
                         {
                             TCPCardSocket cardSocket = new TCPCardSocket(cardnumber, socket);
