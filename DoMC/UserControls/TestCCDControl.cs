@@ -493,12 +493,18 @@ namespace DoMC.Forms
                     TestDiffImage = ImageTools.GetDifference(TestStandardImage, TestReadImage);
                     var ipp = CurrentContext.Configuration.ReadingSocketsSettings.CCDSocketParameters[TestSocketNumberSelected].ImageCheckingParameters;
 
+                    try
+                    {
+                        var SocketCheckResults = ImageTools.CheckIfSocketGood(TestReadImage, TestStandardImage, ipp);
+                        if (!SocketCheckResults.IsSocketGood || showMaxDevPoint)
+                            TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors, SocketCheckResults.MaxDeviationPoint);
+                        else
+                            TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors);
+                    }
+                    catch
+                    {
 
-                    var SocketCheckResults = ImageTools.CheckIfSocketGood(TestReadImage, TestStandardImage, ipp);
-                    if (!SocketCheckResults.IsSocketGood || showMaxDevPoint)
-                        TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors, SocketCheckResults.MaxDeviationPoint);
-                    else
-                        TestBmpDiffImage = ImageTools.DrawImage(TestDiffImage, invertColors);
+                    }
                     SendNotificationImagesSelected(TestReadImage, TestStandardImage, ipp);
 
                 }
