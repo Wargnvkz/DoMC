@@ -6,6 +6,7 @@ using DoMCModuleControl;
 using DoMCModuleControl.Commands;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,6 +66,10 @@ namespace DoMCLib.Classes.Module.CCD
         private Task ImagesReadAllSocketsThread = null;
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
+
+        private PendingCommandController<CCDCardAnswerResults>? _pendingCommandController = new PendingCommandController<CCDCardAnswerResults>();
+        private PendingCommandController<(SocketReadData, bool)[]> _pendingCommandsImageReceiveController = new PendingCommandController<(SocketReadData, bool)[]>();
+
         /// <summary>
         /// </summary>
         /// <param name="DoMCCardNumber">Номер платы. от 1 до 12</param>
@@ -79,7 +84,7 @@ namespace DoMCLib.Classes.Module.CCD
             if (CardNumber < 1 && CardNumber > 12) throw new ArgumentOutOfRangeException("Номер платы должен быть от 1 до 12");
             CardNumber = DoMCCardNumber;
             //SocketsStatuses = new SocketWorkStatus[8];
-            //for (int i = 0; i < 8; i++) SocketsStatuses[i] = new SocketWorkStatus();
+            //for (int rc = 0; rc < 8; rc++) SocketsStatuses[rc] = new SocketWorkStatus();
 
             Controller = controller;
             WorkingLog = Controller.GetLogger(this.GetType().Name);
@@ -89,9 +94,9 @@ namespace DoMCLib.Classes.Module.CCD
         /*public void SetSocketConfiguration(SocketReadingParameters[] Configurations)
         {
             SocketConfigurations = new SocketReadingParameters[SocketNumber];
-            for (int i = 0; i < Configurations.Length; i++)
+            for (int rc = 0; rc < Configurations.Length; rc++)
             {
-                SocketConfigurations[i] = SocketConfigurations[i].Clone();
+                SocketConfigurations[rc] = SocketConfigurations[rc].Clone();
             }
         }*/
 
@@ -237,7 +242,47 @@ namespace DoMCLib.Classes.Module.CCD
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Гнездо: {Socket}. Соединение закрыто.");
             }
         }
-              
+
+        public async Task<(SocketReadData, bool)[]> GetImageDataFromAllSocketsAsync(int msTimeout, CancellationToken cancellationToken)
+        {
+            var result = new (SocketReadData, bool)[8];
+            for (int socket = 0; socket < 8; socket++)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
+                var (readData, success) = await Task.Run(() =>
+                {
+                    var ok = GetImageDataFromSocketAsync(socket, msTimeout, cancellationToken, out var data);
+                    return (data, ok);
+                });
+
+                result[socket] = (readData, success);
+            }
+
+            return result;
+        }
+
+        public async Task<(SocketReadData, bool)[]> GetAllImagesDataAsync(int msTimeout, CancellationToken cancellationToken)
+        {
+            //TODO:
+            // 1.послать запрос на получение изображений, как SendCommandGetAllSocketImagesAsync
+            // 2. Запустить чтение изображений, как GetImageDataFromAllSocketsAsync
+            // 3. Дождаться либо отмены, либо таймаута, либо завершения
+            return await _pendingCommandsImageReceiveController.AsyncCommand(
+                cancellationToken, 
+                (rc) => false,
+                () => GetImageDataFromAllSocketsAsync(msTimeout, cancellationToken),
+                () =>
+            {
+                WorkingLog.Add(LoggerLevel.Information, $"Отправляется запрос на получение изображений платы {CardNumber}");
+                var cfg = new CCDCardArrayRequest9();
+                cfg.Address = 8;
+                Send(BinaryConverter.ToBytes(cfg), cancellationToken);
+            }, msTimeout
+                );
+        }
+
         private void Disconnect()
         {
             try
@@ -409,7 +454,7 @@ namespace DoMCLib.Classes.Module.CCD
 
             for (int i = 0; i < log.Count; i++)
             {
-                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"{CardToComputer()} (CRC:{(log[i].Item2.Item2 ? "+" : $"- (0x{log[i].Item2.Item1:X2})")}): " + $"<{String.Join(", ",log[i].Item1.Select(i=>$"0x{i:X2}"))}");
+                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"{CardToComputer()} (CRC:{(log[i].Item2.Item2 ? "+" : $"- (0x{log[i].Item2.Item1:X2})")}): " + $"<{String.Join(", ", log[i].Item1.Select(i => $"0x{i:X2}"))}");
             }
 
 
@@ -440,17 +485,23 @@ namespace DoMCLib.Classes.Module.CCD
                                 CardAnswerResult.ReadingSocketsResult = result;
                                 CardAnswerResult.ReadingSocketsTime = dtime;
 
+
+                                _pendingCommandController?.TrySetResult(1, CardAnswerResult);
+
+
                                 Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseReadSockets", CardAnswerResult);
                             }
                             break;
                         case 4:
                             {
+                                _pendingCommandController?.TrySetResult(4, CardAnswerResult);
                                 Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseSetSocketsExpositionParameters", CardAnswerResult);
 
                             }
                             break;
                         case 5:
                             {
+                                _pendingCommandController?.TrySetResult(5, CardAnswerResult);
                                 Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseSetConfiguration", CardAnswerResult);
 
                             }
@@ -458,14 +509,15 @@ namespace DoMCLib.Classes.Module.CCD
 
                         case 9:
                             {
-
+                                _pendingCommandsImageReceiveController?.SetCanceled();
+                                _pendingCommandController?.SetCanceled();
                                 Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseGetSocketsImages", CardAnswerResult);
 
                             }
                             break;
                         case 11:
                             {
-
+                                _pendingCommandController?.TrySetResult(11, CardAnswerResult);
                                 Controller.GetObserver().Notify($"{this.GetType().Name}.ReadingSocketsResult.ResponseSetReadingParametersConfiguration", CardAnswerResult);
 
                             }
@@ -524,7 +576,7 @@ namespace DoMCLib.Classes.Module.CCD
             //var crc = (byte)(0x100 - (((byte)b.Sum(bb => bb)) & 0xff));
             var res = string.Join("", b.Select(bb => bb.ToString("X2")));
             var crc = (byte)(0x100 - ((byte)res.Sum(bb => bb) & 0xff));
-            var resStr = $":{res}{crc:X2}\r\n";
+            var resStr = $":{res}{crc:X2}\rc\n";
             var resb = Encoding.ASCII.GetBytes(resStr);
             return resb;
         }
@@ -594,30 +646,36 @@ namespace DoMCLib.Classes.Module.CCD
 
         #region Requests
 
+
+
         /// <summary>
         /// Command = 4, Загрузка конфигурации чтения в гнезда по списку
         /// </summary>
 
-        public void SendCommandSetSocketsExpositionParameters(SocketParameters socketParameters, CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandSetSocketsExpositionParameters(SocketParameters socketParameters, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             if (socketParameters == null || socketParameters.ReadingParameters == null || socketParameters.ReadingParameters.Exposition == 0 || socketParameters.ReadingParameters.FrameDuration == 0) throw new DoMCSocketParametersNotSetException(CardNumber, 0);
-            var cfg = socketParameters.ReadingParameters.GetFrameExpositionConfiguration();
-            Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
-
+            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 4, () =>
+            {
+                var cfg = socketParameters.ReadingParameters.GetFrameExpositionConfiguration();
+                Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
+            });
         }
         /// <summary>
         /// Command = 11, Загрузка основной конфигурации в гнезда по списку
         /// </summary>
-        public void SendCommandSetSocketReadingParameters(SocketParameters socketParameters, CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandSetSocketReadingParameters(SocketParameters socketParameters, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
             if (socketParameters == null || socketParameters.ReadingParameters == null || socketParameters.ReadingParameters.Exposition == 0 || socketParameters.ReadingParameters.FrameDuration == 0) throw new DoMCSocketParametersNotSetException(CardNumber, 0);
-            var cfg = socketParameters.ReadingParameters.GetReadingParametersConfiguration();
-            Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
-
+            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 11, () =>
+            {
+                var cfg = socketParameters.ReadingParameters.GetReadingParametersConfiguration();
+                Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
+            });
         }
 
 
@@ -625,81 +683,103 @@ namespace DoMCLib.Classes.Module.CCD
         /// Command = 1, читать изображения с датчиков
         /// </summary>
 
-        public void SendCommandReadAllSockets(CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandReadAllSockets(CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
-
-            var cfg = new CCDCardReadRequest1();
-            cfg.Address = 0;
-            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
+            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 1, () =>
+            {
+                var cfg = new CCDCardReadRequest1();
+                cfg.Address = 0;
+                Send(BinaryConverter.ToBytes(cfg), cancellationToken);
+            });
 
         }
+
         /// <summary>
         /// Command = 1, читать изображение одного гнезда
         /// </summary>
-
-        public void SendCommandReadSocket(byte SocketNum, CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandReadSocketAsync(byte socketNum, CancellationToken token)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
+            return await _pendingCommandController.AsyncCommand(token, (rc) => rc == 1, () =>
+            {
+                // отправляем команду
+                var cfg = new CCDCardReadRequest1 { Address = 0 };
+                Send(socketNum, BinaryConverter.ToBytes(cfg), token);
+            });
 
-            var cfg = new CCDCardReadRequest1();
-            cfg.Address = 0;
-            Send(SocketNum, BinaryConverter.ToBytes(cfg), cancellationToken);
         }
 
+
+        /*
+                public void SendCommandReadSocket(byte SocketNum, CancellationToken cancellationToken)
+                {
+                    if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
+
+                    var cfg = new CCDCardReadRequest1();
+                    cfg.Address = 0;
+                    Send(SocketNum, BinaryConverter.ToBytes(cfg), cancellationToken);
+                }
+        */
         /// <summary>
         /// Command = 5, установка параметров чтения или запуск чтения по внешнему сигналу
         /// </summary>
 
-        public void SendCommandSetSocketReadingParameters(CancellationToken cancellationToken, bool AnswerWithImage, bool ExternalStart, bool FastRead, bool ResetReady = true)
+        public async Task<CCDCardAnswerResults> SendCommandSetSocketReadingParameters(CancellationToken cancellationToken, bool AnswerWithImage, bool ExternalStart, bool FastRead, bool ResetReady = true)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
-
-            var cfg = CCDCardConfigRequest5.GetConfiguration(ResetReady, AnswerWithImage, ExternalStart, FastRead);
-            cfg.Address = 0;
-            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-
+            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => ExternalStart ? rc == 5 : rc == 1, () =>
+            {
+                var cfg = CCDCardConfigRequest5.GetConfiguration(ResetReady, AnswerWithImage, ExternalStart, FastRead);
+                cfg.Address = 0;
+                Send(BinaryConverter.ToBytes(cfg), cancellationToken);
+            });
         }
         /// <summary>
         /// Command = 5, запуск по внешнему старту
         /// </summary>
-        public void SendCommandReadSeveralSocketsExternal(CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandReadSeveralSocketsExternal(CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
-
-            var cfg = CCDCardConfigRequest5.GetConfiguration(true, false, true, true);
-            cfg.Address = 0;
-            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-
+            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 1, () =>
+            {
+                var cfg = CCDCardConfigRequest5.GetConfiguration(true, false, true, true);
+                cfg.Address = 0;
+                Send(BinaryConverter.ToBytes(cfg), cancellationToken);
+            });
         }
 
         /// <summary>
         /// Command = 9, получить прочитанные изображения по всем гнездам
         /// </summary>
 
-        public void SendCommandGetAllSocketImages(CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandGetAllSocketImagesAsync(CancellationToken cancellationToken)
         {
 
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
-            WorkingLog.Add(LoggerLevel.Information, $"Отправляется запрос на получение изображений платы {CardNumber}");
-            var cfg = new CCDCardArrayRequest9();
-            cfg.Address = 8;
-            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-
+            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 9, () =>
+            {
+                WorkingLog.Add(LoggerLevel.Information, $"Отправляется запрос на получение изображений платы {CardNumber}");
+                var cfg = new CCDCardArrayRequest9();
+                cfg.Address = 8;
+                Send(BinaryConverter.ToBytes(cfg), cancellationToken);
+            });
         }
+
         /// <summary>
         /// Command = 9, получить прочитанное изображение по одному гнезду
         /// </summary>
 
-        public void SendCommandGetSocketImage(int socket, CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandGetSocketImage(int socket, CancellationToken cancellationToken)
         {
 
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
-
-            var cfg = new CCDCardArrayRequest9();
-            cfg.Address = (byte)socket;
-            Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-
+            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 9, () =>
+            {
+                var cfg = new CCDCardArrayRequest9();
+                cfg.Address = (byte)socket;
+                Send(BinaryConverter.ToBytes(cfg), cancellationToken);
+            });
         }
         #endregion
 

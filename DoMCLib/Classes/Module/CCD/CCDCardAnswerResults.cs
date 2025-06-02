@@ -11,5 +11,6 @@ namespace DoMCLib.Classes.Module.CCD
         public int CardNumber;
         public int ReadingSocketsTime;
         public int ReadingSocketsResult;
+        public bool CommandSucceed;
     }
 }

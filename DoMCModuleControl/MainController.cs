@@ -25,10 +25,6 @@ namespace DoMCModuleControl
         private readonly static string appsettingsPath = "appsettings.json";
         private readonly static string MainInterfaceFieldString = "IMainUserInterface";
         /// <summary>
-        /// список команд(паттерн команда), которые могут выполняться, к которым можно получить доступ по именам
-        /// </summary>
-        private readonly Dictionary<string, CommandInfo> _commands = [];
-        /// <summary>
         /// список модулей, к которым можно получить доступ по именам
         /// </summary>
         private readonly Dictionary<string, Modules.AbstractModuleBase> _modules = [];
@@ -184,7 +180,6 @@ namespace DoMCModuleControl
 
 
             var mainController = new MainController(null);
-            mainController.RegisterAllCommands();
             mainController.CreateUserInterface(UIType, data);
 
             foreach (var moduleType in ModuleTypes)
@@ -258,202 +253,9 @@ namespace DoMCModuleControl
 
         }
 
-        /// <summary>
-        /// Регистрация команды в контроллере
-        /// </summary>
-        /// <param name="commandInfo"></param>
-        public void RegisterCommand(CommandInfo commandInfo)
-        {
-            if (commandInfo == null) throw new ArgumentNullException(nameof(commandInfo));
-            if (commandInfo.CommandName == null) throw new ArgumentNullException(nameof(commandInfo.CommandName));
-            if (commandInfo.CommandClass == null) throw new ArgumentNullException(nameof(commandInfo.CommandClass));
-            if (commandInfo.Module == null) throw new ArgumentNullException(nameof(commandInfo.Module));
-            _commands[commandInfo.CommandName] = commandInfo;
-        }
-
-        /// <summary>
-        /// Поиск по всем загруженным сборкам и регистрация найденных команд
-        /// </summary>
-        public void RegisterAllCommands()
-        {
-
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            var commandTypes = new List<Type>();
-            foreach (var assembly in assemblies)
-            {
-                commandTypes.AddRange(assembly.GetTypes().Where(t => typeof(AbstractCommandBase).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface));
-            }
 
 
-            foreach (var commandType in commandTypes)
-            {
-                AbstractModuleBase? moduleInstance = null;
 
-                if (commandType.DeclaringType != null && typeof(AbstractModuleBase).IsAssignableFrom(commandType.DeclaringType))
-                {
-                    var moduleInstanceFound = _modules.Where(ni => ni.Value.GetType() == commandType.DeclaringType);
-                    if (moduleInstanceFound.Count() > 0)
-                    {
-                        moduleInstance = moduleInstanceFound.First().Value;
-                    }
-                    else
-                    {
-                        moduleInstance = (AbstractModuleBase?)Activator.CreateInstance(commandType.DeclaringType, this);
-                        RegisterModule(moduleInstance);
-                    }
-                }
-                else
-                {
-                    var moduleTypeAttribute = commandType.GetCustomAttribute<CommandModuleTypeAttribute>();
-                    if (moduleTypeAttribute != null && moduleTypeAttribute.ModuleType != null)
-                    {
-                        var moduleInstanceFound = _modules.Where(ni => ni.Value.GetType() == moduleTypeAttribute.ModuleType);
-                        if (moduleInstanceFound.Count() > 0)
-                        {
-                            moduleInstance = moduleInstanceFound.First().Value;
-                        }
-                        else
-                        {
-                            moduleInstance = (AbstractModuleBase?)Activator.CreateInstance(moduleTypeAttribute.ModuleType, this);
-                            RegisterModule(moduleInstance);
-                        }
-                    }
-
-                }
-                //var moduleNameAttribute = commandType.GetCustomAttribute<CommandModuleNameAttribute>();
-
-                if (moduleInstance != null)
-                {
-                    var commandInstance = (AbstractCommandBase?)Activator.CreateInstance(commandType, this, moduleInstance);
-                    if (commandInstance != null)
-                    {
-                        var commandInfo = new CommandInfo(
-                                //moduleNameAttribute == null ?
-                                commandInstance.CommandName
-                                //:$"{moduleInstance.GetType().Name}.{moduleNameAttribute.ModuleName}"
-                                ,
-                            commandInstance.InputType,
-                            commandInstance.OutputType,
-                            commandType,
-                            moduleInstance
-                        );
-                        RegisterCommand(commandInfo);
-                    }
-                }
-            }
-        }
-
-        public List<CommandInfo> GetRegisteredCommandList()
-        {
-            var result = new List<CommandInfo>();
-            foreach (var kv in _commands)
-            {
-                result.Add(kv.Value.Clone());
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Создание команды по имени (из списка известных команд создается экземпляр команды, который выполняет код)
-        /// </summary>
-        /// <param name="commandName">Текстовое имя команды</param>
-        /// <returns>Созданная команда</returns>
-        /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
-        /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public AbstractCommandBase? CreateCommandInstance(string commandName)
-        {
-            if (commandName == null) throw new ArgumentNullException(nameof(commandName));
-            if (_commands.TryGetValue(commandName, out var commandInfo))
-            {
-                if (commandInfo.CommandClass != null)
-                {
-                    try
-                    {
-                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
-                    }
-                    catch
-                    {
-                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module);
-
-                    }
-                }
-                throw new ArgumentNullException($"В команде \"{commandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
-            }
-            throw new ArgumentException($"Команда \"{commandName}\" не зарегистрирована.");
-        }
-
-        /// <summary>
-        /// Создание команды по типу
-        /// </summary>
-        /// <param name="commandName">Текстовое имя команды</param>
-        /// <returns>Созданная команда</returns>
-        /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
-        /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public AbstractCommandBase? CreateCommandInstance(Type commandType)
-        {
-            if (commandType == null) throw new ArgumentNullException(nameof(commandType));
-
-            var commandInfo = _commands.Where(c => c.Value.CommandClass == commandType).FirstOrDefault().Value;
-            if (commandInfo != null)
-            {
-                if (commandInfo.CommandClass != null)
-                {
-                    try
-                    {
-                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
-                    }
-                    catch
-                    {
-                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module);
-
-                    }
-                }
-                throw new ArgumentNullException($"В команде \"{commandInfo.CommandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
-            }
-            throw new ArgumentException($"Команда \"{commandType.FullName}\" не найдена.");
-        }
-
-        /// <summary>
-        /// Создание команды по типу команды и модуля
-        /// </summary>
-        /// <param name="commandName">Текстовое имя команды</param>
-        /// <returns>Созданная команда</returns>
-        /// <exception cref="ArgumentNullException">Возникает, если класс команды не задан</exception>
-        /// <exception cref="ArgumentException">Возникает, если команда не найдена в списке зарегистрированых</exception>
-        public AbstractCommandBase? CreateCommandInstance(Type commandType, Type moduleType)
-        {
-            if (commandType == null) throw new ArgumentNullException(nameof(commandType));
-            if (moduleType == null) throw new ArgumentNullException(nameof(moduleType));
-
-            var commandInfo = _commands.Where(c => c.Value.CommandClass == commandType).FirstOrDefault().Value;
-            if (commandInfo != null)
-            {
-                if (commandInfo.CommandClass != null)
-                {
-                    AbstractModuleBase? moduleInstance;
-                    var moduleInstanceFound = _modules.Where(ni => ni.Value.GetType() == moduleType);
-                    if (moduleInstanceFound.Count() > 0)
-                    {
-                        moduleInstance = moduleInstanceFound.First().Value;
-                    }
-                    else
-                    {
-                        moduleInstance = (AbstractModuleBase?)Activator.CreateInstance(moduleType, this);
-                        RegisterModule(moduleInstance);
-                    }
-                    try
-                    {
-                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module, commandInfo.InputType, commandInfo.OutputType);
-                    }
-                    catch
-                    {
-                        return (AbstractCommandBase?)Activator.CreateInstance(commandInfo.CommandClass, this, commandInfo.Module);
-                    }
-                }
-                throw new ArgumentNullException($"В команде \"{commandInfo.CommandName}\" не задан код выполнения команды(ее класс)");//new InvalidOperationException($"Command class \"{commandInfo.CommandClass.Name}\" not found.");
-            }
-            throw new ArgumentException($"Команда \"{commandType.Name}\" не найдена.");
-        }
 
         public Observer GetObserver()
         {

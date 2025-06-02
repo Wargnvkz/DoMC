@@ -18,6 +18,7 @@ using DoMCModuleControl.Logging;
 using System.Runtime.CompilerServices;
 using DoMCLib.Tools;
 using System.Threading;
+using DoMCLib.Classes.Module.CCD;
 
 namespace DoMCLib.Classes.Module.LCB
 {
@@ -115,6 +116,34 @@ namespace DoMCLib.Classes.Module.LCB
             udp = null;
         }
 
+        private async Task<> AsyncCommand(CancellationToken token, Action cmd)
+        {
+            await _commandLock.WaitAsync(token); // ждём доступа к плате
+
+            try
+            {
+                if (_pendingReadTask != null)
+                    throw new InvalidOperationException("Команда уже выполняется на этой плате");
+
+                _pendingReadTask = new TaskCompletionSource<CCDCardAnswerResults>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+                cmd?.Invoke();
+
+                // отмена по токену
+                using (token.Register(() =>
+                {
+                    _pendingReadTask?.TrySetCanceled(token);
+                }))
+                {
+                    return await _pendingReadTask.Task;
+                }
+            }
+            finally
+            {
+                _pendingReadTask = null;
+                _commandLock.Release(); // разрешаем следующий вызов
+            }
+        }
 
         // Вызов команд снаружи модуля
         /*public void SetLCBParameters(LCBSettings settings)

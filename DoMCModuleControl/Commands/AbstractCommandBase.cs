@@ -16,7 +16,7 @@ namespace DoMCModuleControl.Commands
     /// "{CommandName}.Success" - OutputData (loggin - Informational)
     /// "{CommandName}.Error" - Exception (loggin - Critical)
     /// </summary>
-    public abstract class AbstractCommandBase
+    public abstract class AbstractCommandBase : ICommandStatus
     {
         //TODO: сделать синхронизацию для многопоточности
         /// <summary>
@@ -34,7 +34,7 @@ namespace DoMCModuleControl.Commands
         /// <summary>
         /// Выходные данные
         /// </summary>
-        public object? OutputData { get; set; }
+        public object? OutputData { get; protected set; }
         /// <summary>
         /// Модуль с которым работает команда
         /// </summary>
@@ -93,8 +93,6 @@ namespace DoMCModuleControl.Commands
         {
             Controller = mainController;
             Module = module;
-            InputType = inputType;
-            OutputType = outputType;
             CancelationTokenSourceToCancelCommandExecution = new CancellationTokenSource();
 
         }
@@ -196,7 +194,7 @@ namespace DoMCModuleControl.Commands
         /// </summary>
         /// <param name="inputData">Входные данные</param>
         /// <exception cref="ArgumentException">Вызывается, если тип переданых данных не совпадает с типом данных, которые должны быть переданы и указаны в InputType</exception>
-        public void SetInputData(object? inputData)
+        public virtual void SetInputData(object? inputData)
         {
             if (InputType == null || inputData == null) return;
             if (!InputType.IsInstanceOfType(inputData))

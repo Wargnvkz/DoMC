@@ -8,6 +8,7 @@ using static DoMCLib.Classes.Module.LCB.LCBModule;
 /// </summary>
 namespace DoMCLib.Classes
 {
+    /*
     public abstract class WaitingCommandBase : AbstractCommandBase
     {
         protected bool IsWaitingCompletedSuccessfuly = false;
@@ -94,5 +95,5 @@ namespace DoMCLib.Classes
 
         }
     }
-
+    */
 }
