@@ -283,6 +283,7 @@ namespace DoMCModuleControl
             var moduleInstanceFound = _modules.Where(ni => ni.Key == ModuleName);
             return moduleInstanceFound.FirstOrDefault().Value;
         }
+
     }
 
 }

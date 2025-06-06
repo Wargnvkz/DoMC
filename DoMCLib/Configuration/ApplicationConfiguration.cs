@@ -193,7 +193,7 @@ namespace DoMCLib.Configuration
             }
         }
 
-        /*private void WriteCurrentConfigEntry<T>(string filename, T data)
+        /*private void WriteCurrentConfigEntry<TContext>(string filename, TContext data)
         {
             var json = JsonConvert.SerializeObject(data);
 
@@ -202,7 +202,7 @@ namespace DoMCLib.Configuration
                 sw.Write(json);
             }
         }
-        private T ReadCurrentConfigEntry<T>(string filename)
+        private TContext ReadCurrentConfigEntry<TContext>(string filename)
         {
             string json;
             using (var sr = new StreamReader(filename))
@@ -210,7 +210,7 @@ namespace DoMCLib.Configuration
                 json = sr.ReadToEnd();
             }
 
-            return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
+            return JsonConvert.DeserializeObject<TContext>(json, new JsonSerializerSettings
             {
                 MissingMemberHandling = MissingMemberHandling.Ignore,
                 NullValueHandling = NullValueHandling.Include

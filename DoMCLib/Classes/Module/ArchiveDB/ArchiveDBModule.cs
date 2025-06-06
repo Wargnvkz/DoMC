@@ -21,7 +21,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
         int DelayOfTransferInSeconds;
         ILogger WorkingLog;
         DataStorage Storage;
-        bool IsStarted;
+        public bool IsStarted { get; private set; } = false;
         Task task;
         CancellationTokenSource cancelationTockenSource;
         ThrottledErrorNotifier errorNotifier;
@@ -108,25 +108,6 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             IsStarted = false;
         }
 
-        public class SetConfigurationCommand : AbstractCommandBase
-        {
-            public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ArchiveDBConfiguration), null) { }
-            protected override void Executing() => ((ArchiveDBModule)Module).SetConfiguration((ArchiveDBConfiguration)InputData);
-        }
-        public class StartCommand : AbstractCommandBase
-        {
-            public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
-            protected override void Executing() => ((ArchiveDBModule)Module).Start();
-        }
-        public class StopCommand : AbstractCommandBase
-        {
-            public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
-            protected override void Executing() => ((ArchiveDBModule)Module).Stop();
-        }
-        public class GetWorkingStatusCommand : AbstractCommandBase
-        {
-            public GetWorkingStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(bool)) { }
-            protected override void Executing() => OutputData = ((ArchiveDBModule)Module).IsStarted;
-        }
+
     }
 }

@@ -10,6 +10,7 @@ namespace DoMCLib.Classes.Module.CCD
     {
         public int CardNumber;
         public int ReadingSocketsTime;
+        // 0 - успех, 1 - ошибка
         public int ReadingSocketsResult;
         public bool CommandSucceed;
     }

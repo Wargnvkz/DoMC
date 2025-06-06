@@ -120,7 +120,7 @@ namespace DoMCModuleControl.Commands
         /// <summary>
         /// Метод запускающий команду в работу и регулирующий статусы и логирование
         /// </summary>
-        private void ExecuteCommandBase()
+        private async Task ExecuteCommandBase()
         {
             IsRunning = true;
             IsCompleteSuccessfully = false;
@@ -131,7 +131,7 @@ namespace DoMCModuleControl.Commands
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Начало выполнения кода команды {CommandName}.");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Started}", InputData);
                 if (InputType != null && InputData == null) throw new InvalidOperationException($"Не могу выполнить команду. Необходимо задать входные данные методом SetInputData с типом {InputType.Name}");
-                Executing();
+                await Executing();
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.FullDetailedInformation, $"Выполнение кода команды {CommandName} завершено");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Suceeded}", OutputData);
                 IsRunning = false;
@@ -151,44 +151,28 @@ namespace DoMCModuleControl.Commands
             {
             }
         }
-        /// <summary>
-        /// Запуск команды на асинхронное выполнение
-        /// </summary>
-        public void ExecuteCommand()
+
+        public async Task<T> ExecuteCommandAsync<T>()
         {
-            var task = new Task(ExecuteCommandBase);
-            task.Start();
+            await ExecuteCommandBase();
+
+            if (OutputData is T result)
+                return result;
+
+            throw new InvalidOperationException($"Тип выходных данных {OutputData?.GetType().Name} не соответствует ожидаемому {typeof(T).Name}.");
+            
         }
-        /// <summary>
-        /// Запуск команды на асинхронное выполнение с передачей входных данный
-        /// </summary>
-        public void ExecuteCommand(object? InputData)
+
+        public async Task<T> ExecuteCommandAsync<T>(object? inputData)
         {
-            SetInputData(InputData);
-            var task = new Task(ExecuteCommandBase);
-            task.Start();
+            SetInputData(inputData);
+            return await ExecuteCommandAsync<T>();
         }
-        /// <summary>
-        /// Запуск команды на асинхронное выполнение
-        /// </summary>
-        public async Task ExecuteCommandAsync()
-        {
-            var task = new Task(ExecuteCommandBase);
-            await task;
-        }
-        /// <summary>
-        /// Запуск команды на асинхронное выполнение с передачей входных данный
-        /// </summary>
-        public async Task ExecuteCommandAsync(object? InputData)
-        {
-            SetInputData(InputData);
-            var task = new Task(ExecuteCommandBase);
-            await task;
-        }
+
         /// <summary>
         /// Метод описываемый в потомках, то есть в конкретной команде и выполняющий сам код команды. Классам реализующим этот метод не нужно заботиться о логировании или ошибках. Все это сделано в базовом классе, чтобы соблюсти стандартизацию
         /// </summary>
-        protected abstract void Executing();
+        protected abstract Task Executing();
         /// <summary>
         /// Установка входных данных
         /// </summary>
@@ -208,7 +192,7 @@ namespace DoMCModuleControl.Commands
         /// </summary>
         /// <typeparam name="T">Тип выходные данных</typeparam>
         /// <returns>Данные поля OutputData</returns>
-        /// <exception cref="InvalidOperationException">Если тип данных в OutputData отличается от типа T</exception>
+        /// <exception cref="InvalidOperationException">Если тип данных в OutputData отличается от типа TContext</exception>
         public T GetOutputData<T>()
         {
             if (OutputData is T result)
@@ -220,64 +204,7 @@ namespace DoMCModuleControl.Commands
                 throw new InvalidOperationException($"Выходные данные не являются данными типа {typeof(T).Name}.");
             }
         }
-        /// <summary>
-        /// Ждет завершения выполнения команды.
-        /// Если команда не запущена, то запускает ее
-        /// </summary>
-        /// <param name="TimeoutInSeconds">Таймаут в секундах, -1 без таймаута</param>
-        public virtual object? Wait(int TimeoutInSeconds, CancellationTokenSource cancellationTokenSource = null)
-        {
-            // Если метод не реализован в потомке, генерируем исключение
-            throw new NotImplementedException("Метод Wait не реализован для этой команды.");
-
-        }
-        /// <summary>
-        /// Ждет завершения выполнения команды.
-        /// Если команда не запущена, то запускает ее
-        /// </summary>
-        /// <param name="TimeoutInSeconds">Таймаут в секундах, -1 без таймаута</param>
-        public virtual bool Wait<T>(object? InputData, int TimeoutInSeconds, out T outputData, CancellationTokenSource cancellationTokenSource = null)
-        {
-            try
-            {
-                SetInputData(InputData);
-                var resultExpositionCommand = Wait(TimeoutInSeconds, cancellationTokenSource);
-                if (resultExpositionCommand == null)
-                {
-                    outputData = default;
-                }
-                else
-                {
-                    outputData = (T)resultExpositionCommand;
-                }
-                var success = WasCompletedSuccessfully();
-                return success;
-                // return true;
-            }
-            catch (NotImplementedException)
-            {
-                ExecuteCommand(InputData);
-                Task.Delay(100).Wait();
-                outputData = default;
-                return true;
-            }
-        }
-        /// <summary>
-        /// Немедленное прекращение выполнения команды
-        /// </summary>
-        public virtual void Cancel()
-        {
-            CancelationTokenSourceToCancelCommandExecution.Cancel();
-            IsCanceled = true;
-        }
-        /// <summary>
-        /// Немедленное прекращение выполнения команды, без установки статуса отменено
-        /// </summary>
-        protected void Stop()
-        {
-            CancelationTokenSourceToCancelCommandExecution.Cancel();
-        }
-
+        
     }
 
 }

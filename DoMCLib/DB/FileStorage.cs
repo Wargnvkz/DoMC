@@ -291,7 +291,7 @@ namespace DoMCLib.DB
                     var bf = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
                     return bf.ReadObject(file) as T;
                     /*var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    return bf.Deserialize(file) as T;*/
+                    return bf.Deserialize(file) as TContext;*/
                 }
                 return DecomposeFileName(fileName);
             }
@@ -330,7 +330,7 @@ namespace DoMCLib.DB
                     var bf = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
                     return bf.ReadObject(ms) as T;
                     //var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    //return bf.Deserialize(ms) as T;
+                    //return bf.Deserialize(ms) as TContext;
                 }
                 return DecomposeFileName(fileName);
             }
@@ -368,7 +368,7 @@ namespace DoMCLib.DB
                     var bf = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
                     return bf.ReadObject(ms) as T;
                     //var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    //return bf.Deserialize(ms) as T;
+                    //return bf.Deserialize(ms) as TContext;
                 }
                 return DecomposeFileName(fileName);
             }

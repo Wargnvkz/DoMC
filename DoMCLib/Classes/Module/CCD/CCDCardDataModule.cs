@@ -31,6 +31,11 @@ namespace DoMCLib.Classes.Module.CCD
                 tcpClients[i] = new CCDCardTCPClient(i + 1, typeof(TcpSocketDevice), MainController);
             }
         }
+
+        public CCDCardTCPClient this[int cardNumber]
+        {
+            get { return tcpClients[cardNumber]; }
+        }
     }
 
 }

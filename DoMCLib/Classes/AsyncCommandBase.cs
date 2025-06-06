@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DoMCLib.Classes
 {
-    public abstract class AsyncCommandBase : AbstractCommandBase
+    /*public abstract class AsyncCommandBase : AbstractCommandBase
     {
         private TaskCompletionSource<object?> _completionSource;
         protected CancellationToken Token;
@@ -56,5 +56,5 @@ namespace DoMCLib.Classes
         protected abstract void NotificationReceived(string NotificationName, object? data);
         protected abstract void PrepareOutputData();
     }
-
+    */
 }

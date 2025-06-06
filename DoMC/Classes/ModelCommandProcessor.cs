@@ -164,7 +164,7 @@ namespace DoMC.Classes
             }
             else
             {
-                var setExpositionCommand = Controller.CreateCommandInstance(typeof(CCDCardDataModule.SendReadSocketCommand));
+                var setExpositionCommand = Controller.CreateCommandInstance(typeof(CCDCardDataModule.SendReadSocketsCommand));
                 if (setExpositionCommand == null) return false;
                 var resultExpositionCommand = setExpositionCommand.Wait(CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds);
                 if (resultExpositionCommand is SetReadingParametersCommandResult resultExposition)

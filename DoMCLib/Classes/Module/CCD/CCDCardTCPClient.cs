@@ -100,7 +100,7 @@ namespace DoMCLib.Classes.Module.CCD
             }
         }*/
 
-        private void Connect(CancellationToken cancellationToken)
+        private async Task Connect(CancellationToken cancellationToken)
         {
             try
             {
@@ -115,21 +115,9 @@ namespace DoMCLib.Classes.Module.CCD
                 }
                 var target = GetServerCommandIPAddress();
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Установка соединения с {target.Address.ToString()}:{target.Port}");
-                //var connectionResult = TCPClientCommandConnection.BeginConnect(target.Address, target.Port, null, null);
-                //var connectionResult = TCPClientCommandConnection.ConnectAsync(target,);
-                //var connectSucceeded = connectionResult.AsyncWaitHandle.WaitOne(ConnectionTimeoutInMilliseconds);
-                var connectionTask = TCPClientCommandConnection.ConnectAsync(target, ConnectionTimeoutInMilliseconds, cancellationToken);
-                var connectSucceeded = connectionTask.Wait(ConnectionTimeoutInMilliseconds, cancellationToken);
-                if (!connectSucceeded)
-                {
-                    throw new SocketException(10060);
-                }
-                //TCPClientCommandConnection.Connect(target);
-
-
+                await TCPClientCommandConnection.ConnectAsync(target, ConnectionTimeoutInMilliseconds, cancellationToken);
                 IsConnected = true;
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Соединение установлено.");
-                //WorkingLog.Add(LoggerLevel.Information,$"Плата: {CardNumber}. ");
 
             }
             catch (Exception ex)
@@ -270,7 +258,7 @@ namespace DoMCLib.Classes.Module.CCD
             // 2. Запустить чтение изображений, как GetImageDataFromAllSocketsAsync
             // 3. Дождаться либо отмены, либо таймаута, либо завершения
             return await _pendingCommandsImageReceiveController.AsyncCommand(
-                cancellationToken, 
+                cancellationToken,
                 (rc) => false,
                 () => GetImageDataFromAllSocketsAsync(msTimeout, cancellationToken),
                 () =>
@@ -283,11 +271,10 @@ namespace DoMCLib.Classes.Module.CCD
                 );
         }
 
-        private void Disconnect()
+        private async Task Disconnect()
         {
             try
             {
-                cancellationTokenSource.Cancel();
                 if (IsConnected) WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Соединение закрыто.");
                 IsConnected = false;
                 TCPClientCommandConnection?.Close();
@@ -295,23 +282,39 @@ namespace DoMCLib.Classes.Module.CCD
             catch { }
         }
 
-        public void Start()
+        public async Task Start()
         {
             if (IsStarted) return;
             cancellationTokenSource = new CancellationTokenSource();
-            Connect(cancellationTokenSource.Token);
+            await Connect(cancellationTokenSource.Token);
 
-            ReceiveTask = new Task(ReceiveThreadProc);
-            ReceiveTask.Start();
+            ReceiveTask = Task.Run(() => ReceiveThreadProc(cancellationTokenSource.Token));
             Controller.GetObserver().Notify($"{this.GetType().Name}.Module.Start", new CCDCardAnswerResults() { CardNumber = CardNumber });
             IsStarted = true;
         }
 
-        public void Stop()
+        public async Task Stop()
         {
             IsStarted = false;
-            Disconnect();
+            cancellationTokenSource?.Cancel();
+            await Disconnect();
             Controller.GetObserver().Notify($"{this.GetType().Name}.Module.Stop", new CCDCardAnswerResults() { CardNumber = CardNumber });
+        }
+
+        public async Task<bool> TestConntectivity()
+        {
+            try
+            {
+                var cts = new CancellationTokenSource();
+                await Connect(cts.Token);
+                if (IsConnected)
+                    await Disconnect();
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool Send(byte[] data, CancellationToken cancellationToken)
@@ -363,17 +366,76 @@ namespace DoMCLib.Classes.Module.CCD
                 return false;
             }
         }
-        //private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-        private void ReceiveThreadProc()
+
+        private async Task ReceiveThreadProc(CancellationToken token)
+        {
+            try
+            {
+                var buffer = new byte[2048];
+
+                while (!token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        int read = 0;
+
+                        // ждём, пока появятся байты
+                        if (TCPClientCommandConnection.AvailableBytes() > 0)
+                        {
+                            // асинхронно читаем
+                            read = await TCPClientCommandConnection.ReadAsync(buffer, 0, buffer.Length, token);
+                        }
+
+                        if (read > 0)
+                        {
+                            AddToBuffer(buffer, 0, read);
+
+                            // пробуем обработать сразу
+                            try
+                            {
+                                if (SizeOfReadBuffer() > 0)
+                                    ProcessBuffer();
+                            }
+                            catch (Exception ex)
+                            {
+                                WorkingLog.Add(LoggerLevel.Critical, $"Исключение при обработке буфера: {ex.Message}", ex);
+                            }
+                        }
+                        else
+                        {
+                            // Ничего не прочитали — делаем короткую паузу, чтобы не крутить процессор
+                            await Task.Delay(10, token);
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // всё ок — корректная отмена
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        WorkingLog.Add(LoggerLevel.Critical, $"Исключение в ReceiveThreadProc (внутри): {ex.Message}", ex);
+                        await Task.Delay(100, token); // дожидаемся перед следующим кругом, чтобы не спамить
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, $"Ошибка в ReceiveThreadProc: {ex.Message}", ex);
+            }
+
+            // отключаемся в самом конце
+            try { Disconnect(); } catch { }
+        }
+
+        /*private async Task ReceiveThreadProc()
         {
             //Connect();
             while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
                 try
                 {
-                    //if (NeedReconnect())
-                    //    Connect();
-                    //_semaphore.WaitAsync(cancellationTokenSource.Token);
+
                     lock (TCPClientCommandConnection)
                     {
                         //var ns = TCPClientCommandConnection.GetStream();
@@ -397,11 +459,7 @@ namespace DoMCLib.Classes.Module.CCD
                                 {
                                     read = 0;
                                 }
-                                /*var readTask = TCPClientCommandConnection.ReadAsync(tmpBuffer, 0, tmpBuffer.Length, cancellationTokenSource.Token);
-                                if (readTask.Wait(10, cancellationTokenSource.Token))
-                                {
-                                    read = readTask.Result;
-                                }*/
+
                             }
                             catch (Exception ex) { read = 0; }
                             if (read > 0)
@@ -427,7 +485,7 @@ namespace DoMCLib.Classes.Module.CCD
                 Thread.Sleep(10);
             }
             Disconnect();
-        }
+        }*/
 
         private void AddToBuffer(byte[] data, int start, int length)
         {
@@ -652,7 +710,7 @@ namespace DoMCLib.Classes.Module.CCD
         /// Command = 4, Загрузка конфигурации чтения в гнезда по списку
         /// </summary>
 
-        public async Task<CCDCardAnswerResults> SendCommandSetSocketsExpositionParameters(SocketParameters socketParameters, CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandSetSocketsExpositionParametersAsync(SocketParameters socketParameters, int msTimeout, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
@@ -661,12 +719,12 @@ namespace DoMCLib.Classes.Module.CCD
             {
                 var cfg = socketParameters.ReadingParameters.GetFrameExpositionConfiguration();
                 Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
-            });
+            }, msTimeout);
         }
         /// <summary>
         /// Command = 11, Загрузка основной конфигурации в гнезда по списку
         /// </summary>
-        public async Task<CCDCardAnswerResults> SendCommandSetSocketReadingParameters(SocketParameters socketParameters, CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandSetSocketReadingParametersAsync(SocketParameters socketParameters, int msTimeout, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
 
@@ -675,7 +733,7 @@ namespace DoMCLib.Classes.Module.CCD
             {
                 var cfg = socketParameters.ReadingParameters.GetReadingParametersConfiguration();
                 Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
-            });
+            }, msTimeout);
         }
 
 
@@ -683,7 +741,7 @@ namespace DoMCLib.Classes.Module.CCD
         /// Command = 1, читать изображения с датчиков
         /// </summary>
 
-        public async Task<CCDCardAnswerResults> SendCommandReadAllSockets(CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandReadAllSocketsAsync(int msTimeout, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
             return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 1, () =>
@@ -691,14 +749,14 @@ namespace DoMCLib.Classes.Module.CCD
                 var cfg = new CCDCardReadRequest1();
                 cfg.Address = 0;
                 Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-            });
+            }, msTimeout);
 
         }
 
         /// <summary>
         /// Command = 1, читать изображение одного гнезда
         /// </summary>
-        public async Task<CCDCardAnswerResults> SendCommandReadSocketAsync(byte socketNum, CancellationToken token)
+        public async Task<CCDCardAnswerResults> SendCommandReadSocketAsync(byte socketNum, int msTimeout, CancellationToken token)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
             return await _pendingCommandController.AsyncCommand(token, (rc) => rc == 1, () =>
@@ -706,7 +764,7 @@ namespace DoMCLib.Classes.Module.CCD
                 // отправляем команду
                 var cfg = new CCDCardReadRequest1 { Address = 0 };
                 Send(socketNum, BinaryConverter.ToBytes(cfg), token);
-            });
+            }, msTimeout);
 
         }
 
@@ -725,7 +783,7 @@ namespace DoMCLib.Classes.Module.CCD
         /// Command = 5, установка параметров чтения или запуск чтения по внешнему сигналу
         /// </summary>
 
-        public async Task<CCDCardAnswerResults> SendCommandSetSocketReadingParameters(CancellationToken cancellationToken, bool AnswerWithImage, bool ExternalStart, bool FastRead, bool ResetReady = true)
+        public async Task<CCDCardAnswerResults> SendCommandSetSocketReadingStateAsync(CancellationToken cancellationToken, int msTimeout, bool AnswerWithImage, bool ExternalStart, bool FastRead, bool ResetReady = true)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
             return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => ExternalStart ? rc == 5 : rc == 1, () =>
@@ -733,12 +791,12 @@ namespace DoMCLib.Classes.Module.CCD
                 var cfg = CCDCardConfigRequest5.GetConfiguration(ResetReady, AnswerWithImage, ExternalStart, FastRead);
                 cfg.Address = 0;
                 Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-            });
+            }, msTimeout);
         }
         /// <summary>
         /// Command = 5, запуск по внешнему старту
         /// </summary>
-        public async Task<CCDCardAnswerResults> SendCommandReadSeveralSocketsExternal(CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandReadSeveralSocketsExternalAsync(int msTimeout, CancellationToken cancellationToken)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
             return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 1, () =>
@@ -746,14 +804,14 @@ namespace DoMCLib.Classes.Module.CCD
                 var cfg = CCDCardConfigRequest5.GetConfiguration(true, false, true, true);
                 cfg.Address = 0;
                 Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-            });
+            }, msTimeout);
         }
 
         /// <summary>
         /// Command = 9, получить прочитанные изображения по всем гнездам
         /// </summary>
 
-        public async Task<CCDCardAnswerResults> SendCommandGetAllSocketImagesAsync(CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandGetAllSocketImagesAsync(int msTimeout, CancellationToken cancellationToken)
         {
 
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
@@ -763,14 +821,14 @@ namespace DoMCLib.Classes.Module.CCD
                 var cfg = new CCDCardArrayRequest9();
                 cfg.Address = 8;
                 Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-            });
+            }, msTimeout);
         }
 
         /// <summary>
         /// Command = 9, получить прочитанное изображение по одному гнезду
         /// </summary>
 
-        public async Task<CCDCardAnswerResults> SendCommandGetSocketImage(int socket, CancellationToken cancellationToken)
+        public async Task<CCDCardAnswerResults> SendCommandGetSocketImageAsync(int socket, int msTimeout, CancellationToken cancellationToken)
         {
 
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
@@ -779,7 +837,7 @@ namespace DoMCLib.Classes.Module.CCD
                 var cfg = new CCDCardArrayRequest9();
                 cfg.Address = (byte)socket;
                 Send(BinaryConverter.ToBytes(cfg), cancellationToken);
-            });
+            }, msTimeout);
         }
         #endregion
 
