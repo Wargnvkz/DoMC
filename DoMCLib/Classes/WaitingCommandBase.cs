@@ -42,7 +42,7 @@ namespace DoMCLib.Classes
                     if (NoNeedToWaitMore)
                     {
                         Controller.GetLogger(Module.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.FullDetailedInformation, $"Результаты вполнения команды {CommandName} получены.");
-                        Stop();
+                        StopAsync();
                         break;
                     }
                     Task.Delay(10).Wait();

@@ -41,7 +41,7 @@ namespace DoMC.UserControls
 
             //MainController.GetObserver().NotificationReceivers += GetCCDStandardInterface_NotificationReceivers;
         }
-        private void Observer_NotificationReceivers(string EventName, object? data)
+        private async Task Observer_NotificationReceivers(string EventName, object? data)
         {
             /*var EventNameParts = EventName.Split('.');
             if (EventNameParts[0] == nameof(DoMCLib.Classes.Module.RDPB.RDPBModule))

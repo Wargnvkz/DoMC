@@ -151,6 +151,11 @@ namespace DoMCModuleControl.Commands
             {
             }
         }
+        public async Task ExecuteCommandAsync()
+        {
+            await ExecuteCommandBase();
+
+        }
 
         public async Task<T> ExecuteCommandAsync<T>()
         {

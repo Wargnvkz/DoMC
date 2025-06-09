@@ -298,7 +298,7 @@ namespace DoMCLib.Classes.Module.CCD
             IsStarted = false;
             cancellationTokenSource?.Cancel();
             await Disconnect();
-            Controller.GetObserver().Notify($"{this.GetType().Name}.Module.Stop", new CCDCardAnswerResults() { CardNumber = CardNumber });
+            Controller.GetObserver().Notify($"{this.GetType().Name}.Module.StopAsync", new CCDCardAnswerResults() { CardNumber = CardNumber });
         }
 
         public async Task<bool> TestConntectivity()

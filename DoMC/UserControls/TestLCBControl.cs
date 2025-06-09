@@ -57,7 +57,7 @@ namespace DoMC.UserControls
             //MainController.GetObserver().NotificationReceivers += GetCCDStandardInterface_NotificationReceivers;
         }
 
-        private void Observer_NotificationReceivers(string EventName, object? data)
+        private async Task Observer_NotificationReceivers(string EventName, object? data)
         {
             if (EventName.EndsWith($"{LEDCommandType.LEDSynchrosignalResponse}.{EventType.Received}"))
             {

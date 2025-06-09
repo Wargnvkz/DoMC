@@ -44,7 +44,7 @@ namespace DoMCLib.Tools
             Buffer.BlockCopy(image, 0, baData, 0, len);
             return baData;
         }
-        public static short[,] ArrayToImage(byte[] data, bool NonStandardImage = false)
+        public static short[,]? ArrayToImage(byte[] data, bool NonStandardImage = false)
         {
             if (data is null || data.Length == 0)
             {
@@ -88,7 +88,7 @@ namespace DoMCLib.Tools
             return img;
         }
 
-        public static short[,] ImageCopy(short[,] image)
+        public static short[,]? ImageCopy(short[,] image)
         {
             if (image == null) return null;
             var len = Buffer.ByteLength(image);
@@ -118,7 +118,7 @@ namespace DoMCLib.Tools
             return output.ToArray();
         }
 
-        public static Bitmap DrawImage(short[,] image, bool invert = false,
+        public static Bitmap? DrawImage(short[,] image, bool invert = false,
             Point? BadPoint = null, Rectangle? CheckArea = null)
         {
             if (image == null)
@@ -761,7 +761,7 @@ namespace DoMCLib.Tools
             avg2 /= 512;
             avgdev = Math.Sqrt(avg2 - avg * avg);
 
-            double k = 4;
+            //double k = 4;
 
             for (int x = 0; x <= 511; x++)
             {

@@ -55,7 +55,7 @@ namespace DoMC.UserControls
 
         }
 
-        private void GetCCDStandardInterface_NotificationReceivers(string eventName, object? data)
+        private async Task GetCCDStandardInterface_NotificationReceivers(string eventName, object? data)
         {
             if (eventName.EndsWith(".GetImageDataFromSocketAsync.Error"))
             {

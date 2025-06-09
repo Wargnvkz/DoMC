@@ -35,45 +35,44 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             ObserverForDataStorage.NotificationReceivers += ObserverForDataStorage_NotificationReceived;
         }
 
-        private void ObserverForDataStorage_NotificationReceived(string Name, object? data)
+        private async Task ObserverForDataStorage_NotificationReceived(string Name, object? data)
         {
             if (Name == DoMCApplicationContext.ConfigurationUpdateEventName)
             {
                 var cfg = data as ApplicationConfiguration;
-                SetConfiguration(cfg.HardwareSettings.ArchiveDBConfig);
+                await SetConfigurationAsync(cfg.HardwareSettings.ArchiveDBConfig);
             }
         }
 
-        public void SetConfiguration(ArchiveDBConfiguration configuration)
+        public async Task SetConfigurationAsync(ArchiveDBConfiguration configuration)
         {
             var restart = IsStarted;
             if (restart)
             {
-                Stop();
+                await StopAsync();
             }
             this.Configuration = configuration;
             if (restart)
             {
-                Start();
+                await StartAsync();
             }
         }
-        public void Start()
+        public async Task StartAsync()
         {
             Storage = new DataStorage(Configuration.LocalDBPath, Configuration.ArchiveDBPath, WorkingLog, ObserverForDataStorage);
             WorkingLog.Add(LoggerLevel.Critical, "Модуль переноса данных в архив запущен");
             cancelationTockenSource = new CancellationTokenSource();
-            task = new Task(Process);
-            task.Start();
+            task = Task.Run(() => Process());
         }
 
-        public void Stop()
+        public async Task StopAsync()
         {
             cancelationTockenSource.Cancel();
-            task.Wait();
+            await task;
             IsStarted = false;
         }
 
-        private void Process()
+        private async Task Process()
         {
             IsStarted = true;
             while (!cancelationTockenSource.Token.IsCancellationRequested)
@@ -103,7 +102,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
                     WorkingLog.Add(LoggerLevel.Critical, "Ошибка при переносе данных. ", ex);
                     errorNotifier.SendError($"{this.GetType().Name}.Error", ex);
                 }
-                Task.Delay(100).Wait();
+                await Task.Delay(100, cancelationTockenSource.Token);
             }
             IsStarted = false;
         }

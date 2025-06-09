@@ -13,17 +13,17 @@ namespace DoMCLib.Classes.Module.ArchiveDB.Commands
     public class SetConfigurationCommand : AbstractCommandBase
     {
         public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ArchiveDBConfiguration), null) { }
-        protected override async Task Executing() => ((ArchiveDBModule)Module).SetConfiguration((ArchiveDBConfiguration)InputData);
+        protected override async Task Executing() => ((ArchiveDBModule)Module).SetConfigurationAsync((ArchiveDBConfiguration)InputData);
     }
     public class StartCommand : AbstractCommandBase
     {
         public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
-        protected override async Task Executing() => ((ArchiveDBModule)Module).Start();
+        protected override async Task Executing() => ((ArchiveDBModule)Module).StartAsync();
     }
     public class StopCommand : AbstractCommandBase
     {
         public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
-        protected override async Task Executing() => ((ArchiveDBModule)Module).Stop();
+        protected override async Task Executing() => ((ArchiveDBModule)Module).StopAsync();
     }
     public class GetWorkingStatusCommand : AbstractCommandBase
     {

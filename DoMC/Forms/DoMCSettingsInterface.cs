@@ -69,26 +69,20 @@ namespace DoMC
             observer.NotificationReceivers += Observer_NotificationReceivers;
         }
 
-        private void Observer_NotificationReceivers(string EventName, object? arg2)
+        private async Task Observer_NotificationReceivers(string EventName, object? arg2)
         {
             if (EventName == DoMCApplicationContext.ConfigurationUpdateEventName)
             {
-                if (this.InvokeRequired)
-                {
-                    this.Invoke(new Action(() => PreparationsAfterChangingConfig()));
-                }
-                else
-                {
-                    PreparationsAfterChangingConfig();
-                }
+                this.InvokeAsync(() => PreparationsAfterChangingConfig());
             }
         }
-        private void PreparationsAfterChangingConfig()
+
+        private async Task PreparationsAfterChangingConfig()
         {
             Context.FillEquipmentSocket2CardSocket();
             FillSettingPage();
-
         }
+
         private void NotifyConfigurationUpdated()
         {
             observer.Notify(DoMCApplicationContext.ConfigurationUpdateEventName, Context.Configuration);
@@ -520,20 +514,20 @@ namespace DoMC
         }
 
 
-        private void btnMoveToArchive_Click(object sender, EventArgs e)
+        private async void btnMoveToArchive_Click(object sender, EventArgs e)
         {
 
             if (MovingCyclesToArchive)
             {
                 MovingCyclesToArchive = false;
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule.StartCommand))?.ExecuteCommand();
+                await new DoMCLib.Classes.Module.ArchiveDB.Commands.StartCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule))).ExecuteCommandAsync();
                 btnMoveToArchive.BackColor = SystemColors.Control;
 
             }
             else
             {
                 MovingCyclesToArchive = true;
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule.StopCommand))?.ExecuteCommand();
+                await new DoMCLib.Classes.Module.ArchiveDB.Commands.StopCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule))).ExecuteCommandAsync();
                 btnMoveToArchive.BackColor = Color.DarkGreen;
             }
 

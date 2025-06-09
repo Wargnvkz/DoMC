@@ -138,21 +138,13 @@ namespace DoMC
             StartArchiveDB();
         }
 
-        private void Observer_NotificationReceivers(string EventName, object? data)
+        private async Task Observer_NotificationReceivers(string EventName, object? data)
         {
             if (EventName == DoMCApplicationContext.ConfigurationUpdateEventName)
             {
                 var config = data as DoMCLib.Configuration.ApplicationConfiguration;
                 if (config == null) return;
-                if (this.InvokeRequired)
-                {
-                    archiveForm?.SetParameters(config.HardwareSettings.ArchiveDBConfig.LocalDBPath, config.HardwareSettings.ArchiveDBConfig.ArchiveDBPath);
-                    //this.Invoke(new Action(() => PreparationsAfterChangingConfig()));
-                }
-                else
-                {
-                    //PreparationsAfterChangingConfig();
-                }
+                archiveForm?.InvokeAsync(() => archiveForm?.SetParameters(config.HardwareSettings.ArchiveDBConfig.LocalDBPath, config.HardwareSettings.ArchiveDBConfig.ArchiveDBPath));
             }
             if (EventName.EndsWith($"{LEDCommandType.LEDSynchrosignalResponse}.{EventType.Received}"))
             {

@@ -1,4 +1,5 @@
-﻿using DoMCLib.Configuration;
+﻿using DoMC.Classes;
+using DoMCLib.Configuration;
 using DoMCLib.Tools;
 using DoMCModuleControl;
 using System;
@@ -64,20 +65,20 @@ namespace DoMCLib.Forms
             Observer.NotificationReceivers += Observer_NotificationReceivers;
         }
 
-        private void Observer_NotificationReceivers(string arg1, object? arg2)
+        private async Task Observer_NotificationReceivers(string arg1, object? arg2)
         {
             if (arg1 == EventNamesList.InterfaceImagesSelected)
             {
                 if (arg2 != null)
                 {
                     var data = ((short[,] Image, short[,] Standard, ImageProcessParameters ipp))arg2;
-                    this.Invoke(new Action(() =>
+                    this?.InvokeAsync(() =>
                     {
                         SetImage(data.Image);
                         SetStandardImage(data.Standard);
                         SetImageProcessParameters(data.ipp);
                         CalcImages();
-                    }));
+                    });
                 }
             }
         }
@@ -362,7 +363,7 @@ namespace DoMCLib.Forms
                 {
                     ReadLine = LineFrom2D(ImageToDraw, linen);
                     StandardLine = LineFrom2D(StandardImageToDraw, linen);
-                    DiffLine = LineFrom2D(ImageProcessResult?.ResultImage??null, linen);
+                    DiffLine = LineFrom2D(ImageProcessResult?.ResultImage ?? null, linen);
                 }
             }
 

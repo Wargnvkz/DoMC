@@ -103,7 +103,7 @@ namespace DoMCLib.Tools
                 var size = SizeOf(x);//System.Runtime.InteropServices.Marshal.SizeOf(x);
                 return size;
             }
-            catch (Exception exs)
+            catch 
             {
                 return -1;
             }
@@ -115,7 +115,7 @@ namespace DoMCLib.Tools
                 var size = System.Runtime.InteropServices.Marshal.SizeOf(o);
                 return size;
             }
-            catch (Exception exs)
+            catch 
             {
                 return -1;
             }
