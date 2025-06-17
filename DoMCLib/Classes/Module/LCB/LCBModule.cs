@@ -19,6 +19,7 @@ using System.Runtime.CompilerServices;
 using DoMCLib.Tools;
 using System.Threading;
 using DoMCLib.Classes.Module.CCD;
+using DoMCModuleControl.Commands;
 
 namespace DoMCLib.Classes.Module.LCB
 {
@@ -47,6 +48,18 @@ namespace DoMCLib.Classes.Module.LCB
         LCBWorkingParameters CurrentWorkingParameters = new LCBWorkingParameters();
         Task task;
         CancellationTokenSource cancellationTokenSource;
+        PendingCommandController<bool> _pendingCommandIsOK = new DoMCModuleControl.Commands.PendingCommandController<bool>();
+        PendingCommandController<int> _pendingCommandCurrent = new DoMCModuleControl.Commands.PendingCommandController<int>();
+        PendingCommandController<LEDMovementParameters> _pendingCommandLEDMovementParameters = new DoMCModuleControl.Commands.PendingCommandController<LEDMovementParameters>();
+        PendingCommandController<LEDEquimpentStatus> _pendingCommandLEDEquimpentStatus = new DoMCModuleControl.Commands.PendingCommandController<LEDEquimpentStatus>();
+
+
+        PendingCommandController<int> _pendingCommandMaxStrokeImpulses = new DoMCModuleControl.Commands.PendingCommandController<int>();
+        PendingCommandController<int> _pendingCommandCurStrokeImpulses = new DoMCModuleControl.Commands.PendingCommandController<int>();
+
+
+
+
 
         public LCBModule(IMainController mainController) : base(mainController)
         {
@@ -71,8 +84,7 @@ namespace DoMCLib.Classes.Module.LCB
             udp.EnableBroadcast = true;
             udp.AllowNatTraversal(false);
             cancellationTokenSource = new CancellationTokenSource();
-            task = new Task(Process);
-            task.Start();
+            task = Task.Run(Process);
         }
         /*public void StartForInterface(NetworkInterface ni)
         {
@@ -115,7 +127,7 @@ namespace DoMCLib.Classes.Module.LCB
             catch { }
             udp = null;
         }
-                
+
         // Вызов команд снаружи модуля
         /*public void SetLCBParameters(LCBSettings settings)
         {
@@ -126,89 +138,137 @@ namespace DoMCLib.Classes.Module.LCB
             CurrentWorkingParameters = parameters.Clone();
             CurrentObserver.Notify(this, Operations.ModuleParametersSet.ToString(), EventType.Success.ToString(), null);
         }
-        public void SetLCBCurrent(int current)
+        public async Task<bool> SetLCBCurrent(int current)
         {
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.SetLEDCurrentRequest;
-            cmd.Data = new byte[1];
-            cmd.Data[0] = (byte)(current / 10);
-            LEDOutCommands.Enqueue(cmd);
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+            return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLEDCurrentResponse, () =>
+            {
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.SetLEDCurrentRequest;
+                cmd.Data = new byte[1];
+                cmd.Data[0] = (byte)(current / 10);
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void GetLCBCurrent()
+        public async Task<int> GetLCBCurrent()
         {
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.GetLEDCurrentRequest;
-            cmd.Data = new byte[0];
-            LEDOutCommands.Enqueue(cmd);
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+            return await _pendingCommandCurrent.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLEDCurrentResponse, () =>
+            {
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.GetLEDCurrentRequest;
+                cmd.Data = new byte[0];
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void SetLCBMovementParameters(int PreformLength, int DelayLength)
+        public async Task<bool> SetLCBMovementParameters(int PreformLength, int DelayLength)
         {
-            var lmp = new LEDMovementParameters();
-            lmp.PreformLengthImpulses = PreformLength;
-            lmp.DelayLengthImpulses = DelayLength;
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+            return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBMovementParametersResponse, () =>
+            {
+                var lmp = new LEDMovementParameters();
+                lmp.PreformLengthImpulses = PreformLength;
+                lmp.DelayLengthImpulses = DelayLength;
 
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.SetLCBMovementParametersRequest;
-            cmd.Data = lmp.ToBytes();
-            LEDOutCommands.Enqueue(cmd);
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.SetLCBMovementParametersRequest;
+                cmd.Data = lmp.ToBytes();
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void GetLCBMovementParameters()
+        public async Task<LEDMovementParameters> GetLCBMovementParameters()
         {
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.GetLCBMovementParametersRequest;
-            cmd.Data = new byte[0];
-            LEDOutCommands.Enqueue(cmd);
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+            return await _pendingCommandLEDMovementParameters.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBMovementParametersResponse, () =>
+            {
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.GetLCBMovementParametersRequest;
+                cmd.Data = new byte[0];
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void SetLCBEquipmentStatus(LEDEquimpentStatus newStatus)
+        public async Task<bool> SetLCBEquipmentStatus(LEDEquimpentStatus newStatus)
         {
-            var les = new LEDEquimpentStatus();
-            les.Inputs = newStatus.Inputs;
-            les.Outputs = newStatus.Outputs;
-            les.Magnets = newStatus.Magnets;
-            les.Valve = newStatus.Valve;
-            les.LEDStatuses = newStatus.LEDStatuses;
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
 
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.SetLCBEquipmentStatusRequest;
-            cmd.Data = les.ToBytesFull();
-            LEDOutCommands.Enqueue(cmd);
+            return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBEquipmentStatusResponse, () =>
+            {
+
+                var les = new LEDEquimpentStatus();
+                les.Inputs = newStatus.Inputs;
+                les.Outputs = newStatus.Outputs;
+                les.Magnets = newStatus.Magnets;
+                les.Valve = newStatus.Valve;
+                les.LEDStatuses = newStatus.LEDStatuses;
+
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.SetLCBEquipmentStatusRequest;
+                cmd.Data = les.ToBytesFull();
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void GetLCBEquipmentStatus()
+        public async Task<LEDEquimpentStatus> GetLCBEquipmentStatus()
         {
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.GetLCBEquipmentStatusRequest;
-            cmd.Data = new byte[0];
-            LEDOutCommands.Enqueue(cmd);
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+
+            return await _pendingCommandLEDEquimpentStatus.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBEquipmentStatusResponse, () =>
+            {
+
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.GetLCBEquipmentStatusRequest;
+                cmd.Data = new byte[0];
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void SetLCBWorkMode()
+        public async Task<bool> SetLCBWorkMode()
         {
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.SetLCBWorkModeRequest;
-            cmd.Data = new byte[1];
-            cmd.Data[0] = (byte)1;
-            LEDOutCommands.Enqueue(cmd);
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+
+            return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBWorkModeResponse, () =>
+            {
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.SetLCBWorkModeRequest;
+                cmd.Data = new byte[1];
+                cmd.Data[0] = (byte)1;
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void SetLCBNonWorkMode()
+        public async Task<bool> SetLCBNonWorkMode()
         {
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.SetLCBWorkModeRequest;
-            cmd.Data = new byte[1];
-            cmd.Data[0] = (byte)0;
-            LEDOutCommands.Enqueue(cmd);
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+
+            return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBWorkModeResponse, () =>
+            {
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.SetLCBWorkModeRequest;
+                cmd.Data = new byte[1];
+                cmd.Data[0] = (byte)0;
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void GetLCBMaxPosition()
+        public async Task<int> GetLCBMaxPosition()
         {
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.GetLCBMaxHorizontalStrokeRequest;
-            cmd.Data = new byte[0];
-            LEDOutCommands.Enqueue(cmd);
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+
+            return await _pendingCommandMaxStrokeImpulses.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBMaxHorizontalStrokeResponse, () =>
+            {
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.GetLCBMaxHorizontalStrokeRequest;
+                cmd.Data = new byte[0];
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
-        public void GetLCBCurrentPosition()
+        public async Task<int> GetLCBCurrentPosition()
         {
-            var cmd = new LEDBlockCommand();
-            cmd.Command = (int)LEDCommandType.GetLCBCurrentHorizontalStrokeRequest;
-            cmd.Data = new byte[0];
-            LEDOutCommands.Enqueue(cmd);
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+
+            return await _pendingCommandCurStrokeImpulses.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBCurrentHorizontalStrokeResponse, () =>
+            {
+                var cmd = new LEDBlockCommand();
+                cmd.Command = (int)LEDCommandType.GetLCBCurrentHorizontalStrokeRequest;
+                cmd.Data = new byte[0];
+                LEDOutCommands.Enqueue(cmd);
+            });
         }
         private void Send()
         {
@@ -290,6 +350,7 @@ namespace DoMCLib.Classes.Module.LCB
                             case (int)LEDCommandType.SetLEDCurrentResponse://0x81:
                                 {
                                     var isOk = cmd.Data[0] == 1;
+                                    _pendingCommandIsOK.TrySetResult(cmd.Command, isOk);
                                     CurrentObserver.Notify(this, LEDCommandType.SetLEDCurrentResponse.ToString(), EventType.Received.ToString(), isOk);
                                 }
                                 break;
@@ -298,6 +359,8 @@ namespace DoMCLib.Classes.Module.LCB
                             case (int)LEDCommandType.GetLEDCurrentResponse://0x82:
                                 {
                                     var current = cmd.Data[0] * 10;
+                                    _pendingCommandCurrent.TrySetResult(cmd.Command, current);
+
                                     CurrentObserver.Notify(this, LEDCommandType.GetLEDCurrentResponse.ToString(), EventType.Received.ToString(), current);
                                 }
                                 break;
@@ -323,6 +386,8 @@ namespace DoMCLib.Classes.Module.LCB
                             case (int)LEDCommandType.SetLCBMovementParametersResponse://0x85:
                                 {
                                     var isOk = cmd.Data[0] == 1;
+                                    _pendingCommandIsOK.TrySetResult(cmd.Command, isOk);
+
                                     CurrentObserver.Notify(this, LEDCommandType.SetLCBMovementParametersResponse.ToString(), EventType.Received.ToString(), isOk);
                                 }
                                 break;
@@ -331,6 +396,8 @@ namespace DoMCLib.Classes.Module.LCB
                             case (int)LEDCommandType.GetLCBMovementParametersResponse://0x86:
                                 {
                                     var lmp = LEDMovementParameters.FromBytes(cmd.Data);
+                                    _pendingCommandLEDMovementParameters.TrySetResult(cmd.Command, lmp);
+
                                     CurrentObserver.Notify(this, LEDCommandType.GetLCBMovementParametersResponse.ToString(), EventType.Received.ToString(), lmp);
 
                                 }
@@ -340,6 +407,8 @@ namespace DoMCLib.Classes.Module.LCB
                             case (int)LEDCommandType.SetLCBEquipmentStatusResponse://0x87:
                                 {
                                     var isOk = cmd.Data[0] == 1;
+                                    _pendingCommandIsOK.TrySetResult(cmd.Command, isOk);
+
                                     CurrentObserver.Notify(this, LEDCommandType.SetLCBEquipmentStatusResponse.ToString(), EventType.Received.ToString(), isOk);
                                 }
                                 break;
@@ -348,6 +417,8 @@ namespace DoMCLib.Classes.Module.LCB
                             case (int)LEDCommandType.GetLCBEquipmentStatusResponse://0x88:
                                 {
                                     var les = LEDEquimpentStatus.FromBytes(cmd.Data);
+                                    _pendingCommandLEDEquimpentStatus.TrySetResult(cmd.Command, les);
+
                                     CurrentObserver.Notify(this, LEDCommandType.GetLCBEquipmentStatusResponse.ToString(), EventType.Received.ToString(), les);
                                 }
                                 break;
@@ -356,18 +427,24 @@ namespace DoMCLib.Classes.Module.LCB
                             case (int)LEDCommandType.SetLCBWorkModeResponse://0x89:
                                 {
                                     var isOk = cmd.Data[0] == 1;
+                                    _pendingCommandIsOK.TrySetResult(cmd.Command, isOk);
+
                                     CurrentObserver.Notify(this, LEDCommandType.SetLCBWorkModeResponse.ToString(), EventType.Received.ToString(), isOk);
                                 }
                                 break;
                             case (int)LEDCommandType.GetLCBMaxHorizontalStrokeResponse://0x8a:
                                 {
                                     var maxStrokeImpulses = (int)BitConverter.ToUInt16(cmd.Data, 0);
+                                    _pendingCommandMaxStrokeImpulses.TrySetResult(cmd.Command, maxStrokeImpulses);
+
                                     CurrentObserver.Notify(this, LEDCommandType.GetLCBMaxHorizontalStrokeResponse.ToString(), EventType.Received.ToString(), maxStrokeImpulses);
                                 }
                                 break;
                             case (int)LEDCommandType.GetLCBCurrentHorizontalStrokeResponse: //0x8b
                                 {
                                     var curStrokeImpulses = (int)BitConverter.ToUInt16(cmd.Data, 0);
+                                    _pendingCommandCurStrokeImpulses.TrySetResult(cmd.Command, curStrokeImpulses);
+
                                     CurrentObserver.Notify(this, LEDCommandType.GetLCBCurrentHorizontalStrokeResponse.ToString(), EventType.Received.ToString(), curStrokeImpulses);
                                 }
                                 break;
@@ -397,5 +474,7 @@ namespace DoMCLib.Classes.Module.LCB
             Received
         }
 
- }
+        public class NotConnectedException : Exception { }
+
+    }
 }

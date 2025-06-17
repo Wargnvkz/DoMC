@@ -486,6 +486,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             Task.WaitAll(tasks.ToArray(), CancelationTokenSourceToCancelCommandExecution.Token); // блокируем здесь, потому что это sync Executing()
             SetOutput(result);
         }
+        
     }
     public abstract class CCDSingleSocketCommand : GenericCommandBase<(int SocketNumber, DoMCApplicationContext Context), bool>
     {

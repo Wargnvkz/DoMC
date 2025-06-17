@@ -30,6 +30,17 @@ namespace DoMCModuleControl.Commands
         }
 
         public TOutput GetOutput() => OutputData;
+
+        public override async Task<TOutput> ExecuteCommandAsync()
+        {
+            return await base.ExecuteCommandAsync<TOutput>();
+
+        }
+
+        public async Task<TOutput> ExecuteCommandAsync(TInput input)
+        {
+            return await base.ExecuteCommandAsync<TOutput>(input);
+        }
     }
     public abstract class GenericCommandBase<TOutput> : AbstractCommandBase
     {
@@ -46,6 +57,20 @@ namespace DoMCModuleControl.Commands
         }
 
         public TOutput GetOutput() => OutputData;
+        public override async Task<TOutput> ExecuteCommandAsync()
+        {
+            return await base.ExecuteCommandAsync<TOutput>();
+
+        }
+
+    }
+
+    public abstract class GenericCommandBase : AbstractCommandBase
+    {
+
+        public GenericCommandBase(IMainController controller, AbstractModuleBase module)
+            : base(controller, module, null, null) { }
+
     }
 
 }

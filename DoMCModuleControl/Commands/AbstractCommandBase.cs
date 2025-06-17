@@ -151,13 +151,13 @@ namespace DoMCModuleControl.Commands
             {
             }
         }
-        public async Task ExecuteCommandAsync()
+        public virtual async Task ExecuteCommandAsync()
         {
             await ExecuteCommandBase();
 
         }
 
-        public async Task<T> ExecuteCommandAsync<T>()
+        public virtual async Task<T> ExecuteCommandAsync<T>()
         {
             await ExecuteCommandBase();
 
@@ -168,7 +168,7 @@ namespace DoMCModuleControl.Commands
             
         }
 
-        public async Task<T> ExecuteCommandAsync<T>(object? inputData)
+        public virtual async Task<T> ExecuteCommandAsync<T>(object? inputData)
         {
             SetInputData(inputData);
             return await ExecuteCommandAsync<T>();

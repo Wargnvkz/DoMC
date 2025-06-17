@@ -155,7 +155,7 @@ namespace DoMCLib.Classes
         public enum LastCCDAction
         {
             Starting,
-            LocadConfig,
+            LoadConfig,
             Reading,
             GettingImages,
             Stopping
