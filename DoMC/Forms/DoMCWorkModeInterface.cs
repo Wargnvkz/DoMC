@@ -164,7 +164,7 @@ namespace DoMC
             }
             if (EventName.EndsWith($"{LEDCommandType.LEDStatusResponse}.{EventType.Received}"))
             {
-                var les = (LEDEquimpentStatus)data!;
+                var les = (LEDEquipmentStatus)data!;
                 LCBStatus.LEDStatus = les.LEDStatuses;
                 LCBStatus.LastLedStatusesGotTime = DateTime.Now;
                 WorkingLog.Add(LoggerLevel.Critical, $"Пришел статус светодиодов.");
@@ -756,7 +756,7 @@ namespace DoMC
                         WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при чтении данных гнезд. Чтение не завершено.");
                         WorkingLog.Add(LoggerLevel.Critical, "Чтение состояния БУС");
                         var start = DateTime.Now;
-                        var LCBres = Controller.CreateCommandInstance(typeof(LCBModule.GetLCBEquipmentStatusCommand)).Wait(null, 2, out LEDEquimpentStatus Status);
+                        var LCBres = Controller.CreateCommandInstance(typeof(LCBModule.GetLCBEquipmentStatusCommand)).Wait(null, 2, out LEDEquipmentStatus Status);
                         if (LCBres)
                         {
                             // если БУС - Авария

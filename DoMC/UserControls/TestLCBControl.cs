@@ -116,7 +116,7 @@ namespace DoMC.UserControls
 
 
             var res = MainController.CreateCommandInstance(typeof(GetLCBEquipmentStatusCommand))
-                .Wait(this, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out LEDEquimpentStatus LEDStatus);
+                .Wait(this, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out LEDEquipmentStatus LEDStatus);
             //GetLCBEquipmentStatusCommand
 
             /*SendCommand(ModuleCommand.GetLCBEquipmentStatusRequest);
@@ -147,7 +147,7 @@ namespace DoMC.UserControls
         private void btnTestLCBWriteStatuses_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
-            LEDEquimpentStatus LEDStatus = new LEDEquimpentStatus();
+            LEDEquipmentStatus LEDStatus = new LEDEquipmentStatus();
             for (int o = 0; o < TestLCBOutputs.Length; o++)
             {
                 LEDStatus.Outputs[o] = TestLCBOutputs[o].CheckState != CheckState.Unchecked;
@@ -268,7 +268,7 @@ namespace DoMC.UserControls
             checkboxes.AddRange(TestLCBLEDs);
             checkboxes.AddRange(TestLCBOutputs);
             checkboxes.Add(null);
-            LEDEquimpentStatus LEDStatus = new LEDEquimpentStatus();
+            LEDEquipmentStatus LEDStatus = new LEDEquipmentStatus();
             for (int o1 = 0; o1 < checkboxes.Count; o1++)
             {
                 for (int i1 = 0; i1 < checkboxes.Count; i1++)
@@ -297,7 +297,7 @@ namespace DoMC.UserControls
 
                 Application.DoEvents();
                 var res = MainController.CreateCommandInstance(typeof(SetLCBEquipmentStatusCommand))
-                    .Wait(new LEDEquimpentStatus() { Inputs = LEDStatus.Inputs, LEDStatuses = LEDStatus.LEDStatuses, Magnets = LEDStatus.Magnets, Outputs = LEDStatus.Outputs, Valve = LEDStatus.Valve }, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
+                    .Wait(new LEDEquipmentStatus() { Inputs = LEDStatus.Inputs, LEDStatuses = LEDStatus.LEDStatuses, Magnets = LEDStatus.Magnets, Outputs = LEDStatus.Outputs, Valve = LEDStatus.Valve }, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
 
                 if (!res || !result)
                 {

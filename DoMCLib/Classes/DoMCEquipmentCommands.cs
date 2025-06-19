@@ -133,52 +133,37 @@ namespace DoMCLib.Classes
                 }
             }
         }
-        public async static Task<(bool, CCDCardDataCommandResponse)> ReadSockets(IMainController Controller, ILogger WorkingLog, bool IsExternalRead, out CCDCardDataCommandResponse result, int? socketNumber = null, CancellationTokenSource cancellationTokenSource = null)
-        {
-            LastAction = LastCCDAction.Reading;
-            if (IsExternalRead)
-            {
-                if (!socketNumber.HasValue)
-                {
-                    result = await new SendReadSocketsWithExternalSignalCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync<CCDCardDataCommandResponse>();
-                    return Controller.CreateCommandInstance(typeof(SendReadSocketsWithExternalSignalCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
-                }
-                else
-                {
-                    return Controller.CreateCommandInstance(typeof(SendReadSingleSocketWithExternalSignalCommand), typeof(CCDCardDataModule))
-                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
 
-                }
-            }
-            else
-            {
-                if (!socketNumber.HasValue)
-                {
-                    result = await new SendReadSocketsCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync<CCDCardDataCommandResponse>();
-                    return Controller.CreateCommandInstance(typeof(SendReadSocketCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
-                }
-                else
-                {
-                    return Controller.CreateCommandInstance(typeof(SendReadSingleSocketCommand), typeof(CCDCardDataModule))
-                        .Wait((this, socketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
-                }
-            }
-        }
 
-        public async static Task<(bool, GetImageDataCommandResponse)> GetSocketsImages(IMainController Controller, ILogger WorkingLog, out GetImageDataCommandResponse result, int? EquipmentSocketNumber = null, CancellationTokenSource cancellationTokenSource = null)
+        public async static Task<(bool, GetImageDataCommandResponse)> GetSocketsImages(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog)
         {
             LastAction = LastCCDAction.GettingImages;
-            if (EquipmentSocketNumber == null)
+
+            try
             {
-                return Controller.CreateCommandInstance(typeof(GetSocketsImagesDataCommand), typeof(CCDCardDataModule))
-                        .Wait(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
+                var result = await new CCDAllSocketsImagesCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync<GetImageDataCommandResponse>(context);
+                if ((result?.CardsNotAnswered().Count ?? 0) > 0)
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
+                }
+                return (true, result);
             }
-            else
+            catch { return (false, null); }
+
+
+        }
+        public async static Task<SocketReadData?> GetSingleSocketsImage(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog, int EquipmentSocketNumber, CancellationTokenSource cancellationTokenSource = null)
+        {
+            LastAction = LastCCDAction.GettingImages;
+            try
             {
-                return Controller.CreateCommandInstance(typeof(GetSingleSocketImageDataCommand), typeof(CCDCardDataModule))
-                        .Wait((this, EquipmentSocketNumber.Value), Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out result, cancellationTokenSource);
+                var result = await new CCDGetSingleSocketImageCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync<SocketReadData>((EquipmentSocketNumber, context));
+                return result;
+            }
+            catch
+            {
+                WorkingLog.Add(LoggerLevel.Critical, $"Не удалось получить изображение для {EquipmentSocketNumber}");
+                return null;
             }
         }
         public async static Task<(bool, CCDCardDataCommandResponse)> TestCards(IMainController Controller, ILogger WorkingLog)
@@ -189,7 +174,7 @@ namespace DoMCLib.Classes
 
 
         }
-        public async static Task<(bool, CCDCardDataCommandResponse)> ResetCards(IMainController Controller, ILogger WorkingLog, int? SocketNumber = null)
+        public async static Task<(bool, CCDCardDataCommandResponse)> ResetCards(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog, int? SocketNumber = null)
         {
             LastAction = LastCCDAction.LoadConfig;
             if (SocketNumber == null)
@@ -247,30 +232,41 @@ namespace DoMCLib.Classes
         public async static Task<bool> StopLCB(IMainController Controller, ILogger WorkingLog)
         {
             WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Отключение от БУС");
-            if (!Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand))
-                .Wait<object>(this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out _))
-            //if (!WaitForCommand<LCBModule.LCBStopCommand, SetReadingParametersCommandResult>(Controller, WorkingLog, this, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, "Отключение от БУС", LoggerLevel.FullDetailedInformation, out SetReadingParametersCommandResult? result))
+            try
             {
-                /*if (result != null)
-                {
-                    WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
-                }*/
+                await new DoMCLib.Classes.Module.LCB.Commands.LCBStopCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.LCB.LCBModule))).ExecuteCommandAsync();
+                return true;
             }
-            return true;
+            catch
+            {
+                return false;
+            }
         }
         public async static Task<bool> SetLCBWorkingMode(IMainController Controller, ILogger WorkingLog)
         {
             WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Подключение к БУС");
-            var res = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBWorkModeCommand))
-                .Wait<bool>(null, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
-            return res && result;
+            try
+            {
+                await new DoMCLib.Classes.Module.LCB.Commands.SetLCBWorkModeCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.LCB.LCBModule))).ExecuteCommandAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
-        public async static bool SetLCBNonWorkingMode(IMainController Controller, ILogger WorkingLog)
+        public async static Task<bool> SetLCBNonWorkingMode(IMainController Controller, ILogger WorkingLog)
         {
             WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Подключение к БУС");
-            var res = Controller.CreateCommandInstance(typeof(LCBModule.SetLCBNonWorkModeCommand))
-                .Wait<bool>(null, Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
-            return res && result;
+            try
+            {
+                await new DoMCLib.Classes.Module.LCB.Commands.SetLCBNonWorkModeCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.LCB.LCBModule))).ExecuteCommandAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
 
@@ -303,6 +299,8 @@ namespace DoMCLib.Classes
             }
             catch { return (false, null); }
         }
+
+
         #endregion
     }
 }

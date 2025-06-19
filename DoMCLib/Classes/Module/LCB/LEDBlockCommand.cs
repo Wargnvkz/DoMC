@@ -102,7 +102,7 @@ namespace DoMCLib.Classes.Module.LCB
         GetLCBCurrentHorizontalStrokeResponse = 0x8b
 
     }
-    public class LEDEquimpentStatus
+    public class LEDEquipmentStatus
     {
         public bool[] LEDStatuses = new bool[12];
         public bool[] Inputs = new bool[8];
@@ -138,10 +138,10 @@ namespace DoMCLib.Classes.Module.LCB
             return res;
         }
 
-        public static LEDEquimpentStatus FromBytes(byte[] bytes)
+        public static LEDEquipmentStatus FromBytes(byte[] bytes)
         {
             if (bytes.Length != 2 && bytes.Length != 4) return null;
-            var lbc = new LEDEquimpentStatus();
+            var lbc = new LEDEquipmentStatus();
             switch (bytes.Length)
             {
                 case 2:

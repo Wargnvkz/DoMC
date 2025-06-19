@@ -231,7 +231,7 @@ namespace DoMCLib.Classes.Module.CCD
             }
         }
 
-        public async Task<(SocketReadData, bool)[]> GetImageDataFromAllSocketsAsync(int msTimeout, CancellationToken cancellationToken)
+        private async Task<(SocketReadData, bool)[]> GetImageDataFromAllSocketsAsync(int msTimeout, CancellationToken cancellationToken)
         {
             var result = new (SocketReadData, bool)[8];
             for (int socket = 0; socket < 8; socket++)

@@ -20,15 +20,15 @@ using Microsoft.AspNetCore.Http.Metadata;
 
 namespace DoMCLib.Classes.Module.API
 {
-    public partial class API : AbstractModuleBase
+    public partial class APIModule : AbstractModuleBase
     {
         WebApplication _app;
         public bool IsStarted { get; private set; } = false;
-        public API(IMainController MainController) : base(MainController)
+        public APIModule(IMainController MainController) : base(MainController)
         {
         }
 
-        public void StartServer()
+        public async Task StartServer()
         {
             if (IsStarted) return;
             try
@@ -131,10 +131,10 @@ namespace DoMCLib.Classes.Module.API
                     }
                 });
 
-                _app.Start();
-                MainController.GetObserver().Notify("REST.API.Started", null);
+                await _app.StartAsync();
+                MainController.GetObserver().Notify("REST.APIModule.Started", null);
                 IsStarted = true;
-                MainController.GetLogger(this.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.Information, "Сервер REST API запущен");
+                MainController.GetLogger(this.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.Information, "Сервер REST APIModule запущен");
                 _app.Logger.LogInformation("Server started on http://0.0.0.0:8080");
             }
             catch (Exception ex)
@@ -143,16 +143,15 @@ namespace DoMCLib.Classes.Module.API
                 _app?.Logger.LogError(ex, "Failed to start server");
             }
         }
-        public void StopServer()
+        public async Task StopServer()
         {
             if (!IsStarted || _app == null) return;
             try
             {
-                var stopTask = _app.StopAsync();
-                stopTask.Wait();
+                await _app.StopAsync();
                 _app.Logger.LogInformation("Server stopped");
-                MainController.GetObserver().Notify("REST.API.Stopped", null);
-                MainController.GetLogger(this.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.Information, "Сервер REST API остановлен");
+                MainController.GetObserver().Notify("REST.APIModule.Stopped", null);
+                MainController.GetLogger(this.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.Information, "Сервер REST APIModule остановлен");
             }
             catch (Exception ex)
             {

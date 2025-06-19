@@ -38,9 +38,9 @@ namespace DoMC
 
             var mainForm = (Form)Controller.GetMainUserInterface();
             mainForm.Shown += (sender, args) => mainForm.Activate();
-            Controller.CreateCommandInstance(typeof(API.StartRESTAPIServerCommand)).Wait(5);
+            Controller.CreateCommandInstance(typeof(APIModule.StartRESTAPIServerCommand)).Wait(5);
             Application.Run(mainForm);
-            Controller.CreateCommandInstance(typeof(API.StopRESTAPIServerCommand)).Wait(5);
+            Controller.CreateCommandInstance(typeof(APIModule.StopRESTAPIServerCommand)).Wait(5);
         }
 
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)

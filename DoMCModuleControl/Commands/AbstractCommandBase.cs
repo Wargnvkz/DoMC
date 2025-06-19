@@ -165,7 +165,7 @@ namespace DoMCModuleControl.Commands
                 return result;
 
             throw new InvalidOperationException($"Тип выходных данных {OutputData?.GetType().Name} не соответствует ожидаемому {typeof(T).Name}.");
-            
+
         }
 
         public virtual async Task<T> ExecuteCommandAsync<T>(object? inputData)
@@ -209,7 +209,23 @@ namespace DoMCModuleControl.Commands
                 throw new InvalidOperationException($"Выходные данные не являются данными типа {typeof(T).Name}.");
             }
         }
-        
+
     }
+
+    /*
+    public interface IExecuteAsync<TInput, TOutput>
+    {
+        public Task<TOutput> ExecuteAsync(TInput input);
+    }
+    public interface IExecuteAsync<TOutput>
+    {
+        public Task<TOutput> ExecuteAsync();
+    }
+
+    public interface IExecuteAsync
+    {
+        public Task ExecuteAsync();
+    }
+    */
 
 }

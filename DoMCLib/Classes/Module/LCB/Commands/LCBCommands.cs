@@ -44,12 +44,12 @@ namespace DoMCLib.Classes.Module.LCB.Commands
         public GetLCBMovementParametersCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => SetOutput(await ((LCBModule)Module).GetLCBMovementParameters());
     }
-    public class SetLCBEquipmentStatusCommand : GenericCommandBase<LEDMovementParameters, bool>
+    public class SetLCBEquipmentStatusCommand : GenericCommandBase<LEDEquipmentStatus, bool>
     {
         public SetLCBEquipmentStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => SetOutput(await ((LCBModule)Module).SetLCBEquipmentStatus(InputData));
     }
-    public class GetLCBEquipmentStatusCommand : GenericCommandBase<LEDEquimpentStatus>
+    public class GetLCBEquipmentStatusCommand : GenericCommandBase<LEDEquipmentStatus>
     {
         public GetLCBEquipmentStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => SetOutput(await ((LCBModule)Module).GetLCBEquipmentStatus());

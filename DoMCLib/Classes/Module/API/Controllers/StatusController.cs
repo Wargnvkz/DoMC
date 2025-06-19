@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace DoMCLib.Classes.Module.API.Controllers
 {
     [Route("api/[controller]")] // Маршрут: /api/status
-    [ApiController] // Упрощает обработку API (валидация, JSON)
+    [ApiController] // Упрощает обработку APIModule (валидация, JSON)
     public class StatusController : ControllerBase
     {
         [HttpGet] // GET /api/status

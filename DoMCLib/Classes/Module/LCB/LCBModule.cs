@@ -51,7 +51,7 @@ namespace DoMCLib.Classes.Module.LCB
         PendingCommandController<bool> _pendingCommandIsOK = new DoMCModuleControl.Commands.PendingCommandController<bool>();
         PendingCommandController<int> _pendingCommandCurrent = new DoMCModuleControl.Commands.PendingCommandController<int>();
         PendingCommandController<LEDMovementParameters> _pendingCommandLEDMovementParameters = new DoMCModuleControl.Commands.PendingCommandController<LEDMovementParameters>();
-        PendingCommandController<LEDEquimpentStatus> _pendingCommandLEDEquimpentStatus = new DoMCModuleControl.Commands.PendingCommandController<LEDEquimpentStatus>();
+        PendingCommandController<LEDEquipmentStatus> _pendingCommandLEDEquimpentStatus = new DoMCModuleControl.Commands.PendingCommandController<LEDEquipmentStatus>();
 
 
         PendingCommandController<int> _pendingCommandMaxStrokeImpulses = new DoMCModuleControl.Commands.PendingCommandController<int>();
@@ -152,7 +152,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<int> GetLCBCurrent()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
             return await _pendingCommandCurrent.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLEDCurrentResponse, () =>
             {
                 var cmd = new LEDBlockCommand();
@@ -178,7 +178,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<LEDMovementParameters> GetLCBMovementParameters()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
             return await _pendingCommandLEDMovementParameters.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBMovementParametersResponse, () =>
             {
                 var cmd = new LEDBlockCommand();
@@ -187,14 +187,14 @@ namespace DoMCLib.Classes.Module.LCB
                 LEDOutCommands.Enqueue(cmd);
             });
         }
-        public async Task<bool> SetLCBEquipmentStatus(LEDEquimpentStatus newStatus)
+        public async Task<bool> SetLCBEquipmentStatus(LEDEquipmentStatus newStatus)
         {
             if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
 
             return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBEquipmentStatusResponse, () =>
             {
 
-                var les = new LEDEquimpentStatus();
+                var les = new LEDEquipmentStatus();
                 les.Inputs = newStatus.Inputs;
                 les.Outputs = newStatus.Outputs;
                 les.Magnets = newStatus.Magnets;
@@ -207,9 +207,9 @@ namespace DoMCLib.Classes.Module.LCB
                 LEDOutCommands.Enqueue(cmd);
             });
         }
-        public async Task<LEDEquimpentStatus> GetLCBEquipmentStatus()
+        public async Task<LEDEquipmentStatus> GetLCBEquipmentStatus()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
 
             return await _pendingCommandLEDEquimpentStatus.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBEquipmentStatusResponse, () =>
             {
@@ -248,7 +248,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<int> GetLCBMaxPosition()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
 
             return await _pendingCommandMaxStrokeImpulses.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBMaxHorizontalStrokeResponse, () =>
             {
@@ -260,7 +260,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<int> GetLCBCurrentPosition()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new NotConnectedException();
+            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
 
             return await _pendingCommandCurStrokeImpulses.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBCurrentHorizontalStrokeResponse, () =>
             {
@@ -376,7 +376,7 @@ namespace DoMCLib.Classes.Module.LCB
                                 break;*/
                             case (int)LEDCommandType.LEDStatusResponse://0x84:
                                 {
-                                    var les = LEDEquimpentStatus.FromBytes(cmd.Data);
+                                    var les = LEDEquipmentStatus.FromBytes(cmd.Data);
                                     WorkingLog.Add(LoggerLevel.Information, $"Получен статус светодиодов - {string.Join("", les.LEDStatuses.Select(i => i ? 1 : 0))}");
                                     CurrentObserver.Notify(this, LEDCommandType.LEDStatusResponse.ToString(), EventType.Received.ToString(), les);
                                 }
@@ -416,7 +416,7 @@ namespace DoMCLib.Classes.Module.LCB
                                 break;*/
                             case (int)LEDCommandType.GetLCBEquipmentStatusResponse://0x88:
                                 {
-                                    var les = LEDEquimpentStatus.FromBytes(cmd.Data);
+                                    var les = LEDEquipmentStatus.FromBytes(cmd.Data);
                                     _pendingCommandLEDEquimpentStatus.TrySetResult(cmd.Command, les);
 
                                     CurrentObserver.Notify(this, LEDCommandType.GetLCBEquipmentStatusResponse.ToString(), EventType.Received.ToString(), les);
@@ -474,7 +474,6 @@ namespace DoMCLib.Classes.Module.LCB
             Received
         }
 
-        public class NotConnectedException : Exception { }
 
     }
 }

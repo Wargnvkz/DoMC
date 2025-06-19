@@ -37,7 +37,7 @@ namespace DoMCLib.Classes.Module.DB
             ObserverForDataStorage.NotificationReceivers += ObserverForDataStorage_NotificationReceived;
             ExternalObserver = MainController.GetObserver();
         }
-        private void ObserverForDataStorage_NotificationReceived(string Name, object? data)
+        private async Task ObserverForDataStorage_NotificationReceived(string Name, object? data)
         {
             switch (Name)
             {

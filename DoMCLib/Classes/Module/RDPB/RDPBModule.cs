@@ -2,6 +2,7 @@
 using DoMCLib.Classes.Module.RDPB.Classes;
 using DoMCLib.Configuration;
 using DoMCModuleControl;
+using DoMCModuleControl.Commands;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
 using System;
@@ -39,7 +40,8 @@ namespace DoMCLib.Classes.Module.RDPB
         private ILogger WorkingLog;
 
         Task task;
-        CancellationTokenSource cancelationTockenSource;
+        CancellationTokenSource cancelationTokenSource;
+        PendingCommandController<RDPBStatus> _pendingCommandController = new PendingCommandController<RDPBStatus>();
 
         public RDPBModule(IMainController MainController) : base(MainController)
         {
@@ -47,31 +49,29 @@ namespace DoMCLib.Classes.Module.RDPB
             WorkingLog = mainController.GetLogger(this.GetType().Name);
             WorkingLog.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
         }
-        public void SetConfig(ApplicationConfiguration config)
+        public async Task SetConfig(ApplicationConfiguration config)
         {
             var wasConnected = IsConnected;
-            if (wasConnected) Stop();
+            if (wasConnected) await Stop();
             RDPBConfig = config.HardwareSettings.RemoveDefectedPreformBlockConfig;
             remoteIP = new IPEndPoint(IPAddress.Parse(RDPBConfig.IP), RDPBConfig.Port);
             CurrentStatus.SetTimeout(config.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds);
-            if (wasConnected) Start();
+            if (wasConnected) await Start();
         }
 
-        public void Start()
+        public async Task Start()
         {
             if (IsStarted) return;
-            MakeConnected();
+            await MakeConnected();
 
-            cancelationTockenSource = new CancellationTokenSource();
-            task = new Task(RDPBProcessDataThreadProc);
-            task.Start();
+            cancelationTokenSource = new CancellationTokenSource();
+            task = Task.Run(RDPBProcessDataThreadProc);
 
             WorkingLog.Add(LoggerLevel.Critical, "Модуль запущен");
         }
-        public void Stop()
+        public async Task Stop()
         {
-            cancelationTockenSource.Cancel();
-            task.Wait();
+            cancelationTokenSource.Cancel();
             try { client?.Close(); } catch { }
             IsStarted = false;
             WorkingLog.Add(LoggerLevel.Critical, "Модуль остановлен");
@@ -94,7 +94,7 @@ namespace DoMCLib.Classes.Module.RDPB
             else return true;
         }
 
-        private void MakeConnected()
+        private async Task MakeConnected()
         {
             if (DoConnectionNeedToRestart())
             {
@@ -105,35 +105,38 @@ namespace DoMCLib.Classes.Module.RDPB
 
                 }
                 client = new TcpClient();
-                client.Connect(remoteIP);
+                await client.ConnectAsync(remoteIP);
             }
 
         }
 
-        public void Send(RDPBCommandType Command, int CoolingBlocks = 0)
+        public async Task<RDPBStatus> Send(RDPBCommandType Command, CancellationToken Token, int CoolingBlocks = 0)
         {
             if (client.Connected)
             {
-                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда модулю бракера: <{Command.ToString()}>");
-                CurrentStatus.SetTimeLastSent();
-                //CurrentStatus.LastSentTime = Timer.ElapsedTicks;//DateTime.Now;
-                RDPBStatus stat = new RDPBStatus();
-                stat.CommandType = Command;
-                stat.MachineNumber = MachineNumber;
-                stat.CoolingBlocksQuantity = CoolingBlocks;
-                CurrentStatus.SentCommandType = Command;
-                CurrentStatus.SetTimeCommandSent();
-                //CurrentStatus.TimeCommandSent = Timer.ElapsedTicks;//DateTime.Now;
-                var str = stat.ToString();
-                WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда бракеру: <{str.Trim()}>");
-                var bytes = Encoding.ASCII.GetBytes(str);
-                var ns = client.GetStream();
-                ns.Write(bytes, 0, bytes.Length);
+                return await _pendingCommandController.AsyncCommand(Token, null, () =>
+                {
+                    WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда модулю бракера: <{Command.ToString()}>");
+                    CurrentStatus.SetTimeLastSent();
+                    //CurrentStatus.LastSentTime = Timer.ElapsedTicks;//DateTime.Now;
+                    RDPBStatus stat = new RDPBStatus();
+                    stat.CommandType = Command;
+                    stat.MachineNumber = MachineNumber;
+                    stat.CoolingBlocksQuantity = CoolingBlocks;
+                    CurrentStatus.SentCommandType = Command;
+                    CurrentStatus.SetTimeCommandSent();
+                    //CurrentStatus.TimeCommandSent = Timer.ElapsedTicks;//DateTime.Now;
+                    var str = stat.ToString();
+                    WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда бракеру: <{str.Trim()}>");
+                    var bytes = Encoding.ASCII.GetBytes(str);
+                    var ns = client.GetStream();
+                    ns.Write(bytes, 0, bytes.Length);
+                });
             }
             else
             {
                 WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Нет подключения к бракёру");
-
+                throw new DoMCNotConnectedException();
             }
 
         }
@@ -231,6 +234,8 @@ namespace DoMCLib.Classes.Module.RDPB
                         WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получено от бракера: <{AnswerString.Trim()}>");
                         var result = CurrentStatus.ChangeFromString(AnswerString);
                         mainController.GetObserver().Notify(this, CurrentStatus.CommandType.ToString(), result.ToString(), CurrentStatus);
+
+                        _pendingCommandController.TrySetResult(0, CurrentStatus);
                     }
                     while (buffer.Length > 0);
                 }
@@ -245,7 +250,7 @@ namespace DoMCLib.Classes.Module.RDPB
         {
             WorkingLog?.Add(LoggerLevel.Critical, "Запуск потока обработки модуля бракера");
             IsStarted = true;
-            while (!cancelationTockenSource.Token.IsCancellationRequested)
+            while (!cancelationTokenSource.Token.IsCancellationRequested)
             {
 
                 try
