@@ -74,16 +74,16 @@ namespace DoMC
 
         }
 
-        private void StopReading()
+        private async Task StopReading()
         {
             try
             {
-                CurrentContext.StopCCD(Controller, WorkingLog, out CCDCardDataCommandResponse stopResult);
+                await DoMCEquipmentCommands.StopCCD(Controller, CurrentContext, WorkingLog);
             }
             catch { }
             try
             {
-                CurrentContext.StopLCB(Controller, WorkingLog);
+                await DoMCEquipmentCommands.StopLCB(Controller, WorkingLog);
             }
             catch { }
             ResetInterface();
@@ -98,7 +98,7 @@ namespace DoMC
             }));
         }
 
-        private void FullStandardGet()
+        private async void FullStandardGet()
         {
             PictureBox[] StandardPictures = new PictureBox[3] { pbStandard1, pbStandard2, pbStandard3 };
             short[][][,] img = new short[CurrentContext.Configuration.HardwareSettings.SocketQuantity][][,];
@@ -107,17 +107,18 @@ namespace DoMC
             int socketMax = CurrentContext.Configuration.HardwareSettings.SocketQuantity;
             errorReadingData.Clear();
 
-            if (CurrentContext.StartCCD(Controller, WorkingLog, out CCDCardDataCommandResponse startResult))
+            var startResult = await DoMCEquipmentCommands.StartCCD(Controller, CurrentContext, WorkingLog);
+            if (startResult.Item1)
             {
                 try
                 {
-                    if (CurrentContext.StartLCB(Controller, WorkingLog))
+                    if (await DoMCEquipmentCommands.StartLCB(Controller, WorkingLog))
                     {
-                        if (CurrentContext.SetLCBWorkingMode(Controller, WorkingLog))
+                        if (await DoMCEquipmentCommands.SetLCBWorkingMode(Controller, WorkingLog))
                         {
-                            if (CurrentContext.LoadCCDConfiguration(Controller, WorkingLog,out CCDCardDataCommandResponse LoadCfgResult))
+                            if ((await DoMCEquipmentCommands.LoadCCDConfiguration(Controller, CurrentContext, WorkingLog)).Item1)
                             {
-                                if (CurrentContext.SetFastRead(Controller, WorkingLog))
+                                if ((await DoMCEquipmentCommands.SetFastRead(Controller, CurrentContext, WorkingLog)).Item1)
                                 {
                                     for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                     {
@@ -126,16 +127,13 @@ namespace DoMC
                                     int StandartImageNumReading = 0;
                                     for (int repeat = 0; repeat < MaxImagesReadToMakeStandard && StandartImageNumReading < ImagesToMakeStandard; repeat++)
                                     {
-                                        if (CurrentContext.ReadSockets(Controller, WorkingLog, true, out CCDCardDataCommandResponse readResult))
+                                        if ((await DoMCEquipmentCommands.ReadSockets(Controller, CurrentContext, WorkingLog, true)).Item1)
                                         {
-                                            var si = CurrentContext.GetSocketsImages(Controller, WorkingLog, out GetImageDataCommandResponse getImageResult);
-                                            if (getImageResult == null) throw new Exception();
-                                            if (getImageResult.Data == null) throw new Exception();
-                                            if (getImageResult.Data.Length != socketMax) throw new Exception();
+                                            var getImageResult = await DoMCEquipmentCommands.GetSocketsImages(Controller, CurrentContext, WorkingLog);
                                             for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                             {
-                                                if (getImageResult.Data[socketNum] != null)
-                                                    img[socketNum][StandartImageNumReading] = getImageResult.Data[socketNum].Image;
+                                                if (getImageResult.Item2[socketNum] != null)
+                                                    img[socketNum][StandartImageNumReading] = getImageResult.Item2[socketNum].Image;
                                                 var errorCards = errorReadingData.ErrorCards();
                                                 if (errorCards.Count > 0)
                                                 {
@@ -199,7 +197,7 @@ namespace DoMC
                 }
                 finally
                 {
-                    StopReading();
+                    await StopReading();
                 }
             }
             else

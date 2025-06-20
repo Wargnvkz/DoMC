@@ -54,15 +54,15 @@ namespace DoMCLib.Classes.Module.LCB.Commands
         public GetLCBEquipmentStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => SetOutput(await ((LCBModule)Module).GetLCBEquipmentStatus());
     }
-    public class SetLCBWorkModeCommand : GenericCommandBase
+    public class SetLCBWorkModeCommand : GenericCommandBase<bool>
     {
         public SetLCBWorkModeCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((LCBModule)Module).SetLCBWorkMode();
+        protected override async Task Executing() => SetOutput(await ((LCBModule)Module).SetLCBWorkMode());
     }
-    public class SetLCBNonWorkModeCommand : GenericCommandBase
+    public class SetLCBNonWorkModeCommand : GenericCommandBase<bool>
     {
         public SetLCBNonWorkModeCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((LCBModule)Module).SetLCBNonWorkMode();
+        protected override async Task Executing() => SetOutput(await ((LCBModule)Module).SetLCBNonWorkMode());
     }
     public class GetLCBMaxPositionCommand : GenericCommandBase<int>
     {

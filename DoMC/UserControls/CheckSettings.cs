@@ -14,6 +14,7 @@ using DoMCLib.Classes.Module.CCD.Commands.Classes;
 using DoMC.Tools;
 using DoMCLib.Tools;
 using DoMCLib.Classes.Module.CCD;
+using DoMCLib.Classes;
 
 namespace DoMC.UserControls
 {
@@ -74,21 +75,22 @@ namespace DoMC.UserControls
             }
         }
 
-        private void btnSettingsCheckCardStatus_Click(object sender, EventArgs e)
+        private async void btnSettingsCheckCardStatus_Click(object sender, EventArgs e)
         {
-            if (CurrentContext.TestCards(MainController, WorkingLog, out CCDCardDataCommandResponse result))
+            var result = await DoMCEquipmentCommands.TestCards(MainController, WorkingLog);
+            if (result.Item1)
             {
-                for (int i = 0; i < result.requested.Length; i++)
+                for (int i = 0; i < result.Item2.requested.Length; i++)
                 {
-                    if (result.requested[i])
+                    if (result.Item2.requested[i])
                     {
-                        CardsChecks[i] = result.answered[i];
+                        CardsChecks[i] = result.Item2.answered[i];
                     }
                 }
             }
             else
             {
-                for (int i = 0; i < result.requested.Length; i++)
+                for (int i = 0; i < result.Item2.requested.Length; i++)
                 {
                     CardsChecks[i] = false;
                 }

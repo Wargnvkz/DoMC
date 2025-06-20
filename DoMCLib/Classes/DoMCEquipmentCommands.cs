@@ -43,7 +43,7 @@ namespace DoMCLib.Classes
             if (SocketNumber == null)
             {
                 return await ExecuteCCDCommandForAllCards(WorkingLog, async () =>
-                 await (new DoMCLib.Classes.Module.CCD.Commands.StopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync(context)
+                 await (new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync(context)
                 );
 
             }

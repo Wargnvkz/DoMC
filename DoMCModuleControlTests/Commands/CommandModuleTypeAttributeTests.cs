@@ -38,7 +38,7 @@ namespace DoMCModuleControl.Commands.Tests
             {
             }
 
-            protected override void Executing()
+            protected override async Task Executing()
             {
 
             }
@@ -50,7 +50,7 @@ namespace DoMCModuleControl.Commands.Tests
             {
             }
 
-            protected override void Executing()
+            protected override async Task Executing()
             {
 
             }

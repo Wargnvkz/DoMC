@@ -26,7 +26,7 @@ namespace DoMCModuleControlTests
             string expectedEventName = "TestEvent";
             object? expectedEventData = null;
             int counter = 0;
-            observer.NotificationReceivers += (eventName, eventData) =>
+            observer.NotificationReceivers += async (eventName, eventData) =>
             {
                 // Проверяем, что событие вызвано с правильными аргументами
                 if (eventName == expectedEventName && eventData == expectedEventData)

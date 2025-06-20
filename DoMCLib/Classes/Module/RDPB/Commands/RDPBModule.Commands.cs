@@ -7,7 +7,6 @@ using DoMCModuleControl.Modules;
 
 namespace DoMCLib.Classes.Module.RDPB.Commands
 {
-
     public class SendSetIsOkCommand : GenericCommandBase<RDPBStatus>
     {
         public SendSetIsOkCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
@@ -17,7 +16,11 @@ namespace DoMCLib.Classes.Module.RDPB.Commands
     public class LoadConfigurationToModuleCommand : GenericCommandBase<ApplicationConfiguration, bool>
     {
         public LoadConfigurationToModuleCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((RDPBModule)Module).SetConfig(InputData);
+        protected override async Task Executing()
+        {
+            await ((RDPBModule)Module).SetConfig(InputData);
+            SetOutput(true);
+        }
     }
 
     public class GetParametersCommand : GenericCommandBase<RDPBStatus>
@@ -44,28 +47,28 @@ namespace DoMCLib.Classes.Module.RDPB.Commands
         protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.SetCoolingBlocks, CancelationTokenSourceToCancelCommandExecution.Token, InputData);
     }
 
-    public class StartCommand : GenericCommandBase<RDPBStatus>
+    public class StartCommand : GenericCommandBase
     {
         public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => await ((RDPBModule)Module).Start();
     }
 
-    public class StopCommand : GenericCommandBase<RDPBStatus>
+    public class RDPBStopCommand : GenericCommandBase
     {
-        public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
+        public RDPBStopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => await ((RDPBModule)Module).Stop();
     }
 
     public class TurnOffCommand : GenericCommandBase<RDPBStatus>
     {
         public TurnOffCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.Off, CancelationTokenSourceToCancelCommandExecution.Token);
+        protected override async Task Executing() => SetOutput(await ((RDPBModule)Module).Send(RDPBCommandType.Off, CancelationTokenSourceToCancelCommandExecution.Token));
     }
 
     public class TurnOnCommand : GenericCommandBase<RDPBStatus>
     {
         public TurnOnCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.On, CancelationTokenSourceToCancelCommandExecution.Token);
+        protected override async Task Executing() => SetOutput(await ((RDPBModule)Module).Send(RDPBCommandType.On, CancelationTokenSourceToCancelCommandExecution.Token));
     }
 
 

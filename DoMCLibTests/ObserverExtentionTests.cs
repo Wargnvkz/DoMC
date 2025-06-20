@@ -31,7 +31,7 @@ namespace DoMCLib.Tests
             string expectedEventName = "TestEvent";
             object? expectedEventData = new object();
             int counter = 0;
-            controller.GetObserver().NotificationReceivers += (eventName, eventData) =>
+            controller.GetObserver().NotificationReceivers += async (eventName, eventData) =>
             {
                 // Проверяем, что событие вызвано с правильными аргументами
                 if (eventName == $"{ModuleObserverName}.{OperationName}.{expectedEventName}" && eventData == expectedEventData)

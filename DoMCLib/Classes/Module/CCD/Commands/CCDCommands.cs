@@ -29,9 +29,9 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return new CCDCardAnswerResults() { CardNumber = cardnumber, CommandSucceed = true, ReadingSocketsResult = 0 };
         }
     }
-    public class StopCommand : CCDAllSocketsCommand
+    public class CCDStopCommand : CCDAllSocketsCommand
     {
-        public StopCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
+        public CCDStopCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
         {
         }
 

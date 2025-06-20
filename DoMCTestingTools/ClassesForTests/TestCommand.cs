@@ -12,7 +12,7 @@ namespace DoMCTestingTools.ClassesForTests
             {
             }
 
-            protected override void Executing()
+            protected override async Task Executing()
             {
                 var outputData = new TestOutputData();
                 outputData.Value = ((TestInputData)InputData).Value.ToString();

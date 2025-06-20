@@ -10,24 +10,29 @@ using System.Threading.Tasks;
 
 namespace DoMCLib.Classes.Module.ArchiveDB.Commands
 {
-    public class SetConfigurationCommand : AbstractCommandBase
+    public class SetConfigurationCommand : GenericCommandBase<ArchiveDBConfiguration, bool>
     {
-        public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(ArchiveDBConfiguration), null) { }
-        protected override async Task Executing() => ((ArchiveDBModule)Module).SetConfigurationAsync((ArchiveDBConfiguration)InputData);
+        public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
+        protected override async Task Executing()
+        {
+            await ((ArchiveDBModule)Module).SetConfigurationAsync(InputData);
+            SetOutput(true);
+        }
+
     }
     public class StartCommand : AbstractCommandBase
     {
         public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
-        protected override async Task Executing() => ((ArchiveDBModule)Module).StartAsync();
+        protected override async Task Executing() => await ((ArchiveDBModule)Module).StartAsync();
     }
     public class StopCommand : AbstractCommandBase
     {
         public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
-        protected override async Task Executing() => ((ArchiveDBModule)Module).StopAsync();
+        protected override async Task Executing() => await ((ArchiveDBModule)Module).StopAsync();
     }
-    public class GetWorkingStatusCommand : AbstractCommandBase
+    public class GetWorkingStatusCommand : GenericCommandBase<bool>
     {
-        public GetWorkingStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, typeof(bool)) { }
-        protected override async Task Executing() => OutputData = ((ArchiveDBModule)Module).IsStarted;
+        public GetWorkingStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
+        protected override async Task Executing() => SetOutput(((ArchiveDBModule)Module).IsStarted);
     }
 }

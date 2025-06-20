@@ -101,14 +101,14 @@ namespace DoMC.Classes
         }
         public bool StopCCD()
         {
-            var StopCmd = Controller.CreateCommandInstance(typeof(CCDCardDataModule.StopCommand));
+            var StopCmd = Controller.CreateCommandInstance(typeof(CCDCardDataModule.CCDStopCommand));
             if (StopCmd == null) return false;
             StopCmd.ExecuteCommandAsync().Wait();
             return StopCmd.WasCompletedSuccessfully();
         }
         public bool StopRDPB()
         {
-            var StopCmd = Controller.CreateCommandInstance(typeof(RDPBModule.StopCommand));
+            var StopCmd = Controller.CreateCommandInstance(typeof(RDPBModule.CCDStopCommand));
             if (StopCmd == null) return false;
             StopCmd.ExecuteCommandAsync().Wait();
             return StopCmd.WasCompletedSuccessfully();
