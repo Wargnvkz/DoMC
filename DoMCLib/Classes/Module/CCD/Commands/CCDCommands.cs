@@ -89,7 +89,9 @@ namespace DoMCLib.Classes.Module.CCD.Commands
 
         protected override async Task<CCDCardAnswerResults> ExecuteCCDFunction(CCDCardDataModule module, int cardnumber, SocketParameters cardParameters, CancellationToken token, int TimeoutMs)
         {
+
             return await module[cardnumber].SendCommandReadSeveralSocketsExternalAsync(TimeoutMs, token);
+
         }
     }
     public class ResetCardsCommand : CCDAllSocketsCommand

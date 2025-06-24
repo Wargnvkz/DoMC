@@ -73,11 +73,11 @@ namespace DoMC
         {
             if (EventName == DoMCApplicationContext.ConfigurationUpdateEventName)
             {
-                this.InvokeAsync(() => PreparationsAfterChangingConfig());
+                await this.InvokeAsync(() => PreparationsAfterChangingConfig());
             }
         }
 
-        private async Task PreparationsAfterChangingConfig()
+        private void PreparationsAfterChangingConfig()
         {
             Context.FillEquipmentSocket2CardSocket();
             FillSettingPage();

@@ -91,7 +91,7 @@ namespace DoMC
         DateTime CCDStart, CCDEnd;
         bool WasErrorWhileWorking;
         public DoMCInterfaceDataExchangeErrors Errors = new DoMCInterfaceDataExchangeErrors();
-        bool wasSynchro = true;
+        volatile bool wasSynchro = true;
 
         Timings Timings = new Timings();
         RDPBStatus RDPBCurrentStatus = new RDPBStatus();
@@ -109,6 +109,7 @@ namespace DoMC
         DateTime lastSavedConfiguration;
         int SaveTimeoutInSecodns = 300;
 
+        volatile bool RDPBResult = true;
 
         public DoMCWorkModeInterface()
         {
@@ -137,7 +138,7 @@ namespace DoMC
             DevicesControlInit();
             PressAllDevicesButton();
             ShowDevicesButtonStatuses();
-            LoadArchiveTab();
+            LoadArchiveTab();            
             StartArchiveDB();
         }
 
@@ -176,15 +177,6 @@ namespace DoMC
             var eventNameParts = EventName.Split(".");
             if (eventNameParts.Length >= 3)
             {
-                if (eventNameParts[0] == nameof(RDPBModule))
-                {
-                    if (Enum.TryParse(eventNameParts[1], out RDPBCommandType commandType))
-                    {
-                        RDPBCurrentStatus = (RDPBStatus)data;
-                        WorkingLog.Add(LoggerLevel.Critical, $"Получено от бракера {commandType}. {RDPBCurrentStatus.ToString()}");
-                    }
-                    else { }
-                }
                 if (eventNameParts[0] == nameof(DBModule))
                 {
                     if (eventNameParts[1] == "CycleSave")
@@ -344,7 +336,7 @@ namespace DoMC
         {
             if (IsWorkingModeStarted)
             {
-                StopWork();
+                await StopWork();
             }
             else
             {
@@ -357,7 +349,7 @@ namespace DoMC
                 }
                 else
                 {
-                    StartFailed();
+                    await StartFailed();
                 }
             }
         }
@@ -588,13 +580,13 @@ namespace DoMC
 
         }
 
-        private void StopWork()
+        private async Task StopWork()
         {
             WorkCancellationTokenSource.Cancel();
             Context.IsInWorkingMode = false;
             try
             {
-                StopReading();
+                await StopReading();
             }
             catch
             {
@@ -620,9 +612,9 @@ namespace DoMC
             //InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
             Thread.Sleep(200);
 
-            SetNonWorkingModeLCB();
+            await SetNonWorkingModeLCB();
 
-            StopRDPB();
+            await StopRDPB();
 
             WorkingLog.Add(LoggerLevel.Critical, "Остановка базы данных");
             //InterfaceDataExchange.SendCommand(ModuleCommand.DBStop);
@@ -631,7 +623,7 @@ namespace DoMC
 
 
             pbStartStop.IsPressed = false;
-            StopModules();
+            await StopModules();
         }
 
         public async Task StartFailed()
@@ -645,7 +637,7 @@ namespace DoMC
 
             pbStartStop.BackColor = Color.Red;
             pbStartStop.IsPressed = false;
-            StopModules();
+            await StopModules();
 
         }
 
@@ -744,10 +736,11 @@ namespace DoMC
                     //Запрашиваем чтение ПЗС матриц по внешнему имульсу
                     //WasLastOperationSuccessful = CurrentContext.ReadSockets(Controller, WorkingLog, true);
 
-                    var CCDCardDataCommandResponse=await new DoMCLib.Classes.Module.CCD.Commands.SendReadAllSocketsCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(context);
 
+                    var readResult = await new DoMCLib.Classes.Module.CCD.Commands.SendReadAllSocketsWithExternalSignalCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
+                    WasLastOperationSuccessful = readResult.CardsNotAnswered().Count == 0;
+                    //WasLastOperationSuccessful = Context.ReadSockets(Controller, WorkingLog, true, out CCDCardDataCommandResponse resdResult, cancellationTokenSource: WorkCancellationTokenSource);
 
-                    WasLastOperationSuccessful = Context.ReadSockets(Controller, WorkingLog, true, out CCDCardDataCommandResponse resdResult, cancellationTokenSource: WorkCancellationTokenSource);
                     //Ждем пока произойдет чтение
                     CCDEnd = DateTime.Now;
 
@@ -759,10 +752,14 @@ namespace DoMC
                     {
                         WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при чтении данных гнезд. Чтение не завершено.");
                         WorkingLog.Add(LoggerLevel.Critical, "Чтение состояния БУС");
-                        var start = DateTime.Now;
-                        var LCBres = Controller.CreateCommandInstance(typeof(LCBModule.GetLCBEquipmentStatusCommand)).Wait(null, 2, out LEDEquipmentStatus Status);
-                        if (LCBres)
+
+                        try
                         {
+                            var Status = await new DoMCLib.Classes.Module.LCB.Commands.GetLCBEquipmentStatusCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+
+
+                            //var LCBres = Controller.CreateCommandInstance(typeof(LCBModule.GetLCBEquipmentStatusCommand)).Wait(null, 2, out LEDEquipmentStatus Status);
+
                             // если БУС - Авария
                             if (Status.Outputs[3])
                             {
@@ -770,23 +767,30 @@ namespace DoMC
                                 if (Status.Inputs[6])
                                 {
                                     WorkingLog.Add(LoggerLevel.Critical, "Маячки спрятаны. Остановка БУС");
-                                    if (!Controller.CreateCommandInstance(typeof(LCBModule.SetLCBNonWorkModeCommand)).Wait(null, 2, out bool NWresult) || !NWresult)
+                                    try
                                     {
-                                        WorkingLog.Add(LoggerLevel.Critical, "Не удалось остановить работу БУС");
+                                        await new DoMCLib.Classes.Module.LCB.Commands.SetLCBNonWorkModeCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        WorkingLog.Add(LoggerLevel.Critical, "Не удалось остановить работу БУС. ", ex);
                                         Errors.CCDNotRespond = true;
                                         Errors.LCBDoesNotRespond = true;
                                         IsWorkingModeStarted = false;
                                         WasErrorWhileWorking = true;
                                     }
                                     WorkingLog.Add(LoggerLevel.Critical, "Маячки спрятаны. Перезапуск");
-                                    if (!Controller.CreateCommandInstance(typeof(LCBModule.SetLCBNonWorkModeCommand)).Wait(null, 2, out bool Wresult) || !Wresult)
+                                    try
                                     {
-                                        WorkingLog.Add(LoggerLevel.Critical, "Не удалось запустить БУС");
+                                        await new DoMCLib.Classes.Module.LCB.Commands.SetLCBWorkModeCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        WorkingLog.Add(LoggerLevel.Critical, "Не удалось запустить БУС в работу. ", ex);
                                         Errors.CCDNotRespond = true;
                                         Errors.LCBDoesNotRespond = true;
                                         IsWorkingModeStarted = false;
                                         WasErrorWhileWorking = true;
-
                                     }
                                     continue;
                                 }
@@ -808,7 +812,7 @@ namespace DoMC
                             }
 
                         }
-                        else
+                        catch (Exception ex)
                         {
                             WorkingLog.Add(LoggerLevel.Critical, "БУС не ответил");
                             Errors.CCDNotRespond = true;
@@ -835,7 +839,7 @@ namespace DoMC
                             WorkingLog.Add(LoggerLevel.Critical, $"Ожидание синхросигнала");
                             //ждать синхросигнал за таймаут чтения
                             wasSynchro = false;
-                            start = DateTime.Now;
+                            var start = DateTime.Now;
                             while ((DateTime.Now - start).TotalSeconds < Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds && !wasSynchro)
                             {
                                 if (!IsWorkingModeStarted) throw new DoMCException("Работа остановлена пользователем");
@@ -927,15 +931,24 @@ namespace DoMC
                     WorkingStepTime[(int)WorkStep.StartReadingImages] = sw.ElapsedTicks;
 
                     WorkingLog.Add(LoggerLevel.Critical, "Запрос на получение изображений гнезд");
+                    GetImageDataCommandResponse getImageResult = null;
                     //Запрашиваем сами изображения гнезд
-                    var getImgSuccess = Context.GetSocketsImages(Controller, WorkingLog, out GetImageDataCommandResponse getImageResult, cancellationTokenSource: WorkCancellationTokenSource);
+                    try
+                    {
+                        getImageResult = await new DoMCLib.Classes.Module.CCD.Commands.CCDAllSocketsImagesCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
+                    }
+                    catch
+                    {
+
+                    }
                     WasLastOperationSuccessful = (getImageResult?.CardsAnswered().Count ?? 0) == 0;// .completedSuccessfully.All(c => c);
+
 
                     WorkingStep = WorkStep.ReadingImagesCompleted;
                     WorkingStepTime[(int)WorkStep.ReadingImagesCompleted] = sw.ElapsedTicks;
 
                     //если не получили или в модуле ПЗС ошибка, то выставляем ошибку
-                    if (!WasLastOperationSuccessful)
+                    if (!WasLastOperationSuccessful || getImageResult == null)
                     {
                         WorkingLog.Add(LoggerLevel.Critical, "Ошибка при получении изображения.");// Остановка");
                         Errors.CCDNotRespond = true;
@@ -949,7 +962,7 @@ namespace DoMC
                                 for (int j = 0; j < 6; j++)
                                 {
                                     var socketNum = j * 16 + i + 1;
-                                    sb.Append(getImageResult.Data[socketNum].ImageData != null ? "+" : " ");
+                                    sb.Append(getImageResult[socketNum].ImageData != null ? "+" : " ");
                                     sb.Append("  ");
                                 }
                                 WorkingLog.Add(LoggerLevel.Critical, sb.ToString());
@@ -1000,7 +1013,14 @@ namespace DoMC
                     }
 
                     //сохраняем изображения в данные текущего цикла
-                    CurrentCycleCCD.CurrentImages = getImageResult?.Data?.Select(d => d?.Image ?? null).ToArray() ?? new short[0][,];
+
+                    CurrentCycleCCD.CurrentImages = new short[96][,];
+
+                    for (int i = 0; i < 96; i++)
+                    {
+                        CurrentCycleCCD.CurrentImages[i] = getImageResult[96]?.Image ?? null;
+                    }
+                    //CurrentCycleCCD.CurrentImages = getImageResult?.Data?.Select(d => d?.Image ?? null).ToArray() ?? new short[0][,];
 
                     //если получены данные о состоянии светодиодов, то
                     if (LCBStatus.LastLedStatusesGotTime >= LCBStatus.TimeSyncSignalGotForShowInCycle)
@@ -1092,11 +1112,11 @@ namespace DoMC
                         Timings.CCDImagesProcessEnded = DateTime.Now;
 
                         //Проверить, работает ли бракер, если он был включен
-                        bool RDPBResult = true;
+                        RDPBResult = true;
 
                         if (RDPBCurrentStatus.IsStarted)
                         {
-                            if (RDPBCurrentStatus.BlockIsOn != ((ActiveDevices & WorkingModule.RDPB) == WorkingModule.RDPB))
+                            /*if (RDPBCurrentStatus.BlockIsOn != ((ActiveDevices & WorkingModule.RDPB) == WorkingModule.RDPB))
                             {
                                 RDPBCurrentStatus.ErrorCounter++;
                                 WorkingLog.Add(LoggerLevel.Critical, $"Состояние бракера не соответствует состоянию выбранному пользователем. Проход: {RDPBCurrentStatus.ErrorCounter}");
@@ -1106,7 +1126,19 @@ namespace DoMC
                                     {
                                         WorkingLog.Add(LoggerLevel.Critical, "Бракер выключен, но должен быть включен.");
                                         //WorkingLog.Add(LoggerLevel.Critical, "Бракер выключен, но должен быть включен. Включаю бракер");
-                                        Controller.CreateCommandInstance(typeof(RDPBModule.TurnOnCommand)).ExecuteCommand();
+                                        Task.Run(async () =>
+                                        {
+                                            try
+                                            {
+                                                await new DoMCLib.Classes.Module.RDPB.Commands.SendSetIsOkCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
+                                            }
+                                            catch
+                                            {
+
+                                            }
+                                        
+                                        });
+                                        //Controller.CreateCommandInstance(typeof(RDPBModule.TurnOnCommand)).ExecuteCommand();
                                     }
                                     else
                                     {
@@ -1120,7 +1152,7 @@ namespace DoMC
                             else
                             {
                                 RDPBCurrentStatus.ErrorCounter = 0;
-                            }
+                            }*/
                             WorkingStep = WorkStep.RDPBSend;
                             WorkingStepTime[(int)WorkStep.RDPBSend] = sw.ElapsedTicks;
 
@@ -1130,26 +1162,43 @@ namespace DoMC
                                 if (Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.SendBadCycleToRDPB)
                                 {
                                     WorkingLog.Add(LoggerLevel.Critical, "Съем: Плохой");
-                                    try
-                                    {
-                                        Controller.CreateCommandInstance(typeof(RDPBModule.SendSetIsBadCommand)).ExecuteCommand();
-                                    }
-                                    catch
-                                    {
-                                        RDPBResult = false;
-                                    }
+
+                                    new DoMCLib.Classes.Module.RDPB.Commands.SendSetIsBadCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync()
+                                    .FireAndForgetWithResult(
+                                            ProcessRDPBStatusGetWithBoxCreation
+                                        ,
+                                        (ex) =>
+                                        {
+                                            RDPBResult = false;
+                                            WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера.", ex);
+
+                                        }
+                                     );
+
                                 }
                                 else
                                 {
                                     WorkingLog.Add(LoggerLevel.Critical, "Съем: Плохой (но посылаем, что хороший)");
-                                    try
+                                    new DoMCLib.Classes.Module.RDPB.Commands.SendSetIsOkCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync()
+                                    .FireAndForgetWithResult(
+                                            ProcessRDPBStatusGetWithBoxCreation
+                                        ,
+                                        (ex) =>
+                                        {
+                                            RDPBResult = false;
+                                            WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера.", ex);
+
+                                        }
+                                     );
+
+                                    /*try
                                     {
                                         Controller.CreateCommandInstance(typeof(RDPBModule.SendSetIsOkCommand)).ExecuteCommand();
                                     }
                                     catch
                                     {
                                         RDPBResult = false;
-                                    }
+                                    }*/
                                 }
                                 RDPBCurrentStatus.CurrentBoxDefectCycles++;
                                 RDPBCurrentStatus.TotalDefectCycles++;
@@ -1165,56 +1214,22 @@ namespace DoMC
                                     WorkingLog.Add(LoggerLevel.Critical, "Съем: Не все гнезда прочитаны правильно, считаем, что съем хороший");
 
                                 }
-                                try
-                                {
-                                    Controller.CreateCommandInstance(typeof(RDPBModule.SendSetIsOkCommand)).ExecuteCommand();
-                                }
-                                catch
-                                {
-                                    RDPBResult = false;
-                                }
-                            }
 
-                            if (!RDPBResult)
-                            {
-                                Errors.RemovingDefectedPreformsBlockError = true;
-                                WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера");
-                            }
-                            else
-                            {
-                                Errors.RemovingDefectedPreformsBlockError = false;
-                            }
+                                new DoMCLib.Classes.Module.RDPB.Commands.SendSetIsOkCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync()
+                                  .FireAndForgetWithResult(
+                                          ProcessRDPBStatusGetWithBoxCreation
+                                      ,
+                                      (ex) =>
+                                      {
+                                          RDPBResult = false;
+                                          WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера.", ex);
 
-                            var boxdir = RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Left ? "Левый" : (
-                                RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Right ? "Правый" :
-                                (RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Stoped ? "Стоит" : "Ошибка"));
-                            WorkingLog.Add(LoggerLevel.Critical, "Короб: " + boxdir);
+                                      }
+                                   );
 
-                            RDPBCurrentStatus.CurrentTransporterSide = RDPBCurrentStatus.TransporterSide;
-
-                            if (RDPBCurrentStatus.PreviousDirection != RDPBTransporterSide.NotSet && RDPBCurrentStatus.PreviousDirection != RDPBCurrentStatus.CurrentTransporterSide)
-                            {
-                                var box = new DoMCLib.Classes.Box();
-                                box.BadCyclesCount = RDPBCurrentStatus.CurrentBoxDefectCycles;
-                                box.CompletedTime = DateTime.Now;
-                                box.TransporterSide = RDPBCurrentStatus.PreviousDirection;
-
-                                RDPBCurrentStatus.CurrentBoxDefectCycles = 0;
-                                WorkingLog.Add(LoggerLevel.Critical, "Смена короба");
-                                lastBoxRead = DateTime.MinValue;
-                                if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
-                                {
-                                    WorkingLog.Add(LoggerLevel.Critical, "Создаем новый короб");
-                                    Controller.CreateCommandInstance(typeof(DBModule.EnqueueBoxDateCommand)).ExecuteCommand(box);
-
-                                }
                             }
 
 
-                            if (RDPBCurrentStatus.CoolingBlocksQuantity != Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity)
-                            {
-                                Controller.CreateCommandInstance(typeof(RDPBModule.SetCoolingBlockQuantityCommand)).ExecuteCommand(Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity);
-                            }
                         }
                         CurrentCycleCCD.TransporterSide = RDPBCurrentStatus.CurrentTransporterSide;
                         if (IsAllHaveImages)
@@ -1269,8 +1284,10 @@ namespace DoMC
                                     WorkingStep = WorkStep.SendToDB;
                                     WorkingStepTime[(int)WorkStep.SendToDB] = sw.ElapsedTicks;
 
+                                    await new DoMCLib.Classes.Module.DB.Commands.EnqueueCycleDateCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync(CurrentCycleCCD);
+
                                     // ставим текущий цикл в общую очередь циклов для сохранения
-                                    Controller.CreateCommandInstance(typeof(DBModule.EnqueueCycleDateCommand)).ExecuteCommand(CurrentCycleCCD);
+                                    //Controller.CreateCommandInstance(typeof(DBModule.EnqueueCycleDateCommand)).ExecuteCommand(CurrentCycleCCD);
 
                                     WorkingLog.Add(LoggerLevel.Critical, $"Данные съема поставлены в очередь на запись. В очереди {DBCyclesCCDLeftInQueue} элемент(а,ов)");
                                 }
@@ -1351,6 +1368,61 @@ namespace DoMC
             if (WasErrorWhileWorked)
             {
                 ForceStop = true;
+            }
+        }
+
+        private void ProcessRDPBStatusGetWithBoxCreation(RDPBStatus newStatus)
+        {
+            RDPBCurrentStatus = newStatus;
+            WorkingLog.Add(LoggerLevel.Critical, $"Получено от бракера {RDPBCurrentStatus.CommandType}. {RDPBCurrentStatus.ToString()}");
+
+            if (!RDPBResult)
+            {
+                Errors.RemovingDefectedPreformsBlockError = true;
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера");
+            }
+            else
+            {
+                Errors.RemovingDefectedPreformsBlockError = false;
+            }
+
+            var boxdir = RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Left ? "Левый" : (
+                RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Right ? "Правый" :
+                (RDPBCurrentStatus.TransporterSide == RDPBTransporterSide.Stoped ? "Стоит" : "Ошибка"));
+            WorkingLog.Add(LoggerLevel.Critical, "Короб: " + boxdir);
+
+            RDPBCurrentStatus.CurrentTransporterSide = RDPBCurrentStatus.TransporterSide;
+
+            if (RDPBCurrentStatus.PreviousDirection != RDPBTransporterSide.NotSet && RDPBCurrentStatus.PreviousDirection != RDPBCurrentStatus.CurrentTransporterSide)
+            {
+                var box = new DoMCLib.Classes.Box();
+                box.BadCyclesCount = RDPBCurrentStatus.CurrentBoxDefectCycles;
+                box.CompletedTime = DateTime.Now;
+                box.TransporterSide = RDPBCurrentStatus.PreviousDirection;
+
+                RDPBCurrentStatus.CurrentBoxDefectCycles = 0;
+                WorkingLog.Add(LoggerLevel.Critical, "Смена короба");
+                lastBoxRead = DateTime.MinValue;
+                if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, "Создаем новый короб");
+                    new DoMCLib.Classes.Module.DB.Commands.EnqueueBoxDateCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync(box)
+                        .FireAndForgetWithResult(null, (ex) =>
+                        {
+                            WorkingLog.Add(LoggerLevel.Critical, "Не удалось создать короб в БД. ", ex);
+                        });
+                }
+            }
+
+
+            if (RDPBCurrentStatus.CoolingBlocksQuantity != Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity)
+            {
+                new DoMCLib.Classes.Module.RDPB.Commands.SetCoolingBlockQuantityCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity)
+                    .FireAndForgetWithResult(null, (ex) =>
+                    {
+                        WorkingLog.Add(LoggerLevel.Critical, $"Не удалось установить количество охраждающих блоков в бракёр. Конфигурация {Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity} блока не совпадает с бракёром {RDPBCurrentStatus.CoolingBlocksQuantity}.", ex);
+                    });
+                //Controller.CreateCommandInstance(typeof(RDPBModule.SetCoolingBlockQuantityCommand)).ExecuteCommand(Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.CoolingBlocksQuantity);
             }
         }
 
@@ -1522,7 +1594,7 @@ namespace DoMC
             return v;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private async void timer1_Tick(object sender, EventArgs e)
         {
             var now = DateTime.Now;
 
@@ -1588,7 +1660,7 @@ namespace DoMC
             GetIsDevicesButtonWorking();
             if (ForceStop)
             {
-                StopWork();
+                await StopWork();
                 ForceStop = false;
             }
             if (RDPBCurrentStatus.IsTimeout)
@@ -1600,7 +1672,7 @@ namespace DoMC
             {
                 DevicesErrors &= ~WorkingModule.RDPB;
             }
-            GetArchiveDBModuleStatus();
+            await GetArchiveDBModuleStatus();
         }
 
         private void CurrentDraw()
@@ -1669,14 +1741,14 @@ namespace DoMC
             CurrentDraw();
         }
 
-        private void pbDevices_Click(object sender, EventArgs e)
+        private async void pbDevices_Click(object sender, EventArgs e)
         {
             GetIsDevicesButtonWorking();
             if (IsWorkingModeStarted)
             {
                 if (ActiveDevices.HasFlag(WorkingModule.RDPB))
                 {
-                    if (!StartRDPB())
+                    if (!await StartRDPB())
                     {
                         UnPressDevice(WorkingModule.RDPB);
                         return;
@@ -1684,15 +1756,15 @@ namespace DoMC
                 }
                 else
                 {
-                    StopRDPB();
+                    await StopRDPB();
                 }
                 if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
                 {
-                    StartDB();
+                    await StartDB();
                 }
                 else
                 {
-                    StopDB();
+                    await StopDB();
                 }
             }
 
@@ -1703,48 +1775,48 @@ namespace DoMC
             DevicesFlagButtons[wm].IsPressed = false;
         }
 
-        private void DoMCWorkModeInterface_FormClosed(object sender, FormClosedEventArgs e)
+        private async void DoMCWorkModeInterface_FormClosed(object sender, FormClosedEventArgs e)
         {
 
             try
             {
-                StopWork();
-                StopArchiveDB();
+                await StopWork();
+                await StopArchiveDB();
             }
             catch { }
 
 
         }
-        private void StopModules()
+        private async Task StopModules()
         {
             try
             {
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.CCD.CCDCardDataModule.StopCommand)).ExecuteCommand();
+                await new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
             }
             catch { }
             try
             {
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.LCB.LCBModule.SetLCBNonWorkModeCommand)).ExecuteCommand();
+                await new DoMCLib.Classes.Module.LCB.Commands.SetLCBNonWorkModeCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
             }
             catch { }
             try
             {
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.LCB.LCBModule.LCBStopCommand)).ExecuteCommand();
+                await new DoMCLib.Classes.Module.LCB.Commands.LCBStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
             }
             catch { }
             try
             {
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StopCommand)).ExecuteCommand();
+                await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
             }
             catch { }
             try
             {
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.DB.DBModule.StopCommand)).ExecuteCommand();
+                await new DoMCLib.Classes.Module.DB.Commands.StopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
             }
             catch { }
             try
             {
-                Controller.CreateCommandInstance(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule.StopCommand)).ExecuteCommand();
+                await new DoMCLib.Classes.Module.ArchiveDB.Commands.StopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
             }
             catch { }
         }
@@ -1789,7 +1861,7 @@ namespace DoMC
             TotalDefectCycles = 0;
         }
 
-        private void miSettings_Click(object sender, EventArgs e)
+        private async void miSettings_Click(object sender, EventArgs e)
         {
 
             try
@@ -1798,7 +1870,7 @@ namespace DoMC
                 {
                     try
                     {
-                        StopWork();
+                        await StopWork();
                     }
                     catch { }
                     var wmf = new DoMCSettingsInterface();
@@ -2050,9 +2122,10 @@ namespace DoMC
         {
             await new LCBStopCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
             await new LCBStartCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
-            Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand)).ExecuteCommand();
-            System.Threading.Thread.Sleep(10);
-            Controller.CreateCommandInstance(typeof(LCBModule.LCBStartCommand)).ExecuteCommand();
+
+            //Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand)).ExecuteCommand();
+            //System.Threading.Thread.Sleep(10);
+            //Controller.CreateCommandInstance(typeof(LCBModule.LCBStartCommand)).ExecuteCommand();
         }
 
         private void tsmiLogsArchive_Click(object sender, EventArgs e)

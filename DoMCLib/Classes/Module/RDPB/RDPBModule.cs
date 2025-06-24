@@ -234,6 +234,7 @@ namespace DoMCLib.Classes.Module.RDPB
                         WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получено от бракера: <{AnswerString.Trim()}>");
                         var result = CurrentStatus.ChangeFromString(AnswerString);
                         mainController.GetObserver().Notify(this, CurrentStatus.CommandType.ToString(), result.ToString(), CurrentStatus);
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получена команда от бракёра: {CurrentStatus.CommandType}");
 
                         _pendingCommandController.TrySetResult(0, CurrentStatus);
                     }
@@ -246,7 +247,7 @@ namespace DoMCLib.Classes.Module.RDPB
             }
         }
 
-        private void RDPBProcessDataThreadProc()
+        private async Task RDPBProcessDataThreadProc()
         {
             WorkingLog?.Add(LoggerLevel.Critical, "Запуск потока обработки модуля бракера");
             IsStarted = true;
@@ -255,7 +256,7 @@ namespace DoMCLib.Classes.Module.RDPB
 
                 try
                 {
-                    MakeConnected();
+                    await MakeConnected();
                     GetData();
                 }
                 catch (Exception ex)
@@ -269,7 +270,7 @@ namespace DoMCLib.Classes.Module.RDPB
 
         public void Dispose()
         {
-            Stop();
+            Stop().FireAndForgetWithResult(null,null);
         }
     }
 }

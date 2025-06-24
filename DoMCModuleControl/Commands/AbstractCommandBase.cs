@@ -167,7 +167,11 @@ namespace DoMCModuleControl.Commands
             throw new InvalidOperationException($"Тип выходных данных {OutputData?.GetType().Name} не соответствует ожидаемому {typeof(T).Name}.");
 
         }
-
+        public virtual async Task ExecuteCommandAsync(object? inputData)
+        {
+            SetInputData(inputData);
+            await ExecuteCommandAsync();
+        }
         public virtual async Task<T> ExecuteCommandAsync<T>(object? inputData)
         {
             SetInputData(inputData);

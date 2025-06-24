@@ -16,6 +16,8 @@ using DoMCLib.Classes.Module.CCD;
 using System.Net.Sockets;
 using DoMCLib.Classes;
 using DoMCLib.Classes.Module.CCD.Commands.Classes;
+using DoMCLib.Classes.Module.LCB;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DoMC.UserControls
 {
@@ -133,6 +135,8 @@ namespace DoMC.UserControls
             errorReadingData.Clear();
             SingleSocketImages = new short[this.ImagesToMakeStandard][,];
             ProgressbarStep = 0;
+            await new DoMCLib.Classes.Module.CCD.Commands.StartCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+
             if (CurrentContext.StartCCD(MainController, WorkingLog, out CCDCardDataCommandResponse StartResult, ChosenSocketNumber.Value - 1))
             {
                 try

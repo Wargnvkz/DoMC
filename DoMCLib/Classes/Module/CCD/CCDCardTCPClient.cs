@@ -425,7 +425,7 @@ namespace DoMCLib.Classes.Module.CCD
             }
 
             // отключаемся в самом конце
-            try { Disconnect(); } catch { }
+            try { await Disconnect(); } catch { }
         }
 
         /*private async Task ReceiveThreadProc()
