@@ -1,3 +1,4 @@
+using DoMCLib.Classes;
 using DoMCLib.Classes.Module.API;
 using DoMCModuleControl;
 using WorkshopEquipmentData;
@@ -38,9 +39,10 @@ namespace DoMC
 
             var mainForm = (Form)Controller.GetMainUserInterface();
             mainForm.Shown += (sender, args) => mainForm.Activate();
-            Controller.CreateCommandInstance(typeof(APIModule.StartRESTAPIServerCommand)).Wait(5);
+            new DoMCLib.Classes.Module.API.Commands.StartRESTAPIServerCommand(Controller, Controller.GetModule(typeof(APIModule))).ExecuteCommandAsync().FireAndForget();
+            //APIModule
             Application.Run(mainForm);
-            Controller.CreateCommandInstance(typeof(APIModule.StopRESTAPIServerCommand)).Wait(5);
+            new DoMCLib.Classes.Module.API.Commands.StopRESTAPIServerCommand(Controller, Controller.GetModule(typeof(APIModule))).ExecuteCommandAsync().FireAndForget();
         }
 
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)

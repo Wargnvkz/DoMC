@@ -70,5 +70,30 @@ namespace DoMCLib.Classes
                 }
             });
         }
+        public static void FireAndForget(
+            this Task task,
+            Action<Exception>? onError = null,
+            SynchronizationContext? context = null)
+        {
+            context ??= SynchronizationContext.Current;
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await task;
+                }
+                catch (Exception ex)
+                {
+                    if (onError != null)
+                    {
+                        if (context != null)
+                            context.Post(_ => onError(ex), null);
+                        else
+                            onError(ex);
+                    }
+                }
+            });
+        }
     }
 }
