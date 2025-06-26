@@ -82,7 +82,7 @@ namespace DoMC
         CycleImagesCCD? CurrentCycleData;
         DateTime LastSynchosignal = DateTime.MinValue;
 
-        public event EventHandler SettingsUpdated;
+        public event Func<object?,Task> SettingsUpdated;
 
         ButtonsPresses[] switches;
 
@@ -125,7 +125,7 @@ namespace DoMC
             MaxDegreeOfParallelism = Environment.ProcessorCount;
 
         }
-        public void SetMainController(IMainController controller, object? data)
+        public async Task SetMainController(IMainController controller, object? data)
         {
             Context = (DoMCLib.Classes.DoMCApplicationContext)data;
             Controller = controller;
@@ -139,7 +139,7 @@ namespace DoMC
             PressAllDevicesButton();
             ShowDevicesButtonStatuses();
             LoadArchiveTab();            
-            StartArchiveDB();
+            await StartArchiveDB();
         }
 
         private async Task Observer_NotificationReceivers(string EventName, object? data)
@@ -419,7 +419,7 @@ namespace DoMC
 
                 WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля работы с базой данных");
                 await new SetConfigurationCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig);
-                await new DoMCLib.Classes.Module.CCD.Commands.StartCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.CCD.Commands.StartCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync(Context);
 
                 /*if (Errors.NoLocalSQL)
                 {
@@ -446,7 +446,7 @@ namespace DoMC
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля работы с базой данных архива");
                 Controller.CreateCommandInstance(typeof(ArchiveDBModule.SetConfigurationCommand)).ExecuteCommand(Context.Configuration.HardwareSettings.ArchiveDBConfig);
-                Controller.CreateCommandInstance(typeof(ArchiveDBModule.StartCommand)).ExecuteCommand();
+                Controller.CreateCommandInstance(typeof(ArchiveDBModule.RDPBStartCommand)).ExecuteCommand();
                 if (Errors.NoRemoteSQL)
                 {
                     ErrorMsg = "Ошибка при запуске модуля работы с архивом";
@@ -484,7 +484,7 @@ namespace DoMC
 
         private async Task<bool> SetRDPBParameters()
         {
-            return await new DoMCLib.Classes.Module.RDPB.Commands.LoadConfigurationToModuleCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync(Context.Configuration);
+            return await new DoMCLib.Classes.Module.RDPB.Commands.SendConfigurationToModuleCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync(Context.Configuration);
         }
 
         private async Task<bool> StartRDPB()
@@ -499,7 +499,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля бракёра");
             try
             {
-                await new DoMCLib.Classes.Module.RDPB.Commands.StartCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStartCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
                 RDPBCurrentStatus.IsStarted = true;
             }
             catch { RDPBCurrentStatus.IsStarted = false; }
@@ -631,7 +631,7 @@ namespace DoMC
             WorkCancellationTokenSource.Cancel();
 
 
-            await new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
+            await new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
             await new DoMCLib.Classes.Module.LCB.Commands.LCBStopCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
             await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
 
@@ -1791,7 +1791,7 @@ namespace DoMC
         {
             try
             {
-                await new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
             }
             catch { }
             try

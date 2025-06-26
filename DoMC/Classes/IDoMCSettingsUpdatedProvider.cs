@@ -10,6 +10,6 @@ namespace DoMC.Classes
     public interface IDoMCSettingsUpdatedProvider
     {
         DoMCLib.Classes.DoMCApplicationContext GetContext();
-        event EventHandler SettingsUpdated;
+        event Func<object?,Task> SettingsUpdated;
     }
 }

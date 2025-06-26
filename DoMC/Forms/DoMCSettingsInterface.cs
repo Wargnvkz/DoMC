@@ -48,7 +48,7 @@ namespace DoMC
         TestRDPBControl TestRDPBControlInterface;
         bool MovingCyclesToArchive = false;
 
-        public event EventHandler SettingsUpdated;
+        public event Func<object?, Task> SettingsUpdated;
 
         public DoMCSettingsInterface()
         {
@@ -175,7 +175,7 @@ namespace DoMC
 
         private void FillSettingPage()
         {
-            SettingsUpdated?.Invoke(this, new EventArgs());
+            _ = Task.Run(async ()=> { try { await SettingsUpdated(this); } catch { } });
 
             miLEDSettings.Checked = Context.Configuration.ReadingSocketsSettings.IsLCBSettingsSet();
             miReadParameters.Checked = Context.Configuration.ReadingSocketsSettings.IsReadingParametersSet();

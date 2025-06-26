@@ -65,7 +65,7 @@ namespace DoMC.Forms
             SettingsUpdateProvider.SettingsUpdated += SettingsUpdateProvider_SettingsUpdated;
         }
 
-        private void SettingsUpdateProvider_SettingsUpdated(object? sender, EventArgs e)
+        private async Task SettingsUpdateProvider_SettingsUpdated(object? sender)
         {
             var context = SettingsUpdateProvider.GetContext();
             ApplyNewContext(context);
@@ -99,7 +99,7 @@ namespace DoMC.Forms
             MainController.GetObserver().Notify(DoMCLib.EventNamesList.InterfaceImagesSelected, (Image, Standard, ipp));
         }
 
-        private void btnTest_ReadAllSockets_Click(object sender, EventArgs e)
+        private async void btnTest_ReadAllSockets_Click(object sender, EventArgs e)
         {
 
             if (TestCCDIsReading) return;
@@ -111,7 +111,7 @@ namespace DoMC.Forms
                 TestSocketNumberSelected = 0;
                 lblTestSelectedSocket.Text = "";
                 ExternalStart = cbTest_ExternalStart.Checked;
-                TestReadAllSockets();
+                await TestReadAllSockets();
             }
             catch (Exception ex)
             {
@@ -125,7 +125,7 @@ namespace DoMC.Forms
             AbleForRead(false);
 
         }
-        private void btnReadSelectedSocket_Click(object sender, EventArgs e)
+        private async void btnReadSelectedSocket_Click(object sender, EventArgs e)
         {
 
             if (TestCCDIsReading) return;
@@ -135,7 +135,7 @@ namespace DoMC.Forms
             try
             {
                 ExternalStart = cbTest_ExternalStart.Checked;
-                TestReadOneSocket(TestSocketNumberSelected);
+                await TestReadOneSocket(TestSocketNumberSelected);
 
             }
             catch (Exception ex)
@@ -153,7 +153,7 @@ namespace DoMC.Forms
 
         }
 
-        private void btnCycleStartStop_Click(object sender, EventArgs e)
+        private async void btnCycleStartStop_Click(object sender, EventArgs e)
         {
 
             if (TestCCDIsReading) return;
@@ -161,7 +161,7 @@ namespace DoMC.Forms
             IsCycleStarted = true;
             AbleForRead(true);
             ExternalStart = cbTest_ExternalStart.Checked;
-            CycleReadingProc(TestSocketNumberSelected);
+            await CycleReadingProc(TestSocketNumberSelected);
             IsCycleStarted = false;
             TestCCDIsReading = false;
 

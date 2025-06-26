@@ -16,6 +16,7 @@ using DoMCLib.Classes.Module.LCB;
 using static DoMCLib.Classes.Module.LCB.LCBModule;
 using System.Security.Cryptography;
 using DoMCLib.Classes;
+using DoMCLib.Classes.Module.LCB.Commands;
 
 namespace DoMC.UserControls
 {
@@ -63,18 +64,18 @@ namespace DoMC.UserControls
             {
                 LastSinchrosignal = DateTime.Now;
             }
-            if (EventName== DoMCApplicationContext.SettingsInterfaceClosedEventName)
+            if (EventName == DoMCApplicationContext.SettingsInterfaceClosedEventName)
             {
-                TestLCBSetSettingMode();
-                TestLCBStop();
+                await TestLCBSetSettingMode();
+                await TestLCBStop();
             }
         }
 
-        private void SettingsUpdateProvider_SettingsUpdated(object? sender, EventArgs e)
+        private async Task SettingsUpdateProvider_SettingsUpdated(object? sender)
         {
             var context = SettingsUpdateProvider.GetContext();
             if (TestLCBConnected)
-                TestLCBStop();
+                await TestLCBStop();
             ApplyNewContext(context);
         }
         /*private void OnDispose(object? sender, EventArgs e)
@@ -110,22 +111,18 @@ namespace DoMC.UserControls
 
 
 
-        private void btnTestLCBReadStatuses_Click(object sender, EventArgs e)
+        private async void btnTestLCBReadStatuses_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
-
-
-            var res = MainController.CreateCommandInstance(typeof(GetLCBEquipmentStatusCommand))
-                .Wait(this, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out LEDEquipmentStatus LEDStatus);
-            //GetLCBEquipmentStatusCommand
-
-            /*SendCommand(ModuleCommand.GetLCBEquipmentStatusRequest);
-            var res = UserInterfaceControls.Wait(CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, 
-                () => { return LEDParameters.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.GetLCBEquipmentStatusResponse && 
-                    LEDParameters.LastCommandResponseReceived > start; });*/
-
-            if (!res)
+            LEDEquipmentStatus LEDStatus;
+            try
             {
+                LEDStatus = await new DoMCLib.Classes.Module.LCB.Commands.GetLCBEquipmentStatusCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные. ", ex);
                 MessageBox.Show("Не удалось получить данные");
                 return;
             }
@@ -144,7 +141,7 @@ namespace DoMC.UserControls
             }
         }
 
-        private void btnTestLCBWriteStatuses_Click(object sender, EventArgs e)
+        private async void btnTestLCBWriteStatuses_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
             LEDEquipmentStatus LEDStatus = new LEDEquipmentStatus();
@@ -164,44 +161,40 @@ namespace DoMC.UserControls
                 LEDStatus.LEDStatuses[l] = TestLCBLEDs[l].CheckState != CheckState.Unchecked;
             }
 
-            var res = MainController.CreateCommandInstance(typeof(SetLCBEquipmentStatusCommand))
-                .Wait(LEDStatus, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
-            //SendCommand(ModuleCommand.SetLCBEquipmentStatusRequest);
-            /*var res = UserInterfaceControls.Wait(CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, 
-                () => { return LEDParameters.NumberOfLastCommandReceived == (int)DoMCLib.Classes.LEDCommandType.SetLCBEquipmentStatusResponse && 
-                    LEDParameters.LastCommandResponseReceived > start; });*/
-            if (!res || !result)
+            if (!await new DoMCLib.Classes.Module.LCB.Commands.SetLCBEquipmentStatusCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync(LEDStatus))
             {
+
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось передать данные.");
                 MessageBox.Show("Не удалось передать данные");
                 return;
             }
         }
 
 
-        private void btnTestLCBInit_Click(object sender, EventArgs e)
+        private async void btnTestLCBInit_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted) return;
             if (TestLCBConnected)
             {
-                TestLCBStop();
+                await TestLCBStop();
             }
             else
             {
-                TestLCBStart();
+                await TestLCBStart();
 
             }
         }
 
-        private void btnTestLCBStop_Click(object sender, EventArgs e)
+        private async void btnTestLCBStop_Click(object sender, EventArgs e)
         {
-            TestLCBStop();
+            await TestLCBStop();
         }
 
-        private void TestLCBStart()
+        private async Task TestLCBStart()
         {
             btnTestLCBInit.BackColor = Color.Gray;
             //Configuration = Configuration;
-            if (!CurrentContext.StartLCB(MainController, WorkingLog))
+            if (!await DoMCEquipmentCommands.StartLCB(MainController, WorkingLog))
             {
                 btnTestLCBInit.BackColor = Color.Red;
                 //DoMCNotInitializedErrorMessage();
@@ -213,9 +206,9 @@ namespace DoMC.UserControls
             btnTestLCBInit.BackColor = Color.Green;
         }
 
-        private void TestLCBStop()
+        private async Task TestLCBStop()
         {
-            CurrentContext.StopLCB(MainController, WorkingLog);
+            await DoMCEquipmentCommands.StopLCB(MainController, WorkingLog);
             //SendCommand(ModuleCommand.LCBStop);
             TestLCBTestStarted = false;
             TestLCBConnected = false;
@@ -260,7 +253,7 @@ namespace DoMC.UserControls
         }
 
 
-        private void btnTestLCBFullTest_Click(object sender, EventArgs e)
+        private async void btnTestLCBFullTest_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
             TestLCBTestStarted = true;
@@ -295,16 +288,18 @@ namespace DoMC.UserControls
                     LEDStatus.LEDStatuses[l] = TestLCBLEDs[l].CheckState != CheckState.Unchecked;
                 }
 
-                Application.DoEvents();
-                var res = MainController.CreateCommandInstance(typeof(SetLCBEquipmentStatusCommand))
-                    .Wait(new LEDEquipmentStatus() { Inputs = LEDStatus.Inputs, LEDStatuses = LEDStatus.LEDStatuses, Magnets = LEDStatus.Magnets, Outputs = LEDStatus.Outputs, Valve = LEDStatus.Valve }, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
+                //new LEDEquipmentStatus() { Inputs = LEDStatus.Inputs, LEDStatuses = LEDStatus.LEDStatuses, Magnets = LEDStatus.Magnets, Outputs = LEDStatus.Outputs, Valve = LEDStatus.Valve }
 
-                if (!res || !result)
+                await Task.Yield();
+                if (!await new DoMCLib.Classes.Module.LCB.Commands.SetLCBEquipmentStatusCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync(LEDStatus))
                 {
+
+                    WorkingLog.Add(LoggerLevel.Critical, "Не удалось передать данные.");
                     MessageBox.Show("Не удалось передать данные");
                     return;
                 }
-                Thread.Sleep(500);
+
+                await Task.Delay(500);
             }
             TestLCBTestStarted = false;
 
@@ -312,21 +307,23 @@ namespace DoMC.UserControls
 
 
 
-        private void btnTestLCBGetCurrent_Click(object sender, EventArgs e)
+        private async void btnTestLCBGetCurrent_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
-            var res = MainController.CreateCommandInstance(typeof(GetLCBCurrentCommand))
-                .Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out int current);
-
-            if (!res)
+            try
             {
+                var current = await new GetLCBCurrentCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+                txbTestLCBCurrent.Text = current.ToString();
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные", ex);
                 MessageBox.Show("Не удалось получить данные");
                 return;
             }
-            txbTestLCBCurrent.Text = current.ToString();
         }
 
-        private void btnTestLCBSetCurrent_Click(object sender, EventArgs e)
+        private async void btnTestLCBSetCurrent_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
             if (!int.TryParse(txbTestLCBCurrent.Text, out int current))
@@ -336,34 +333,33 @@ namespace DoMC.UserControls
                 return;
             }
             //LEDParameters.LEDCurrent = current ;
-            var res = MainController.CreateCommandInstance(typeof(SetLCBCurrentCommand))
-                .Wait(current, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
-            if (!res || !result)
+            var res = await new SetLCBCurrentCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync(current);
+            if (!res)
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось передать данные");
                 MessageBox.Show("Не удалось передать данные");
                 return;
             }
         }
 
-        private void btnTestLCBGetMovementParameters_Click(object sender, EventArgs e)
+        private async void btnTestLCBGetMovementParameters_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
-            var res = MainController.CreateCommandInstance(typeof(GetLCBMovementParametersCommand))
-                .Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out LEDMovementParameters LEDParameters);
-            if (!res)
+            try
             {
+                var LEDParameters = await new GetLCBMovementParametersCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+                SetImpulsesToTextBoxes(txbTestLCBPreformLength, txbTestLCBPreformLengthMm, LEDParameters.PreformLengthImpulses);
+                SetImpulsesToTextBoxes(txbTestLCBDelayLength, txbTestLCBDelayLengthMm, LEDParameters.DelayLengthImpulses);
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные");
                 MessageBox.Show("Не удалось получить данные");
                 return;
             }
-            SetImpulsesToTextBoxes(txbTestLCBPreformLength, txbTestLCBPreformLengthMm, LEDParameters.PreformLengthImpulses);
-            SetImpulsesToTextBoxes(txbTestLCBDelayLength, txbTestLCBDelayLengthMm, LEDParameters.DelayLengthImpulses);
-
-            //txbTestLCBPreformLength.Text = LEDParameters.PreformLengthImpulses.ToString();
-            //txbTestLCBDelayLength.Text = LEDParameters.DelayLengthImpulses.ToString();
-
         }
 
-        private void btnTestLCBSetMovementParameters_Click(object sender, EventArgs e)
+        private async void btnTestLCBSetMovementParameters_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
             if (!int.TryParse(txbTestLCBPreformLength.Text, out int preformLength))
@@ -378,22 +374,26 @@ namespace DoMC.UserControls
                 txbTestLCBDelayLength.Focus();
                 return;
             }
+            var res = await new SetLCBMovementParametersCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync((preformLength, delayLength));
 
-            var res = MainController.CreateCommandInstance(typeof(SetLCBMovementParametersCommand))
-                .Wait((preformLength, delayLength), CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
-            if (!res || !res)
+            if (!res)
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось передать данные");
                 MessageBox.Show("Не удалось передать данные");
                 return;
             }
         }
 
-        private void TestLCBSetWorkMode()
+        private async Task TestLCBSetWorkMode()
         {
-            var res = MainController.CreateCommandInstance(typeof(SetLCBWorkModeCommand))
-                .Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
-            if (!res)
+            try
             {
+                await new SetLCBWorkModeCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные", ex);
                 MessageBox.Show("Не удалось получить данные");
                 return;
             }
@@ -401,47 +401,56 @@ namespace DoMC.UserControls
             //txbTestLCBMaximumHorizontalStroke.Text = (LEDParameters.MaximumHorizontalStroke).ToString();
         }
 
-        private void TestLCBSetSettingMode()
+        private async Task TestLCBSetSettingMode()
         {
-            var res = MainController.CreateCommandInstance(typeof(SetLCBNonWorkModeCommand))
-                .Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out bool result);
-            if (!res)
+            try
             {
+                await new SetLCBNonWorkModeCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные", ex);
                 MessageBox.Show("Не удалось получить данные");
                 return;
             }
             IsWorkingModeStarted = false;
             //txbTestLCBMaximumHorizontalStroke.Text = (LEDParameters.MaximumHorizontalStroke).ToString();
         }
-        private void chbTestLCBWorkMode_CheckedChanged(object sender, EventArgs e)
+        private async void chbTestLCBWorkMode_CheckedChanged(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
             if (chbTestLCBWorkMode.Checked)
             {
                 chbTestLCBWorkMode.BackColor = Color.Green;
-                TestLCBSetWorkMode();
+                await TestLCBSetWorkMode();
             }
             else
             {
                 chbTestLCBWorkMode.BackColor = Color.Transparent;
-                TestLCBSetSettingMode();
+                await TestLCBSetSettingMode();
             }
         }
-        private void btnTestLCBGetMaxPosition_Click(object sender, EventArgs e)
+        private async void btnTestLCBGetMaxPosition_Click(object sender, EventArgs e)
         {
             if (TestLCBTestStarted | !TestLCBConnected) return;
-            var res = MainController.CreateCommandInstance(typeof(GetLCBMaxPositionCommand))
-                .Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out int MaxPosition);
-            if (!res)
+            try
             {
+                var MaxPosition = await new GetLCBMaxPositionCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+                txbTestLCBMaximumHorizontalStroke.Text = MaxPosition.ToString();
+                if (CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient > 0)
+                {
+                    txbTestLCBMaximumHorizontalStrokeMm.Text = (MaxPosition / CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient).ToString();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные", ex);
                 MessageBox.Show("Не удалось получить данные");
                 return;
             }
-            txbTestLCBMaximumHorizontalStroke.Text = MaxPosition.ToString();
-            if (CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient > 0)
-            {
-                txbTestLCBMaximumHorizontalStrokeMm.Text = (MaxPosition / CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient).ToString();
-            }
+
         }
 
         System.Windows.Forms.Timer TestLCBGetCurrentPositionTimer;
@@ -464,9 +473,9 @@ namespace DoMC.UserControls
             }
         }
 
-        private void TestLCBGetCurrentPositionTimer_Tick(object sender, EventArgs e)
+        private async void TestLCBGetCurrentPositionTimer_Tick(object sender, EventArgs e)
         {
-            if (!TestLCBGetCurrentPosition())
+            if (!await TestLCBGetCurrentPosition())
             {
                 if (TestLCBGetCurrentPositionTimer != null)
                 {
@@ -488,21 +497,23 @@ namespace DoMC.UserControls
             btnTestLCBGetCurrentPosition.BackColor = clr;
         }
 
-        private bool TestLCBGetCurrentPosition()
+        private async Task<bool> TestLCBGetCurrentPosition()
         {
             if (TestLCBTestStarted | !TestLCBConnected) return false;
-            var res = MainController.CreateCommandInstance(typeof(GetLCBCurrentPositionCommand))
-                .Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds, out int CurrentPosition);
-            if (!res)
+            try
             {
+                var CurrentPosition = await new GetLCBCurrentPositionCommand(MainController, MainController.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
+                txbTestLCBCurrentHorizontalStroke.Text = (CurrentPosition).ToString();
+                if (CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient > 0)
+                {
+                    txbTestLCBCurrentHorizontalStrokeMm.Text = (CurrentPosition / CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient).ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные", ex);
                 MessageBox.Show("Не удалось получить данные");
                 return false;
-            }
-
-            txbTestLCBCurrentHorizontalStroke.Text = (CurrentPosition).ToString();
-            if (CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient > 0)
-            {
-                txbTestLCBCurrentHorizontalStrokeMm.Text = (CurrentPosition / CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LCBKoefficient).ToString();
             }
 
             return true;

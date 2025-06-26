@@ -10,15 +10,24 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace DoMCLib.Classes.Module.LCB.Commands
 {
-    public class LCBStartCommand : AbstractCommandBase
+    public class LCBStartCommand : AbstractCommandBase, IExecuteCommandAsync
     {
         public LCBStartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
         protected override async Task Executing() => ((LCBModule)Module).Start();
+
+        public new async Task ExecuteCommandAsync()
+        {
+            await base.ExecuteCommandAsync();
+        }
     }
-    public class LCBStopCommand : AbstractCommandBase
+    public class LCBStopCommand : AbstractCommandBase, IExecuteCommandAsync
     {
         public LCBStopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
         protected override async Task Executing() => ((LCBModule)Module).Stop();
+        public new async Task ExecuteCommandAsync()
+        {
+            await base.ExecuteCommandAsync();
+        }
     }
 
     public class SetLCBCurrentCommand : GenericCommandBase<int, bool>

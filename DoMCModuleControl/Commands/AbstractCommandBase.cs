@@ -151,13 +151,13 @@ namespace DoMCModuleControl.Commands
             {
             }
         }
-        public virtual async Task ExecuteCommandAsync()
+        protected virtual async Task ExecuteCommandAsync()
         {
             await ExecuteCommandBase();
 
         }
 
-        public virtual async Task<T> ExecuteCommandAsync<T>()
+        protected virtual async Task<T> ExecuteCommandAsync<T>()
         {
             await ExecuteCommandBase();
 
@@ -167,12 +167,12 @@ namespace DoMCModuleControl.Commands
             throw new InvalidOperationException($"Тип выходных данных {OutputData?.GetType().Name} не соответствует ожидаемому {typeof(T).Name}.");
 
         }
-        public virtual async Task ExecuteCommandAsync(object? inputData)
+        protected virtual async Task ExecuteCommandAsync(object? inputData)
         {
             SetInputData(inputData);
             await ExecuteCommandAsync();
         }
-        public virtual async Task<T> ExecuteCommandAsync<T>(object? inputData)
+        protected virtual async Task<T> ExecuteCommandAsync<T>(object? inputData)
         {
             SetInputData(inputData);
             return await ExecuteCommandAsync<T>();

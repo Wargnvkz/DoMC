@@ -6,7 +6,7 @@ namespace DoMCTestingTools.ClassesForTests
 {
     public partial class TestModule
     {
-        public class TestCommand : AbstractCommandBase
+        public class TestCommand : AbstractCommandBase, IExecuteCommandAsync
         {
             public TestCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, typeof(TestInputData), typeof(TestOutputData))
             {
@@ -17,6 +17,10 @@ namespace DoMCTestingTools.ClassesForTests
                 var outputData = new TestOutputData();
                 outputData.Value = ((TestInputData)InputData).Value.ToString();
                 OutputData = outputData;
+            }
+            public new async Task ExecuteCommandAsync()
+            {
+                await base.ExecuteCommandAsync();
             }
         }
     }

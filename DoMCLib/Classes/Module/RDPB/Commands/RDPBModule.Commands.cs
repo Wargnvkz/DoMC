@@ -13,9 +13,9 @@ namespace DoMCLib.Classes.Module.RDPB.Commands
         protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.SetIsOK, CancelationTokenSourceToCancelCommandExecution.Token);
     }
 
-    public class LoadConfigurationToModuleCommand : GenericCommandBase<ApplicationConfiguration, bool>
+    public class SendConfigurationToModuleCommand : GenericCommandBase<ApplicationConfiguration, bool>
     {
-        public LoadConfigurationToModuleCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
+        public SendConfigurationToModuleCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing()
         {
             await ((RDPBModule)Module).SetConfig(InputData);
@@ -47,9 +47,9 @@ namespace DoMCLib.Classes.Module.RDPB.Commands
         protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.SetCoolingBlocks, CancelationTokenSourceToCancelCommandExecution.Token, InputData);
     }
 
-    public class StartCommand : GenericCommandBase
+    public class RDPBStartCommand : GenericCommandBase
     {
-        public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
+        public RDPBStartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => await ((RDPBModule)Module).Start();
     }
 

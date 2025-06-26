@@ -69,7 +69,7 @@ namespace DoMC.UserControls
             }
         }
 
-        private void SettingsUpdateProvider_SettingsUpdated(object? sender, EventArgs e)
+        private async Task SettingsUpdateProvider_SettingsUpdated(object? sender)
         {
             var context = SettingsUpdateProvider.GetContext();
             ApplyNewContext(context);

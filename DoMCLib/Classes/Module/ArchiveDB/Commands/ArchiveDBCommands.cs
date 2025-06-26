@@ -20,15 +20,23 @@ namespace DoMCLib.Classes.Module.ArchiveDB.Commands
         }
 
     }
-    public class StartCommand : AbstractCommandBase
+    public class StartCommand : AbstractCommandBase, IExecuteCommandAsync
     {
         public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
         protected override async Task Executing() => await ((ArchiveDBModule)Module).StartAsync();
+        public new async Task ExecuteCommandAsync()
+        {
+            await base.ExecuteCommandAsync();
+        }
     }
-    public class StopCommand : AbstractCommandBase
+    public class StopCommand : AbstractCommandBase, IExecuteCommandAsync
     {
         public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
         protected override async Task Executing() => await ((ArchiveDBModule)Module).StopAsync();
+        public new async Task ExecuteCommandAsync()
+        {
+            await base.ExecuteCommandAsync();
+        }
     }
     public class GetWorkingStatusCommand : GenericCommandBase<bool>
     {

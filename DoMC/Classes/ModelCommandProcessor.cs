@@ -79,14 +79,14 @@ namespace DoMC.Classes
         }
         public bool StartCCD()
         {
-            var startCmd = Controller.CreateCommandInstance(typeof(CCDCardDataModule.StartCommand));
+            var startCmd = Controller.CreateCommandInstance(typeof(CCDCardDataModule.RDPBStartCommand));
             if (startCmd == null) return false;
             startCmd.ExecuteCommandAsync().Wait();
             return startCmd.WasCompletedSuccessfully();
         }
         public bool StartRDPB()
         {
-            var startCmd = Controller.CreateCommandInstance(typeof(RDPBModule.StartCommand));
+            var startCmd = Controller.CreateCommandInstance(typeof(RDPBModule.RDPBStartCommand));
             if (startCmd == null) return false;
             startCmd.ExecuteCommandAsync().Wait();
             return startCmd.WasCompletedSuccessfully();
@@ -139,7 +139,7 @@ namespace DoMC.Classes
         }
         public bool LoadConfigurationRDPB()
         {
-            var LoadConfigurationCmd = Controller.CreateCommandInstance(typeof(RDPBModule.LoadConfigurationToModuleCommand));
+            var LoadConfigurationCmd = Controller.CreateCommandInstance(typeof(RDPBModule.SendConfigurationToModuleCommand));
             if (LoadConfigurationCmd == null) return false;
             LoadConfigurationCmd.ExecuteCommandAsync(CurrentContext.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig).Wait();
             return LoadConfigurationCmd.WasCompletedSuccessfully();

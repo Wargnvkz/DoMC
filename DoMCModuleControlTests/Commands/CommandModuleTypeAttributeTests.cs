@@ -32,7 +32,7 @@ namespace DoMCModuleControl.Commands.Tests
 
 
         [CommandModuleType(typeof(TestModule))]
-        internal class TestCommand : AbstractCommandBase
+        internal class TestCommand : AbstractCommandBase, IExecuteCommandAsync
         {
             public TestCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null)
             {
@@ -42,9 +42,14 @@ namespace DoMCModuleControl.Commands.Tests
             {
 
             }
+            public new async Task ExecuteCommandAsync()
+            {
+                await base.ExecuteCommandAsync();
+            }
+
         }
         [CommandModuleType(typeof(TestModule))]
-        internal class NullTestCommand : AbstractCommandBase
+        internal class NullTestCommand : AbstractCommandBase, IExecuteCommandAsync
         {
             public NullTestCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null)
             {
@@ -53,6 +58,10 @@ namespace DoMCModuleControl.Commands.Tests
             protected override async Task Executing()
             {
 
+            }
+            public new async Task ExecuteCommandAsync()
+            {
+                await base.ExecuteCommandAsync();
             }
         }
     }

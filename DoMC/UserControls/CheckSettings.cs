@@ -36,7 +36,7 @@ namespace DoMC.UserControls
             Disposed += OnDispose;
             //MainController.GetObserver().NotificationReceivers += GetCCDStandardInterface_NotificationReceivers;
         }
-        private void SettingsUpdateProvider_SettingsUpdated(object? sender, EventArgs e)
+        private async Task SettingsUpdateProvider_SettingsUpdated(object sender)
         {
             var context = SettingsUpdateProvider.GetContext();
             ApplyNewContext(context);
@@ -77,7 +77,7 @@ namespace DoMC.UserControls
 
         private async void btnSettingsCheckCardStatus_Click(object sender, EventArgs e)
         {
-            var result = await DoMCEquipmentCommands.TestCards(MainController, WorkingLog);
+            var result = await DoMCEquipmentCommands.TestCards(MainController, CurrentContext, WorkingLog);
             if (result.Item1)
             {
                 for (int i = 0; i < result.Item2.requested.Length; i++)

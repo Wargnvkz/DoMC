@@ -14,6 +14,7 @@ using DoMCLib.Classes.Module.LCB;
 using static DoMCLib.Classes.Module.LCB.LCBModule;
 using DoMCLib.Classes.Module.RDPB.Classes;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using DoMCLib.Classes.Module.RDPB;
 
 namespace DoMC.UserControls
 {
@@ -62,12 +63,12 @@ namespace DoMC.UserControls
             }*/
         }
 
-        private void SettingsUpdateProvider_SettingsUpdated(object? sender, EventArgs e)
+        private async Task SettingsUpdateProvider_SettingsUpdated(object? sender)
         {
             var context = SettingsUpdateProvider.GetContext();
             if (TestRDPBConnected)
-                TestRDPBStop();
-            ApplyNewContext(context);
+                await TestRDPBStop();
+            await ApplyNewContext(context);
         }
         private void OnDispose(object? sender, EventArgs e)
         {
@@ -81,134 +82,248 @@ namespace DoMC.UserControls
             }
             catch { }
         }
-        private void ApplyNewContext(DoMCLib.Classes.DoMCApplicationContext context)
+        private async Task ApplyNewContext(DoMCLib.Classes.DoMCApplicationContext context)
         {
             CurrentContext = context;
-            SetRDPBParameters();
+            await SetRDPBParameters();
             FillPage();
         }
         private void FillPage()
         {
 
         }
-        private void SendCommands(Type Command, object data = null)
+        /*private async Task SendCommands( Command, object data = null)
         {
             var cmd = MainController.CreateCommandInstance(Command);
+
             var res = cmd.Wait(data, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out CurrentStatus);
             if (!res)
             {
-                btnRDPBTestConnect.BackColor = Color.Red;
-                TestRDPBConnected = false;
-                TestRDPBStop();
-            }
-            TestRDPBStatusFill();
 
-        }
-        private void TestRDPBStop()
+            }
+
+        }*/
+        private async Task TestRDPBStop()
         {
-            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StopCommand));
-            var res = cmd.Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out object? _);
-            if (res)
+            try
             {
+                await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
                 TestRDPBConnected = false;
                 btnRDPBTestConnect.BackColor = SystemColors.Control;
                 btnRDPBTestConnect.Text = "Подключить";
             }
-            else
+            catch (Exception ex)
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка при отлючении", ex);
                 DisplayMessage.Show("Ошибка при отлючении", "Ошибка");
+
             }
+
+
         }
-        private void TestRDPBStart()
+        private async Task TestRDPBStart()
         {
-            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.StartCommand));
-            var res = cmd.Wait(null, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out object? _);
-            if (res)
+            try
             {
+                await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStartCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
                 TestRDPBConnected = true;
                 btnRDPBTestConnect.BackColor = Color.Green;
                 btnRDPBTestConnect.Text = "Отключить";
             }
-            else
+            catch (Exception ex)
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось подключиться к бракеру", ex);
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
                 DisplayMessage.Show("Не удалось подключиться к бракеру", "Ошибка");
             }
+
         }
 
-        private void btnRDPBTestConnect_Click(object sender, EventArgs e)
+        private async void btnRDPBTestConnect_Click(object sender, EventArgs e)
         {
             if (TestRDPBConnected)
             {
-                TestRDPBStop();
+                await TestRDPBStop();
             }
             else
             {
-                TestRDPBStart();
+                await TestRDPBStart();
                 TestRDPBStatusFill();
             }
         }
 
-        private void SetRDPBParameters()
+        private async Task SetRDPBParameters()
         {
-            var cmd = MainController.CreateCommandInstance(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.LoadConfigurationToModuleCommand));
-            var res = cmd.Wait(CurrentContext.Configuration, CurrentContext.Configuration.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds, out bool result);
-            if (!res)
+            try
             {
+                await new DoMCLib.Classes.Module.RDPB.Commands.SendConfigurationToModuleCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync(CurrentContext.Configuration);
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                TestRDPBStop();
+                await TestRDPBStop();
             }
-            TestRDPBStatusFill();
+            finally
+            {
+                TestRDPBStatusFill();
+            }
+
         }
 
-        private void btnTestRDPBN80_Click(object sender, EventArgs e)
+        private async void btnTestRDPBN80_Click(object sender, EventArgs e)
         {
             if (!TestRDPBConnected) return;
-            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SendSetIsOkCommand));
+            try
+            {
+                CurrentStatus = await new DoMCLib.Classes.Module.RDPB.Commands.SendSetIsOkCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
+                MessageBox.Show("Не удалось оправить команду");
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                await TestRDPBStop();
+            }
+            finally
+            {
+                TestRDPBStatusFill();
+            }
         }
 
-        private void btnTestRDPBN81_Click(object sender, EventArgs e)
+        private async void btnTestRDPBN81_Click(object sender, EventArgs e)
         {
             if (!TestRDPBConnected) return;
-            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SendSetIsBadCommand));
+            try
+            {
+                CurrentStatus = await new DoMCLib.Classes.Module.RDPB.Commands.SendSetIsBadCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
+                MessageBox.Show("Не удалось оправить команду");
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                await TestRDPBStop();
+            }
+            finally
+            {
+                TestRDPBStatusFill();
+            }
 
         }
 
-        private void btnTestRDPBN82_Click(object sender, EventArgs e)
+        private async void btnTestRDPBN82_Click(object sender, EventArgs e)
         {
             if (!TestRDPBConnected) return;
-            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.TurnOnCommand));
+            try
+            {
+                CurrentStatus = await new DoMCLib.Classes.Module.RDPB.Commands.TurnOnCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
+                MessageBox.Show("Не удалось оправить команду");
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                await TestRDPBStop();
+            }
+            finally
+            {
+                TestRDPBStatusFill();
+            }
 
         }
 
-        private void btnTestRDPBN83_Click(object sender, EventArgs e)
+        private async void btnTestRDPBN83_Click(object sender, EventArgs e)
         {
             if (!TestRDPBConnected) return;
-            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.TurnOffCommand));
+            try
+            {
+                CurrentStatus = await new DoMCLib.Classes.Module.RDPB.Commands.TurnOffCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
+                MessageBox.Show("Не удалось оправить команду");
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                await TestRDPBStop();
+            }
+            finally
+            {
+                TestRDPBStatusFill();
+            }
 
         }
 
-        private void btnTestRDPBN90_Click(object sender, EventArgs e)
+        private async void btnTestRDPBN90_Click(object sender, EventArgs e)
         {
             if (!TestRDPBConnected) return;
-            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.GetParametersCommand));
+            try
+            {
+                CurrentStatus = await new DoMCLib.Classes.Module.RDPB.Commands.GetParametersCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
+                MessageBox.Show("Не удалось оправить команду");
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                await TestRDPBStop();
+            }
+            finally
+            {
+                TestRDPBStatusFill();
+            }
 
         }
 
-        private void btnTestRDPBSendCommand_Click(object sender, EventArgs e)
+        private async void btnTestRDPBSendCommand_Click(object sender, EventArgs e)
         {
             if (!TestRDPBConnected) return;
-            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SendManualCommand), txbTestRDPBManualCommand.Text);
+            try
+            {
+                await new DoMCLib.Classes.Module.RDPB.Commands.SendManualCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync(txbTestRDPBManualCommand.Text);
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
+                MessageBox.Show("Не удалось оправить команду");
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                await TestRDPBStop();
+            }
+            finally
+            {
+                TestRDPBStatusFill();
+            }
 
         }
 
-        private void cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged(object sender, EventArgs e)
+        private async void cbTestRDPBCoolingBlocksQuantity_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (!TestRDPBConnected) return;
             var CoolingBlocksQuantityToSet = int.Parse(cbTestRDPBCoolingBlocksQuantity.SelectedItem?.ToString() ?? "0");
-            SendCommands(typeof(DoMCLib.Classes.Module.RDPB.RDPBModule.SetCoolingBlockQuantityCommand), CoolingBlocksQuantityToSet);
+            try
+            {
+                CurrentStatus = await new DoMCLib.Classes.Module.RDPB.Commands.SetCoolingBlockQuantityCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync(CoolingBlocksQuantityToSet);
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
+                MessageBox.Show("Не удалось оправить команду");
+                btnRDPBTestConnect.BackColor = Color.Red;
+                TestRDPBConnected = false;
+                await TestRDPBStop();
+            }
+            finally
+            {
+                TestRDPBStatusFill();
+            }
 
         }
 

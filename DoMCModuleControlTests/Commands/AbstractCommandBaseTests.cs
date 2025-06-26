@@ -100,7 +100,7 @@ namespace DoMCModuleControl.Commands.Tests
             Assert.Fail();
         }
     }
-    public class TestCommand : AbstractCommandBase
+    public class TestCommand : AbstractCommandBase,IExecuteCommandAsync
     {
         public TestCommand(IMainController mainController, AbstractModuleBase module, Type? inputType = null, Type? outputType = null) : base(mainController, module, inputType, outputType)
         {
@@ -109,6 +109,10 @@ namespace DoMCModuleControl.Commands.Tests
         protected override async Task Executing()
         {
             throw new NotImplementedException();
+        }
+        public new async Task ExecuteCommandAsync()
+        {
+            await base.ExecuteCommandAsync();
         }
     }
 }

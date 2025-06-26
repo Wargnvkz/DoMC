@@ -15,7 +15,7 @@ namespace DoMCTestingTools.ClassesForTests
 
         }
 
-        public void SetMainController(IMainController mainController, object? Data)
+        public async Task SetMainController(IMainController mainController, object? Data)
         {
 
         }

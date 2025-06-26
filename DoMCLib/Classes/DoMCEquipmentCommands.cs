@@ -141,7 +141,7 @@ namespace DoMCLib.Classes
 
             try
             {
-                var result = await new CCDAllSocketsImagesCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync<GetImageDataCommandResponse>(context);
+                var result = await new CCDAllSocketsImagesCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(context);
                 if ((result?.CardsNotAnswered().Count ?? 0) > 0)
                 {
                     WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
@@ -157,7 +157,7 @@ namespace DoMCLib.Classes
             LastAction = LastCCDAction.GettingImages;
             try
             {
-                var result = await new CCDGetSingleSocketImageCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync<SocketReadData>((EquipmentSocketNumber, context));
+                var result = await new CCDGetSingleSocketImageCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync((EquipmentSocketNumber, context));
                 return result;
             }
             catch
@@ -166,10 +166,10 @@ namespace DoMCLib.Classes
                 return null;
             }
         }
-        public async static Task<(bool, CCDCardDataCommandResponse)> TestCards(IMainController Controller, ILogger WorkingLog)
+        public async static Task<(bool, CCDCardDataCommandResponse)> TestCards(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog)
         {
             return await ExecuteCCDCommandForAllCards(WorkingLog, async () =>
-                    await (new DoMCLib.Classes.Module.CCD.Commands.TestConnectionCardsCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync()
+                    await (new DoMCLib.Classes.Module.CCD.Commands.TestConnectionCardsCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync(context)
                    );
 
 

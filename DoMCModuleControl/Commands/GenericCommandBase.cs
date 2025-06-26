@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DoMCModuleControl.Commands
 {
-    public abstract class GenericCommandBase<TInput, TOutput> : AbstractCommandBase
+    public abstract class GenericCommandBase<TInput, TOutput> : AbstractCommandBase, IExecuteCommandAsync<TInput, TOutput>
     {
         public new TInput InputData { get; private set; } = default!;
         public new TOutput OutputData { get; protected set; } = default!;
@@ -31,18 +31,12 @@ namespace DoMCModuleControl.Commands
 
         public TOutput GetOutput() => OutputData;
 
-        public override async Task<TOutput> ExecuteCommandAsync()
-        {
-            return await base.ExecuteCommandAsync<TOutput>();
-
-        }
-
         public async Task<TOutput> ExecuteCommandAsync(TInput input)
         {
             return await base.ExecuteCommandAsync<TOutput>(input);
         }
     }
-    public abstract class GenericCommandBase<TOutput> : AbstractCommandBase
+    public abstract class GenericCommandBase<TOutput> : AbstractCommandBase, IExecuteCommandAsync<TOutput>
     {
         public new TOutput OutputData { get; protected set; } = default!;
 
@@ -57,7 +51,7 @@ namespace DoMCModuleControl.Commands
         }
 
         public TOutput GetOutput() => OutputData;
-        public override async Task<TOutput> ExecuteCommandAsync()
+        public new async Task<TOutput> ExecuteCommandAsync()
         {
             return await base.ExecuteCommandAsync<TOutput>();
 
@@ -65,12 +59,27 @@ namespace DoMCModuleControl.Commands
 
     }
 
-    public abstract class GenericCommandBase : AbstractCommandBase
+    public abstract class GenericCommandBase : AbstractCommandBase, IExecuteCommandAsync
     {
 
         public GenericCommandBase(IMainController controller, AbstractModuleBase module)
             : base(controller, module, null, null) { }
-
+        public new async Task ExecuteCommandAsync()
+        {
+            await base.ExecuteCommandAsync();
+        }
     }
 
+    public interface IExecuteCommandAsync<TInput, TOutput>
+    {
+        public Task<TOutput> ExecuteCommandAsync(TInput input);
+    }
+    public interface IExecuteCommandAsync<TOutput>
+    {
+        public Task<TOutput> ExecuteCommandAsync();
+    }
+    public interface IExecuteCommandAsync
+    {
+        public Task ExecuteCommandAsync();
+    }
 }
