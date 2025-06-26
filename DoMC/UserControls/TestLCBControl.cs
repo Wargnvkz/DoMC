@@ -66,7 +66,7 @@ namespace DoMC.UserControls
             }
             if (EventName == DoMCApplicationContext.SettingsInterfaceClosedEventName)
             {
-                await TestLCBSetSettingMode();
+                await TestLCBSetSettingMode(true);
                 await TestLCBStop();
             }
         }
@@ -401,7 +401,7 @@ namespace DoMC.UserControls
             //txbTestLCBMaximumHorizontalStroke.Text = (LEDParameters.MaximumHorizontalStroke).ToString();
         }
 
-        private async Task TestLCBSetSettingMode()
+        private async Task TestLCBSetSettingMode(bool silent = false)
         {
             try
             {
@@ -410,9 +410,12 @@ namespace DoMC.UserControls
             }
             catch (Exception ex)
             {
-                WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные", ex);
-                MessageBox.Show("Не удалось получить данные");
-                return;
+                if (!silent)
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, "Не удалось получить данные", ex);
+                    MessageBox.Show("Не удалось получить данные");
+                    return;
+                }
             }
             IsWorkingModeStarted = false;
             //txbTestLCBMaximumHorizontalStroke.Text = (LEDParameters.MaximumHorizontalStroke).ToString();
