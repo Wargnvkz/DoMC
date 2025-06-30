@@ -141,33 +141,36 @@ namespace DoMC.UserControls
                 try
                 {
                     ProgressbarStep++;
-                    if ((await DoMCEquipmentCommands.LoadCCDConfiguration(MainController, CurrentContext, WorkingLog, ChosenSocketNumber.Value - 1)).Item1)
+                    if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog, ChosenSocketNumber.Value - 1)).Item1)
                     {
-                        ProgressbarStep++;
-                        if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog, ChosenSocketNumber.Value - 1)).Item1)
+                        if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(MainController, CurrentContext, WorkingLog, ChosenSocketNumber.Value - 1)).Item1)
                         {
                             ProgressbarStep++;
-                            for (int i = 0; i < ImagesToMakeStandard; i++)
+                            if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog, ChosenSocketNumber.Value - 1)).Item1)
                             {
-                                if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalRead, ChosenSocketNumber.Value - 1)).Item1)
+                                ProgressbarStep++;
+                                for (int i = 0; i < ImagesToMakeStandard; i++)
                                 {
-                                    ProgressbarStep++;
-                                    var si = await DoMCEquipmentCommands.GetSingleSocketsImage(MainController, CurrentContext, WorkingLog, ChosenSocketNumber.Value - 1);
-                                    ProgressbarStep++;
-                                    if (si == null || si.Image == null)
+                                    if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalRead, ChosenSocketNumber.Value - 1)).Item1)
                                     {
-                                        WorkingLog.Add(LoggerLevel.Critical, $"Не удалось получить изображение гнезда матрицы {ChosenSocketNumber.Value}");
-                                        break;
+                                        ProgressbarStep++;
+                                        var si = await DoMCEquipmentCommands.GetSingleSocketsImage(MainController, CurrentContext, WorkingLog, ChosenSocketNumber.Value - 1);
+                                        ProgressbarStep++;
+                                        if (si == null || si.Image == null)
+                                        {
+                                            WorkingLog.Add(LoggerLevel.Critical, $"Не удалось получить изображение гнезда матрицы {ChosenSocketNumber.Value}");
+                                            break;
+                                        }
+                                        SingleSocketImages[i] = si.Image;
+                                        var sbmp = ImageTools.DrawImage(SingleSocketImages[i], false);
+                                        StandardPictures[i].Image = sbmp;
                                     }
-                                    SingleSocketImages[i] = si.Image;
-                                    var sbmp = ImageTools.DrawImage(SingleSocketImages[i], false);
-                                    StandardPictures[i].Image = sbmp;
                                 }
+                                var existImages = SingleSocketImages.Where(ssi => ssi != null).ToArray();
+                                var avgImg = ImageTools.CalculateAverage(existImages);
+                                CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[ChosenSocketNumber.Value - 1].StandardImage = avgImg;
+                                CurrentContext.Configuration.SaveProcessingDataSettings();
                             }
-                            var existImages = SingleSocketImages.Where(ssi => ssi != null).ToArray();
-                            var avgImg = ImageTools.CalculateAverage(existImages);
-                            CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[ChosenSocketNumber.Value - 1].StandardImage = avgImg;
-                            CurrentContext.Configuration.SaveProcessingDataSettings();
                         }
                     }
                 }
@@ -198,7 +201,7 @@ namespace DoMC.UserControls
             ProgressbarStep = 0;
             List<string> TextResults = new List<string>();
             (bool, CCDCardDataCommandResponse) startResult;
-            if ((startResult=await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog)).Item1)
+            if ((startResult = await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog)).Item1)
             {
                 if (startResult.Item2.CardsNotAnswered().Count > 0)
                 {
@@ -218,45 +221,48 @@ namespace DoMC.UserControls
                 ProgressbarStep++;
                 try
                 {
-                    if ((await DoMCEquipmentCommands.LoadCCDConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
+                    if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
                     {
-                        ProgressbarStep++;
-                        if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog)).Item1)
+                        if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
                         {
                             ProgressbarStep++;
-                            for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                            if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog)).Item1)
                             {
-                                img[socketNum] = new short[ImagesToMakeStandard][,];
-                            }
-                            for (int repeat = 0; repeat < ImagesToMakeStandard; repeat++)
-                            {
-                                if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalRead)).Item1)
+                                ProgressbarStep++;
+                                for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                 {
-                                    ProgressbarStep++;
-                                    var si = await DoMCEquipmentCommands.GetSocketsImages(MainController, CurrentContext, WorkingLog);
-                                    ProgressbarStep++;
-                                    for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                                    img[socketNum] = new short[ImagesToMakeStandard][,];
+                                }
+                                for (int repeat = 0; repeat < ImagesToMakeStandard; repeat++)
+                                {
+                                    if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalRead)).Item1)
                                     {
-                                        if (si.Item2[socketNum] != null)
-                                            img[socketNum][repeat] = si.Item2[socketNum].Image;
+                                        ProgressbarStep++;
+                                        var si = await DoMCEquipmentCommands.GetSocketsImages(MainController, CurrentContext, WorkingLog);
+                                        ProgressbarStep++;
+                                        for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                                        {
+                                            if (si.Item2[socketNum] != null)
+                                                img[socketNum][repeat] = si.Item2[socketNum].Image;
 
+                                        }
                                     }
+                                    StandardPictures[repeat].Image = bmpCheckSign;
                                 }
-                                StandardPictures[repeat].Image = bmpCheckSign;
-                            }
-                            ProgressbarStep++;
-                            for (int socketNum = 0; socketNum < socketMax; socketNum++)
-                            {
-                                if (img[socketNum].Any(im => im == null))
+                                ProgressbarStep++;
+                                for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                 {
-                                    CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
-                                    continue;
+                                    if (img[socketNum].Any(im => im == null))
+                                    {
+                                        CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
+                                        continue;
+                                    }
+                                    var avgImg = ImageTools.CalculateAverage(img[socketNum]);
+                                    CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
                                 }
-                                var avgImg = ImageTools.CalculateAverage(img[socketNum]);
-                                CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
+                                ProgressbarStep++;
+                                CurrentContext.Configuration.SaveProcessingDataSettings();
                             }
-                            ProgressbarStep++;
-                            CurrentContext.Configuration.SaveProcessingDataSettings();
                         }
                     }
                 }

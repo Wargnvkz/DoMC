@@ -90,7 +90,7 @@ namespace DoMCLib.Classes
             }
         }
 
-        public List<(int, SocketParameters)> GetCardParametersByCardList(List<int> CCDCardList)
+        public List<(int CardNumber, SocketParameters CardWorkingParameters)> GetCardParametersByCardList(List<int> CCDCardList)
         {
             var result = new List<(int, SocketParameters)>();
             for (int card = 0; card < CCDCardList.Count; card++)
@@ -155,10 +155,13 @@ namespace DoMCLib.Classes
         public enum LastCCDAction
         {
             Starting,
-            LoadConfig,
+            LoadConfigExposition,
+            LoadConfigReadingParameters,
+            SetFastRead,
             Reading,
             GettingImages,
-            Stopping
+            Stopping,
+            Reset
         }
     }
 

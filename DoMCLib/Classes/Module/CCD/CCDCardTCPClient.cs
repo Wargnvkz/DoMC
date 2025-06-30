@@ -309,7 +309,7 @@ namespace DoMCLib.Classes.Module.CCD
                 await Connect(cts.Token);
                 if (IsConnected)
                     await Disconnect();
-                return false;
+                return true;
             }
             catch
             {
@@ -581,6 +581,7 @@ namespace DoMCLib.Classes.Module.CCD
                             }
                             break;
                         default:
+                            _pendingCommandController?.SetCanceled();
                             break;
                     }
 
@@ -634,7 +635,7 @@ namespace DoMCLib.Classes.Module.CCD
             //var crc = (byte)(0x100 - (((byte)b.Sum(bb => bb)) & 0xff));
             var res = string.Join("", b.Select(bb => bb.ToString("X2")));
             var crc = (byte)(0x100 - ((byte)res.Sum(bb => bb) & 0xff));
-            var resStr = $":{res}{crc:X2}\rc\n";
+            var resStr = $":{res}{crc:X2}\r\n";
             var resb = Encoding.ASCII.GetBytes(resStr);
             return resb;
         }
@@ -718,7 +719,7 @@ namespace DoMCLib.Classes.Module.CCD
             return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 4, () =>
             {
                 var cfg = socketParameters.ReadingParameters.GetFrameExpositionConfiguration();
-                Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
+                Send(1, BinaryConverter.ToBytes(cfg), cancellationToken);
             }, msTimeout);
         }
         /// <summary>
@@ -732,7 +733,7 @@ namespace DoMCLib.Classes.Module.CCD
             return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 11, () =>
             {
                 var cfg = socketParameters.ReadingParameters.GetReadingParametersConfiguration();
-                Send(0, BinaryConverter.ToBytes(cfg), cancellationToken);
+                Send(1, BinaryConverter.ToBytes(cfg), cancellationToken);
             }, msTimeout);
         }
 
@@ -747,7 +748,7 @@ namespace DoMCLib.Classes.Module.CCD
             return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 1, () =>
             {
                 var cfg = new CCDCardReadRequest1();
-                cfg.Address = 0;
+                cfg.Address = 1;
                 Send(BinaryConverter.ToBytes(cfg), cancellationToken);
             }, msTimeout);
 
@@ -762,7 +763,7 @@ namespace DoMCLib.Classes.Module.CCD
             return await _pendingCommandController.AsyncCommand(token, (rc) => rc == 1, () =>
             {
                 // отправляем команду
-                var cfg = new CCDCardReadRequest1 { Address = 0 };
+                var cfg = new CCDCardReadRequest1 { Address = 1 };
                 Send(socketNum, BinaryConverter.ToBytes(cfg), token);
             }, msTimeout);
 
@@ -786,10 +787,10 @@ namespace DoMCLib.Classes.Module.CCD
         public async Task<CCDCardAnswerResults> SendCommandSetSocketReadingStateAsync(CancellationToken cancellationToken, int msTimeout, bool AnswerWithImage, bool ExternalStart, bool FastRead, bool ResetReady = true)
         {
             if (!IsStarted) throw new SocketException((int)SocketError.NotConnected);
-            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => ExternalStart ? rc == 5 : rc == 1, () =>
+            return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => !ExternalStart ? rc == 5 : rc == 1, () =>
             {
                 var cfg = CCDCardConfigRequest5.GetConfiguration(ResetReady, AnswerWithImage, ExternalStart, FastRead);
-                cfg.Address = 0;
+                cfg.Address = 1;
                 Send(BinaryConverter.ToBytes(cfg), cancellationToken);
             }, msTimeout);
         }
@@ -802,7 +803,7 @@ namespace DoMCLib.Classes.Module.CCD
             return await _pendingCommandController.AsyncCommand(cancellationToken, (rc) => rc == 1, () =>
             {
                 var cfg = CCDCardConfigRequest5.GetConfiguration(true, false, true, true);
-                cfg.Address = 0;
+                cfg.Address = 1;
                 Send(BinaryConverter.ToBytes(cfg), cancellationToken);
             }, msTimeout);
         }

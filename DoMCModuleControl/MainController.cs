@@ -180,7 +180,6 @@ namespace DoMCModuleControl
 
 
             var mainController = new MainController(null);
-            mainController.CreateUserInterface(UIType, data);
 
             foreach (var moduleType in ModuleTypes)
             {
@@ -198,6 +197,7 @@ namespace DoMCModuleControl
                     }
                 }
             }
+            mainController.CreateUserInterface(UIType, data);
 
             return mainController;
         }

@@ -6,7 +6,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands.Classes
     {
         public bool[] completedSuccessfully = new bool[12];
         public bool[] error = new bool[12];
-        public SocketReadData[][] CardsImageData = new SocketReadData[8][];
+        public SocketReadData[][] CardsImageData = new SocketReadData[12][];
         public int[] EquipmentSocket2CardSocket = new int[96];
         public void Clear()
         {
@@ -23,11 +23,14 @@ namespace DoMCLib.Classes.Module.CCD.Commands.Classes
             //TODO: Понять как реагировать на ошибку при чтении картинки гнезда. Все отменять и выходить или ждать и дочитывать
             return Enumerable.Range(0, 12).Where(i => requested[i] && !answered[i] && !completedSuccessfully[i] && !error[i] || !FirstRequestSent).ToList();
         }
-        public SocketReadData this[int equipmentSocketNumber]
+        public SocketReadData? this[int equipmentSocketNumber]
         {
             get
             {
                 var cardSocket = new TCPCardSocket(EquipmentSocket2CardSocket[equipmentSocketNumber]);
+                if (CardsImageData == null) return null;
+                if (CardsImageData[cardSocket.CCDCardNumber] == null) return null;
+                if (CardsImageData[cardSocket.CCDCardNumber].Length < cardSocket.InnerSocketNumber) return null;
                 return CardsImageData[cardSocket.CCDCardNumber][cardSocket.InnerSocketNumber];
             }
         }

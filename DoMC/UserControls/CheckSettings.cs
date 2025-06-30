@@ -78,8 +78,8 @@ namespace DoMC.UserControls
         private async void btnSettingsCheckCardStatus_Click(object sender, EventArgs e)
         {
             var result = await DoMCEquipmentCommands.TestCards(MainController, CurrentContext, WorkingLog);
-            if (result.Item1)
-            {
+            //if (result.Item1)
+            //{
                 for (int i = 0; i < result.Item2.requested.Length; i++)
                 {
                     if (result.Item2.requested[i])
@@ -87,7 +87,7 @@ namespace DoMC.UserControls
                         CardsChecks[i] = result.Item2.answered[i];
                     }
                 }
-            }
+            /*}
             else
             {
                 for (int i = 0; i < result.Item2.requested.Length; i++)
@@ -95,7 +95,7 @@ namespace DoMC.UserControls
                     CardsChecks[i] = false;
                 }
 
-            }
+            }*/
             FillPage();
 
         }

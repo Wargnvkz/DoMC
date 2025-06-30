@@ -56,20 +56,34 @@ namespace DoMCLib.Classes
 
         }
 
-        public async static Task<(bool, CCDCardDataCommandResponse)> LoadCCDConfiguration(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog, int? SocketNumber = null, CancellationTokenSource cancellationTokenSource = null)
+        public async static Task<(bool, CCDCardDataCommandResponse)> LoadCCDExpositionConfiguration(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog, int? SocketNumber = null, CancellationTokenSource cancellationTokenSource = null)
         {
-            LastAction = LastCCDAction.LoadConfig;
+            LastAction = LastCCDAction.LoadConfigExposition;
 
             if (SocketNumber == null)
             {
                 WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек экспозиции гнезд в модуль плат ПЗС");
-                var res = await ExecuteCCDCommandForAllCards(WorkingLog, async () =>
+                return await ExecuteCCDCommandForAllCards(WorkingLog, async () =>
                     await (new DoMCLib.Classes.Module.CCD.Commands.SendCommandSetSocketsExpositionParametersCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync(context)
                 );
-                if (!res.Item1)
-                {
-                    return res;
-                }
+            }
+            else
+            {
+
+                WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек экспозиции гнезд в модуль плат ПЗС");
+                return await ExecuteCCDCommandForSingleSocket(WorkingLog, SocketNumber.Value, async (socketNumber) =>
+                    await (new DoMCLib.Classes.Module.CCD.Commands.SetExpositionToSingleSocketCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync((socketNumber, context))
+                );
+            }
+        }
+
+        public async static Task<(bool, CCDCardDataCommandResponse)> LoadCCDReadingParametersConfiguration(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog, int? SocketNumber = null, CancellationTokenSource cancellationTokenSource = null)
+        {
+            LastAction = LastCCDAction.LoadConfigReadingParameters;
+
+            if (SocketNumber == null)
+            {
+
                 WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек чтения гнезд в модуль плат ПЗС");
                 return await ExecuteCCDCommandForAllCards(WorkingLog, async () =>
                     await (new DoMCLib.Classes.Module.CCD.Commands.SendCommandSetSocketReadingParametersCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync(context)
@@ -80,14 +94,6 @@ namespace DoMCLib.Classes
             else
             {
 
-                WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек экспозиции гнезд в модуль плат ПЗС");
-                var res = await ExecuteCCDCommandForSingleSocket(WorkingLog, SocketNumber.Value, async (socketNumber) =>
-                    await (new DoMCLib.Classes.Module.CCD.Commands.SetExpositionToSingleSocketCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync((socketNumber, context))
-                );
-                if (!res.Item1)
-                {
-                    return res;
-                }
                 WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Передача настроек чтения гнезд в модуль плат ПЗС");
                 return await ExecuteCCDCommandForSingleSocket(WorkingLog, SocketNumber.Value, async (socketNumber) =>
                     await (new DoMCLib.Classes.Module.CCD.Commands.SetReadingParametersToSingleSocketCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync((socketNumber, context))
@@ -95,8 +101,6 @@ namespace DoMCLib.Classes
 
             }
         }
-
-
         public async static Task<(bool, CCDCardDataCommandResponse)> ReadSockets(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog, bool IsExternalRead, int? SocketNumber = null)
         {
             LastAction = LastCCDAction.Reading;
@@ -138,17 +142,17 @@ namespace DoMCLib.Classes
         public async static Task<(bool, GetImageDataCommandResponse)> GetSocketsImages(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog)
         {
             LastAction = LastCCDAction.GettingImages;
-
+            GetImageDataCommandResponse result = new GetImageDataCommandResponse();
             try
             {
-                var result = await new CCDAllSocketsImagesCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(context);
-                if ((result?.CardsNotAnswered().Count ?? 0) > 0)
+                result = await new CCDAllSocketsImagesCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(context);
+                if ((result?.CardsAnswered().Count ?? 0) > 0)
                 {
-                    WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
+                    WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsAnswered())}) не отвечают");
                 }
                 return (true, result);
             }
-            catch { return (false, null); }
+            catch { return (false, result); }
 
 
         }
@@ -176,7 +180,7 @@ namespace DoMCLib.Classes
         }
         public async static Task<(bool, CCDCardDataCommandResponse)> ResetCards(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog, int? SocketNumber = null)
         {
-            LastAction = LastCCDAction.LoadConfig;
+            LastAction = LastCCDAction.Reset;
             if (SocketNumber == null)
             {
                 return await ExecuteCCDCommandForAllCards(WorkingLog, async () =>
@@ -194,7 +198,7 @@ namespace DoMCLib.Classes
         }
         public async static Task<(bool, CCDCardDataCommandResponse)> SetFastRead(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog, int? SocketNumber = null)
         {
-            LastAction = LastCCDAction.LoadConfig;
+            LastAction = LastCCDAction.SetFastRead;
             if (SocketNumber == null)
             {
                 return await ExecuteCCDCommandForAllCards(WorkingLog, async () =>
@@ -274,16 +278,18 @@ namespace DoMCLib.Classes
         #region Helpers
         public static async Task<(bool, CCDCardDataCommandResponse)> ExecuteCCDCommandForAllCards(ILogger WorkingLog, Func<Task<CCDCardDataCommandResponse>> func)
         {
+            CCDCardDataCommandResponse result = new CCDCardDataCommandResponse();
             try
             {
-                var result = await func();
+                result = await func();
+                if (result == null) return (false, null);
                 if ((result?.CardsNotAnswered().Count ?? 0) > 0)
                 {
                     WorkingLog.Add(LoggerLevel.Critical, $"Платы ({String.Join(", ", result.CardsNotAnswered())}) не отвечают");
                 }
-                return (true, result);
+                return (result.CardsNotAnswered().Count == 0, result);
             }
-            catch { return (false, null); }
+            catch { return (false, result); }
         }
         public static async Task<(bool, CCDCardDataCommandResponse)> ExecuteCCDCommandForSingleSocket(ILogger WorkingLog, int SocketNumber, Func<int, Task<bool>> func)
         {

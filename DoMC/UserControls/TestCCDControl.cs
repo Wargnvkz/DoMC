@@ -180,10 +180,10 @@ namespace DoMC.Forms
             errorReadingData.Clear();
             try
             {
-                (bool, CCDCardDataCommandResponse) startResult;
-                if ((startResult = await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog)).Item1)
+                (bool, CCDCardDataCommandResponse) operationResult;
+                if ((operationResult = await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog)).Item1)
                 {
-                    if (startResult.Item2.CardsNotAnswered().Count > 0)
+                    if (operationResult.Item2.CardsNotAnswered().Count > 0)
                     {
                         var errorCards = errorReadingData.ErrorCards();
                         var logtext = $"Не удалось подключиться к платам {String.Join(",", errorCards)}.";
@@ -200,28 +200,57 @@ namespace DoMC.Forms
                             }
                         }
                     }
-                    if ((await DoMCEquipmentCommands.LoadCCDConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
+                    if ((operationResult = await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
                     {
-                        if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog)).Item1)
+                        if ((operationResult = await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
                         {
-                            for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                            if ((operationResult = await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog)).Item1)
                             {
-                                AllImages[socketNum] = null;
-                            }
-
-                            if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalStart)).Item1)
-                            {
-                                var ImageData = await DoMCEquipmentCommands.GetSocketsImages(MainController, CurrentContext, WorkingLog);
                                 for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                 {
-                                    if (ImageData.Item2[socketNum] != null)
-                                        AllImages[socketNum] = ImageData.Item2[socketNum].Image;
-
+                                    AllImages[socketNum] = null;
                                 }
+
+                                if ((operationResult = await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalStart)).Item1)
+                                {
+                                    var ImageData = await DoMCEquipmentCommands.GetSocketsImages(MainController, CurrentContext, WorkingLog);
+                                    for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                                    {
+                                        try
+                                        {
+                                            if ((ImageData.Item2?[socketNum] ?? null) != null)
+                                                AllImages[socketNum] = ImageData.Item2[socketNum]?.Image ?? null;
+                                        }catch(Exception ex)
+                                        {
+
+                                        }
+
+                                    }
+                                }
+                                else
+                                {
+                                    ShowCardResultError(operationResult.Item2);
+                                }
+                            }
+                            else
+                            {
+                                ShowCardResultError(operationResult.Item2);
                             }
 
                         }
+                        else
+                        {
+                            ShowCardResultError(operationResult.Item2);
+                        }
                     }
+                    else
+                    {
+                        ShowCardResultError(operationResult.Item2);
+                    }
+                }
+                else
+                {
+                    ShowCardResultError(operationResult.Item2);
                 }
             }
             finally
@@ -233,6 +262,12 @@ namespace DoMC.Forms
 
         }
 
+        private void ShowCardResultError(CCDCardDataCommandResponse res)
+        {
+            var errorCards = res?.CardsNotAnswered() ?? new List<int>(); ;
+            var logtext = $"Не удалось подключиться к платам {String.Join(",", errorCards.Select(card=>card+1))}.";
+            MessageBox.Show(logtext, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
 
         private async Task TestReadOneSocket(int SelectedSocket)
         {
@@ -245,26 +280,27 @@ namespace DoMC.Forms
             {
                 try
                 {
-                    var notAnsweredCards = startResult.Item2.CardsNotAnswered();
-                    if (notAnsweredCards.Count > 0)
+                    var notAnsweredCards = startResult.Item1;
+                    if (!notAnsweredCards)
                     {
-                        var logText = $"Плата {notAnsweredCards[0]} не отвечает.";
+                        var logText = $"Плата гнезда {SelectedSocket} не отвечает.";
                         DisplayMessage.Show(logText, "Ошибка");
                         return;
                     }
-                    if ((await DoMCEquipmentCommands.LoadCCDConfiguration(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
+                    if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
                     {
-                        if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
+                        if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
                         {
-                            if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalStart, SelectedSocket)).Item1)
+                            if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
                             {
-                                var ImageData = await DoMCEquipmentCommands.GetSingleSocketsImage(MainController, CurrentContext, WorkingLog, SelectedSocket);
+                                if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalStart, SelectedSocket)).Item1)
+                                {
+                                    var ImageData = await DoMCEquipmentCommands.GetSingleSocketsImage(MainController, CurrentContext, WorkingLog, SelectedSocket);
 
-                                if (ImageData != null)
-                                    AllImages[SelectedSocket] = ImageData.Image;
+                                    if (ImageData != null)
+                                        AllImages[SelectedSocket] = ImageData.Image;
 
-
-
+                                }
                             }
 
                         }
@@ -290,7 +326,7 @@ namespace DoMC.Forms
             errorReadingData.Clear();
 
             (bool, CCDCardDataCommandResponse) startResult;
-            if ((startResult=await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
+            if ((startResult = await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
             {
                 try
                 {
@@ -301,22 +337,25 @@ namespace DoMC.Forms
                         DisplayMessage.Show(logText, "Ошибка");
                         return;
                     }
-                    if ((await DoMCEquipmentCommands.LoadCCDConfiguration(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
+                    if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
                     {
-                        if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
+                        if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
                         {
-                            while (IsCycleStarted)
+                            if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
                             {
-
-                                if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalStart, SelectedSocket)).Item1)
+                                while (IsCycleStarted)
                                 {
-                                    var ImageData = await DoMCEquipmentCommands.GetSingleSocketsImage(MainController, CurrentContext, WorkingLog, SelectedSocket);
 
-                                    if (ImageData != null)
-                                        AllImages[SelectedSocket] = ImageData.Image;
-                                    Task.Run(() => { }).FireAndForgetWithResult(() => { ShowSocket(SelectedSocket); });
-                                    //ShowSocket(SelectedSocket);
-                                    //Application.DoEvents();
+                                    if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalStart, SelectedSocket)).Item1)
+                                    {
+                                        var ImageData = await DoMCEquipmentCommands.GetSingleSocketsImage(MainController, CurrentContext, WorkingLog, SelectedSocket);
+
+                                        if (ImageData != null)
+                                            AllImages[SelectedSocket] = ImageData.Image;
+                                        Task.Run(() => { }).FireAndForgetWithResult(() => { ShowSocket(SelectedSocket); });
+                                        //ShowSocket(SelectedSocket);
+                                        //Application.DoEvents();
+                                    }
                                 }
                             }
 

@@ -71,7 +71,7 @@ namespace DoMCLib.Classes.Module.RDPB
         }
         public async Task Stop()
         {
-            cancelationTokenSource.Cancel();
+            cancelationTokenSource?.Cancel();
             try { client?.Close(); } catch { }
             IsStarted = false;
             WorkingLog.Add(LoggerLevel.Critical, "Модуль остановлен");

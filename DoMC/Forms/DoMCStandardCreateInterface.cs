@@ -116,83 +116,86 @@ namespace DoMC
                     {
                         if (await DoMCEquipmentCommands.SetLCBWorkingMode(Controller, WorkingLog))
                         {
-                            if ((await DoMCEquipmentCommands.LoadCCDConfiguration(Controller, CurrentContext, WorkingLog)).Item1)
+                            if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(Controller, CurrentContext, WorkingLog)).Item1)
                             {
-                                if ((await DoMCEquipmentCommands.SetFastRead(Controller, CurrentContext, WorkingLog)).Item1)
+                                if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(Controller, CurrentContext, WorkingLog)).Item1)
                                 {
-                                    for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                                    if ((await DoMCEquipmentCommands.SetFastRead(Controller, CurrentContext, WorkingLog)).Item1)
                                     {
-                                        img[socketNum] = new short[ImagesToMakeStandard][,];
-                                    }
-                                    int StandartImageNumReading = 0;
-                                    for (int repeat = 0; repeat < MaxImagesReadToMakeStandard && StandartImageNumReading < ImagesToMakeStandard; repeat++)
-                                    {
-                                        if ((await DoMCEquipmentCommands.ReadSockets(Controller, CurrentContext, WorkingLog, true)).Item1)
+                                        for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                         {
-                                            var getImageResult = await DoMCEquipmentCommands.GetSocketsImages(Controller, CurrentContext, WorkingLog);
-                                            for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                                            img[socketNum] = new short[ImagesToMakeStandard][,];
+                                        }
+                                        int StandartImageNumReading = 0;
+                                        for (int repeat = 0; repeat < MaxImagesReadToMakeStandard && StandartImageNumReading < ImagesToMakeStandard; repeat++)
+                                        {
+                                            if ((await DoMCEquipmentCommands.ReadSockets(Controller, CurrentContext, WorkingLog, true)).Item1)
                                             {
-                                                if (getImageResult.Item2[socketNum] != null)
-                                                    img[socketNum][StandartImageNumReading] = getImageResult.Item2[socketNum].Image;
-                                                var errorCards = errorReadingData.ErrorCards();
-                                                if (errorCards.Count > 0)
+                                                var getImageResult = await DoMCEquipmentCommands.GetSocketsImages(Controller, CurrentContext, WorkingLog);
+                                                for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                                 {
-                                                    for (int c = 0; c < errorCards.Count; c++)
+                                                    if (getImageResult.Item2[socketNum] != null)
+                                                        img[socketNum][StandartImageNumReading] = getImageResult.Item2[socketNum].Image;
+                                                    var errorCards = errorReadingData.ErrorCards();
+                                                    if (errorCards.Count > 0)
                                                     {
-                                                        CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
+                                                        for (int c = 0; c < errorCards.Count; c++)
+                                                        {
+                                                            CurrentContext.Configuration.SetCheckCard(errorCards[c], false);
+                                                        }
                                                     }
+
                                                 }
+                                                StandardPictures[StandartImageNumReading].Image = bmpCheckSign;
+                                                StandartImageNumReading++;
+                                            }
+                                            else
+                                            {
 
                                             }
-                                            StandardPictures[StandartImageNumReading].Image = bmpCheckSign;
-                                            StandartImageNumReading++;
                                         }
-                                        else
+                                        Parallel.For(0, socketMax, socketNum =>
+                                        //for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                         {
+                                            if (img[socketNum].Any(im => im == null))
+                                            {
+                                                CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
+                                                //continue;
+                                            }
+                                            var avgImg = ImageTools.CalculateAverage(img[socketNum]);
+                                            CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
+                                        });
 
-                                        }
+                                        CurrentContext.Configuration.SaveProcessingDataSettings();
+                                        pbStandardSum.Image = bmpCheckSign;
                                     }
-                                    Parallel.For(0, socketMax, socketNum =>
-                                    //for (int socketNum = 0; socketNum < socketMax; socketNum++)
+                                    else
                                     {
-                                        if (img[socketNum].Any(im => im == null))
-                                        {
-                                            CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
-                                            //continue;
-                                        }
-                                        var avgImg = ImageTools.CalculateAverage(img[socketNum]);
-                                        CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
-                                    });
-
-                                    CurrentContext.Configuration.SaveProcessingDataSettings();
-                                    pbStandardSum.Image = bmpCheckSign;
+                                        var msg = "Не удалось установить режим быстрого чтения плат ПЗС";
+                                        WorkingLog.Add(LoggerLevel.Critical, msg);
+                                        MessageBox.Show(msg);
+                                    }
                                 }
                                 else
                                 {
-                                    var msg = "Не удалось установить режим быстрого чтения плат ПЗС";
+                                    var msg = "Не удалось загрузить конфигурацию в платы ПЗС";
                                     WorkingLog.Add(LoggerLevel.Critical, msg);
                                     MessageBox.Show(msg);
                                 }
                             }
                             else
                             {
-                                var msg = "Не удалось загрузить конфигурацию в платы ПЗС";
+                                var msg = "Не удалось установить рабочий режим БУС";
                                 WorkingLog.Add(LoggerLevel.Critical, msg);
                                 MessageBox.Show(msg);
                             }
                         }
                         else
                         {
-                            var msg = "Не удалось установить рабочий режим БУС";
+                            var msg = "Не удалось запустить модуль работы с БУС";
                             WorkingLog.Add(LoggerLevel.Critical, msg);
                             MessageBox.Show(msg);
                         }
-                    }
-                    else
-                    {
-                        var msg = "Не удалось запустить модуль работы с БУС";
-                        WorkingLog.Add(LoggerLevel.Critical, msg);
-                        MessageBox.Show(msg);
                     }
                 }
                 finally

@@ -260,23 +260,29 @@ namespace DoMCLib.Classes.Module.CCD.Commands
 
             var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
             var cardParameters = context.GetCardParametersByCardList(workingCards);
-            var tasks = new List<Task>();
+            //var tasks = new List<Task>();
 
-            foreach (var (cardNumber, cardWorkingParameters) in cardParameters)
+            var tasks = cardParameters.Select(async card =>
             {
-                result.SetCardRequested(cardNumber);
+                result.SetCardRequested(card.CardNumber);
+                try
+                {
+                    var answer = await ExecuteCCDFunction(
+                        module,
+                        card.CardNumber,
+                        card.CardWorkingParameters,
+                        CancelationTokenSourceToCancelCommandExecution.Token,
+                        context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds * 1000
+                    );
 
-                var task = ExecuteCCDFunction(module, cardNumber, cardWorkingParameters, CancelationTokenSourceToCancelCommandExecution.Token, context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds * 1000)
-                    .ContinueWith(t =>
-                    {
-                        if (t.Status == TaskStatus.RanToCompletion && t.Result.ReadingSocketsResult == 0)
-                            result.SetCardAnswered(cardNumber);
-                    });
-
-                tasks.Add(task);
-            }
-
-            Task.WaitAll(tasks.ToArray(), CancelationTokenSourceToCancelCommandExecution.Token); // блокируем здесь, потому что это sync Executing()
+                    if (answer.ReadingSocketsResult == 0)
+                        result.SetCardAnswered(card.CardNumber);
+                }
+                catch
+                {
+                }
+            });
+            await Task.WhenAll(tasks.ToArray());
             SetOutput(result);
         }
 
@@ -333,27 +339,22 @@ namespace DoMCLib.Classes.Module.CCD.Commands
 
             var workingCards = context.GetWorkingCards(context.GetWorkingPhysicalSocket());
             var cardParameters = context.GetCardParametersByCardList(workingCards);
-            var tasks = new List<Task>();
-
-            foreach (var (cardNumber, cardWorkingParameters) in cardParameters)
+            //var tasks = new List<Task>();
+            var tasks = cardParameters.Select(async (card) =>
             {
-                result.SetCardRequested(cardNumber);
+                result.SetCardRequested(card.CardNumber);
 
-                var task = module[cardNumber].GetAllImagesDataAsync(context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds * 1000, CancelationTokenSourceToCancelCommandExecution.Token)
-                    .ContinueWith(t =>
-                    {
-                        if (t.Status == TaskStatus.RanToCompletion)
-                        {
-                            result.SetCardAnswered(cardNumber);
-                            result.CardsImageData[cardNumber] = t.Result.Select(r => r.Item1).ToArray();
-                        }
-                    });
+                var imageData = await module[card.CardNumber]
+                        .GetAllImagesDataAsync(
+                            context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds * 1000,
+                            CancelationTokenSourceToCancelCommandExecution.Token);
 
-                tasks.Add(task);
+                result.SetCardAnswered(card.CardNumber);
+                result.CardsImageData[card.CardNumber] = imageData.Select(r => r.Item1).ToArray();
             }
+            );
 
-            Task.WaitAll(tasks.ToArray(), CancelationTokenSourceToCancelCommandExecution.Token); // блокируем здесь, потому что это sync Executing()
-
+            await Task.WhenAll(tasks);
             SetOutput(result);
         }
 

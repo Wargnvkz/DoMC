@@ -82,7 +82,7 @@ namespace DoMC
         CycleImagesCCD? CurrentCycleData;
         DateTime LastSynchosignal = DateTime.MinValue;
 
-        public event Func<object?,Task> SettingsUpdated;
+        public event Func<object?, Task> SettingsUpdated;
 
         ButtonsPresses[] switches;
 
@@ -138,7 +138,7 @@ namespace DoMC
             DevicesControlInit();
             PressAllDevicesButton();
             ShowDevicesButtonStatuses();
-            LoadArchiveTab();            
+            LoadArchiveTab();
             await StartArchiveDB();
         }
 
@@ -371,9 +371,16 @@ namespace DoMC
                 return false;
             }
 
-            if (!(await DoMCEquipmentCommands.LoadCCDConfiguration(Controller, Context, WorkingLog)).Item1)
+            if (!(await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(Controller, Context, WorkingLog)).Item1)
             {
-                WorkingLog.Add(LoggerLevel.Critical, "Ошибка загрузки конфигураций гнезд. Остановка работы");
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка загрузки параметров чтения гнезд. Остановка работы");
+                Errors.CCDNotRespond = true;
+                DoMCNotAbleLoadConfigurationErrorMessage();
+                return false;
+            }
+            if (!(await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(Controller, Context, WorkingLog)).Item1)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка загрузки экспозиции. Остановка работы");
                 Errors.CCDNotRespond = true;
                 DoMCNotAbleLoadConfigurationErrorMessage();
                 return false;
@@ -582,7 +589,8 @@ namespace DoMC
 
         private async Task StopWork()
         {
-            WorkCancellationTokenSource.Cancel();
+            if (WorkCancellationTokenSource == null) return;
+            WorkCancellationTokenSource?.Cancel();
             Context.IsInWorkingMode = false;
             try
             {

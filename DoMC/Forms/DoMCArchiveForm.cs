@@ -40,13 +40,19 @@ namespace DoMC.Forms
 
             LocalPathString = localConnectionString;
             RemotePathString = remoteConnectionString;
+            this.Load += DoMCArchiveForm_Load;
 
+        }
+
+        private void DoMCArchiveForm_Load(object? sender, EventArgs e)
+        {
             SetNumericUpDownArrowsWidth(nudArchiveFrom, nudArchiveFrom.Width / 2);
             SetNumericUpDownArrowsWidth(nudArchiveSocketNumber, nudArchiveSocketNumber.Width / 2);
             SetNumericUpDownArrowsWidth(nudArchiveTo, nudArchiveTo.Width / 2);
             dtpArchiveFrom.CalendarFont = new Font(dtpArchiveFrom.CalendarFont.FontFamily, 8);
             ResetButtons();
         }
+
         public void SetParameters(string localConnectionString, string remoteConnectionString)
         {
             LocalPathString = localConnectionString;
@@ -133,7 +139,7 @@ namespace DoMC.Forms
                             Errors[i]++;
                         }
                     }
-                    
+
 
 
                     /*if (cycle.CycleData.IsSocketsGood[i] || (!cycle.IsRemote && (cycle.CycleData.IsSocketActive?[i] ?? false)))
@@ -381,7 +387,7 @@ namespace DoMC.Forms
             if (ArchiveCycles == null) return;
             var nsocket = (int)nudArchiveSocketNumber.Value;
             lvArchiveSavedSockets.Items.Clear();
-            var cyclesToShow = ArchiveCycles.Where(c => IsSocketHasImage(c, nsocket-1) && c.CycleData.CycleDateTime >= StartPeriod && c.CycleData.CycleDateTime < EndPeriod.AddHours(1)).OrderBy(c => c.CycleData.CycleDateTime);
+            var cyclesToShow = ArchiveCycles.Where(c => IsSocketHasImage(c, nsocket - 1) && c.CycleData.CycleDateTime >= StartPeriod && c.CycleData.CycleDateTime < EndPeriod.AddHours(1)).OrderBy(c => c.CycleData.CycleDateTime);
             var badColor = Color.Red;
             var goodColor = Color.Green;
             foreach (var cycle in cyclesToShow)

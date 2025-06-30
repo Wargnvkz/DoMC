@@ -121,7 +121,7 @@ namespace DoMCLib.Classes.Module.LCB
         {
             try
             {
-                cancellationTokenSource.Cancel();
+                cancellationTokenSource?.Cancel();
                 udp?.Close();
             }
             catch { }
