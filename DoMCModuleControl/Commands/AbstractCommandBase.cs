@@ -146,6 +146,7 @@ namespace DoMCModuleControl.Commands
                 Error = ex;
                 Controller.GetLogger(Module.GetType().Name).Add(Logging.LoggerLevel.Critical, $"Ошибка при выполнении команды {CommandName}. ", ex);
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Error}", ex);
+                throw ex;
             }
             finally
             {
