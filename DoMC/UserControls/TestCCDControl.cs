@@ -852,7 +852,7 @@ namespace DoMC.Forms
         {
             IsSocketsReadAndGood = new int[SocketQuantity];
             SocketCheckResults = new ImageProcessResult[SocketQuantity];
-            for (int i = 0; i < SocketQuantity; i++)
+            Parallel.For(0, SocketQuantity, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, i =>
             {
                 try
                 {
@@ -886,7 +886,7 @@ namespace DoMC.Forms
                 {
                     IsSocketsReadAndGood[i] = 3;
                 }
-            }
+            });
         }
         private void cbInvertColors_CheckedChanged(object sender, EventArgs e)
         {
