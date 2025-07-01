@@ -86,36 +86,6 @@ namespace DoMCLib.Classes.Module.LCB
             cancellationTokenSource = new CancellationTokenSource();
             task = Task.Run(Process);
         }
-        /*public void StartForInterface(NetworkInterface ni)
-        {
-            Broadcast = new IPEndPoint(NetworkTools.GetBroadcastAddress(ni), portTo);
-            Localaddress = new IPEndPoint(IPAddress.Any, portFromComputer);
-            Any = new IPEndPoint(IPAddress.Any, 0);
-
-            udp = new UdpClient();
-            Localaddress = new IPEndPoint(IPAddress.Any, portFromComputer);
-            udp.Client.Bind(Localaddress);
-
-            udp.EnableBroadcast = true;
-            udp.AllowNatTraversal(false);
-        }
-        public void StartForIPAddress(IPAddress ipAddress)
-        {
-            Broadcast = new IPEndPoint(NetworkTools.GetBroadcastAddress(ipAddress), portFromComputer);
-            //Broadcast = new IPEndPoint(IPAddress.Broadcast, portTo);
-            Localaddress = new IPEndPoint(IPAddress.Any, portFromComputer);
-            Any = new IPEndPoint(IPAddress.Any, 0);
-
-            udp = new UdpClient();
-            Localaddress = new IPEndPoint(IPAddress.Any, portFromComputer);
-            udp.Client.Bind(Localaddress);
-
-            udp.EnableBroadcast = true;
-            udp.AllowNatTraversal(false);
-            cancellationTokenSource = new CancellationTokenSource();
-            task = new Task(Process);
-            task.Start();
-        }*/
 
         public void Stop()
         {
@@ -140,7 +110,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<bool> SetLCBCurrent(int current)
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
             return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLEDCurrentResponse, () =>
             {
                 var cmd = new LEDBlockCommand();
@@ -152,7 +122,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<int> GetLCBCurrent()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
             return await _pendingCommandCurrent.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLEDCurrentResponse, () =>
             {
                 var cmd = new LEDBlockCommand();
@@ -163,7 +133,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<bool> SetLCBMovementParameters(int PreformLength, int DelayLength)
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
             return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBMovementParametersResponse, () =>
             {
                 var lmp = new LEDMovementParameters();
@@ -178,7 +148,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<LEDMovementParameters> GetLCBMovementParameters()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
             return await _pendingCommandLEDMovementParameters.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBMovementParametersResponse, () =>
             {
                 var cmd = new LEDBlockCommand();
@@ -189,7 +159,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<bool> SetLCBEquipmentStatus(LEDEquipmentStatus newStatus)
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
 
             return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBEquipmentStatusResponse, () =>
             {
@@ -209,7 +179,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<LEDEquipmentStatus> GetLCBEquipmentStatus()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
 
             return await _pendingCommandLEDEquimpentStatus.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBEquipmentStatusResponse, () =>
             {
@@ -222,7 +192,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<bool> SetLCBWorkMode()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
 
             return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBWorkModeResponse, () =>
             {
@@ -235,7 +205,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<bool> SetLCBNonWorkMode()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) return false;
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
 
             return await _pendingCommandIsOK.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.SetLCBWorkModeResponse, () =>
             {
@@ -248,7 +218,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<int> GetLCBMaxPosition()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
 
             return await _pendingCommandMaxStrokeImpulses.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBMaxHorizontalStrokeResponse, () =>
             {
@@ -260,7 +230,7 @@ namespace DoMCLib.Classes.Module.LCB
         }
         public async Task<int> GetLCBCurrentPosition()
         {
-            if (cancellationTokenSource?.Token.IsCancellationRequested ?? false) throw new DoMCNotConnectedException();
+            if (cancellationTokenSource == null || (cancellationTokenSource?.Token.IsCancellationRequested ?? false)) throw new DoMCNotConnectedException();
 
             return await _pendingCommandCurStrokeImpulses.AsyncCommand(cancellationTokenSource.Token, (rc) => rc == (int)LEDCommandType.GetLCBCurrentHorizontalStrokeResponse, () =>
             {

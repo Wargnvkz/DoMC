@@ -175,7 +175,12 @@ namespace DoMC
 
         private void FillSettingPage()
         {
-            _ = Task.Run(async ()=> { try { await SettingsUpdated(this); } catch { } });
+            _ = Task.Run(async ()=> { 
+                try { 
+                    if (SettingsUpdated!=null) 
+                        await SettingsUpdated(this); 
+                } 
+                catch { } });
 
             miLEDSettings.Checked = Context.Configuration.ReadingSocketsSettings.IsLCBSettingsSet();
             miReadParameters.Checked = Context.Configuration.ReadingSocketsSettings.IsReadingParametersSet();
