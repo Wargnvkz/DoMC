@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace DoMCLib.Classes.Module.ArchiveDB.Commands
 {
+    [Description("Конфигурирование архива базы данных")]
     public class SetConfigurationCommand : GenericCommandBase<ArchiveDBConfiguration, bool>
     {
         public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
@@ -20,6 +22,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB.Commands
         }
 
     }
+    [Description("Запуск в работу модуля архива базы данных")]
     public class StartCommand : AbstractCommandBase, IExecuteCommandAsync
     {
         public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
@@ -29,6 +32,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB.Commands
             await base.ExecuteCommandAsync();
         }
     }
+    [Description("Остановка работы модуля архива базы данных")]
     public class StopCommand : AbstractCommandBase, IExecuteCommandAsync
     {
         public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module, null, null) { }
@@ -38,6 +42,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB.Commands
             await base.ExecuteCommandAsync();
         }
     }
+    [Description("Получение текущенго состояния архива базы данных")]
     public class GetWorkingStatusCommand : GenericCommandBase<bool>
     {
         public GetWorkingStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }

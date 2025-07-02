@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
@@ -63,6 +64,10 @@
             cbTest_ExternalStart = new CheckBox();
             btnTest_ReadAllSocket = new Button();
             cbTestCCDMaxPointShow = new CheckBox();
+            lblGetStandardWorkStatus = new Label();
+            lblStandardStatusText = new Label();
+            timer1 = new System.Windows.Forms.Timer(components);
+            pbGettingStandard = new ProgressBar();
             ((System.ComponentModel.ISupportInitialize)chTestStandard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)chTestDiff).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numFrame).BeginInit();
@@ -371,10 +376,46 @@
             cbTestCCDMaxPointShow.UseVisualStyleBackColor = true;
             cbTestCCDMaxPointShow.CheckedChanged += cbTestCCDMaxPointShow_CheckedChanged;
             // 
+            // lblGetStandardWorkStatus
+            // 
+            lblGetStandardWorkStatus.AutoSize = true;
+            lblGetStandardWorkStatus.Location = new Point(562, 48);
+            lblGetStandardWorkStatus.Margin = new Padding(5, 0, 5, 0);
+            lblGetStandardWorkStatus.Name = "lblGetStandardWorkStatus";
+            lblGetStandardWorkStatus.Size = new Size(12, 15);
+            lblGetStandardWorkStatus.TabIndex = 98;
+            lblGetStandardWorkStatus.Text = "-";
+            // 
+            // lblStandardStatusText
+            // 
+            lblStandardStatusText.AutoSize = true;
+            lblStandardStatusText.Location = new Point(448, 48);
+            lblStandardStatusText.Margin = new Padding(5, 0, 5, 0);
+            lblStandardStatusText.Name = "lblStandardStatusText";
+            lblStandardStatusText.Size = new Size(69, 15);
+            lblStandardStatusText.TabIndex = 97;
+            lblStandardStatusText.Text = "Состояние:";
+            // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Interval = 300;
+            timer1.Tick += timer1_Tick;
+            // 
+            // pbGettingStandard
+            // 
+            pbGettingStandard.Location = new Point(445, 33);
+            pbGettingStandard.Name = "pbGettingStandard";
+            pbGettingStandard.Size = new Size(142, 12);
+            pbGettingStandard.TabIndex = 99;
+            // 
             // TestCCDControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(pbGettingStandard);
+            Controls.Add(lblGetStandardWorkStatus);
+            Controls.Add(lblStandardStatusText);
             Controls.Add(cbTestCCDMaxPointShow);
             Controls.Add(cbInvertColors);
             Controls.Add(btnCycleStop);
@@ -437,5 +478,9 @@
         private CheckBox cbTest_ExternalStart;
         private Button btnTest_ReadAllSocket;
         private CheckBox cbTestCCDMaxPointShow;
+        private Label lblGetStandardWorkStatus;
+        private Label lblStandardStatusText;
+        private System.Windows.Forms.Timer timer1;
+        private ProgressBar pbGettingStandard;
     }
 }

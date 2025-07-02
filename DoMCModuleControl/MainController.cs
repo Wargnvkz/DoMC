@@ -44,6 +44,8 @@ namespace DoMCModuleControl
         private IMainUserInterface MainUserInterface;
         private Type MainUserInterfaceType;
 
+        public Type? LastCommand { get; set; }
+
         public MainController(IFileSystem? logFileSystem = null)
         {
             MainFileLogger = new BaseFilesLogger(logFileSystem == null ? new FileSystem() : logFileSystem);
@@ -99,6 +101,7 @@ namespace DoMCModuleControl
             if (module != null)
             {
                 var modulename = module.GetType().Name;
+                MainFileLogger.RegisterModule(modulename);
                 if (!_modules.ContainsKey(modulename))
                     _modules.Add(modulename, module);
             }
@@ -250,12 +253,7 @@ namespace DoMCModuleControl
 
             return builder.Build(); // Построение конфигурации
 
-
         }
-
-
-
-
 
         public Observer GetObserver()
         {
@@ -264,7 +262,16 @@ namespace DoMCModuleControl
 
         public ILogger GetLogger(string ModuleName)
         {
+            MainFileLogger.RegisterModule(ModuleName);
             return new Logger(ModuleName, MainFileLogger);
+        }
+        public List<(string ModuleName, string LogPath, string LastLogFile)> GetRegisteredLoggers()
+        {
+            return MainFileLogger.GetRegisteredModules();
+        }
+        public string GetLogFileOfModule(string ModuleName)
+        {
+            return MainFileLogger.GetLogFileOfModule(ModuleName);
         }
 
         public IMainUserInterface GetMainUserInterface()

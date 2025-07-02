@@ -55,5 +55,6 @@ namespace DoMCModuleControl.Logging
         {
             BaseLogger = null;
         }
+
     }
 }

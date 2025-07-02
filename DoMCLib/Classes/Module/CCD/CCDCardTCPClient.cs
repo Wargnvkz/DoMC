@@ -428,65 +428,7 @@ namespace DoMCLib.Classes.Module.CCD
             try { await Disconnect(); } catch { }
         }
 
-        /*private async Task ReceiveThreadProc()
-        {
-            //Connect();
-            while (!cancellationTokenSource.Token.IsCancellationRequested)
-            {
-                try
-                {
-
-                    lock (TCPClientCommandConnection)
-                    {
-                        //var ns = TCPClientCommandConnection.GetStream();
-                        TCPClientCommandConnection.SetReadTimeout(1);
-                        var tmpBuffer = new byte[2048];
-                        int read = 0;
-                        do
-                        {
-                            try
-                            {
-                                if (TCPClientCommandConnection.AvailableBytes() > 0)
-                                {
-                                    var readTask = TCPClientCommandConnection.ReadAsync(tmpBuffer, 0, tmpBuffer.Length, cancellationTokenSource.Token);
-                                    var completedTask = Task.WhenAny(readTask, Task.Delay(10, cancellationTokenSource.Token));
-                                    if (completedTask.Result == readTask)
-                                    {
-                                        read = readTask.Result;
-                                    }
-                                }
-                                else
-                                {
-                                    read = 0;
-                                }
-
-                            }
-                            catch (Exception ex) { read = 0; }
-                            if (read > 0)
-                            {
-                                AddToBuffer(tmpBuffer, 0, read);
-                            }
-                        } while (read > 0);
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                }
-                try
-                {
-                    if (SizeOfReadBuffer() > 0)
-                        ProcessBuffer();
-                }
-                catch (Exception ex)
-                {
-                    WorkingLog.Add(LoggerLevel.Information, "Исключение при обработке буфера: ", ex);
-                }
-                Thread.Sleep(10);
-            }
-            Disconnect();
-        }*/
-
+        
         private void AddToBuffer(byte[] data, int start, int length)
         {
             lock (ReadBuffer)

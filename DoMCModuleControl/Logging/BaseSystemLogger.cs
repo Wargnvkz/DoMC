@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using DoMCModuleControl.External;
+using System.Collections.Concurrent;
 
 namespace DoMCModuleControl.Logging
 {
@@ -41,5 +42,6 @@ namespace DoMCModuleControl.Logging
         {
             ExternalLogger = logger;
         }
+
     }
 }

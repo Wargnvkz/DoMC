@@ -110,6 +110,8 @@ namespace DoMC
         int SaveTimeoutInSecodns = 300;
 
         volatile bool RDPBResult = true;
+        SynchronizationContext UIContext;
+        //DoMCOperation CurrentOperation = DoMCOperation.Idle;
 
         public DoMCWorkModeInterface()
         {
@@ -123,6 +125,7 @@ namespace DoMC
             };
 
             MaxDegreeOfParallelism = Environment.ProcessorCount;
+            UIContext = SynchronizationContext.Current;
 
         }
         public async Task SetMainController(IMainController controller, object? data)
@@ -363,6 +366,7 @@ namespace DoMC
             WasErrorWhileWorked = false;
             Errors.CCDNotRespond = false;
             WorkingLog.Add(LoggerLevel.Critical, "Загрузка конфигурации гнезд");
+            // CurrentOperation = DoMCOperation.StartCCD;
             if (!(await DoMCEquipmentCommands.StartCCD(Controller, Context, WorkingLog)).Item1)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при подключении к платам ПЗС");
@@ -371,6 +375,7 @@ namespace DoMC
                 return false;
             }
 
+            //CurrentOperation = DoMCOperation.SettingReadingParameters;
             if (!(await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(Controller, Context, WorkingLog)).Item1)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка загрузки параметров чтения гнезд. Остановка работы");
@@ -378,6 +383,8 @@ namespace DoMC
                 DoMCNotAbleLoadConfigurationErrorMessage();
                 return false;
             }
+
+            //CurrentOperation = DoMCOperation.SettingExposition;
             if (!(await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(Controller, Context, WorkingLog)).Item1)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка загрузки экспозиции. Остановка работы");
@@ -386,6 +393,7 @@ namespace DoMC
                 return false;
             }
 
+            //CurrentOperation = DoMCOperation.SetFastReading;
             if (!(await DoMCEquipmentCommands.SetFastRead(Controller, Context, WorkingLog)).Item1)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при подключении к платам ПЗС");
@@ -400,6 +408,7 @@ namespace DoMC
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля БУС и загрузка конфигурации");
 
+                //CurrentOperation = DoMCOperation.StartLCB;
                 if (!await DoMCEquipmentCommands.StartLCB(Controller, WorkingLog))
                 {
                     WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при запуске БУС. Остановка работы");
@@ -411,9 +420,33 @@ namespace DoMC
                 {
                     Errors.LCBDoesNotRespond = false;
                 }
+                if (!await DoMCEquipmentCommands.SetLCBMovementConfiguration(Controller, Context, WorkingLog))
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при установке параметров движения БУС. Остановка работы");
+                    Errors.LCBDoesNotRespond = true;
+                    DoMCNotAbleLoadConfigurationErrorMessage();
+                    return false;
 
+                }
+                else
+                {
+                    Errors.LCBDoesNotRespond = false;
+                }
+                if (!await DoMCEquipmentCommands.SetLCBCurrentConfiguration(Controller, Context, WorkingLog))
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при установке тока светодиодов БУС. Остановка работы");
+                    Errors.LCBDoesNotRespond = true;
+                    DoMCNotAbleLoadConfigurationErrorMessage();
+                    return false;
+
+                }
+                else
+                {
+                    Errors.LCBDoesNotRespond = false;
+                }
 
                 var startLCBEWorkModeTime = DateTime.Now;
+                //CurrentOperation = DoMCOperation.SettingLCBWorkingMode;
                 if (!await SetWorkingModeLCB())
                 {
                     WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при запуске БУС в работу. Остановка работы");
@@ -423,25 +456,10 @@ namespace DoMC
             IsConfigurationLoadedSuccessfully = true;
             if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
             {
-
-                WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля работы с базой данных");
-                await new SetConfigurationCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig);
-                await new DoMCLib.Classes.Module.CCD.Commands.StartCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync(Context);
-
-                /*if (Errors.NoLocalSQL)
-                {
-                    ErrorMsg = "Ошибка при запуске модуля работы с базой данных";
-                    WorkingLog.Add(LoggerLevel.Critical, ErrorMsg);
-                    DevicesErrors |= WorkingModule.LocalDB;
-                    if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, "Остановка работы");
-                        DoMCShowErrorMessage(ErrorMsg);
-                        return false;
-                    }
-                    WorkingLog.Add(LoggerLevel.Critical, "Ошибка пропущена");
-
-                }*/
+                //CurrentOperation = DoMCOperation.SetDBConfiguration;
+                await SetDBConfiguration();
+                // CurrentOperation = DoMCOperation.StartDB;
+                await StartDB();
                 Errors.NoLocalSQL = false;
             }
             else
@@ -449,29 +467,6 @@ namespace DoMC
                 Errors.NoLocalSQL = true;
             }
 
-            /*if (ActiveDevices.HasFlag(WorkingModule.RemoteDB))
-            {
-                WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля работы с базой данных архива");
-                Controller.CreateCommandInstance(typeof(ArchiveDBModule.SetConfigurationCommand)).ExecuteCommand(Context.Configuration.HardwareSettings.ArchiveDBConfig);
-                Controller.CreateCommandInstance(typeof(ArchiveDBModule.RDPBStartCommand)).ExecuteCommand();
-                if (Errors.NoRemoteSQL)
-                {
-                    ErrorMsg = "Ошибка при запуске модуля работы с архивом";
-                    WorkingLog.Add(LoggerLevel.Critical, ErrorMsg);
-                    DevicesErrors |= WorkingModule.RemoteDB;
-                    if (ActiveDevices.HasFlag(WorkingModule.RemoteDB))
-                    {
-                        WorkingLog.Add(LoggerLevel.Critical, "Остановка работы");
-                        DoMCShowErrorMessage(ErrorMsg);
-                        return false;
-                    }
-                    WorkingLog.Add(LoggerLevel.Critical, "Ошибка пропущена");
-                }
-            }
-            else
-            {
-                Errors.NoRemoteSQL = true;
-            }*/
 
             if (ActiveDevices.HasFlag(WorkingModule.RDPB))
             {
@@ -498,6 +493,8 @@ namespace DoMC
         {
             string ErrorMsg = "";
             WorkingLog.Add(LoggerLevel.Critical, "Установка параметров работы бракёра");
+
+            //CurrentOperation = DoMCOperation.SetRDPBConfiguration;
             if (!await SetRDPBParameters())
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при параметров работы бракёра");
@@ -506,6 +503,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля бракёра");
             try
             {
+                //CurrentOperation = DoMCOperation.StartRDPB;
                 await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStartCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
                 RDPBCurrentStatus.IsStarted = true;
             }
@@ -528,14 +526,11 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, $"Установка количества охлаждающих блоков: {coolingBlocks}");
             RDPBCurrentStatus.CoolingBlocksQuantity = coolingBlocks;
 
+            //CurrentOperation = DoMCOperation.SettingRDPBCoolingBlocks;
             RDPBCurrentStatus = await new DoMCLib.Classes.Module.RDPB.Commands.SetCoolingBlockQuantityCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync(coolingBlocks);
-
-            Thread.Sleep(10);
             WorkingLog.Add(LoggerLevel.Critical, "Включение бракера");
 
             await new DoMCLib.Classes.Module.RDPB.Commands.TurnOnCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
-
-            Thread.Sleep(10);
 
             return true;
 
@@ -545,6 +540,7 @@ namespace DoMC
         {
 
             WorkingLog.Add(LoggerLevel.Critical, "Отключение бракёра");
+            //CurrentOperation = DoMCOperation.StopRDPB;
             await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
             RDPBCurrentStatus.IsStarted = false;
 
@@ -553,13 +549,20 @@ namespace DoMC
         public async Task StartArchiveDB()
         {
             WorkingLog.Add(LoggerLevel.Critical, "Запуск модуля архивирования");
+            //CurrentOperation = DoMCOperation.StartArchiveDB;
             await new DoMCLib.Classes.Module.ArchiveDB.Commands.StartCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync();
         }
         public async Task StopArchiveDB()
         {
             WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля архивирования");
+            //CurrentOperation = DoMCOperation.StopArchiveDB;
             await new DoMCLib.Classes.Module.ArchiveDB.Commands.StopCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync();
 
+        }
+        public async Task SetArchiveDBConfiguration()
+        {
+            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров роботы модуля базы данных");
+            await new DoMCLib.Classes.Module.ArchiveDB.Commands.SetConfigurationCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig);
         }
         public async Task<bool> GetArchiveDBModuleStatus()
         {
@@ -575,6 +578,11 @@ namespace DoMC
         {
             WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля базы данных");
             await new DoMCLib.Classes.Module.DB.Commands.StopCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync();
+        }
+        public async Task SetDBConfiguration()
+        {
+            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров роботы модуля базы данных");
+            await new DoMCLib.Classes.Module.DB.Commands.SetConfigurationCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath);
         }
         private async Task<bool> SetNonWorkingModeLCB()
         {
@@ -618,7 +626,6 @@ namespace DoMC
             //InterfaceDataExchange.SendCommand(ModuleCommand.StartIdle);
             //InterfaceDataExchange.SendResetToCCDCards();
             //InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
-            Thread.Sleep(200);
 
             await SetNonWorkingModeLCB();
 
@@ -639,7 +646,7 @@ namespace DoMC
             WorkCancellationTokenSource.Cancel();
 
 
-            await new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
+            await new DoMCLib.Classes.Module.CCD.Commands.StopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
             await new DoMCLib.Classes.Module.LCB.Commands.LCBStopCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
             await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
 
@@ -1180,7 +1187,8 @@ namespace DoMC
                                             RDPBResult = false;
                                             WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера.", ex);
 
-                                        }
+                                        },
+                                        UIContext
                                      );
 
                                 }
@@ -1196,7 +1204,8 @@ namespace DoMC
                                             RDPBResult = false;
                                             WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера.", ex);
 
-                                        }
+                                        },
+                                        UIContext
                                      );
 
                                     /*try
@@ -1232,7 +1241,8 @@ namespace DoMC
                                           RDPBResult = false;
                                           WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера.", ex);
 
-                                      }
+                                      },
+                                        UIContext
                                    );
 
                             }
@@ -1789,17 +1799,20 @@ namespace DoMC
             try
             {
                 await StopWork();
+            }
+            catch { }
+            try
+            {
                 await StopArchiveDB();
             }
             catch { }
-
 
         }
         private async Task StopModules()
         {
             try
             {
-                await new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
+                await new DoMCLib.Classes.Module.CCD.Commands.StopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
             }
             catch { }
             try
@@ -1890,6 +1903,7 @@ namespace DoMC
                     }
                     catch { }
                     this.Show();
+                    ChangeWorkingSettings().FireAndForget(context: UIContext);
                 }
             }
             catch (Exception ex)
@@ -1898,6 +1912,11 @@ namespace DoMC
             }
 
         }
+        private async Task ChangeWorkingSettings()
+        {
+            await SetArchiveDBConfiguration();
+        }
+
 
         private void miCreateNewStandard_Click(object sender, EventArgs e)
         {
@@ -2131,9 +2150,6 @@ namespace DoMC
             await new LCBStopCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
             await new LCBStartCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
 
-            //Controller.CreateCommandInstance(typeof(LCBModule.LCBStopCommand)).ExecuteCommand();
-            //System.Threading.Thread.Sleep(10);
-            //Controller.CreateCommandInstance(typeof(LCBModule.LCBStartCommand)).ExecuteCommand();
         }
 
         private void tsmiLogsArchive_Click(object sender, EventArgs e)

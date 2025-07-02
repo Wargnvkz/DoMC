@@ -8,15 +8,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace DoMCLib.Classes.Module.DB.Commands
 {
-
-    public class SetConfigurationCommand : GenericCommandBase<string>
+    [Description("Установка конфигурации базы данных")]
+    public class SetConfigurationCommand : GenericCommandBase<string, bool>
     {
         public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => ((DBModule)Module).SetConfiguration((string)InputData);
+        protected override async Task Executing() => ((DBModule)Module).SetConfiguration(InputData);
     }
+    [Description("Запуск модуля базы данных в работу")]
     public class StartCommand : AbstractCommandBase, IExecuteCommandAsync
     {
         public StartCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
@@ -26,6 +28,7 @@ namespace DoMCLib.Classes.Module.DB.Commands
             await base.ExecuteCommandAsync();
         }
     }
+    [Description("Остановка работы модуля базы данных")]
     public class StopCommand : AbstractCommandBase, IExecuteCommandAsync
     {
         public StopCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
@@ -35,6 +38,7 @@ namespace DoMCLib.Classes.Module.DB.Commands
             await base.ExecuteCommandAsync();
         }
     }
+    [Description("Постановка данных о текущем съеме в очередь записи базы данных")]
     public class EnqueueCycleDateCommand : GenericCommandBase<CycleImagesCCD, bool>
     {
         public EnqueueCycleDateCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
@@ -53,6 +57,7 @@ namespace DoMCLib.Classes.Module.DB.Commands
         }
 
     }
+    [Description("Постановка данных о текущем коробе в очередь записи базы данных")]
     public class EnqueueBoxDateCommand : GenericCommandBase<Box, bool>
     {
         public EnqueueBoxDateCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }

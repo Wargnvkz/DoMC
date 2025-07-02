@@ -38,8 +38,9 @@ namespace DoMC.UserControls
         bool NeedToRenewList = false;
         bool ExternalRead = false;
         DoMCApplicationContext.ErrorsReadingData errorReadingData = new DoMCApplicationContext.ErrorsReadingData();
-        int ProgressbarStep = 0;
-        int PrograssbarMaxStep = 9;
+        volatile int ProgressbarStep = 0;
+        int PrograssbarMaxStep = 10;
+        DoMCOperation CurrentOperation = DoMCOperation.Idle;
 
         public GetCCDStandardInterface(IMainController Controller, ILogger logger, DoMC.Classes.IDoMCSettingsUpdatedProvider settingsUpdateProvider)
         {
@@ -166,6 +167,7 @@ namespace DoMC.UserControls
                                         StandardPictures[i].Image = sbmp;
                                     }
                                 }
+                                ProgressbarStep++;
                                 var existImages = SingleSocketImages.Where(ssi => ssi != null).ToArray();
                                 var avgImg = ImageTools.CalculateAverage(existImages);
                                 CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[ChosenSocketNumber.Value - 1].StandardImage = avgImg;
@@ -177,6 +179,7 @@ namespace DoMC.UserControls
                 finally
                 {
                     await DoMCEquipmentCommands.StopCCD(MainController, CurrentContext, WorkingLog, ChosenSocketNumber.Value - 1);
+                    HideProgressBar();
                 }
             }
             StandardIsReading = false;
@@ -201,6 +204,7 @@ namespace DoMC.UserControls
             ProgressbarStep = 0;
             List<string> TextResults = new List<string>();
             (bool, CCDCardDataCommandResponse) startResult;
+            CurrentOperation = DoMCOperation.StartCCD;
             if ((startResult = await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog)).Item1)
             {
                 if (startResult.Item2.CardsNotAnswered().Count > 0)
@@ -221,11 +225,14 @@ namespace DoMC.UserControls
                 ProgressbarStep++;
                 try
                 {
+                    CurrentOperation = DoMCOperation.SettingReadingParameters;
                     if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
                     {
+                        CurrentOperation = DoMCOperation.SettingExposition;
                         if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
                         {
                             ProgressbarStep++;
+                            CurrentOperation = DoMCOperation.SetFastReading;
                             if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog)).Item1)
                             {
                                 ProgressbarStep++;
@@ -235,9 +242,11 @@ namespace DoMC.UserControls
                                 }
                                 for (int repeat = 0; repeat < ImagesToMakeStandard; repeat++)
                                 {
+                                    CurrentOperation = ExternalRead ? DoMCOperation.ReadingSocketsExternal : DoMCOperation.ReadingSockets;
                                     if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, ExternalRead)).Item1)
                                     {
                                         ProgressbarStep++;
+                                        CurrentOperation = DoMCOperation.GettingImages;
                                         var si = await DoMCEquipmentCommands.GetSocketsImages(MainController, CurrentContext, WorkingLog);
                                         ProgressbarStep++;
                                         for (int socketNum = 0; socketNum < socketMax; socketNum++)
@@ -250,6 +259,8 @@ namespace DoMC.UserControls
                                     StandardPictures[repeat].Image = bmpCheckSign;
                                 }
                                 ProgressbarStep++;
+                                CurrentOperation = DoMCOperation.CreatingStandard;
+
                                 for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                 {
                                     if (img[socketNum].Any(im => im == null))
@@ -261,16 +272,24 @@ namespace DoMC.UserControls
                                     CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
                                 }
                                 ProgressbarStep++;
+                                CurrentOperation = DoMCOperation.SavingConfiguration;
                                 CurrentContext.Configuration.SaveProcessingDataSettings();
+                                CurrentOperation = DoMCOperation.CompleteError;
                             }
                         }
                     }
+                }
+                catch
+                {
+                    CurrentOperation = DoMCOperation.CompleteError;
                 }
                 finally
                 {
                     await DoMCEquipmentCommands.StopCCD(MainController, CurrentContext, WorkingLog);
                 }
                 pbAverage.Image = bmpCheckSign;
+                HideProgressBar();
+
                 StandardIsReading = false;
                 ProgressbarStep++;
                 RenewList();
@@ -340,7 +359,10 @@ namespace DoMC.UserControls
             {
                 try
                 {
-                    SetPrograssbarStep(ProgressbarStep);
+                    SetPrograssbarPosition(ProgressbarStep);
+                    var lastcmd = MainController.LastCommand;
+                    if (lastcmd.FullName?.Contains("CCD") ?? false)
+                        lblGetStandardWorkStatus.Text = MainController.LastCommand?.GetDescription() ?? "";//CurrentOperation.GetDescription();
                 }
                 catch { }
             }
@@ -353,14 +375,38 @@ namespace DoMC.UserControls
 
         private void PrepareProgressBar()
         {
-            pbGettingStandard.Value = 0;
-            pbGettingStandard.Maximum = PrograssbarMaxStep;
+            RunOnUI(pbGettingStandard, () =>
+            {
+                ProgressbarStep = 0;
+                pbGettingStandard.Visible = true;
+                pbGettingStandard.Value = 0;
+                pbGettingStandard.Maximum = PrograssbarMaxStep;
+            });
         }
 
-        private void SetPrograssbarStep(int step)
+        private void SetPrograssbarPosition(int step)
         {
-            pbGettingStandard.Value = step;
+            RunOnUI(pbGettingStandard, () =>
+            {
+                pbGettingStandard.Value = step;
+            });
+        }
+        private void HideProgressBar()
+        {
+            RunOnUI(pbGettingStandard, () =>
+            {
+
+                pbGettingStandard.Visible = false;
+                pbGettingStandard.Value = 0;
+            });
         }
 
+        public static void RunOnUI(Control control, Action action)
+        {
+            if (control.InvokeRequired)
+                control.Invoke(action);
+            else
+                action();
+        }
     }
 }

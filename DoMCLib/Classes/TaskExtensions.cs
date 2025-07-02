@@ -26,6 +26,7 @@ namespace DoMCLib.Classes
                         context.Post(_ => onSuccess(result), null);
                     else
                         onSuccess(result); // fallback если UI нет
+
                 }
                 catch (Exception ex)
                 {
@@ -96,4 +97,5 @@ namespace DoMCLib.Classes
             });
         }
     }
+
 }

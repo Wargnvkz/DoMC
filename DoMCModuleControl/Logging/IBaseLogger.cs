@@ -25,5 +25,6 @@ namespace DoMCModuleControl.Logging
         /// <param name="Module"></param>
         public void Flush(string Module);
 
+
     }
 }

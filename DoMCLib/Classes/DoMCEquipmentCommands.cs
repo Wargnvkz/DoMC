@@ -43,7 +43,7 @@ namespace DoMCLib.Classes
             if (SocketNumber == null)
             {
                 return await ExecuteCCDCommandForAllCards(WorkingLog, async () =>
-                 await (new DoMCLib.Classes.Module.CCD.Commands.CCDStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync(context)
+                 await (new DoMCLib.Classes.Module.CCD.Commands.StopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule)))).ExecuteCommandAsync(context)
                 );
 
             }
@@ -272,7 +272,32 @@ namespace DoMCLib.Classes
                 return false;
             }
         }
-
+        public async static Task<bool> SetLCBMovementConfiguration(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog)
+        {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Установка параметров движения БУС");
+            try
+            {
+                await new DoMCLib.Classes.Module.LCB.Commands.SetLCBMovementParametersCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.LCB.LCBModule))).ExecuteCommandAsync((context.Configuration.ReadingSocketsSettings.LCBSettings.PreformLength, context.Configuration.ReadingSocketsSettings.LCBSettings.DelayLength));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async static Task<bool> SetLCBCurrentConfiguration(IMainController Controller, DoMCApplicationContext context, ILogger WorkingLog)
+        {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Установка токов светодиодов БУС");
+            try
+            {
+                await new DoMCLib.Classes.Module.LCB.Commands.SetLCBCurrentCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.LCB.LCBModule))).ExecuteCommandAsync(context.Configuration.ReadingSocketsSettings.LCBSettings.LEDCurrent);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         #endregion
         #region Helpers

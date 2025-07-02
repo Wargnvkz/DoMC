@@ -29,5 +29,10 @@ namespace DoMCModuleControl
         /// </summary>
         /// <returns></returns>
         public IMainUserInterface GetMainUserInterface();
+
+        /// <summary>
+        /// Последняя выполненная команда
+        /// </summary>
+        public Type? LastCommand { get; set; }
     }
 }

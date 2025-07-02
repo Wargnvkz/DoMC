@@ -354,7 +354,7 @@
             pbCurrentShowStatistics.Location = new Point(7, 7);
             pbCurrentShowStatistics.Margin = new Padding(4, 3, 4, 3);
             pbCurrentShowStatistics.Name = "pbCurrentShowStatistics";
-            pbCurrentShowStatistics.Size = new Size(461, 58);
+            pbCurrentShowStatistics.Size = new Size(411, 58);
             pbCurrentShowStatistics.TabIndex = 7;
             pbCurrentShowStatistics.Text = "Показать статистику";
             pbCurrentShowStatistics.Click += pbCurrentShowStatistics_Click;
@@ -409,7 +409,7 @@
             pnlCurrentSockets.Location = new Point(7, 72);
             pnlCurrentSockets.Margin = new Padding(4, 3, 4, 3);
             pnlCurrentSockets.Name = "pnlCurrentSockets";
-            pnlCurrentSockets.Size = new Size(460, 441);
+            pnlCurrentSockets.Size = new Size(411, 441);
             pnlCurrentSockets.TabIndex = 0;
             pnlCurrentSockets.Paint += pnlCurrentSockets_Paint;
             // 

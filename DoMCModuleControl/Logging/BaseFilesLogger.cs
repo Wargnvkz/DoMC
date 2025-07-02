@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace DoMCModuleControl.Logging
 {
 
-    public class BaseFilesLogger : IDisposable, IBaseLogger
+    public class BaseFilesLogger : IDisposable, IBaseLogger, IFileLoggerRegisterModules
     {
         private static DateTime CurrentDate = DateTime.MinValue;
         private readonly static ConcurrentDictionary<string, ConcurrentQueue<string>> MessagesOfModule = new ConcurrentDictionary<string, ConcurrentQueue<string>>();
@@ -23,6 +23,7 @@ namespace DoMCModuleControl.Logging
         private ILogger? ExternalLogger;
         private IFileSystem FileSystem;
         private static object lockObject = new object();
+        public ConcurrentBag<string> RegisteredModuleNames = new ConcurrentBag<string>();
 
         public BaseFilesLogger(IFileSystem fileSystem)
         {
@@ -156,6 +157,21 @@ namespace DoMCModuleControl.Logging
                 WriteBuffer(ModuleName);
         }
 
+        public List<(string ModuleName, string LogPath, string LastLogFile)> GetRegisteredModules()
+        {
+            return RegisteredModuleNames.Select(mn => (mn, GetPath(mn), GetLogFileName(mn, CurrentDate))).ToList();
+        }
+
+        public void RegisterModule(string ModuleName)
+        {
+            if (!RegisteredModuleNames.Contains(ModuleName))
+                RegisteredModuleNames.Add(ModuleName);
+        }
+
+        public string GetLogFileOfModule(string ModuleName)
+        {
+            return GetLogFileName(ModuleName, CurrentDate);
+        }
     }
 
 }

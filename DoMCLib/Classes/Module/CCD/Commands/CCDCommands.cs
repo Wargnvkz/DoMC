@@ -13,10 +13,12 @@ using DoMCModuleControl.Logging;
 using Microsoft.AspNetCore.Mvc;
 using DoMCLib.Exceptions;
 using DoMCLib.Classes.Configuration.CCD;
+using System.ComponentModel;
 
 namespace DoMCLib.Classes.Module.CCD.Commands
 {
     #region Start/stop
+    [Description("Запуск модуля работы с платами ПЗС")]
     public class StartCommand : CCDAllSocketsCommand
     {
         public StartCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -29,9 +31,10 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return new CCDCardAnswerResults() { CardNumber = cardnumber, CommandSucceed = true, ReadingSocketsResult = 0 };
         }
     }
-    public class CCDStopCommand : CCDAllSocketsCommand
+    [Description("Остановка модуля работы с платами ПЗС")]
+    public class StopCommand : CCDAllSocketsCommand
     {
-        public CCDStopCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
+        public StopCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
         {
         }
 
@@ -41,6 +44,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return new CCDCardAnswerResults() { CardNumber = cardnumber, CommandSucceed = true, ReadingSocketsResult = 0 };
         }
     }
+    [Description("Запуск модуля работы с платами ПЗС для одной платы")]
     public class StartSingleSocketCommand : CCDSingleSocketCommand
     {
         public StartSingleSocketCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -53,6 +57,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return new CCDCardAnswerResults() { CardNumber = cardSocket.CCDCardNumber, CommandSucceed = true, ReadingSocketsResult = 0 };
         }
     }
+    [Description("Остановка модуля работы с платами ПЗС для одной платы")]
     public class StopSingleSocketCommand : CCDSingleSocketCommand
     {
         public StopSingleSocketCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -70,6 +75,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
 
 
     #region AllCards
+    [Description("Чтение гнезд платами ПЗС")]
     public class SendReadAllSocketsCommand : CCDAllSocketsCommand
     {
         public SendReadAllSocketsCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -81,6 +87,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return await module[cardnumber].SendCommandReadAllSocketsAsync(TimeoutMs, token);
         }
     }
+    [Description("Ожидание синхроимпульса для чтения гнезд платами ПЗС")]
     public class SendReadAllSocketsWithExternalSignalCommand : CCDAllSocketsCommand
     {
         public SendReadAllSocketsWithExternalSignalCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -94,6 +101,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
 
         }
     }
+    [Description("Сброс плат ПЗС")]
     public class ResetCardsCommand : CCDAllSocketsCommand
     {
         public ResetCardsCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -106,6 +114,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
         }
     }
 
+    [Description("Установка параметров чтения плат ПЗС")]
     public class SendCommandSetSocketReadingParametersCommand : CCDAllSocketsCommand
     {
         public SendCommandSetSocketReadingParametersCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -117,6 +126,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return await module[cardnumber].SendCommandSetSocketReadingParametersAsync(cardParameters, TimeoutMs, token);
         }
     }
+    [Description("Установка экспозиции плат ПЗС")]
     public class SendCommandSetSocketsExpositionParametersCommand : CCDAllSocketsCommand
     {
         public SendCommandSetSocketsExpositionParametersCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -128,6 +138,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return await module[cardnumber].SendCommandSetSocketsExpositionParametersAsync(cardParameters, TimeoutMs, token);
         }
     }
+    [Description("Установка режима быстрого чтения плат ПЗС")]
     public class SetFastReadCommand : CCDAllSocketsCommand
     {
         public SetFastReadCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -140,6 +151,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
         }
     }
 
+    [Description("Проверка возможности подключения к платам ПЗС")]
     public class TestConnectionCardsCommand : CCDAllSocketsCommand
     {
         public TestConnectionCardsCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -318,7 +330,10 @@ namespace DoMCLib.Classes.Module.CCD.Commands
         }
     }
     #endregion
+    #endregion
+
     #region Images Commands
+    [Description("Получение изображений всех гнезд плат ПЗС")]
     public class CCDAllSocketsImagesCommand : GenericCommandBase<DoMCApplicationContext, GetImageDataCommandResponse>
     {
         public CCDAllSocketsImagesCommand(IMainController controller, AbstractModuleBase module)
@@ -359,6 +374,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
         }
 
     }
+    [Description("Получение изображений одного гнезд плат ПЗС")]
     public class CCDGetSingleSocketImageCommand : GenericCommandBase<(int SocketNumber, DoMCApplicationContext Context), SocketReadData>
     {
         public CCDGetSingleSocketImageCommand(IMainController controller, AbstractModuleBase module)
@@ -384,7 +400,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
         }
     }
     #endregion
-    #endregion
+
 
 }
 

@@ -49,7 +49,9 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             var restart = IsStarted;
             if (restart)
             {
+
                 await StopAsync();
+
             }
             this.Configuration = configuration;
             if (restart)
@@ -67,8 +69,17 @@ namespace DoMCLib.Classes.Module.ArchiveDB
 
         public async Task StopAsync()
         {
-            cancelationTockenSource.Cancel();
-            await task;
+            if (cancelationTockenSource == null || !IsStarted)
+            {
+                IsStarted = false;
+                return;
+            }
+            cancelationTockenSource?.Cancel();
+            try
+            {
+                await task;
+            }
+            catch (TaskCanceledException) { }
             IsStarted = false;
         }
 

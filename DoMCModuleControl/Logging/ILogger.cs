@@ -31,5 +31,6 @@ namespace DoMCModuleControl.Logging
         /// </summary>
         /// <returns></returns>
         public void Flush();
+
     }
 }
