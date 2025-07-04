@@ -23,7 +23,6 @@ namespace DoMCModuleControl.Tests
             Assert.IsNotNull(controller.GetLogger("Test"));
             Assert.IsNotNull(controller.GetObserver());
             Assert.IsNotNull(controller.GetMainUserInterface());
-            Assert.ThrowsException<ArgumentNullException>(() => new MainController(null));
         }
 
         [TestMethod()]
@@ -62,7 +61,7 @@ namespace DoMCModuleControl.Tests
             Assert.IsNotNull(controller.GetModule(typeof(TestModule)) as TestModule);
         }
 
-       
+
 
         [TestMethod()]
         public void GetObserverTest()

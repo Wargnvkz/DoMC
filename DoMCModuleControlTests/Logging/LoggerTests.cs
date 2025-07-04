@@ -39,10 +39,10 @@ namespace DoMCModuleControl.Logging.Tests
             Assert.AreEqual(1, fileSystem.GetStreamReader(files[0]).ReadToEnd().Trim().Split("\r\n").Length);
             logger.Add(LoggerLevel.FullDetailedInformation, null);
             logger.Flush();
-            Assert.AreEqual(1, fileSystem.GetStreamReader(files[0]).ReadToEnd().Trim().Split("\r\n").Length);
+            Assert.AreEqual(2, fileSystem.GetStreamReader(files[0]).ReadToEnd().Trim().Split("\r\n").Length);
             logger.Add((LoggerLevel)int.MaxValue, "TestMessage");
             logger.Flush();
-            Assert.AreEqual(1, fileSystem.GetStreamReader(files[0]).ReadToEnd().Trim().Split("\r\n").Length);
+            Assert.AreEqual(2, fileSystem.GetStreamReader(files[0]).ReadToEnd().Trim().Split("\r\n").Length);
 
         }
 

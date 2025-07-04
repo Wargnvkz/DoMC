@@ -66,8 +66,7 @@ namespace DoMCLib.Classes.Module.DB
             Storage = new DataStorage(DBPath, null, WorkingLog, ObserverForDataStorage);
             WorkingLog.Add(LoggerLevel.Critical, "Модуль переноса данных в архив запущен");
             cancelationTockenSource = new CancellationTokenSource();
-            task = new Task(Process);
-            task.Start();
+            task = Task.Run(Process);
         }
 
         public void Stop()
@@ -76,7 +75,7 @@ namespace DoMCLib.Classes.Module.DB
             try
             {
                 cancelationTockenSource?.Cancel();
-                task?.Wait();
+                task?.GetAwaiter().GetResult();
             }
             catch { }
         }

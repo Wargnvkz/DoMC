@@ -580,10 +580,10 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля базы данных");
             await new DoMCLib.Classes.Module.DB.Commands.StopCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync();
         }
-        public async Task SetDBConfiguration()
+        public async Task<bool> SetDBConfiguration()
         {
             WorkingLog.Add(LoggerLevel.Critical, "Установка параметров роботы модуля базы данных");
-            await new DoMCLib.Classes.Module.DB.Commands.SetConfigurationCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath);
+            return await new DoMCLib.Classes.Module.DB.Commands.SetConfigurationCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath);
         }
         private async Task<bool> SetNonWorkingModeLCB()
         {
@@ -627,14 +627,26 @@ namespace DoMC
             //InterfaceDataExchange.SendCommand(ModuleCommand.StartIdle);
             //InterfaceDataExchange.SendResetToCCDCards();
             //InterfaceDataExchange.SendCommand(ModuleCommand.CCDStop);
+            try
+            {
+                await SetNonWorkingModeLCB();
+            }
+            catch
+            {
 
-            await SetNonWorkingModeLCB();
-
-            await StopRDPB();
+            }
+            try
+            {
+                await StopRDPB();
+            }catch{ }
 
             WorkingLog.Add(LoggerLevel.Critical, "Остановка базы данных");
+            try
+            {
+                await StopDB();
+            }catch{ }
             //InterfaceDataExchange.SendCommand(ModuleCommand.DBStop);
-            WorkingLog.Add(LoggerLevel.Critical, "Остановка базы данных архива");
+            //WorkingLog.Add(LoggerLevel.Critical, "Остановка базы данных архива");
             // InterfaceDataExchange.SendCommand(ModuleCommand.ArchiveDBStop);
 
 
@@ -957,7 +969,7 @@ namespace DoMC
                     {
 
                     }
-                    WasLastOperationSuccessful = (getImageResult?.CardsAnswered().Count ?? 0) == 0;// .completedSuccessfully.All(c => c);
+                    WasLastOperationSuccessful = (getImageResult?.CardsNotAnswered().Count ?? 0) == 0;// .completedSuccessfully.All(c => c);
 
 
                     WorkingStep = WorkStep.ReadingImagesCompleted;
@@ -978,7 +990,7 @@ namespace DoMC
                                 for (int j = 0; j < 6; j++)
                                 {
                                     var socketNum = j * 16 + i + 1;
-                                    sb.Append(getImageResult[socketNum].ImageData != null ? "+" : " ");
+                                    sb.Append((getImageResult[socketNum]?.ImageData??null) != null ? "+" : " ");
                                     sb.Append("  ");
                                 }
                                 WorkingLog.Add(LoggerLevel.Critical, sb.ToString());
@@ -1034,7 +1046,7 @@ namespace DoMC
 
                     for (int i = 0; i < 96; i++)
                     {
-                        CurrentCycleCCD.CurrentImages[i] = getImageResult[96]?.Image ?? null;
+                        CurrentCycleCCD.CurrentImages[i] = getImageResult[i]?.Image ?? null;
                     }
                     //CurrentCycleCCD.CurrentImages = getImageResult?.Data?.Select(d => d?.Image ?? null).ToArray() ?? new short[0][,];
 

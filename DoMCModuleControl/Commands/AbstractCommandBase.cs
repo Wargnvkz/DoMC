@@ -166,7 +166,7 @@ namespace DoMCModuleControl.Commands
             if (OutputData is T result)
                 return result;
 
-            throw new InvalidOperationException($"Тип выходных данных {OutputData?.GetType().Name} не соответствует ожидаемому {typeof(T).Name}.");
+            throw new InvalidOperationException($"Тип выходных данных {OutputData?.GetType().Name??"null"} не соответствует ожидаемому {typeof(T).Name}.");
 
         }
         protected virtual async Task ExecuteCommandAsync(object? inputData)

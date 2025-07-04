@@ -16,7 +16,18 @@ namespace DoMCLib.Classes.Module.DB.Commands
     public class SetConfigurationCommand : GenericCommandBase<string, bool>
     {
         public SetConfigurationCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => ((DBModule)Module).SetConfiguration(InputData);
+        protected override async Task Executing()
+        {
+            try
+            {
+                ((DBModule)Module).SetConfiguration(InputData);
+                SetOutput(true);
+            }
+            catch
+            {
+                SetOutput(false);
+            }
+        }
     }
     [Description("Запуск модуля базы данных в работу")]
     public class StartCommand : AbstractCommandBase, IExecuteCommandAsync
