@@ -38,6 +38,7 @@ using DoMCLib.Classes.Module.CCD.Commands.Classes;
 using DoMCLib.Classes.Module.LCB.Commands;
 using DoMCLib.Classes.Module.ArchiveDB.Commands;
 using DoMCLib.Classes.Module.CCD.Commands;
+using WorkshopEquipmentData;
 
 namespace DoMC
 {
@@ -1903,7 +1904,11 @@ namespace DoMC
                     }
                     catch { }
                     this.Show();
-                    ChangeWorkingSettings().FireAndForget(context: UIContext);
+                    var loadingForm = new LoadingDataForm();
+                    loadingForm.Show();
+                    Application.DoEvents();
+                    await ChangeWorkingSettings();
+                    loadingForm.Close();
                 }
             }
             catch (Exception ex)

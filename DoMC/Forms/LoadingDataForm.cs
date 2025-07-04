@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace WorkshopEquipmentData
 {
-    public partial class StartingForm : ShadowForm
+    public partial class LoadingDataForm : ShadowForm
     {
-        public StartingForm()
+        public LoadingDataForm()
         {
             InitializeComponent();
         }

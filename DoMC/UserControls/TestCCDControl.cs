@@ -46,7 +46,6 @@ namespace DoMC.Forms
         Panel[] WorkModeStandardSettingsSocketsPanelList;
         Panel[] TestSocketsSettingsSocketsPanelList;
 
-        bool TestCCDIsReading;
         IDoMCSettingsUpdatedProvider SettingsUpdateProvider;
         DoMCLib.Classes.DoMCApplicationContext CurrentContext;
         short[][,] AllImages;
@@ -57,7 +56,9 @@ namespace DoMC.Forms
         bool invertColors;
         SynchronizationContext UIContext;
         volatile int ProgressbarStep = 0;
-        int PrograssbarMaxStep = 8;
+        int PrograssbarMaxStep = 6;
+        Task currentRunningReadingTask = null;
+        LongInterfaceOperation CurrentOperation = new LongInterfaceOperation();
 
         public TestCCDControl(IMainController Controller, ILogger logger, DoMC.Classes.IDoMCSettingsUpdatedProvider settingsUpdateProvider)
         {
@@ -106,55 +107,55 @@ namespace DoMC.Forms
         private async void btnTest_ReadAllSockets_Click(object sender, EventArgs e)
         {
 
-            if (TestCCDIsReading) return;
-            TestCCDIsReading = true;
+            if (CurrentOperation.IsRunning) return;
             AbleForRead(true);
             long Start = 0;
-            try
+
+            TestSocketNumberSelected = 0;
+            lblTestSelectedSocket.Text = "";
+            ExternalStart = cbTest_ExternalStart.Checked;
+            PrepareProgressBar();
+
+
+            await CurrentOperation.StartOperation(
+                TestReadAllSockets(),
+                SetResultOK,
+                (ex) =>
             {
-                TestSocketNumberSelected = 0;
-                lblTestSelectedSocket.Text = "";
-                ExternalStart = cbTest_ExternalStart.Checked;
-                PrepareProgressBar();
-                await TestReadAllSockets();
-            }
-            catch (Exception ex)
-            {
+                SetResultError();
                 MessageBox.Show(ex.Message + " " + ex.Source);
-            }
-            finally
+            }, () =>
             {
-                TestCCDIsReading = false;
-            }
-            SetTestCCDPanelSocketStatuses();
-            AbleForRead(false);
+                AbleForRead(false);
+                SetTestCCDSocketStatuses();
+                SetTestCCDPanelSocketStatuses();
+            });
 
         }
         private async void btnReadSelectedSocket_Click(object sender, EventArgs e)
         {
 
-            if (TestCCDIsReading) return;
+            if (CurrentOperation.IsRunning) return;
             if (TestSocketNumberSelected < 0 || TestSocketNumberSelected >= CurrentContext.Configuration.HardwareSettings.SocketQuantity) return;
             AbleForRead(true);
-            TestCCDIsReading = true;
-            try
+            ExternalStart = cbTest_ExternalStart.Checked;
+            PrepareProgressBar();
+            await CurrentOperation.StartOperation(
+                TestReadOneSocket(TestSocketNumberSelected)
+            , SetResultOK,
+                (ex) =>
             {
-                ExternalStart = cbTest_ExternalStart.Checked;
-                PrepareProgressBar();
-                await TestReadOneSocket(TestSocketNumberSelected);
-
-            }
-            catch (Exception ex)
-            {
+                SetResultError();
                 MessageBox.Show(ex.Message + " " + ex.Source);
-            }
-            finally
+            },
+                () =>
             {
-                TestCCDIsReading = false;
-            }
+                SetTestCCDSocketStatuses();
+
+                SetTestCCDPanelSocketStatuses();
+            });
             ShowSocket(TestSocketNumberSelected);
 
-            SetTestCCDPanelSocketStatuses();
             AbleForRead(false);
 
         }
@@ -162,15 +163,19 @@ namespace DoMC.Forms
         private async void btnCycleStartStop_Click(object sender, EventArgs e)
         {
 
-            if (TestCCDIsReading) return;
-            TestCCDIsReading = true;
+            if (CurrentOperation.IsRunning) return;
             IsCycleStarted = true;
             AbleForRead(true);
             ExternalStart = cbTest_ExternalStart.Checked;
             PrepareProgressBar();
-            await CycleReadingProc(TestSocketNumberSelected);
-            IsCycleStarted = false;
-            TestCCDIsReading = false;
+            await CurrentOperation.StartOperation(CycleReadingProc(TestSocketNumberSelected),
+                SetResultOK,
+            (ex) =>
+            {
+                SetResultError();
+                throw ex;
+            },
+            () => AbleForRead(false));
 
 
         }
@@ -178,11 +183,11 @@ namespace DoMC.Forms
         private void btnCycleStop_Click(object sender, EventArgs e)
         {
             IsCycleStarted = false;
-            TestCCDIsReading = false;
             AbleForRead(false);
         }
         private async Task TestReadAllSockets()
         {
+
             AllImages = new short[socketMax][,];
             errorReadingData.Clear();
             try
@@ -241,6 +246,7 @@ namespace DoMC.Forms
                                         }
 
                                     }
+
                                     ProgressbarStep++;
                                 }
                                 else
@@ -273,9 +279,7 @@ namespace DoMC.Forms
             {
                 await DoMCEquipmentCommands.StopCCD(MainController, CurrentContext, WorkingLog);
             }
-            SetTestCCDSocketStatuses();
-            SetTestCCDPanelSocketStatuses();
-            HideProgressBar();
+
         }
 
         private void ShowCardResultError(CCDCardDataCommandResponse res)
@@ -334,15 +338,10 @@ namespace DoMC.Forms
                 }
             }
 
-            SetTestCCDSocketStatuses();
-
-            SetTestCCDPanelSocketStatuses();
-            HideProgressBar();
-
-
         }
         private async Task CycleReadingProc(int SelectedSocket)
         {
+
             if (SelectedSocket == -1) return;
             if (AllImages == null)
                 AllImages = new short[socketMax][,];
@@ -354,13 +353,6 @@ namespace DoMC.Forms
             {
                 try
                 {
-                    var notAnsweredCards = startResult.Item2.CardsNotAnswered();
-                    if (notAnsweredCards.Count > 0)
-                    {
-                        var logText = $"Плата {notAnsweredCards[0]} не отвечает.";
-                        DisplayMessage.Show(logText, "Ошибка");
-                        return;
-                    }
                     ProgressbarStep++;
                     if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog, SelectedSocket)).Item1)
                     {
@@ -384,8 +376,10 @@ namespace DoMC.Forms
                                         Task.Run(() => { }).FireAndForgetWithResult(() => { ShowSocket(SelectedSocket); }, context: UIContext);
                                         //ShowSocket(SelectedSocket);
                                         //Application.DoEvents();
+
                                     }
                                 }
+
                             }
 
                         }
@@ -396,7 +390,6 @@ namespace DoMC.Forms
                     await DoMCEquipmentCommands.StopCCD(MainController, CurrentContext, WorkingLog);
                 }
             }
-            HideProgressBar();
 
         }
 
@@ -524,7 +517,7 @@ namespace DoMC.Forms
         }
         private void TestShowSocketImages_Click(object sender, EventArgs e)
         {
-            if (TestCCDIsReading) return;
+            if (CurrentOperation.IsRunning) return;
             var ctrl = sender as Control;
             if (ctrl != null)
             {
@@ -935,45 +928,51 @@ namespace DoMC.Forms
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (TestCCDIsReading)
+            if (CurrentOperation.IsRunning)
             {
                 try
                 {
                     SetPrograssbarPosition(ProgressbarStep);
                     var lastcmd = MainController.LastCommand;
                     if (lastcmd.FullName?.Contains("CCD") ?? false)
-                        lblGetStandardWorkStatus.Text = MainController.LastCommand?.GetDescription() ?? "";//CurrentOperation.GetDescription();
+                        lblWorkStatus.Text = MainController.LastCommand?.GetDescription() ?? "";//CurrentOperation.GetDescription();
                 }
                 catch { }
             }
+
         }
         private void PrepareProgressBar()
         {
-            RunOnUI(pbGettingStandard, () =>
-            {
-                ProgressbarStep = 0;
-                pbGettingStandard.Visible = true;
-                pbGettingStandard.Value = 0;
-                pbGettingStandard.Maximum = PrograssbarMaxStep;
-            });
+
+            ProgressbarStep = 0;
+            pbGettingStandard.Visible = true;
+            pbGettingStandard.Value = 0;
+            pbGettingStandard.Maximum = PrograssbarMaxStep;
+
         }
         private void SetPrograssbarPosition(int step)
         {
-            RunOnUI(pbGettingStandard, () =>
-            {
-                pbGettingStandard.Value = step;
-            });
+
+            pbGettingStandard.Value = step;
+
         }
-        private void HideProgressBar()
+
+        private void SetResultOK()
         {
-            RunOnUI(pbGettingStandard, () =>
+            RunOnUI(this, () =>
             {
-
-                pbGettingStandard.Visible = false;
-                pbGettingStandard.Value = 0;
+                PrepareProgressBar();
+                lblWorkStatus.Text = "Завершено (без ошибок)";
             });
         }
-
+        private void SetResultError()
+        {
+            RunOnUI(this, () =>
+            {
+                PrepareProgressBar();
+                lblWorkStatus.Text = "Завершено (ошибка)";
+            });
+        }
         public static void RunOnUI(Control control, Action action)
         {
             if (control.InvokeRequired)

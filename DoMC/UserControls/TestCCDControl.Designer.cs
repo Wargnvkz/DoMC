@@ -64,10 +64,10 @@
             cbTest_ExternalStart = new CheckBox();
             btnTest_ReadAllSocket = new Button();
             cbTestCCDMaxPointShow = new CheckBox();
-            lblGetStandardWorkStatus = new Label();
-            lblStandardStatusText = new Label();
             timer1 = new System.Windows.Forms.Timer(components);
-            pbGettingStandard = new ProgressBar();
+            statusStrip1 = new StatusStrip();
+            pbGettingStandard = new ToolStripProgressBar();
+            lblWorkStatus = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)chTestStandard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)chTestDiff).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numFrame).BeginInit();
@@ -75,6 +75,7 @@
             ((System.ComponentModel.ISupportInitialize)pbTestStandard).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pbTestDifference).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pbTestReadImage).BeginInit();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // cbInvertColors
@@ -376,46 +377,37 @@
             cbTestCCDMaxPointShow.UseVisualStyleBackColor = true;
             cbTestCCDMaxPointShow.CheckedChanged += cbTestCCDMaxPointShow_CheckedChanged;
             // 
-            // lblGetStandardWorkStatus
-            // 
-            lblGetStandardWorkStatus.AutoSize = true;
-            lblGetStandardWorkStatus.Location = new Point(562, 48);
-            lblGetStandardWorkStatus.Margin = new Padding(5, 0, 5, 0);
-            lblGetStandardWorkStatus.Name = "lblGetStandardWorkStatus";
-            lblGetStandardWorkStatus.Size = new Size(12, 15);
-            lblGetStandardWorkStatus.TabIndex = 98;
-            lblGetStandardWorkStatus.Text = "-";
-            // 
-            // lblStandardStatusText
-            // 
-            lblStandardStatusText.AutoSize = true;
-            lblStandardStatusText.Location = new Point(448, 48);
-            lblStandardStatusText.Margin = new Padding(5, 0, 5, 0);
-            lblStandardStatusText.Name = "lblStandardStatusText";
-            lblStandardStatusText.Size = new Size(69, 15);
-            lblStandardStatusText.TabIndex = 97;
-            lblStandardStatusText.Text = "Состояние:";
-            // 
             // timer1
             // 
             timer1.Enabled = true;
             timer1.Interval = 300;
             timer1.Tick += timer1_Tick;
             // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { pbGettingStandard, lblWorkStatus });
+            statusStrip1.Location = new Point(0, 880);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(1683, 22);
+            statusStrip1.TabIndex = 97;
+            statusStrip1.Text = "statusStrip1";
+            // 
             // pbGettingStandard
             // 
-            pbGettingStandard.Location = new Point(445, 33);
             pbGettingStandard.Name = "pbGettingStandard";
-            pbGettingStandard.Size = new Size(142, 12);
-            pbGettingStandard.TabIndex = 99;
+            pbGettingStandard.Size = new Size(150, 16);
+            // 
+            // lblWorkStatus
+            // 
+            lblWorkStatus.Name = "lblWorkStatus";
+            lblWorkStatus.Size = new Size(12, 17);
+            lblWorkStatus.Text = "-";
             // 
             // TestCCDControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(pbGettingStandard);
-            Controls.Add(lblGetStandardWorkStatus);
-            Controls.Add(lblStandardStatusText);
+            Controls.Add(statusStrip1);
             Controls.Add(cbTestCCDMaxPointShow);
             Controls.Add(cbInvertColors);
             Controls.Add(btnCycleStop);
@@ -449,6 +441,8 @@
             ((System.ComponentModel.ISupportInitialize)pbTestStandard).EndInit();
             ((System.ComponentModel.ISupportInitialize)pbTestDifference).EndInit();
             ((System.ComponentModel.ISupportInitialize)pbTestReadImage).EndInit();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -478,9 +472,9 @@
         private CheckBox cbTest_ExternalStart;
         private Button btnTest_ReadAllSocket;
         private CheckBox cbTestCCDMaxPointShow;
-        private Label lblGetStandardWorkStatus;
-        private Label lblStandardStatusText;
         private System.Windows.Forms.Timer timer1;
-        private ProgressBar pbGettingStandard;
+        private StatusStrip statusStrip1;
+        private ToolStripProgressBar pbGettingStandard;
+        private ToolStripStatusLabel lblWorkStatus;
     }
 }

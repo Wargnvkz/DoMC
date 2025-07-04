@@ -33,9 +33,7 @@ namespace DoMC.UserControls
             components = new System.ComponentModel.Container();
             btnGetAllStandards = new Button();
             btnReadImagesToGetStandardForOneSocket = new Button();
-            lblGetStandardWorkStatus = new Label();
             lblStandardSocketNumber = new Label();
-            lblStandardStatusText = new Label();
             lblSocketNumberText = new Label();
             btnMakeAverage = new Button();
             lblImageStandardText = new Label();
@@ -49,12 +47,15 @@ namespace DoMC.UserControls
             cbExternalSignalForStandard = new CheckBox();
             pnlGetStandardSockets = new Panel();
             tmrRenew = new System.Windows.Forms.Timer(components);
-            pbGettingStandard = new ProgressBar();
             lblProgressCaption = new Label();
+            statusStrip1 = new StatusStrip();
+            pbGettingStandard = new ToolStripProgressBar();
+            lblWorkStatus = new ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)pbAverage).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pbStandard3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pbStandard2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pbStandard1).BeginInit();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // btnGetAllStandards
@@ -79,17 +80,6 @@ namespace DoMC.UserControls
             btnReadImagesToGetStandardForOneSocket.UseVisualStyleBackColor = true;
             btnReadImagesToGetStandardForOneSocket.Click += btnReadImagesToGetStandardForOneSocket_Click;
             // 
-            // lblGetStandardWorkStatus
-            // 
-            lblGetStandardWorkStatus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            lblGetStandardWorkStatus.AutoSize = true;
-            lblGetStandardWorkStatus.Location = new Point(138, 815);
-            lblGetStandardWorkStatus.Margin = new Padding(5, 0, 5, 0);
-            lblGetStandardWorkStatus.Name = "lblGetStandardWorkStatus";
-            lblGetStandardWorkStatus.Size = new Size(12, 15);
-            lblGetStandardWorkStatus.TabIndex = 53;
-            lblGetStandardWorkStatus.Text = "-";
-            // 
             // lblStandardSocketNumber
             // 
             lblStandardSocketNumber.AutoSize = true;
@@ -100,17 +90,6 @@ namespace DoMC.UserControls
             lblStandardSocketNumber.Size = new Size(14, 17);
             lblStandardSocketNumber.TabIndex = 52;
             lblStandardSocketNumber.Text = "-";
-            // 
-            // lblStandardStatusText
-            // 
-            lblStandardStatusText.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            lblStandardStatusText.AutoSize = true;
-            lblStandardStatusText.Location = new Point(5, 815);
-            lblStandardStatusText.Margin = new Padding(5, 0, 5, 0);
-            lblStandardStatusText.Name = "lblStandardStatusText";
-            lblStandardStatusText.Size = new Size(69, 15);
-            lblStandardStatusText.TabIndex = 51;
-            lblStandardStatusText.Text = "Состояние:";
             // 
             // lblSocketNumberText
             // 
@@ -244,13 +223,6 @@ namespace DoMC.UserControls
             tmrRenew.Interval = 300;
             tmrRenew.Tick += tmrRenew_Tick;
             // 
-            // pbGettingStandard
-            // 
-            pbGettingStandard.Location = new Point(5, 542);
-            pbGettingStandard.Name = "pbGettingStandard";
-            pbGettingStandard.Size = new Size(393, 23);
-            pbGettingStandard.TabIndex = 62;
-            // 
             // lblProgressCaption
             // 
             lblProgressCaption.AutoSize = true;
@@ -260,17 +232,35 @@ namespace DoMC.UserControls
             lblProgressCaption.TabIndex = 63;
             lblProgressCaption.Text = "Чтение эталонов:";
             // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { pbGettingStandard, lblWorkStatus });
+            statusStrip1.Location = new Point(0, 837);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(1444, 22);
+            statusStrip1.TabIndex = 64;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // pbGettingStandard
+            // 
+            pbGettingStandard.Name = "pbGettingStandard";
+            pbGettingStandard.Size = new Size(150, 16);
+            // 
+            // lblWorkStatus
+            // 
+            lblWorkStatus.Name = "lblWorkStatus";
+            lblWorkStatus.Size = new Size(12, 17);
+            lblWorkStatus.Text = "-";
+            // 
             // GetCCDStandardInterface
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(statusStrip1);
             Controls.Add(lblProgressCaption);
-            Controls.Add(pbGettingStandard);
             Controls.Add(btnGetAllStandards);
             Controls.Add(btnReadImagesToGetStandardForOneSocket);
-            Controls.Add(lblGetStandardWorkStatus);
             Controls.Add(lblStandardSocketNumber);
-            Controls.Add(lblStandardStatusText);
             Controls.Add(lblSocketNumberText);
             Controls.Add(btnMakeAverage);
             Controls.Add(lblImageStandardText);
@@ -289,6 +279,8 @@ namespace DoMC.UserControls
             ((System.ComponentModel.ISupportInitialize)pbStandard3).EndInit();
             ((System.ComponentModel.ISupportInitialize)pbStandard2).EndInit();
             ((System.ComponentModel.ISupportInitialize)pbStandard1).EndInit();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -297,9 +289,7 @@ namespace DoMC.UserControls
 
         private Button btnGetAllStandards;
         private Button btnReadImagesToGetStandardForOneSocket;
-        private Label lblGetStandardWorkStatus;
         private Label lblStandardSocketNumber;
-        private Label lblStandardStatusText;
         private Label lblSocketNumberText;
         private Button btnMakeAverage;
         private Label lblImageStandardText;
@@ -313,7 +303,9 @@ namespace DoMC.UserControls
         private CheckBox cbExternalSignalForStandard;
         private Panel pnlGetStandardSockets;
         private System.Windows.Forms.Timer tmrRenew;
-        private ProgressBar pbGettingStandard;
         private Label lblProgressCaption;
+        private StatusStrip statusStrip1;
+        private ToolStripProgressBar pbGettingStandard;
+        private ToolStripStatusLabel lblWorkStatus;
     }
 }

@@ -75,7 +75,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
 
 
     #region AllCards
-    [Description("Чтение гнезд платами ПЗС")]
+    [Description("Чтение всех гнезд работающих плат ПЗС")]
     public class SendReadAllSocketsCommand : CCDAllSocketsCommand
     {
         public SendReadAllSocketsCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -87,7 +87,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return await module[cardnumber].SendCommandReadAllSocketsAsync(TimeoutMs, token);
         }
     }
-    [Description("Ожидание синхроимпульса для чтения гнезд платами ПЗС")]
+    [Description("Чтение всех гнезд работающих плат ПЗС по внешнему сигналу")]
     public class SendReadAllSocketsWithExternalSignalCommand : CCDAllSocketsCommand
     {
         public SendReadAllSocketsWithExternalSignalCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -172,7 +172,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
     #endregion
 
     #region Single Socket
-
+    [Description("Чтение одной платы ПЗС")]
     public class SendReadSingleSocketCommand : CCDSingleSocketCommand
     {
         public SendReadSingleSocketCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -185,6 +185,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
         }
     }
 
+    [Description("Чтение одной платы ПЗС по внешнему сигналу")]
     public class SendReadSingleSocketWithExternalSignalCommand : CCDSingleSocketCommand
     {
         public SendReadSingleSocketWithExternalSignalCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -196,7 +197,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return await module[cardSocket.CCDCardNumber].SendCommandReadSeveralSocketsExternalAsync(TimeoutMs, token);
         }
     }
-
+    [Description("Сброс платы ПЗС")]
     public class ResetCardsSingleSocketCommand : CCDSingleSocketCommand
     {
         public ResetCardsSingleSocketCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -208,6 +209,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return await module[cardSocket.CCDCardNumber].SendCommandSetSocketReadingStateAsync(token, TimeoutMs, false, false, false, true);
         }
     }
+    [Description("Установка режима быстрого чтения платы ПЗС")]
     public class SetFastReadSingleSocketCommand : CCDSingleSocketCommand
     {
         public SetFastReadSingleSocketCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -220,6 +222,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
 
         }
     }
+    [Description("Установка параметров чтения платы ПЗС")]
     public class SetReadingParametersToSingleSocketCommand : CCDSingleSocketCommand
     {
         public SetReadingParametersToSingleSocketCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
@@ -231,7 +234,7 @@ namespace DoMCLib.Classes.Module.CCD.Commands
             return await module[cardSocket.CCDCardNumber].SendCommandSetSocketReadingParametersAsync(cardParameters, TimeoutMs, token);
         }
     }
-
+    [Description("Установка экспозиции платы ПЗС")]
     public class SetExpositionToSingleSocketCommand : CCDSingleSocketCommand
     {
         public SetExpositionToSingleSocketCommand(IMainController controller, AbstractModuleBase module) : base(controller, module)
