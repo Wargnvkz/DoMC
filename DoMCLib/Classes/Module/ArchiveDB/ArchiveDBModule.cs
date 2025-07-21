@@ -78,6 +78,8 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             try
             {
                 await task;
+                //await Task.WhenAny([task, Task.Delay(200)]);
+                //task.;
             }
             catch (TaskCanceledException) { }
             IsStarted = false;
@@ -96,7 +98,8 @@ namespace DoMCLib.Classes.Module.ArchiveDB
                         {
                             WorkingLog.Add(LoggerLevel.Information, "Начало переноса прошлых данных");
                             TimeLastLocalToRemoteCheck = DateTime.Now;
-                            Storage.MoveFromLocalToRemoteWithDutyCycle(Configuration.ArchiveRecordAgeSeconds, Configuration.DutyCycleInSeconds, Configuration.BeforeAndAfterErrorInSeconds);
+                            //TODO:обеспечить отмену операции при отмене CancelationTocken
+                            Storage.MoveFromLocalToRemoteWithDutyCycle(Configuration.ArchiveRecordAgeSeconds, Configuration.DutyCycleInSeconds, Configuration.BeforeAndAfterErrorInSeconds, cancelationTockenSource.Token);
                             WorkingLog.Add(LoggerLevel.Information, "Перенос данных в архив завершен");
                             ObserverForDataStorage.Notify($"{this.GetType().Name}.Success", null);
                         }
@@ -107,13 +110,14 @@ namespace DoMCLib.Classes.Module.ArchiveDB
                             ObserverForDataStorage.Notify($"{this.GetType().Name}.Deleted", null);
                         }
                     }
+                    await Task.Delay(100, cancelationTockenSource.Token);
                 }
+                catch (TaskCanceledException) { }
                 catch (Exception ex)
                 {
                     WorkingLog.Add(LoggerLevel.Critical, "Ошибка при переносе данных. ", ex);
                     errorNotifier.SendError($"{this.GetType().Name}.Error", ex);
                 }
-                await Task.Delay(100, cancelationTockenSource.Token);
             }
             IsStarted = false;
         }

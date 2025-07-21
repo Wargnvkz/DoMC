@@ -291,6 +291,7 @@
             pbLCB.Size = new Size(222, 128);
             pbLCB.TabIndex = 11;
             pbLCB.Text = "БУС";
+            pbLCB.Visible = false;
             pbLCB.Click += pbDevices_Click;
             // 
             // pbLocalDB

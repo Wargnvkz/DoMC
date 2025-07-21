@@ -241,7 +241,7 @@ namespace DoMCLib.DB
             return IsMovingToArchive;
         }
 
-        public virtual void MoveFromLocalToRemote(int DelayOfTransferInSeconds)
+        /*public virtual void MoveFromLocalToRemote(int DelayOfTransferInSeconds)
         {
             IsTerminatingMovingToArchive = false;
             if (LocalStorage == null) return;
@@ -331,136 +331,153 @@ namespace DoMCLib.DB
             }
             IsMovingToArchive = false;
             IsTerminatingMovingToArchive = false;
-        }
+        }*/
 
-        public virtual void MoveFromLocalToRemoteWithDutyCycle(int DelayOfTransferInSeconds, int DutyCycleInSeconds, int BeforeAndAfterErrorInSeconds)
+        public virtual void MoveFromLocalToRemoteWithDutyCycle(int DelayOfTransferInSeconds, int DutyCycleInSeconds, int BeforeAndAfterErrorInSeconds, CancellationToken token)
         {
             IsTerminatingMovingToArchive = false;
-            if (LocalStorage == null) return;
-            var now = DateTime.Now;
-            var moveFrom = now.AddSeconds(-DelayOfTransferInSeconds);
-            var cycles = LocalStorage.GetCyclesHeadersBefore(moveFrom);
-            var ArchiveCycles = RemoteStorage.GetCyclesHeadersBefore(moveFrom);
-            WorkingLog?.Add(LoggerLevel.Information, cycles.Count + " съемов для переноса.");
-
-            IsMovingToArchive = true;
-            List<CycleData> AllCycles = new List<CycleData>();
-            AllCycles.AddRange(ArchiveCycles);
-            AllCycles.AddRange(cycles);
-            //cycle
-            AllCycles = AllCycles.OrderBy(c => c.CycleDateTime).ToList();
-            cycles = cycles.OrderBy(c => c.CycleDateTime).ToList();
-            List<CycleData> toRemove = new List<CycleData>();
-            List<CycleData> toMove = new List<CycleData>();
-            foreach (var cycleHeader in cycles)
-            {
-                var StartPeriodID = cycleHeader.CycleDateTime.AddSeconds(-DutyCycleInSeconds).Ticks;
-                var id = cycleHeader.CycleID;
-                var PeriodCycles = AllCycles.FindAll(c => c.CycleID >= StartPeriodID && c.CycleID < id);
-                if (PeriodCycles.Count == 0)
-                {
-                    toMove.Add(cycleHeader);
-                    continue;
-                }
-                var ErrPeriodStartID = cycleHeader.CycleDateTime.AddSeconds(-BeforeAndAfterErrorInSeconds).Ticks;
-                var ErrPeriodEndID = cycleHeader.CycleDateTime.AddSeconds(BeforeAndAfterErrorInSeconds).Ticks;
-                var ErrCycles = AllCycles.FindAll(c => c.CycleID >= ErrPeriodStartID && c.CycleID <= ErrPeriodEndID && c.IsSocketsGood.Any(s => !s));
-                if (ErrCycles.Count > 0)
-                {
-                    toMove.Add(cycleHeader);
-                    continue;
-                }
-                toRemove.Add(cycleHeader);
-                AllCycles.Remove(cycleHeader);
-            }
-
-            foreach (var cycleMove in toMove)
-            {
-                WorkingLog?.Add(LoggerLevel.Information, "Перенос съема от " + cycleMove.CycleDateTime.ToString("dd-MM-yyyy HH\\:mm\\:ss"));
-                try
-                {
-                    var localfilename = LocalStorage.GetFileName(cycleMove.CycleID);
-                    var remotePath = RemoteStorage.GetPathForDate(cycleMove.CycleDateTime);
-                    if (!Directory.Exists(remotePath))
-                        Directory.CreateDirectory(remotePath);
-                    File.Move(localfilename, Path.Combine(remotePath, Path.GetFileName(localfilename)));
-                }
-                catch (Exception ex)
-                {
-                    WorkingLog?.Add(LoggerLevel.Information, "Ошибка при переносе файлов: " + ex.Message);
-                    Observer.Notify($"{this.GetType().Name}.DB.Move.File.Error", ex);
-                }
-                /*var cycleIDInLocalDB = cycleMove.CycleID;
-                var cycleBin = LocalStorage.GetCycleBinary(cycleMove);
-                RemoteStorage.SetCycleBinary(cycleMove, cycleBin);
-                LocalStorage.DeleteCycleByIDAndIgnoreErrors(cycleIDInLocalDB);*/
-            }
-            foreach (var cycleRemove in toRemove)
-            {
-                LocalStorage.DeleteCycleByIDAndIgnoreErrors(cycleRemove.CycleID);
-                WorkingLog?.Add(LoggerLevel.Information, "Удаление съема от " + cycleRemove.CycleDateTime.ToString("dd-MM-yyyy HH\\:mm\\:ss"));
-            }
-            HashSet<string> pathDatesToCheck = new HashSet<string>();
-            HashSet<string> pathMonthesToCheck = new HashSet<string>();
-            foreach (var cycle in toMove)
-            {
-                var pathElemets = LocalStorage.GetPathElemetsForDateTime(cycle.CycleDateTime);
-                var dir1 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0], pathElemets[1]);
-                var dir2 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0]);
-                if (!pathDatesToCheck.Contains(dir1)) { pathDatesToCheck.Add(dir1); }
-                if (!pathMonthesToCheck.Contains(dir2)) { pathMonthesToCheck.Add(dir2); }
-            }
-            var shift = new Shift();
-            foreach (var cycle in toRemove)
-            {
-                if (new Shift(cycle.CycleDateTime).ShiftDate == shift.ShiftDate) continue;
-                var pathElemets = LocalStorage.GetPathElemetsForDateTime(cycle.CycleDateTime);
-                var dir1 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0], pathElemets[1]);
-                var dir2 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0]);
-                if (!pathDatesToCheck.Contains(dir1)) { pathDatesToCheck.Add(dir1); }
-                if (!pathMonthesToCheck.Contains(dir2)) { pathMonthesToCheck.Add(dir2); }
-            }
-            foreach (var path in pathDatesToCheck)
-            {
-                if (!Directory.EnumerateFileSystemEntries(path).Any())
-                {
-                    Directory.Delete(path);
-
-                }
-            }
-            foreach (var path in pathMonthesToCheck)
-            {
-                if (!Directory.EnumerateFileSystemEntries(path).Any())
-                {
-                    Directory.Delete(path);
-
-                }
-            }
+            if (LocalStorage == null || RemoteStorage == null) return;
+            if (token.IsCancellationRequested) return;
+            LocalStorage.ResetCache();
+            if (token.IsCancellationRequested) return;
+            RemoteStorage.ResetCache();
+            if (token.IsCancellationRequested) return;
             try
             {
-                var boxes = LocalStorage.GetBoxesBefore(moveFrom);
-                foreach (var box in boxes)
+                var now = DateTime.Now;
+                var moveFrom = now.AddSeconds(-DelayOfTransferInSeconds);
+                var cycles = LocalStorage.GetCyclesHeadersBefore(moveFrom);
+                var ArchiveCycles = RemoteStorage.GetCyclesHeadersBefore(moveFrom);
+                WorkingLog?.Add(LoggerLevel.Information, cycles.Count + " съемов для переноса.");
+
+                IsMovingToArchive = true;
+                List<CycleData> AllCycles = new List<CycleData>();
+                AllCycles.AddRange(ArchiveCycles);
+                AllCycles.AddRange(cycles);
+                //cycle
+                AllCycles = AllCycles.OrderBy(c => c.CycleDateTime).ToList();
+                cycles = cycles.OrderBy(c => c.CycleDateTime).ToList();
+                List<CycleData> toRemove = new List<CycleData>();
+                List<CycleData> toMove = new List<CycleData>();
+                foreach (var cycleHeader in cycles)
                 {
+                    if (token.IsCancellationRequested) return;
+
+                    var StartPeriodID = cycleHeader.CycleDateTime.AddSeconds(-DutyCycleInSeconds).Ticks;
+                    var id = cycleHeader.CycleID;
+                    var PeriodCycles = AllCycles.FindAll(c => c.CycleID >= StartPeriodID && c.CycleID < id);
+                    if (PeriodCycles.Count == 0)
+                    {
+                        toMove.Add(cycleHeader);
+                        continue;
+                    }
+                    var ErrPeriodStartID = cycleHeader.CycleDateTime.AddSeconds(-BeforeAndAfterErrorInSeconds).Ticks;
+                    var ErrPeriodEndID = cycleHeader.CycleDateTime.AddSeconds(BeforeAndAfterErrorInSeconds).Ticks;
+                    var ErrCycles = AllCycles.FindAll(c => c.CycleID >= ErrPeriodStartID && c.CycleID <= ErrPeriodEndID && c.IsSocketsGood.Any(s => !s));
+                    if (ErrCycles.Count > 0)
+                    {
+                        toMove.Add(cycleHeader);
+                        continue;
+                    }
+                    toRemove.Add(cycleHeader);
+                    AllCycles.Remove(cycleHeader);
+                }
+
+                foreach (var cycleMove in toMove)
+                {
+                    if (token.IsCancellationRequested) return;
+
+                    WorkingLog?.Add(LoggerLevel.Information, "Перенос съема от " + cycleMove.CycleDateTime.ToString("dd-MM-yyyy HH\\:mm\\:ss"));
                     try
                     {
-                        WorkingLog?.Add(LoggerLevel.Information, "Перенос данных о коробе: " + box.CompletedTime.ToString("G"));
-                        RemoteStorage.SaveBox(box);
-                        LocalStorage.DeleteBox(box.BoxID);
+                        var localfilename = LocalStorage.GetFileName(cycleMove.CycleID);
+                        var remotePath = RemoteStorage.GetPathForDate(cycleMove.CycleDateTime);
+                        if (!Directory.Exists(remotePath))
+                            Directory.CreateDirectory(remotePath);
+                        File.Move(localfilename, Path.Combine(remotePath, Path.GetFileName(localfilename)));
                     }
                     catch (Exception ex)
                     {
-                        WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при попытке переноса: " + ex.Message);
-                        Observer.Notify($"{this.GetType().Name}.BoxDB.Move.Error", ex);
+                        WorkingLog?.Add(LoggerLevel.Information, "Ошибка при переносе файлов: " + ex.Message);
+                        Observer.Notify($"{this.GetType().Name}.DB.Move.File.Error", ex);
+                    }
+
+                }
+                foreach (var cycleRemove in toRemove)
+                {
+                    if (token.IsCancellationRequested) return;
+                    LocalStorage.DeleteCycleByIDAndIgnoreErrors(cycleRemove.CycleID);
+                    WorkingLog?.Add(LoggerLevel.Information, "Удаление съема от " + cycleRemove.CycleDateTime.ToString("dd-MM-yyyy HH\\:mm\\:ss"));
+                }
+                HashSet<string> pathDatesToCheck = new HashSet<string>();
+                HashSet<string> pathMonthesToCheck = new HashSet<string>();
+                foreach (var cycle in toMove)
+                {
+                    var pathElemets = LocalStorage.GetPathElemetsForDateTime(cycle.CycleDateTime);
+                    var dir1 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0], pathElemets[1]);
+                    var dir2 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0]);
+                    if (!pathDatesToCheck.Contains(dir1)) { pathDatesToCheck.Add(dir1); }
+                    if (!pathMonthesToCheck.Contains(dir2)) { pathMonthesToCheck.Add(dir2); }
+                }
+                var shift = new Shift();
+                foreach (var cycle in toRemove)
+                {
+                    if (new Shift(cycle.CycleDateTime).ShiftDate == shift.ShiftDate) continue;
+                    var pathElemets = LocalStorage.GetPathElemetsForDateTime(cycle.CycleDateTime);
+                    var dir1 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0], pathElemets[1]);
+                    var dir2 = Path.Combine(LocalStorage.DBDirectory, pathElemets[0]);
+                    if (!pathDatesToCheck.Contains(dir1)) { pathDatesToCheck.Add(dir1); }
+                    if (!pathMonthesToCheck.Contains(dir2)) { pathMonthesToCheck.Add(dir2); }
+                }
+                foreach (var path in pathDatesToCheck)
+                {
+                    if (token.IsCancellationRequested) return;
+                    if (!Directory.EnumerateFileSystemEntries(path).Any())
+                    {
+                        Directory.Delete(path);
                     }
                 }
+                foreach (var path in pathMonthesToCheck)
+                {
+                    if (token.IsCancellationRequested) return;
+                    if (!Directory.EnumerateFileSystemEntries(path).Any())
+                    {
+                        Directory.Delete(path);
+
+                    }
+                }
+                try
+                {
+                    var boxes = LocalStorage.GetBoxesBefore(moveFrom);
+                    foreach (var box in boxes)
+                    {
+                        if (token.IsCancellationRequested) return;
+                        try
+                        {
+                            WorkingLog?.Add(LoggerLevel.Information, "Перенос данных о коробе: " + box.CompletedTime.ToString("G"));
+                            RemoteStorage.SaveBox(box);
+                            LocalStorage.DeleteBox(box.BoxID);
+                        }
+                        catch (Exception ex)
+                        {
+                            WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при попытке переноса: " + ex.Message);
+                            Observer.Notify($"{this.GetType().Name}.BoxDB.Move.Error", ex);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при чтении списка коробов: " + ex.Message);
+                    Observer.Notify($"{this.GetType().Name}.BoxDB.Read.Error", ex);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                WorkingLog?.Add(LoggerLevel.Critical, "Ошибка при чтении списка коробов: " + ex.Message);
-                Observer.Notify($"{this.GetType().Name}.BoxDB.Read.Error", ex);
+                LocalStorage.ResetCache();
+                RemoteStorage.ResetCache();
+                IsMovingToArchive = false;
+                IsTerminatingMovingToArchive = false;
             }
-            IsMovingToArchive = false;
-            IsTerminatingMovingToArchive = false;
         }
     }
 }

@@ -78,9 +78,9 @@ namespace DoMCLib.Classes
         {
             return _networkStream.CanWrite;
         }
-/*        public int Read(byte[] buffer, int offset, int size)
+/*        public int Read(byte[] ReadBuffer, int offset, int size)
         {
-            return _networkStream.Read(buffer, offset, size);
+            return _networkStream.Read(ReadBuffer, offset, size);
         }*/
     }
 

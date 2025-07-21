@@ -164,7 +164,6 @@ namespace DoMC.UserControls
                 WorkingLog.Add(LoggerLevel.Critical, "Не удалось оправить команду", ex);
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                await TestRDPBStop();
             }
             finally
             {
@@ -186,7 +185,6 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось оправить команду");
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                await TestRDPBStop();
             }
             finally
             {
@@ -207,7 +205,6 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось оправить команду");
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                await TestRDPBStop();
             }
             finally
             {
@@ -229,7 +226,6 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось оправить команду");
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                await TestRDPBStop();
             }
             finally
             {
@@ -251,7 +247,6 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось оправить команду");
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                await TestRDPBStop();
             }
             finally
             {
@@ -273,7 +268,6 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось оправить команду");
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                await TestRDPBStop();
             }
             finally
             {
@@ -295,7 +289,6 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось оправить команду");
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                await TestRDPBStop();
             }
             finally
             {
@@ -318,7 +311,6 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось оправить команду");
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                await TestRDPBStop();
             }
             finally
             {

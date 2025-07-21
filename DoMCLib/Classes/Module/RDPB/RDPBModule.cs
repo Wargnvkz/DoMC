@@ -5,7 +5,9 @@ using DoMCModuleControl;
 using DoMCModuleControl.Commands;
 using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,6 +16,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DoMCLib.Classes.Module.RDPB
 {
@@ -25,9 +28,9 @@ namespace DoMCLib.Classes.Module.RDPB
     {
         private DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig RDPBConfig;
         private IMainController mainController;
-        TcpClient client;
+        TcpSocketDevice TCPClientCommandConnection = new TcpSocketDevice();
         IPEndPoint remoteIP;
-        private byte[] buffer;
+        private byte[] ReadBuffer;
         public bool IsConnected;
         private int MachineNumber = 1;
         private RDPBStatus CurrentStatus = new RDPBStatus();
@@ -40,7 +43,7 @@ namespace DoMCLib.Classes.Module.RDPB
         private ILogger WorkingLog;
 
         Task task;
-        CancellationTokenSource cancelationTokenSource;
+        CancellationTokenSource cancellationTokenSource;
         PendingCommandController<RDPBStatus> _pendingCommandController = new PendingCommandController<RDPBStatus>();
 
         public RDPBModule(IMainController MainController) : base(MainController)
@@ -55,31 +58,33 @@ namespace DoMCLib.Classes.Module.RDPB
             if (wasConnected) await Stop();
             RDPBConfig = config.HardwareSettings.RemoveDefectedPreformBlockConfig;
             remoteIP = new IPEndPoint(IPAddress.Parse(RDPBConfig.IP), RDPBConfig.Port);
-            CurrentStatus.SetTimeout(config.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds);
+            CurrentStatus.SetTimeout(config.HardwareSettings.Timeouts.WaitForRDPBCardAnswerTimeoutInSeconds * 1000);
+            MachineNumber = config.HardwareSettings.RemoveDefectedPreformBlockConfig.MachineNumber;
             if (wasConnected) await Start();
         }
 
         public async Task Start()
         {
             if (IsStarted) return;
-            await MakeConnected();
 
-            cancelationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource = new CancellationTokenSource();
+            await TCPClientCommandConnection.ConnectAsync(remoteIP, (int)(CurrentStatus.RDPBTimeoutInns / 10000), cancellationTokenSource.Token);
+
             task = Task.Run(RDPBProcessDataThreadProc);
 
             WorkingLog.Add(LoggerLevel.Critical, "Модуль запущен");
         }
         public async Task Stop()
         {
-            cancelationTokenSource?.Cancel();
-            try { client?.Close(); } catch { }
+            cancellationTokenSource?.Cancel();
+            try { TCPClientCommandConnection?.Close(); } catch { }
             IsStarted = false;
             WorkingLog.Add(LoggerLevel.Critical, "Модуль остановлен");
         }
 
-        private bool DoConnectionNeedToRestart()
+        /*private bool DoConnectionNeedToRestart()
         {
-            if (client?.Connected ?? false)
+            if (TCPClientCommandConnection?.Connected ?? false)
             {
                 // таймаут если сообщение послано, ответ не получен и если оно послано давно
                 //var isTimeouted = CurrentStatus.LastSentTime != DateTime.MinValue && !CurrentStatus.ResponseGot && (DateTime.Now - CurrentStatus.LastSentTime) < Timeout;
@@ -92,29 +97,13 @@ namespace DoMCLib.Classes.Module.RDPB
                 return false;
             }
             else return true;
-        }
-
-        private async Task MakeConnected()
-        {
-            if (DoConnectionNeedToRestart())
-            {
-                if (client?.Connected ?? false)
-                {
-                    client?.Close();
-                    client = null;
-
-                }
-                client = new TcpClient();
-                await client.ConnectAsync(remoteIP);
-            }
-
-        }
+        }*/
 
         public async Task<RDPBStatus> Send(RDPBCommandType Command, CancellationToken Token, int CoolingBlocks = 0)
         {
-            if (client.Connected)
+            if (IsStarted)
             {
-                return await _pendingCommandController.AsyncCommand(Token, null, () =>
+                return await _pendingCommandController.AsyncCommand(Token, null, async () =>
                 {
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда модулю бракера: <{Command.ToString()}>");
                     CurrentStatus.SetTimeLastSent();
@@ -129,8 +118,7 @@ namespace DoMCLib.Classes.Module.RDPB
                     var str = stat.ToString();
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда бракеру: <{str.Trim()}>");
                     var bytes = Encoding.ASCII.GetBytes(str);
-                    var ns = client.GetStream();
-                    ns.Write(bytes, 0, bytes.Length);
+                    await TCPClientCommandConnection.WriteAsync(bytes, 0, bytes.Length, cancellationTokenSource.Token);
                 });
             }
             else
@@ -141,46 +129,38 @@ namespace DoMCLib.Classes.Module.RDPB
 
         }
 
-        public void SendManualCommandProc(string cmd)
+        public async Task SendManualCommandProc(string cmd)
         {
             var crc = RDPBStatus.CalcLRC(cmd);
             var rescmd = cmd.Trim() + " " + crc + "\r\n";
             WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда бракеру: <{rescmd.Trim()}>");
             var bytes = Encoding.ASCII.GetBytes(rescmd);
-            var ns = client.GetStream();
-            ns.Write(bytes, 0, bytes.Length);
+            await TCPClientCommandConnection.WriteAsync(bytes, 0, bytes.Length, cancellationTokenSource.Token);
         }
 
-        public void GetData()
-        {
-            ReadNetwork();
-            ProcessBuffer();
-        }
 
-        private void ReadNetwork()
+        private async Task ReadNetwork()
         {
             try
             {
-                if (client.Connected)
+                if (ReadBuffer == null) ReadBuffer = new byte[0];
+
+                byte[] tempreadbuff = new byte[1024];
+                int read = 0;
+
+                // ждём, пока появятся байты
+                if (TCPClientCommandConnection.AvailableBytes() > 0)
                 {
-                    if (buffer == null) buffer = new byte[0];
-                    var ns = client.GetStream();
-                    while (ns.CanRead && ns.DataAvailable)
-                    {
-                        ns.ReadTimeout = 1;
-                        byte[] tempreadbuff = new byte[1024];
-                        var read = ns.Read(tempreadbuff, 0, 1024);
-                        if (read > 0)
-                        {
-                            var tempnextbuffer = new byte[buffer.Length + read];
-                            Array.Copy(buffer, 0, tempnextbuffer, 0, buffer.Length);
-                            Array.Copy(tempreadbuff, 0, tempnextbuffer, buffer.Length, read);
-                            buffer = tempnextbuffer;
-                            //CurrentStatus.TimeLastReceive = DateTime.Now;
-                            CurrentStatus.SetTimeLastReceived();
-                        }
-                    }
+                    // асинхронно читаем
+                    read = await TCPClientCommandConnection.ReadAsync(tempreadbuff, 0, tempreadbuff.Length, cancellationTokenSource.Token);
                 }
+
+                if (read > 0)
+                {
+                    AddToBuffer(tempreadbuff, 0, read);
+                    CurrentStatus.SetTimeLastReceived();
+                }
+
             }
             catch (Exception ex)
             {
@@ -188,18 +168,27 @@ namespace DoMCLib.Classes.Module.RDPB
             }
 
         }
+        private void AddToBuffer(byte[] data, int start, int length)
+        {
+            lock (ReadBuffer)
+            {
+                var oldSize = ReadBuffer.Length;
+                Array.Resize(ref ReadBuffer, oldSize + length);
+                Array.Copy(data, start, ReadBuffer, oldSize, length);
+            }
+        }
 
         private void ProcessBuffer()
         {
             try
             {
-                if (buffer.Length > 0)
+                if (ReadBuffer.Length > 0)
                 {
                     do
                     {
-                        var StartIndex = Array.IndexOf<byte>(buffer, 0x4E);
-                        var StopIndex = Array.IndexOf<byte>(buffer, 0x0A, StartIndex + 1);
-                        var NextStartIndex = Array.IndexOf<byte>(buffer, 0x4E, StartIndex + 1);
+                        var StartIndex = Array.IndexOf<byte>(ReadBuffer, 0x4E);
+                        var StopIndex = Array.IndexOf<byte>(ReadBuffer, 0x0A, StartIndex + 1);
+                        var NextStartIndex = Array.IndexOf<byte>(ReadBuffer, 0x4E, StartIndex + 1);
                         if (StartIndex == -1 || (StopIndex == -1 && NextStartIndex != -1))
                         {
                             break;
@@ -207,9 +196,9 @@ namespace DoMCLib.Classes.Module.RDPB
 
                         if (NextStartIndex != -1 && NextStartIndex < StopIndex)
                         {
-                            var nbl = buffer.Length - NextStartIndex;
-                            Array.Copy(buffer, NextStartIndex, buffer, 0, nbl);
-                            Array.Resize(ref buffer, nbl);
+                            var nbl = ReadBuffer.Length - NextStartIndex;
+                            Array.Copy(ReadBuffer, NextStartIndex, ReadBuffer, 0, nbl);
+                            Array.Resize(ref ReadBuffer, nbl);
                             continue;
                         }
 
@@ -225,10 +214,10 @@ namespace DoMCLib.Classes.Module.RDPB
                         }
                         var msglen = endmessage - StartIndex;
                         var msgarr = new byte[msglen];
-                        Array.Copy(buffer, StartIndex, msgarr, 0, msglen);
-                        var newbufferlength = buffer.Length - endmessage;
-                        Array.Copy(buffer, endmessage, buffer, 0, newbufferlength);
-                        Array.Resize(ref buffer, newbufferlength);
+                        Array.Copy(ReadBuffer, StartIndex, msgarr, 0, msglen);
+                        var newbufferlength = ReadBuffer.Length - endmessage;
+                        Array.Copy(ReadBuffer, endmessage, ReadBuffer, 0, newbufferlength);
+                        Array.Resize(ref ReadBuffer, newbufferlength);
                         if (CurrentStatus == null) CurrentStatus = new RDPBStatus();
                         var AnswerString = Encoding.ASCII.GetString(msgarr);
                         WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получено от бракера: <{AnswerString.Trim()}>");
@@ -238,7 +227,7 @@ namespace DoMCLib.Classes.Module.RDPB
 
                         _pendingCommandController.TrySetResult(0, CurrentStatus);
                     }
-                    while (buffer.Length > 0);
+                    while (ReadBuffer.Length > 0);
                 }
             }
             catch (Exception ex)
@@ -251,13 +240,13 @@ namespace DoMCLib.Classes.Module.RDPB
         {
             WorkingLog?.Add(LoggerLevel.Critical, "Запуск потока обработки модуля бракера");
             IsStarted = true;
-            while (!cancelationTokenSource.Token.IsCancellationRequested)
+            while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
 
                 try
                 {
-                    await MakeConnected();
-                    GetData();
+                    await ReadNetwork();
+                    ProcessBuffer();
                 }
                 catch (Exception ex)
                 {
@@ -270,7 +259,7 @@ namespace DoMCLib.Classes.Module.RDPB
 
         public void Dispose()
         {
-            Stop().FireAndForgetWithResult(null,null);
+            Stop().FireAndForgetWithResult(null, null);
         }
     }
 }

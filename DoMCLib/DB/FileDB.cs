@@ -129,10 +129,15 @@ namespace DoMCLib.DB
         {
             if ((DateTime.Now - LastCached).TotalSeconds > CacheTimeoutInSeconds)
             {
-                _CycleDataFiles = GetDBFileHeaderList(DBDirectory);
-                _BoxFiles = GetBoxFileHeaderList(BoxDirectory);
-                GC.Collect();
+                ResetCache();
             }
+        }
+        public void ResetCache()
+        {
+            _CycleDataFiles = GetDBFileHeaderList(DBDirectory);
+            _BoxFiles = GetBoxFileHeaderList(BoxDirectory);
+            GC.Collect();
+
         }
 
         private int GetLastBoxID()

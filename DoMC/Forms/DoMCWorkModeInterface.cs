@@ -562,8 +562,12 @@ namespace DoMC
         }
         public async Task SetArchiveDBConfiguration()
         {
-            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров роботы модуля базы данных");
-            await new DoMCLib.Classes.Module.ArchiveDB.Commands.SetConfigurationCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig);
+            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров работы модуля базы данных");
+            try
+            {
+                await new DoMCLib.Classes.Module.ArchiveDB.Commands.SetConfigurationCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig);
+            }
+            catch { }
         }
         public async Task<bool> GetArchiveDBModuleStatus()
         {
@@ -638,13 +642,15 @@ namespace DoMC
             try
             {
                 await StopRDPB();
-            }catch{ }
+            }
+            catch { }
 
             WorkingLog.Add(LoggerLevel.Critical, "Остановка базы данных");
             try
             {
                 await StopDB();
-            }catch{ }
+            }
+            catch { }
             //InterfaceDataExchange.SendCommand(ModuleCommand.DBStop);
             //WorkingLog.Add(LoggerLevel.Critical, "Остановка базы данных архива");
             // InterfaceDataExchange.SendCommand(ModuleCommand.ArchiveDBStop);
@@ -990,7 +996,7 @@ namespace DoMC
                                 for (int j = 0; j < 6; j++)
                                 {
                                     var socketNum = j * 16 + i + 1;
-                                    sb.Append((getImageResult[socketNum]?.ImageData??null) != null ? "+" : " ");
+                                    sb.Append((getImageResult[socketNum]?.ImageData ?? null) != null ? "+" : " ");
                                     sb.Append("  ");
                                 }
                                 WorkingLog.Add(LoggerLevel.Critical, sb.ToString());
@@ -1919,8 +1925,14 @@ namespace DoMC
                     var loadingForm = new LoadingDataForm();
                     loadingForm.Show();
                     Application.DoEvents();
-                    await ChangeWorkingSettings();
-                    loadingForm.Close();
+                    try
+                    {
+                        await ChangeWorkingSettings();
+                    }
+                    finally
+                    {
+                        loadingForm.Close();
+                    }
                 }
             }
             catch (Exception ex)

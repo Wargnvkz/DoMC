@@ -26,7 +26,7 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
         public long TimeParametersGot;
         public long TimeLastSent;
         public long TimeLastReceived;
-        private long RDPBTimeout;
+        public long RDPBTimeoutInns;
         private long RDPBConnectionTimeout;
         public string ManualCommand;
         public bool IsStarted;
@@ -73,7 +73,7 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
 
         public void SetTimeout(int TimeoutInms)
         {
-            RDPBTimeout = TimeoutInms * 10000;
+            RDPBTimeoutInns = TimeoutInms * 10000;
             RDPBConnectionTimeout = 600000000;
         }
 

@@ -139,7 +139,7 @@ namespace DoMCModuleControl.Commands
         }
         protected bool IsExpectedResponse(int ResponseCode)
         {
-            return ResponseFilter?.Invoke(ResponseCode) ?? false;
+            return ResponseFilter?.Invoke(ResponseCode) ?? true;
         }
 
         public void SetCanceled()

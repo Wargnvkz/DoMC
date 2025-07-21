@@ -12,7 +12,7 @@ namespace DoMCLib.Classes.Module.RDPB.Commands
     public class SendSetIsOkCommand : GenericCommandBase<RDPBStatus>
     {
         public SendSetIsOkCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.SetIsOK, CancelationTokenSourceToCancelCommandExecution.Token);
+        protected override async Task Executing() => SetOutput(await ((RDPBModule)Module).Send(RDPBCommandType.SetIsOK, CancelationTokenSourceToCancelCommandExecution.Token));
     }
 
     [Description("Установка параметров подключения к бракёру")]
@@ -29,25 +29,29 @@ namespace DoMCLib.Classes.Module.RDPB.Commands
     public class GetParametersCommand : GenericCommandBase<RDPBStatus>
     {
         public GetParametersCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.GetParameters, CancelationTokenSourceToCancelCommandExecution.Token);
+        protected override async Task Executing() => SetOutput(await((RDPBModule)Module).Send(RDPBCommandType.GetParameters, CancelationTokenSourceToCancelCommandExecution.Token));
     }
     [Description("Отправка команды в бракёр вручную")]
     public class SendManualCommand : GenericCommandBase<string, bool>
     {
         public SendManualCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => ((RDPBModule)Module).SendManualCommandProc(InputData);
+        protected override async Task Executing()
+        {
+            await ((RDPBModule)Module).SendManualCommandProc(InputData);
+            SetOutput(true);
+        }
     }
     [Description("Отправка информации бракёру, что съем плохой")]
     public class SendSetIsBadCommand : GenericCommandBase<RDPBStatus>
     {
         public SendSetIsBadCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.SetIsBad, CancelationTokenSourceToCancelCommandExecution.Token);
+        protected override async Task Executing() => SetOutput(await((RDPBModule)Module).Send(RDPBCommandType.SetIsBad, CancelationTokenSourceToCancelCommandExecution.Token));
     }
     [Description("Установка количества охлаждающих блоков")]
     public class SetCoolingBlockQuantityCommand : GenericCommandBase<int, RDPBStatus>
     {
         public SetCoolingBlockQuantityCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
-        protected override async Task Executing() => await ((RDPBModule)Module).Send(RDPBCommandType.SetCoolingBlocks, CancelationTokenSourceToCancelCommandExecution.Token, InputData);
+        protected override async Task Executing() => SetOutput(await((RDPBModule)Module).Send(RDPBCommandType.SetCoolingBlocks, CancelationTokenSourceToCancelCommandExecution.Token, InputData));
     }
     [Description("Запуск модуля бракёра в работу")]
     public class RDPBStartCommand : GenericCommandBase

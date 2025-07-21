@@ -62,8 +62,7 @@ namespace DoMC.Forms
         {
             try
             {
-                var field = nud.GetType().GetField("defaultButtonsWidth", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                field.SetValue(nud, newWidth);
+                nud?.GetType()?.GetField("defaultButtonsWidth", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(nud, newWidth);
             }
             catch { }
         }
