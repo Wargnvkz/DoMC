@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using DoMCLib.DB;
 
 namespace DoMCLib.Classes.Module.ArchiveDB.Commands
 {
@@ -47,5 +48,17 @@ namespace DoMCLib.Classes.Module.ArchiveDB.Commands
     {
         public GetWorkingStatusCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => SetOutput(((ArchiveDBModule)Module).IsStarted);
+    }
+
+    public class GetBoxFromCommand : GenericCommandBase<DateTime, List<Box>>
+    {
+        public GetBoxFromCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
+        protected override async Task Executing()
+        {
+            var boxes = ((ArchiveDBModule)Module).GetBoxes(InputData);
+            var result = boxes.Select(b => b.Convert()).ToList();
+            SetOutput(result);
+        }
+
     }
 }

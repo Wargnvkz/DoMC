@@ -122,6 +122,13 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             IsStarted = false;
         }
 
+        public List<BoxDB> GetBoxes(DateTime From)
+        {
+            var localBoxes = Storage.LocalGetBox(From, DateTime.Now);
+            var RemoteBoxes = Storage.RemoteGetBox(From, DateTime.Now);
+            var result = localBoxes.Concat(RemoteBoxes).DistinctBy(b => b.CompletedTime).ToList();
+            return result;
+        }
 
     }
 }

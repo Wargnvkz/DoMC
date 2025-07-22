@@ -1643,21 +1643,12 @@ namespace DoMC
                 }
                 lblTotalDefectCycles.Text = TotalDefectCycles.ToString();
 
-                /*if (InterfaceDataExchange.DataStorage != null && InterfaceDataExchange.DataStorage.LocalIsActive && (now - lastBoxRead) > lastBoxReadTime)
+
+                if (ArchiveDBModuleStatus.IsStarted && (now - lastBoxRead) > lastBoxReadTime)
                 {
                     lastBoxRead = now;
                     var start = now.AddHours(-5);
-                    List<DoMCLib.DB.Box> boxes = new List<DoMCLib.DB.Box>();
-                    var localboxes = InterfaceDataExchange?.DataStorage?.LocalGetBox(start, now) ?? new List<DoMCLib.DB.Box>();
-                    if (localboxes != null && localboxes.Count > 0)
-                        localboxes = localboxes.OrderBy(b => b.CompletedTime).ToList();
-                    if (localboxes != null)
-                        boxes.AddRange(localboxes);
-                    var remoteboxes = InterfaceDataExchange?.DataStorage?.RemoteGetBox(start, now) ?? new List<DoMCLib.DB.Box>();
-                    if (remoteboxes != null && remoteboxes.Count > 0)
-                        remoteboxes = remoteboxes.OrderBy(b => b.CompletedTime).ToList();
-                    if (remoteboxes != null)
-                        boxes.AddRange(remoteboxes);
+                    var boxes = await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetBoxFromCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(start);
                     boxes = boxes.OrderBy(b => b.CompletedTime).ToList();
 
                     lvBoxes.Items.Clear();
@@ -1667,7 +1658,7 @@ namespace DoMC
                         var lvi = new ListViewItem(new string[] { box.CompletedTime.ToString("G"), box.BadCyclesCount.ToString(), box.TransporterSideToString() });
                         lvBoxes.Items.Add(lvi);
                     }
-                }*/
+                }
             }
             //если прошло больше 2 секунд после последней провеки ошибок, то показываем их
             if ((DateTime.Now - lastErrorCheck).TotalSeconds > 2)
