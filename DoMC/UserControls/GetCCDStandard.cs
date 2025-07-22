@@ -172,9 +172,10 @@ namespace DoMC.UserControls
                                         StandardPictures[i].Image = sbmp;
                                     }
                                 }
+                                await Task.Yield();
                                 ProgressbarStep++;
                                 var existImages = SingleSocketImages.Where(ssi => ssi != null).ToArray();
-                                var avgImg = ImageTools.CalculateAverage(existImages);
+                                var avgImg = ImageTools.CalculateAverage(existImages, CurrentContext.Configuration.HardwareSettings.ThresholdAverageToHaveImage);
                                 CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[ChosenSocketNumber.Value - 1].StandardImage = avgImg;
                                 CurrentContext.Configuration.SaveProcessingDataSettings();
                             }
@@ -265,6 +266,8 @@ namespace DoMC.UserControls
                                     }
                                     StandardPictures[repeat].Image = bmpCheckSign;
                                 }
+                                await Task.Yield();
+
                                 ProgressbarStep++;
                                 //CurrentOperation = DoMCOperation.CreatingStandard;
 
@@ -275,7 +278,7 @@ namespace DoMC.UserControls
                                         CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
                                         continue;
                                     }
-                                    var avgImg = ImageTools.CalculateAverage(img[socketNum]);
+                                    var avgImg = ImageTools.CalculateAverage(img[socketNum], CurrentContext.Configuration.HardwareSettings.ThresholdAverageToHaveImage);
                                     CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
                                 }
                                 ProgressbarStep++;
@@ -303,7 +306,7 @@ namespace DoMC.UserControls
             var workingCardSocket = new TCPCardSocket(cardSocket);
             var imagesForStandards = new short[0][,];
 
-            var avgImg = ImageTools.CalculateAverage(SingleSocketImages);
+            var avgImg = ImageTools.CalculateAverage(SingleSocketImages, CurrentContext.Configuration.HardwareSettings.ThresholdAverageToHaveImage);
             CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[ChosenSocketNumber.Value - 1].StandardImage = avgImg;
             CurrentContext.Configuration.SaveProcessingDataSettings();
             var msbmp = ImageTools.DrawImage(avgImg, false);// invertColors);

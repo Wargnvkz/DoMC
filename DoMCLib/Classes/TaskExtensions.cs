@@ -21,11 +21,13 @@ namespace DoMCLib.Classes
                 try
                 {
                     var result = await task;
-
-                    if (context != null)
-                        context.Post(_ => onSuccess(result), null);
-                    else
-                        onSuccess(result); // fallback если UI нет
+                    if (onSuccess != null)
+                    {
+                        if (context != null)
+                            context.Post(_ => onSuccess(result), null);
+                        else
+                            onSuccess(result); // fallback если UI нет
+                    }
 
                 }
                 catch (Exception ex)

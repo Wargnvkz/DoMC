@@ -230,12 +230,18 @@ namespace DoMCLib.Tools
 
         }
 
-        public static short[,] CalculateAverage(short[][,] images)
+        public static short[,] CalculateAverage(short[][,] images, short noImageIfAverageLessThan)
         {
             var standard = new short[512, 512];
             if (images == null || images.Length == 0)
                 return standard;
-            var standardsN = images.Length;
+            bool[] hasImage = new bool[images.Length];
+            for (int i = 0; i < images.Length; i++)
+            {
+                hasImage[i] = Average(images[i]) > noImageIfAverageLessThan;
+            }
+            var imagesWithData = Enumerable.Range(0, images.Length).Where(i => hasImage[i]).ToList();
+            var standardsN = imagesWithData.Count;
             for (int x = 0; x < 512; x++)
             {
                 for (int y = 0; y < 512; y++)
@@ -243,7 +249,7 @@ namespace DoMCLib.Tools
                     var vals = new short[standardsN];
                     for (int s = 0; s < standardsN; s++)
                     {
-                        vals[s] = (short)(images[s]?[y, x] ?? 0);
+                        vals[s] = (short)(images[imagesWithData[s]]?[y, x] ?? 0);
                     }
                     double avg = (vals.Sum(v => (double)v) / standardsN);
                     if (avg > short.MaxValue) avg = short.MaxValue;

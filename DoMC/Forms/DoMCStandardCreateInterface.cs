@@ -162,7 +162,7 @@ namespace DoMC
                                                 CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
                                                 //continue;
                                             }
-                                            var avgImg = ImageTools.CalculateAverage(img[socketNum]);
+                                            var avgImg = ImageTools.CalculateAverage(img[socketNum],CurrentContext.Configuration.HardwareSettings.ThresholdAverageToHaveImage);
                                             CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
                                         });
 

@@ -1191,7 +1191,7 @@ namespace DoMC
                             WorkingStepTime[(int)WorkStep.RDPBSend] = sw.ElapsedTicks;
 
                             // сообщить бракеру о съеме
-                            if (IsSetBad && IsAllHaveImages)
+                            if (IsSetBad)
                             {
                                 if (Context.Configuration.HardwareSettings.RemoveDefectedPreformBlockConfig.SendBadCycleToRDPB)
                                 {
@@ -1241,15 +1241,6 @@ namespace DoMC
                             }
                             else
                             {
-                                if (IsAllHaveImages)
-                                {
-                                    WorkingLog.Add(LoggerLevel.Critical, "Съем: OK");
-                                }
-                                else
-                                {
-                                    WorkingLog.Add(LoggerLevel.Critical, "Съем: Не все гнезда прочитаны правильно, считаем, что съем хороший");
-
-                                }
 
                                 new DoMCLib.Classes.Module.RDPB.Commands.SendSetIsOkCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync()
                                   .FireAndForgetWithResult(
@@ -1269,20 +1260,13 @@ namespace DoMC
 
                         }
                         CurrentCycleCCD.TransporterSide = RDPBCurrentStatus.CurrentTransporterSide;
-                        if (IsAllHaveImages)
-                        {
-                            WorkingStep = WorkStep.RecalcStandards;
-                            WorkingStepTime[(int)WorkStep.RecalcStandards] = sw.ElapsedTicks;
+                        WorkingStep = WorkStep.RecalcStandards;
+                        WorkingStepTime[(int)WorkStep.RecalcStandards] = sw.ElapsedTicks;
 
-                            Timings.CCDEtalonsRecalculateStarted = DateTime.Now;
-                            WorkingLog.Add(LoggerLevel.Critical, "Перерасчет эталонов");
-                            RecalcAllStandards(CurrentCycleCCD);
-                        }
-                        else
-                        {
-                            WorkingLog.Add(LoggerLevel.Critical, "Эталоны не пересчитываем");
+                        Timings.CCDEtalonsRecalculateStarted = DateTime.Now;
+                        WorkingLog.Add(LoggerLevel.Critical, "Перерасчет эталонов");
+                        RecalcAllStandards(CurrentCycleCCD);
 
-                        }
                         if ((DateTime.Now - lastSavedConfiguration).TotalSeconds > SaveTimeoutInSecodns)
                         {
                             WorkingStep = WorkStep.SaveConfiguration;
@@ -2144,7 +2128,8 @@ namespace DoMC
             {
                 try
                 {
-                    RecalcStandard(CurrentCycleCCD, i);
+                    if (CurrentCycleCCD.IsSocketHasImage[i])
+                        RecalcStandard(CurrentCycleCCD, i);
                 }
                 catch (Exception ex)
                 {

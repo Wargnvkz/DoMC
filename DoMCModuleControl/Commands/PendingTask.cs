@@ -153,7 +153,7 @@ namespace DoMCModuleControl.Commands
         public bool TrySetResult(int ResponseCode, T result)
         {
             if (!IsExpectedResponse(ResponseCode)) return false;
-            return _pendingReadTask.TrySetResult(result);
+            return _pendingReadTask?.TrySetResult(result) ?? false;
         }
     }
 }
