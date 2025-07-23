@@ -103,15 +103,17 @@ namespace DoMC.Forms
             nudArchiveFrom.BackColor = SystemColors.Window;
             nudArchiveTo.BackColor = SystemColors.Window;
 
-            var DS = new DoMCLib.DB.DataStorage(LocalPathString, RemotePathString, logger, observer);
-            if (!DS.LocalIsActive && !DS.RemoteIsActive)
+            using (var DS = new DoMCLib.DB.DataStorage(LocalPathString, RemotePathString, logger, observer))
             {
-                MessageBox.Show("Не получилось подключиться к базе данных", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+                if (!DS.LocalIsActive && !DS.RemoteIsActive)
+                {
+                    MessageBox.Show("Не получилось подключиться к базе данных", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-            LocalArchiveCycles = DS.LocalGetCycles(dtArchiveFrom, dtArchiveTo);
-            RemoteArchiveCycles = DS.RemoteGetCycles(dtArchiveFrom, dtArchiveTo);
+                LocalArchiveCycles = DS.LocalGetCycles(dtArchiveFrom, dtArchiveTo);
+                RemoteArchiveCycles = DS.RemoteGetCycles(dtArchiveFrom, dtArchiveTo);
+            }
 
             if (LocalArchiveCycles != null)
                 ArchiveCycles.AddRange(LocalArchiveCycles.Select(cd => new DisplayCycleData() { IsRemote = false, CycleData = cd }));
@@ -189,15 +191,17 @@ namespace DoMC.Forms
 
         private void FillBoxes()
         {
-            var DS = new DoMCLib.DB.DataStorage(LocalPathString, RemotePathString, logger, observer);
-
             List<BoxDB> boxes = new List<BoxDB>();
-            var localboxes = DS.LocalGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
-            if (localboxes != null)
-                boxes.AddRange(localboxes);
-            var remoteboxes = DS.RemoteGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
-            if (remoteboxes != null)
-                boxes.AddRange(remoteboxes);
+            using (var DS = new DoMCLib.DB.DataStorage(LocalPathString, RemotePathString, logger, observer))
+            {
+
+                var localboxes = DS.LocalGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
+                if (localboxes != null)
+                    boxes.AddRange(localboxes);
+                var remoteboxes = DS.RemoteGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
+                if (remoteboxes != null)
+                    boxes.AddRange(remoteboxes);
+            }
             boxes = boxes.OrderBy(b => b.CompletedTime).ToList();
 
             lvBoxes.Items.Clear();
@@ -294,16 +298,18 @@ namespace DoMC.Forms
             System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
             if (lvArchiveSavedSockets.SelectedItems == null || lvArchiveSavedSockets.SelectedItems.Count == 0) return;
             var cycleTag = lvArchiveSavedSockets.SelectedItems[0].Tag as CycleTag;
-            var DS = new DoMCLib.DB.DataStorage(LocalPathString, RemotePathString, logger, observer);
             CycleData cycle = null;
-            if (!cycleTag.IsRemote)
+            using (var DS = new DoMCLib.DB.DataStorage(LocalPathString, RemotePathString, logger, observer))
             {
-                cycle = DS.LocalGetCycleById(cycleTag.CycleID);
-            }
-            if (cycleTag.IsRemote || cycle == null)
-            {
-                cycle = DS.RemoteGetCycleById(cycleTag.CycleID);
+                if (!cycleTag.IsRemote)
+                {
+                    cycle = DS.LocalGetCycleById(cycleTag.CycleID);
+                }
+                if (cycleTag.IsRemote || cycle == null)
+                {
+                    cycle = DS.RemoteGetCycleById(cycleTag.CycleID);
 
+                }
             }
             //var cycle = DS.GetCycleById(cycleid);
             if (cycle == null)
@@ -559,14 +565,16 @@ namespace DoMC.Forms
             nudArchiveFrom.BackColor = SystemColors.Window;
             nudArchiveTo.BackColor = SystemColors.Window;
 
-            var DS = new DoMCLib.DB.DataStorage(LocalPathString, RemotePathString, logger, observer);
+            using (var DS = new DoMCLib.DB.DataStorage(LocalPathString, RemotePathString, logger, observer))
+            {
 
-            LocalArchiveCycles = DS.LocalGetCycles(dtArchiveFrom, dtArchiveTo);
-            if (LocalArchiveCycles.Count > 0)
-                LocalArchiveCycles = LocalArchiveCycles.FindAll(lc => lc.IsSocketsGood.Any(s => !s));
-            RemoteArchiveCycles = DS.RemoteGetCycles(dtArchiveFrom, dtArchiveTo);
-            if (RemoteArchiveCycles.Count > 0)
-                RemoteArchiveCycles.FindAll(lc => lc.IsSocketsGood.Any(s => !s));
+                LocalArchiveCycles = DS.LocalGetCycles(dtArchiveFrom, dtArchiveTo);
+                if (LocalArchiveCycles.Count > 0)
+                    LocalArchiveCycles = LocalArchiveCycles.FindAll(lc => lc.IsSocketsGood.Any(s => !s));
+                RemoteArchiveCycles = DS.RemoteGetCycles(dtArchiveFrom, dtArchiveTo);
+                if (RemoteArchiveCycles.Count > 0)
+                    RemoteArchiveCycles.FindAll(lc => lc.IsSocketsGood.Any(s => !s));
+            }
 
             if (LocalArchiveCycles != null)
                 ArchiveCycles.AddRange(LocalArchiveCycles.Select(cd => new DisplayCycleData() { IsRemote = false, CycleData = cd }));

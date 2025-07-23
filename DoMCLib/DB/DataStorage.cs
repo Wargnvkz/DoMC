@@ -6,12 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DoMCLib.DB
 {
-    public class DataStorage
+    public class DataStorage : IDisposable
     {
         private string ConnectionStringLocal;
         private string ConnectionStringRemote;
@@ -144,7 +145,7 @@ namespace DoMCLib.DB
 
         public virtual List<BoxDB> LocalGetBox(DateTime start, DateTime end)
         {
-            if (LocalStorage == null) return null;
+            if (LocalStorage == null) return new List<BoxDB>();
             var res = LocalStorage.GetBox(start, end);
             return res;
         }
@@ -218,7 +219,7 @@ namespace DoMCLib.DB
 
         public virtual List<BoxDB> RemoteGetBox(DateTime start, DateTime end)
         {
-            if (RemoteStorage == null) return null;
+            if (RemoteStorage == null) return new List<BoxDB>();
             var res = RemoteStorage.GetBox(start, end);
             return res;
         }
@@ -338,9 +339,7 @@ namespace DoMCLib.DB
             IsTerminatingMovingToArchive = false;
             if (LocalStorage == null || RemoteStorage == null) return;
             if (token.IsCancellationRequested) return;
-            LocalStorage.ResetCache();
             if (token.IsCancellationRequested) return;
-            RemoteStorage.ResetCache();
             if (token.IsCancellationRequested) return;
             try
             {
@@ -473,11 +472,15 @@ namespace DoMCLib.DB
             }
             finally
             {
-                LocalStorage.ResetCache();
-                RemoteStorage.ResetCache();
                 IsMovingToArchive = false;
                 IsTerminatingMovingToArchive = false;
             }
+        }
+
+        public void Dispose()
+        {
+            LocalStorage?.StopBackgroundIndexer();
+            RemoteStorage?.StopBackgroundIndexer();
         }
     }
 }

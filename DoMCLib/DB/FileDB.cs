@@ -4,12 +4,13 @@ using DoMCModuleControl.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Runtime.Serialization;
 using System.Text;
 
 namespace DoMCLib.DB
 {
-    public partial class FileDB : IDatabase
+    public partial class FileDB : IDatabase, IDisposable
     {
         public string DBDirectory { get; private set; }
         public string BoxDirectory { get; private set; }
@@ -17,24 +18,29 @@ namespace DoMCLib.DB
         public string DBExtension = ".cd";
         public string BoxExtension = ".box";
 
-        DateTime LastCached = DateTime.MinValue;
-        double CacheTimeoutInSeconds = 60;
-        private List<CycleDBFileHeader> _CycleDataFiles;
+        DateTime LastCycleCached = DateTime.MinValue;
+        DateTime LastBoxCached = DateTime.MinValue;
+        double CacheTimeoutInSeconds = 30;
+
+        private volatile List<CycleDBFileHeader> _CycleDataFiles = new();
+        private List<CycleDBFileHeader> _PendingCycleCache = null;
+        CancellationTokenSource renewCancelationTockenSource;
+
         private List<BoxFileHeader> _BoxFiles;
+        private List<BoxFileHeader> _PendingBoxCache = null;
         private ILogger? WorkingLog;
         private List<CycleDBFileHeader> CycleDataFiles
         {
             get
             {
-                RenewCache();
                 return _CycleDataFiles;
+
             }
         }
         private List<BoxFileHeader> BoxFiles
         {
             get
             {
-                RenewCache();
                 return _BoxFiles;
             }
         }
@@ -43,18 +49,67 @@ namespace DoMCLib.DB
         {
             DBDirectory = CycleDBDirectory;
             BoxDirectory = System.IO.Path.Combine(CycleDBDirectory, "boxes");
+            StartBackgroundIndexer();
         }
         public bool CheckDB(bool RecreateDB)
         {
             try
             {
-                RenewCache();
+                RenewCycleCache();
+                RenewBoxCache();
                 return true;
             }
             catch
             {
                 return false;
             }
+        }
+
+        public void StartBackgroundIndexer()
+        {
+            if (renewCancelationTockenSource != null && !renewCancelationTockenSource.IsCancellationRequested) return;
+            renewCancelationTockenSource = new CancellationTokenSource();
+            Task.Run(async () =>
+            {
+                while (renewCancelationTockenSource.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        var newCycleCache = GetDBFileHeaderList(DBDirectory);
+                        _PendingCycleCache = newCycleCache;
+                        var newBoxCache = GetBoxFileHeaderList(DBDirectory);
+                        _PendingBoxCache = newBoxCache;
+
+                        bool needToClearMemory = false;
+                        if (_PendingCycleCache != null)
+                        {
+                            Interlocked.Exchange(ref _CycleDataFiles, _PendingCycleCache);
+                            _PendingCycleCache = null;
+                            needToClearMemory = true;
+                        }
+                        if (_PendingBoxCache != null)
+                        {
+                            Interlocked.Exchange(ref _BoxFiles, _PendingBoxCache);
+                            _PendingBoxCache = null;
+                            needToClearMemory = true;
+                        }
+                        if (needToClearMemory)
+                        {
+                            GC.Collect();
+                        }
+
+                        await Task.Delay((int)(CacheTimeoutInSeconds * 1000)); // обновление раз в CacheTimeoutInSeconds сек
+                    }
+                    catch (Exception ex)
+                    {
+                        // логгирование
+                    }
+                }
+            });
+        }
+        public void StopBackgroundIndexer()
+        {
+            renewCancelationTockenSource?.Cancel();
         }
 
         /// <summary>
@@ -85,7 +140,20 @@ namespace DoMCLib.DB
             if (!System.IO.Directory.Exists(directory))
                 System.IO.Directory.CreateDirectory(directory);
             List<CycleDBFileHeader> fileList = new List<CycleDBFileHeader>();
-            var queuePath = new Queue<string>();
+
+            var files = Directory.EnumerateFiles(directory, "*" + DBExtension, SearchOption.AllDirectories);
+            foreach (var file in files)
+                try
+                {
+                    var fileDescription = new CycleDBFileHeader() { FileName = file, CycleHeader = FileStorage<CycleData>.DecomposeFileName(file) };
+                    fileList.Add(fileDescription);
+                }
+                catch
+                {
+
+                }
+
+            /*var queuePath = new Queue<string>();
             queuePath.Enqueue(directory);
             //foreach (var InnerDirectory in directories)
             while (queuePath.Count > 0)
@@ -108,7 +176,7 @@ namespace DoMCLib.DB
                 foreach (var d in directories)
                     if (d != BoxDirectory)
                         queuePath.Enqueue(d);
-            }
+            }*/
             return fileList;
         }
         protected List<BoxFileHeader> GetBoxFileHeaderList(string directory)
@@ -125,18 +193,27 @@ namespace DoMCLib.DB
         }
 
 
-        private void RenewCache()
+        private void RenewCycleCache()
         {
-            if ((DateTime.Now - LastCached).TotalSeconds > CacheTimeoutInSeconds)
+            if ((DateTime.Now - LastCycleCached).TotalSeconds > CacheTimeoutInSeconds)
             {
-                ResetCache();
+                ResetCycleCache();
             }
         }
-        public void ResetCache()
+        public void ResetCycleCache()
         {
             _CycleDataFiles = GetDBFileHeaderList(DBDirectory);
+        }
+        private void RenewBoxCache()
+        {
+            if ((DateTime.Now - LastBoxCached).TotalSeconds > CacheTimeoutInSeconds)
+            {
+                ResetBoxCache();
+            }
+        }
+        public void ResetBoxCache()
+        {
             _BoxFiles = GetBoxFileHeaderList(BoxDirectory);
-            GC.Collect();
 
         }
 
@@ -159,7 +236,8 @@ namespace DoMCLib.DB
             var fn = FileStorage<CycleData>.SaveFile(localCD, path, DBExtension);
             WorkingLog?.Add(LoggerLevel.FullDetailedInformation, $"Съем {cd.CycleDateTime}. Файл сохранен: {fn}");
             localCD.SocketImages = null;
-            CycleDataFiles.Add(new CycleDBFileHeader() { FileName = fn, CycleHeader = localCD });
+            var header = new CycleDBFileHeader() { FileName = fn, CycleHeader = localCD };
+            _CycleDataFiles.Add(header);
         }
 
         public void SaveCycleAndCompressedImagesOfActiveSockets(DB.CycleData cd)
@@ -171,7 +249,8 @@ namespace DoMCLib.DB
             var path = GetPathForDate(localCD.CycleDateTime);
             var fn = FileStorage<CycleData>.SaveFile(localCD, path, DBExtension);
             localCD.SocketImages = null;
-            CycleDataFiles.Add(new CycleDBFileHeader() { FileName = fn, CycleHeader = localCD });
+            var header = new CycleDBFileHeader() { FileName = fn, CycleHeader = localCD };
+            _CycleDataFiles.Add(header);
         }
 
         public void SaveBox(DB.BoxDB box)
@@ -180,7 +259,8 @@ namespace DoMCLib.DB
             box.BoxID = newid;
             var localBox = new Box(box);
             var fn = FileStorage<Box>.SaveFile(localBox, BoxDirectory, BoxExtension);
-            BoxFiles.Add(new BoxFileHeader() { FileName = fn, BoxHeader = localBox });
+            var boxHeader = new BoxFileHeader() { FileName = fn, BoxHeader = localBox };
+            _BoxFiles.Add(boxHeader);
         }
         #endregion
 
@@ -347,6 +427,11 @@ namespace DoMCLib.DB
             var filename = FileStorage<CycleData>.CreateFileName(cycleHeader);
             var path = System.IO.Path.Combine(DBDirectory, System.IO.Path.ChangeExtension(filename, DBExtension));
             FileStorage<CycleData>.SaveFileBinary(path, data);
+        }
+
+        public void Dispose()
+        {
+            StopBackgroundIndexer();
         }
 
         #endregion
