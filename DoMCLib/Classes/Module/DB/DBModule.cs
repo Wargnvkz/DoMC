@@ -78,6 +78,7 @@ namespace DoMCLib.Classes.Module.DB
                 task?.GetAwaiter().GetResult();
             }
             catch { }
+            Storage.Dispose();
         }
 
         public void EnqueueCycleDate(CycleImagesCCD cd)

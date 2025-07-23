@@ -83,6 +83,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
                 //task.;
             }
             catch (TaskCanceledException) { }
+            Storage.Dispose();
             IsStarted = false;
         }
 
