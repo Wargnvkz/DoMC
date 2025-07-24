@@ -24,6 +24,7 @@ namespace DoMCLib.DB
 
         public bool LocalIsActive;
         public bool RemoteIsActive;
+        public bool IsStarted => LocalIsActive || RemoteIsActive;
 
         private bool IsTerminatingMovingToArchive = false;
         private bool IsMovingToArchive = false;

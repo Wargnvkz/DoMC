@@ -40,7 +40,7 @@ namespace DoMCLib.Forms
         private DoMCLib.Classes.ImageProcessResult ImageProcessResult;
         private DoMCLib.Configuration.ImageProcessParameters ImageProcessParameters;
 
-        DefectMethod CalculationMethod = DefectMethod.PlainDifference;
+        DefectMethod CalculationMethod = DefectMethod.CheckBySettings;
         Observer Observer;
 
         public ShowPreformImages()
@@ -280,6 +280,16 @@ namespace DoMCLib.Forms
             else
             {
                 if (ImageToDraw != null && StandardImageToDraw != null && ImageProcessResult.ResultImage != null) TestBmpDiffImage = ImageTools.DrawImage(ImageProcessResult.ResultImage, invertColors, BadPoint: ImageProcessResult.MaxDeviationPoint, CheckArea: ShowCheckArea ? CheckArea : (Rectangle?)null);
+                if (ImageProcessResult.MaxDeviationPoint != null)
+                    if (cbVertical.Checked)
+                    {
+                        numFrame.Value = ImageProcessResult.MaxDeviationPoint.Value.X;
+                    }
+                    else
+                    {
+                        numFrame.Value = ImageProcessResult.MaxDeviationPoint.Value.Y;
+
+                    }
             }
             SetImages();
         }

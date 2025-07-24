@@ -18,7 +18,7 @@ namespace DoMCLib.Classes.Configuration.CCD
         public bool LEDStatusesAdded = false; // прочитаны ли статусы светодиодов
         public static readonly int DefaultLEDQnt = 12;
         public short MaxDeviation;
-        public Point MaxDeviationPoint;
+        public Point? MaxDeviationPoint;
         public short Average;
         public ImageProcessParameters[] ImageProcessParameters;
         public ImageErrorType SocketErrorType;

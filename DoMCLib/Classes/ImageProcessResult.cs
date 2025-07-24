@@ -7,7 +7,7 @@ namespace DoMCLib.Classes
         public ImageErrorType SocketErrorType;
         public short Average;
         public short[,] ResultImage;
-        public Point MaxDeviationPoint;
+        public Point? MaxDeviationPoint;
         public short MaxDeviation;
         public bool IsSocketGood;
         public string ErrorToString()

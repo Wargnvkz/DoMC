@@ -34,9 +34,9 @@ namespace DoMCLib.Classes
         {
             Operations.RemoveAt(index);
         }
-        public bool IsImageGood(short[,] std, short[,] img, ImageProcessParameters ipp, out short[,] ResultImg, out Point MaxCoord)
+        public bool IsImageGood(short[,] std, short[,] img, ImageProcessParameters ipp, out short[,] ResultImg, out Point? MaxCoord)
         {
-            
+
             short[][,] res;
             if (Operations != null)
             {
@@ -53,11 +53,12 @@ namespace DoMCLib.Classes
                 res = op.Operation(ipp, res);
             }
             ResultImg = res[0];
-            MaxCoord = new Point(0, 0);
+            MaxCoord = null;
             switch (DecisionAction)
             {
                 case MakeDecisionAction.Average:
                     var avg = ImageTools.Average(res[0]);
+
                     return avg < ParameterCompareGoodIfLess;
                 case MakeDecisionAction.Max:
                     var imgarr = res[0].Cast<short>().ToArray();

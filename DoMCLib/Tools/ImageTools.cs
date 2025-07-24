@@ -1099,13 +1099,13 @@ namespace DoMCLib.Tools
                 for (int i = 0; i < ipp.Decisions.Length; i++)
                 {
 
-                    var imgres = ipp.Decisions[i].IsImageGood(StandardImage, Current, ipp, out short[,] resImg, out Point maxCoord);
+                    var imgres = ipp.Decisions[i].IsImageGood(StandardImage, Current, ipp, out short[,] resImg, out Point? maxCoord);
                     if (!imgres)
                     {
                         result.IsSocketGood = false;
                         result.SocketErrorType |= ipp.Decisions[i].Result == DecisionActionResult.Defect ? ImageErrorType.Defect : ImageErrorType.Average;
                     }
-                    result.MaxDeviationPoint = maxCoord;
+                    if (maxCoord != null) result.MaxDeviationPoint = maxCoord;
                     if (i == 0) result.ResultImage = resImg;
 
                 }
