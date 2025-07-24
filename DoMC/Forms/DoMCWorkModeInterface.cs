@@ -71,7 +71,7 @@ namespace DoMC
         DateTime lastBoxRead = DateTime.MinValue;
         TimeSpan lastBoxReadTime = new TimeSpan(0, 2, 0);
 
-        WorkStep WorkingStep;
+        WorkStep WorkingStep = WorkStep.Stopped;
         long[] WorkingStepTime = new long[Enum.GetNames(typeof(WorkStep)).Count() + 1];
 
         IMainController Controller;
@@ -81,7 +81,6 @@ namespace DoMC
         DoMCArchiveForm? archiveForm = null;
 
         CycleImagesCCD? CurrentCycleData;
-        DateTime LastSynchosignal = DateTime.MinValue;
 
         public event Func<object?, Task> SettingsUpdated;
 
@@ -709,6 +708,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Начало чтения");
             CCDReadsFailed = 0;
             RDPBCurrentStatus.PreviousDirection = RDPBTransporterSide.NotSet;
+            LCBStatus.TimePreviousSyncSignalGot = null;
             var sw = new Stopwatch();
             sw.Start();
             try
@@ -1141,7 +1141,7 @@ namespace DoMC
                         }
 
                         var IsSetBad = CurrentCycleCCD.IsSocketGood.Any(p => !p);
-                        WorkingLog.Add(LoggerLevel.Critical, "Хорошие гнезда: " + System.String.Join("", CurrentCycleCCD.IsSocketGood.Select((ci, i) => $"{(ci == null ? 0 : 1)}{(i % 8 == 7 ? " " : "")}")));
+                        WorkingLog.Add(LoggerLevel.Critical, "Хорошие гнезда: " + System.String.Join("", CurrentCycleCCD.IsSocketGood.Select((ci, i) => $"{(ci ? 1 : 0)}{(i % 8 == 7 ? " " : "")}")));
 
                         Timings.CCDImagesProcessEnded = DateTime.Now;
 
@@ -1390,6 +1390,9 @@ namespace DoMC
             {
                 ForceStop = true;
             }
+            WorkingStep = WorkStep.Stopped;
+            WorkingStepTime[(int)WorkStep.Stopped] = sw.ElapsedTicks;
+
         }
 
         private void ProcessRDPBStatusGetWithBoxCreation(RDPBStatus newStatus)
@@ -1626,7 +1629,8 @@ namespace DoMC
                 {
                     CurrentDraw();
                     lastDrawCycleTime = LCBStatus.TimeOfLCBSynchrosignal;
-                    lblCycleDurationValue.Text = (LCBStatus.TimeOfLCBSynchrosignal - LCBStatus.TimePreviousSyncSignalGot).TotalSeconds.ToString("F1") + " с";
+                    if (LCBStatus.TimePreviousSyncSignalGot != null)
+                        lblCycleDurationValue.Text = (LCBStatus.TimeOfLCBSynchrosignal - LCBStatus.TimePreviousSyncSignalGot.Value).TotalSeconds.ToString("F1") + " с";
 
                     lblCurrentBoxDefectCycles.Text = RDPBCurrentStatus.CurrentBoxDefectCycles.ToString();
                 }
@@ -1660,6 +1664,7 @@ namespace DoMC
                     }
                 }
             }
+            lblFooterStep.Text = $"Текущий шаг: {GetWorkStepText(WorkingStep)}";
             //если прошло больше 2 секунд после последней провеки ошибок, то показываем их
             if ((DateTime.Now - lastErrorCheck).TotalSeconds > 2)
             {
@@ -2204,6 +2209,25 @@ namespace DoMC
             return;
         }
 
+        private string GetWorkStepText(WorkStep step)
+        {
+            switch (step)
+            {
+                case WorkStep.Stopped: return "Остановлен";
+                case WorkStep.Prepare: return "Подготовка";
+                case WorkStep.WaitForSyncroSignal: return "Ожидание синхросигнала";
+                case WorkStep.ReadingSocketsCompleted: return "Завершено чтение гнезд";
+                case WorkStep.StartReadingImages: return "Начало получения данных";
+                case WorkStep.ReadingImagesCompleted: return "Завершено получение данных";
+                case WorkStep.SearchForDefectedPreforms: return "Поиск дефектов";
+                case WorkStep.RDPBSend: return "Отправка данных в бракёр";
+                case WorkStep.SendToDB: return "Отправка в базу данных";
+                case WorkStep.RecalcStandards: return "Перерасчет эталонов";
+                case WorkStep.SaveConfiguration: return "Сохранение конфигурации";
+                case WorkStep.ClearMemory: return "Очистка памяти";
+                default: return "Неизвестно";
+            }
+        }
     }
 
     public class SocketStatus
@@ -2297,6 +2321,7 @@ namespace DoMC
 
     public enum WorkStep
     {
+        Stopped = 0,
         Prepare = 1,
         WaitForSyncroSignal = 2,
         ReadingSocketsCompleted = 3,
@@ -2333,7 +2358,7 @@ namespace DoMC
     public class LCBStatus
     {
         public bool[] LEDStatus = new bool[12];
-        public DateTime TimePreviousSyncSignalGot;
+        public DateTime? TimePreviousSyncSignalGot;
         public DateTime TimeOfLCBSynchrosignal;
         public DateTime TimeSyncSignalGotForShowInCycle;
         public DateTime LastLedStatusesGotTime;

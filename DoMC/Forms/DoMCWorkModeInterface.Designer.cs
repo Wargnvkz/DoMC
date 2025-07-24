@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             msWorkingModeMenu = new MenuStrip();
             tsmiStandards = new ToolStripMenuItem();
             miLoadStandard = new ToolStripMenuItem();
@@ -67,10 +67,13 @@
             tbpArchive = new TabPage();
             timer1 = new System.Windows.Forms.Timer(components);
             pbStartStop = new UserControls.PressButton();
+            ssFooter = new StatusStrip();
+            lblFooterStep = new ToolStripStatusLabel();
             msWorkingModeMenu.SuspendLayout();
             tabWorkAndArchive.SuspendLayout();
             tbpCurrent.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chCurrentLastHourSumBad).BeginInit();
+            ssFooter.SuspendLayout();
             SuspendLayout();
             // 
             // msWorkingModeMenu
@@ -170,7 +173,7 @@
             tabWorkAndArchive.Margin = new Padding(4, 3, 4, 3);
             tabWorkAndArchive.Name = "tabWorkAndArchive";
             tabWorkAndArchive.SelectedIndex = 0;
-            tabWorkAndArchive.Size = new Size(1652, 876);
+            tabWorkAndArchive.Size = new Size(1652, 865);
             tabWorkAndArchive.TabIndex = 3;
             tabWorkAndArchive.DrawItem += tabWorkAndArchive_DrawItem;
             // 
@@ -198,7 +201,7 @@
             tbpCurrent.Margin = new Padding(4, 3, 4, 3);
             tbpCurrent.Name = "tbpCurrent";
             tbpCurrent.Padding = new Padding(4, 3, 4, 3);
-            tbpCurrent.Size = new Size(1644, 838);
+            tbpCurrent.Size = new Size(1644, 827);
             tbpCurrent.TabIndex = 0;
             tbpCurrent.Text = "Текущий";
             // 
@@ -275,7 +278,7 @@
             // 
             lblCurrentLastHourSumBadCaption.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblCurrentLastHourSumBadCaption.AutoSize = true;
-            lblCurrentLastHourSumBadCaption.Location = new Point(7, 530);
+            lblCurrentLastHourSumBadCaption.Location = new Point(7, 519);
             lblCurrentLastHourSumBadCaption.Margin = new Padding(4, 0, 4, 0);
             lblCurrentLastHourSumBadCaption.Name = "lblCurrentLastHourSumBadCaption";
             lblCurrentLastHourSumBadCaption.Size = new Size(339, 25);
@@ -331,7 +334,7 @@
             // lblCycleDurationValue
             // 
             lblCycleDurationValue.AutoSize = true;
-            lblCycleDurationValue.Location = new Point(747, 72);
+            lblCycleDurationValue.Location = new Point(670, 72);
             lblCycleDurationValue.Margin = new Padding(4, 0, 4, 0);
             lblCycleDurationValue.Name = "lblCycleDurationValue";
             lblCycleDurationValue.Size = new Size(23, 25);
@@ -384,20 +387,20 @@
             // chCurrentLastHourSumBad
             // 
             chCurrentLastHourSumBad.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            chartArea1.AxisX.Maximum = 100D;
-            chartArea1.AxisX.Minimum = 0D;
-            chartArea1.AxisX.MinorGrid.Enabled = true;
-            chartArea1.AxisX.MinorGrid.LineColor = Color.LightGray;
-            chartArea1.AxisX.MinorTickMark.Enabled = true;
-            chartArea1.AxisX.MinorTickMark.LineColor = Color.LightGray;
-            chartArea1.Name = "ChartArea1";
-            chCurrentLastHourSumBad.ChartAreas.Add(chartArea1);
-            chCurrentLastHourSumBad.Location = new Point(7, 579);
+            chartArea2.AxisX.Maximum = 100D;
+            chartArea2.AxisX.Minimum = 0D;
+            chartArea2.AxisX.MinorGrid.Enabled = true;
+            chartArea2.AxisX.MinorGrid.LineColor = Color.LightGray;
+            chartArea2.AxisX.MinorTickMark.Enabled = true;
+            chartArea2.AxisX.MinorTickMark.LineColor = Color.LightGray;
+            chartArea2.Name = "ChartArea1";
+            chCurrentLastHourSumBad.ChartAreas.Add(chartArea2);
+            chCurrentLastHourSumBad.Location = new Point(7, 568);
             chCurrentLastHourSumBad.Margin = new Padding(4, 3, 4, 3);
             chCurrentLastHourSumBad.Name = "chCurrentLastHourSumBad";
-            series1.ChartArea = "ChartArea1";
-            series1.Name = "Series1";
-            chCurrentLastHourSumBad.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.Name = "Series1";
+            chCurrentLastHourSumBad.Series.Add(series2);
             chCurrentLastHourSumBad.Size = new Size(1628, 245);
             chCurrentLastHourSumBad.TabIndex = 1;
             chCurrentLastHourSumBad.Text = "chart1";
@@ -409,7 +412,7 @@
             pnlCurrentSockets.Location = new Point(7, 72);
             pnlCurrentSockets.Margin = new Padding(4, 3, 4, 3);
             pnlCurrentSockets.Name = "pnlCurrentSockets";
-            pnlCurrentSockets.Size = new Size(411, 441);
+            pnlCurrentSockets.Size = new Size(411, 430);
             pnlCurrentSockets.TabIndex = 0;
             pnlCurrentSockets.Paint += pnlCurrentSockets_Paint;
             // 
@@ -445,11 +448,29 @@
             pbStartStop.UseVisualStyleBackColor = false;
             pbStartStop.Click += btnStartStop_Click;
             // 
+            // ssFooter
+            // 
+            ssFooter.Items.AddRange(new ToolStripItem[] { lblFooterStep });
+            ssFooter.Location = new Point(0, 910);
+            ssFooter.Name = "ssFooter";
+            ssFooter.Size = new Size(1799, 22);
+            ssFooter.TabIndex = 5;
+            ssFooter.Text = "statusStrip1";
+            // 
+            // lblFooterStep
+            // 
+            lblFooterStep.AutoSize = false;
+            lblFooterStep.Name = "lblFooterStep";
+            lblFooterStep.Size = new Size(500, 17);
+            lblFooterStep.Text = "Текущий шаг:";
+            lblFooterStep.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // DoMCWorkModeInterface
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1799, 932);
+            Controls.Add(ssFooter);
             Controls.Add(pbStartStop);
             Controls.Add(tabWorkAndArchive);
             Controls.Add(msWorkingModeMenu);
@@ -466,7 +487,10 @@
             tbpCurrent.ResumeLayout(false);
             tbpCurrent.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)chCurrentLastHourSumBad).EndInit();
+            ssFooter.ResumeLayout(false);
+            ssFooter.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -506,5 +530,7 @@
         private System.Windows.Forms.ToolStripMenuItem miCreateNewStandard;
         private System.Windows.Forms.ToolStripMenuItem сохранитьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem miSocketsSettings;
+        private StatusStrip ssFooter;
+        private ToolStripStatusLabel lblFooterStep;
     }
 }
