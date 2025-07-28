@@ -9,6 +9,7 @@ using DoMCModuleControl.Modules;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -23,6 +24,7 @@ namespace DoMCLib.Classes.Module.CCD
     /// <summary>
     /// Работа с одной платой по протоколу TCP/IP
     /// </summary>
+    [Description("Платы ПЗС")]
     public class CCDCardTCPClient
     {
         private static string BaseIPv4Address = "192.168.255.0";
@@ -87,7 +89,7 @@ namespace DoMCLib.Classes.Module.CCD
             //for (int rc = 0; rc < 8; rc++) SocketsStatuses[rc] = new SocketWorkStatus();
 
             Controller = controller;
-            WorkingLog = Controller.GetLogger(this.GetType().Name);
+            WorkingLog = Controller.GetLogger(this.GetType().GetDescriptionOrName());
             //WorkingLogSocketStatus = Controller.GetLogger("SocketStatus");
         }
 

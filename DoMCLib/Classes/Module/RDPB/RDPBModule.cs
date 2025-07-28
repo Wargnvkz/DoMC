@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -24,6 +25,7 @@ namespace DoMCLib.Classes.Module.RDPB
     /// Observer of MainController:
     /// "RDPBModule.StatusChanged" - RDPBStatus
     /// </summary>
+    [Description("Бракёр")]
     public partial class RDPBModule : AbstractModuleBase
     {
         private DoMCLib.Classes.Configuration.RemoveDefectedPreformBlockConfig RDPBConfig;
@@ -49,7 +51,7 @@ namespace DoMCLib.Classes.Module.RDPB
         public RDPBModule(IMainController MainController) : base(MainController)
         {
             mainController = MainController;
-            WorkingLog = mainController.GetLogger(this.GetType().Name);
+            WorkingLog = mainController.GetLogger(this.GetType().GetDescriptionOrName());
             WorkingLog.SetMaxLogginLevel(LoggerLevel.FullDetailedInformation);
         }
         public async Task SetConfig(ApplicationConfiguration config)

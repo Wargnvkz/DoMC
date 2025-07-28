@@ -21,7 +21,7 @@ namespace DoMC
     public partial class DoMCStandardCreateInterface : Form
     {
 
-        IMainController Controller;
+        IMainController MainController;
         DoMCApplicationContext CurrentContext;
         Bitmap bmpCheckSign;
         PictureBox[] StandardPictures;
@@ -34,10 +34,14 @@ namespace DoMC
         int MaxImagesReadToMakeStandard = 10;
         DoMCApplicationContext.ErrorsReadingData errorReadingData = new DoMCApplicationContext.ErrorsReadingData();
 
+        volatile int ProgressbarStep = 0;
+        int PrograssbarMaxStep = 9;
+        bool IsGettingStandard = false;
+
         public DoMCStandardCreateInterface(IMainController controller, DoMCApplicationContext context, ILogger logger)
         {
             InitializeComponent();
-            Controller = controller;
+            MainController = controller;
             CurrentContext = context;
             WorkingLog = logger;
             bmpCheckSign = new Bitmap(100, 100);
@@ -55,17 +59,16 @@ namespace DoMC
 
         private void btnCreateStandard_Click(object sender, EventArgs e)
         {
+            if (IsGettingStandard) return;
             WorkingLog?.Add(LoggerLevel.Critical, "Начало создания эталона");
             try
             {
                 ResetCheckSigns();
-                SocketReadRepeat = -1;
                 SocketCreateCompleted = false;
-                CheckSignSet = -1;
                 btnCreateStandard.Enabled = false;
-                var tsk = new Task(FullStandardGet);
-                tsk.Start();
+                Task.Run(FullStandardGet);
                 tmCheckSignShow.Enabled = true;
+                IsGettingStandard = true;
             }
             catch
             {
@@ -78,12 +81,12 @@ namespace DoMC
         {
             try
             {
-                await DoMCEquipmentCommands.StopCCD(Controller, CurrentContext, WorkingLog);
+                await DoMCEquipmentCommands.StopCCD(MainController, CurrentContext, WorkingLog);
             }
             catch { }
             try
             {
-                await DoMCEquipmentCommands.StopLCB(Controller, WorkingLog);
+                await DoMCEquipmentCommands.StopLCB(MainController, WorkingLog);
             }
             catch { }
             ResetInterface();
@@ -97,8 +100,138 @@ namespace DoMC
                 btnCreateStandard.Enabled = true;
             }));
         }
+        private async Task FullStandardGet()
+        {
+            PictureBox[] StandardPictures = new PictureBox[3] { pbStandard1, pbStandard2, pbStandard3 };
+            int SocketQuantity = CurrentContext.Configuration.HardwareSettings.SocketQuantity;
+            short[][][,] img = new short[SocketQuantity][][,];
+            List<string> TextResults = new List<string>();
+            (bool, CCDCardDataCommandResponse) startResult;
+            ProgressbarStep = 0;
+            //CurrentOperation = DoMCOperation.StartCCD;
+            if ((startResult = await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog)).Item1)
+            {
+                ProgressbarStep++;
+                try
+                {
+                    if (await DoMCEquipmentCommands.StartLCB(MainController, WorkingLog))
+                    {
+                        try
+                        {
+                            if (await DoMCEquipmentCommands.SetLCBWorkingMode(MainController, WorkingLog))
+                            {
+                                try
+                                {
+                                    //CurrentOperation = DoMCOperation.SettingReadingParameters;
+                                    if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
+                                    {
+                                        //CurrentOperation = DoMCOperation.SettingExposition;
+                                        if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
+                                        {
+                                            ProgressbarStep++;
+                                            //CurrentOperation = DoMCOperation.SetFastReading;
+                                            if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog)).Item1)
+                                            {
+                                                ProgressbarStep++;
+                                                for (int socketNum = 0; socketNum < SocketQuantity; socketNum++)
+                                                {
+                                                    img[socketNum] = new short[ImagesToMakeStandard][,];
+                                                }
+                                                for (int repeat = 0; repeat < ImagesToMakeStandard; repeat++)
+                                                {
+                                                    if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, true)).Item1)
+                                                    {
+                                                        ProgressbarStep++;
+                                                        //CurrentOperation = DoMCOperation.GettingImages;
+                                                        var si = await DoMCEquipmentCommands.GetSocketsImages(MainController, CurrentContext, WorkingLog);
+                                                        ProgressbarStep++;
+                                                        for (int socketNum = 0; socketNum < SocketQuantity; socketNum++)
+                                                        {
+                                                            if (si.Item2[socketNum] != null)
+                                                                img[socketNum][repeat] = si.Item2[socketNum].Image;
 
-        private async void FullStandardGet()
+                                                        }
+                                                    }
+                                                    StandardPictures[repeat].Image = bmpCheckSign;
+
+                                                }
+                                                await Task.Yield();
+
+                                                ProgressbarStep++;
+                                                //CurrentOperation = DoMCOperation.CreatingStandard;
+
+                                                for (int socketNum = 0; socketNum < SocketQuantity; socketNum++)
+                                                {
+                                                    if (img[socketNum].Any(im => im == null))
+                                                    {
+                                                        CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
+                                                        continue;
+                                                    }
+                                                    var avgImg = ImageTools.CalculateAverage(img[socketNum], CurrentContext.Configuration.HardwareSettings.ThresholdAverageToHaveImage);
+                                                    CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
+                                                }
+                                                ProgressbarStep++;
+                                                //CurrentOperation = DoMCOperation.SavingConfiguration;
+                                                CurrentContext.Configuration.SaveProcessingDataSettings();
+                                                //CurrentOperation = DoMCOperation.CompleteError;
+                                                MainController.LastCommand = typeof(DoMC.Classes.Operation.OperationsCompleteWithoutErrors);
+                                                pbStandardSum.Image = bmpCheckSign;
+                                            }
+                                            else
+                                            {
+                                                var msg = "Не удалось установить режим быстрого чтения плат ПЗС";
+                                                WorkingLog.Add(LoggerLevel.Critical, msg);
+                                                MessageBox.Show(msg);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var msg = "Не удалось загрузить параметры экспозиции в платы ПЗС";
+                                            WorkingLog.Add(LoggerLevel.Critical, msg);
+                                            MessageBox.Show(msg);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var msg = "Не удалось загрузить параметры чтения в платы ПЗС";
+                                        WorkingLog.Add(LoggerLevel.Critical, msg);
+                                        MessageBox.Show(msg);
+                                    }
+                                }
+                                finally
+                                {
+                                    await DoMCEquipmentCommands.SetLCBNonWorkingMode(MainController, WorkingLog);
+                                }
+                            }
+                            else
+                            {
+                                var msg = "Не удалось установить рабочий режим БУС";
+                                WorkingLog.Add(LoggerLevel.Critical, msg);
+                                MessageBox.Show(msg);
+                            }
+                        }
+                        finally
+                        {
+                            await DoMCEquipmentCommands.StopLCB(MainController, WorkingLog);
+                        }
+                    }
+                    else
+                    {
+                        var msg = "Не удалось запустить модуль работы с БУС";
+                        WorkingLog.Add(LoggerLevel.Critical, msg);
+                        MessageBox.Show(msg);
+                    }
+                }
+                finally
+                {
+                    await DoMCEquipmentCommands.StopCCD(MainController, CurrentContext, WorkingLog);
+                    IsGettingStandard = false;
+                }
+
+            }
+        }
+
+        /*private async Task FullStandardGet()
         {
             PictureBox[] StandardPictures = new PictureBox[3] { pbStandard1, pbStandard2, pbStandard3 };
             short[][][,] img = new short[CurrentContext.Configuration.HardwareSettings.SocketQuantity][][,];
@@ -107,20 +240,20 @@ namespace DoMC
             int socketMax = CurrentContext.Configuration.HardwareSettings.SocketQuantity;
             errorReadingData.Clear();
 
-            var startResult = await DoMCEquipmentCommands.StartCCD(Controller, CurrentContext, WorkingLog);
+            var startResult = await DoMCEquipmentCommands.StartCCD(MainController, CurrentContext, WorkingLog);
             if (startResult.Item1)
             {
                 try
                 {
-                    if (await DoMCEquipmentCommands.StartLCB(Controller, WorkingLog))
+                    if (await DoMCEquipmentCommands.StartLCB(MainController, WorkingLog))
                     {
-                        if (await DoMCEquipmentCommands.SetLCBWorkingMode(Controller, WorkingLog))
+                        if (await DoMCEquipmentCommands.SetLCBWorkingMode(MainController, WorkingLog))
                         {
-                            if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(Controller, CurrentContext, WorkingLog)).Item1)
+                            if ((await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
                             {
-                                if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(Controller, CurrentContext, WorkingLog)).Item1)
+                                if ((await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(MainController, CurrentContext, WorkingLog)).Item1)
                                 {
-                                    if ((await DoMCEquipmentCommands.SetFastRead(Controller, CurrentContext, WorkingLog)).Item1)
+                                    if ((await DoMCEquipmentCommands.SetFastRead(MainController, CurrentContext, WorkingLog)).Item1)
                                     {
                                         for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                         {
@@ -129,9 +262,9 @@ namespace DoMC
                                         int StandartImageNumReading = 0;
                                         for (int repeat = 0; repeat < MaxImagesReadToMakeStandard && StandartImageNumReading < ImagesToMakeStandard; repeat++)
                                         {
-                                            if ((await DoMCEquipmentCommands.ReadSockets(Controller, CurrentContext, WorkingLog, true)).Item1)
+                                            if ((await DoMCEquipmentCommands.ReadSockets(MainController, CurrentContext, WorkingLog, true)).Item1)
                                             {
-                                                var getImageResult = await DoMCEquipmentCommands.GetSocketsImages(Controller, CurrentContext, WorkingLog);
+                                                var getImageResult = await DoMCEquipmentCommands.GetSocketsImages(MainController, CurrentContext, WorkingLog);
                                                 for (int socketNum = 0; socketNum < socketMax; socketNum++)
                                                 {
                                                     if (getImageResult.Item2[socketNum] != null)
@@ -162,7 +295,7 @@ namespace DoMC
                                                 CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = null;
                                                 //continue;
                                             }
-                                            var avgImg = ImageTools.CalculateAverage(img[socketNum],CurrentContext.Configuration.HardwareSettings.ThresholdAverageToHaveImage);
+                                            var avgImg = ImageTools.CalculateAverage(img[socketNum], CurrentContext.Configuration.HardwareSettings.ThresholdAverageToHaveImage);
                                             CurrentContext.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[socketNum].StandardImage = avgImg;
                                         });
 
@@ -178,24 +311,32 @@ namespace DoMC
                                 }
                                 else
                                 {
-                                    var msg = "Не удалось загрузить конфигурацию в платы ПЗС";
+                                    var msg = "Не удалось загрузить параметры экспозиции в платы ПЗС";
                                     WorkingLog.Add(LoggerLevel.Critical, msg);
                                     MessageBox.Show(msg);
                                 }
                             }
                             else
                             {
-                                var msg = "Не удалось установить рабочий режим БУС";
+                                var msg = "Не удалось загрузить параметры чтения в платы ПЗС";
                                 WorkingLog.Add(LoggerLevel.Critical, msg);
                                 MessageBox.Show(msg);
                             }
+
                         }
                         else
                         {
-                            var msg = "Не удалось запустить модуль работы с БУС";
+                            var msg = "Не удалось установить рабочий режим БУС";
                             WorkingLog.Add(LoggerLevel.Critical, msg);
                             MessageBox.Show(msg);
                         }
+
+                    }
+                    else
+                    {
+                        var msg = "Не удалось запустить модуль работы с БУС";
+                        WorkingLog.Add(LoggerLevel.Critical, msg);
+                        MessageBox.Show(msg);
                     }
                 }
                 finally
@@ -221,7 +362,7 @@ namespace DoMC
         {
             DisplayMessage.Show("Не удалось прочитать гнездо", "Ошибка");
             return;
-        }
+        }*/
 
         private void ResetCheckSigns()
         {
@@ -231,8 +372,21 @@ namespace DoMC
 
         private void tmCheckSignShow_Tick(object sender, EventArgs e)
         {
-            /*
-            if (!(th?.IsAlive ?? false))
+            if (IsGettingStandard)
+            {
+                try
+                {
+                    SetPrograssbarPosition(ProgressbarStep);
+                    var lastcmd = MainController.LastCommand;
+                    if (lastcmd.FullName?.Contains("CCD") ?? false)
+                        lblWorkStatus.Text = MainController.LastCommand?.GetDescriptionOrFullName() ?? "";//CurrentOperation.GetDescriptionOrFullName();
+                }
+                catch { }
+            }
+
+
+
+           /* if (!(th?.IsAlive ?? false))
             {
                 tmCheckSignShow.Enabled = false;
                 btnCreateStandard.Enabled = true;
@@ -250,7 +404,7 @@ namespace DoMC
                 //btnCreateStandard.Enabled = true;
 
             }
-            */
+           */
         }
 
         private void DoMCStandardCreateInterface_Paint(object sender, PaintEventArgs e)
@@ -267,6 +421,46 @@ namespace DoMC
                 StopReadingBecauseOfError();
             }
             */
+        }
+
+        private void PrepareProgressBar()
+        {
+
+            ProgressbarStep = 0;
+            pbGettingStandard.Visible = true;
+            pbGettingStandard.Value = 0;
+            pbGettingStandard.Maximum = PrograssbarMaxStep;
+
+        }
+        private void SetPrograssbarPosition(int step)
+        {
+
+            pbGettingStandard.Value = step;
+
+        }
+
+        private void SetResultOK()
+        {
+            RunOnUI(this, () =>
+            {
+                PrepareProgressBar();
+                lblWorkStatus.Text = "Завершено (без ошибок)";
+            });
+        }
+        private void SetResultError()
+        {
+            RunOnUI(this, () =>
+            {
+                PrepareProgressBar();
+                lblWorkStatus.Text = "Завершено (ошибка)";
+            });
+        }
+        public static void RunOnUI(Control control, Action action)
+        {
+            if (control.InvokeRequired)
+                control.Invoke(action);
+            else
+                action();
         }
     }
 }

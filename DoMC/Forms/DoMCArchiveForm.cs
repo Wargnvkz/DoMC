@@ -35,7 +35,7 @@ namespace DoMC.Forms
         {
             InitializeComponent();
             Controller = mainController;
-            logger = Controller.GetLogger("ArchiveViewer");
+            logger = Controller.GetLogger("Просмотр архива");
             observer = Controller.GetObserver();
             selectedButtons = new Button[] { btnArchiveSelect, btnArchiveSelectBad };
 

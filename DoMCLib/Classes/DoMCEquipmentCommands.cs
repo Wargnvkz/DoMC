@@ -314,7 +314,11 @@ namespace DoMCLib.Classes
                 }
                 return (result.CardsNotAnswered().Count == 0, result);
             }
-            catch { return (false, result); }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при выполнении команды", ex);
+                return (false, result);
+            }
         }
         public static async Task<(bool, CCDCardDataCommandResponse)> ExecuteCCDCommandForSingleSocket(ILogger WorkingLog, int SocketNumber, Func<int, Task<bool>> func)
         {
@@ -328,7 +332,12 @@ namespace DoMCLib.Classes
                 }
                 return (true, null);
             }
-            catch { return (false, null); }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка при выполнении команды", ex);
+
+                return (false, null);
+            }
         }
 
 

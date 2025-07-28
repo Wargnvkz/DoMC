@@ -52,7 +52,7 @@ namespace DoMCModuleControl
             MainSystemLogger = new BaseSystemLogger(new ExternalFileSystem());
             SystemLogger = new Logger("DoMC", MainSystemLogger);
             MainFileLogger.RegisterExternalLogger(SystemLogger);
-            Observer = new Observer(GetLogger("Events"));
+            Observer = new Observer(GetLogger("События"));
         }
 
         /// <summary>

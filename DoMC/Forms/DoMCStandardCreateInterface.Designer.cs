@@ -28,138 +28,162 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.btnCreateStandard = new System.Windows.Forms.Button();
-            this.pbStandard1 = new System.Windows.Forms.PictureBox();
-            this.lblStandard1Ready = new System.Windows.Forms.Label();
-            this.lblStandard2Ready = new System.Windows.Forms.Label();
-            this.pbStandard2 = new System.Windows.Forms.PictureBox();
-            this.lblStandard3Ready = new System.Windows.Forms.Label();
-            this.pbStandard3 = new System.Windows.Forms.PictureBox();
-            this.lblTotalStandard = new System.Windows.Forms.Label();
-            this.pbStandardSum = new System.Windows.Forms.PictureBox();
-            this.tmCheckSignShow = new System.Windows.Forms.Timer(this.components);
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandardSum)).BeginInit();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            btnCreateStandard = new Button();
+            pbStandard1 = new PictureBox();
+            lblStandard1Ready = new Label();
+            lblStandard2Ready = new Label();
+            pbStandard2 = new PictureBox();
+            lblStandard3Ready = new Label();
+            pbStandard3 = new PictureBox();
+            lblTotalStandard = new Label();
+            pbStandardSum = new PictureBox();
+            tmCheckSignShow = new System.Windows.Forms.Timer(components);
+            statusStrip1 = new StatusStrip();
+            pbGettingStandard = new ToolStripProgressBar();
+            lblWorkStatus = new ToolStripStatusLabel();
+            ((System.ComponentModel.ISupportInitialize)pbStandard1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandardSum).BeginInit();
+            statusStrip1.SuspendLayout();
+            SuspendLayout();
             // 
             // btnCreateStandard
             // 
-            this.btnCreateStandard.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCreateStandard.Location = new System.Drawing.Point(13, 14);
-            this.btnCreateStandard.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnCreateStandard.Name = "btnCreateStandard";
-            this.btnCreateStandard.Size = new System.Drawing.Size(395, 35);
-            this.btnCreateStandard.TabIndex = 0;
-            this.btnCreateStandard.Text = "Создать эталон";
-            this.btnCreateStandard.UseVisualStyleBackColor = true;
-            this.btnCreateStandard.Click += new System.EventHandler(this.btnCreateStandard_Click);
+            btnCreateStandard.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            btnCreateStandard.Location = new Point(13, 14);
+            btnCreateStandard.Margin = new Padding(4, 5, 4, 5);
+            btnCreateStandard.Name = "btnCreateStandard";
+            btnCreateStandard.Size = new Size(395, 35);
+            btnCreateStandard.TabIndex = 0;
+            btnCreateStandard.Text = "Создать эталон";
+            btnCreateStandard.UseVisualStyleBackColor = true;
+            btnCreateStandard.Click += btnCreateStandard_Click;
             // 
             // pbStandard1
             // 
-            this.pbStandard1.Location = new System.Drawing.Point(102, 57);
-            this.pbStandard1.Name = "pbStandard1";
-            this.pbStandard1.Size = new System.Drawing.Size(100, 100);
-            this.pbStandard1.TabIndex = 1;
-            this.pbStandard1.TabStop = false;
+            pbStandard1.Location = new Point(102, 57);
+            pbStandard1.Name = "pbStandard1";
+            pbStandard1.Size = new Size(100, 100);
+            pbStandard1.TabIndex = 1;
+            pbStandard1.TabStop = false;
             // 
             // lblStandard1Ready
             // 
-            this.lblStandard1Ready.AutoSize = true;
-            this.lblStandard1Ready.Location = new System.Drawing.Point(12, 57);
-            this.lblStandard1Ready.Name = "lblStandard1Ready";
-            this.lblStandard1Ready.Size = new System.Drawing.Size(84, 20);
-            this.lblStandard1Ready.TabIndex = 2;
-            this.lblStandard1Ready.Text = "Эталон 1:";
+            lblStandard1Ready.AutoSize = true;
+            lblStandard1Ready.Location = new Point(12, 57);
+            lblStandard1Ready.Name = "lblStandard1Ready";
+            lblStandard1Ready.Size = new Size(84, 20);
+            lblStandard1Ready.TabIndex = 2;
+            lblStandard1Ready.Text = "Эталон 1:";
             // 
             // lblStandard2Ready
             // 
-            this.lblStandard2Ready.AutoSize = true;
-            this.lblStandard2Ready.Location = new System.Drawing.Point(12, 163);
-            this.lblStandard2Ready.Name = "lblStandard2Ready";
-            this.lblStandard2Ready.Size = new System.Drawing.Size(84, 20);
-            this.lblStandard2Ready.TabIndex = 4;
-            this.lblStandard2Ready.Text = "Эталон 2:";
+            lblStandard2Ready.AutoSize = true;
+            lblStandard2Ready.Location = new Point(12, 163);
+            lblStandard2Ready.Name = "lblStandard2Ready";
+            lblStandard2Ready.Size = new Size(84, 20);
+            lblStandard2Ready.TabIndex = 4;
+            lblStandard2Ready.Text = "Эталон 2:";
             // 
             // pbStandard2
             // 
-            this.pbStandard2.Location = new System.Drawing.Point(102, 163);
-            this.pbStandard2.Name = "pbStandard2";
-            this.pbStandard2.Size = new System.Drawing.Size(100, 100);
-            this.pbStandard2.TabIndex = 3;
-            this.pbStandard2.TabStop = false;
+            pbStandard2.Location = new Point(102, 163);
+            pbStandard2.Name = "pbStandard2";
+            pbStandard2.Size = new Size(100, 100);
+            pbStandard2.TabIndex = 3;
+            pbStandard2.TabStop = false;
             // 
             // lblStandard3Ready
             // 
-            this.lblStandard3Ready.AutoSize = true;
-            this.lblStandard3Ready.Location = new System.Drawing.Point(12, 269);
-            this.lblStandard3Ready.Name = "lblStandard3Ready";
-            this.lblStandard3Ready.Size = new System.Drawing.Size(84, 20);
-            this.lblStandard3Ready.TabIndex = 6;
-            this.lblStandard3Ready.Text = "Эталон 3:";
+            lblStandard3Ready.AutoSize = true;
+            lblStandard3Ready.Location = new Point(12, 269);
+            lblStandard3Ready.Name = "lblStandard3Ready";
+            lblStandard3Ready.Size = new Size(84, 20);
+            lblStandard3Ready.TabIndex = 6;
+            lblStandard3Ready.Text = "Эталон 3:";
             // 
             // pbStandard3
             // 
-            this.pbStandard3.Location = new System.Drawing.Point(102, 269);
-            this.pbStandard3.Name = "pbStandard3";
-            this.pbStandard3.Size = new System.Drawing.Size(100, 100);
-            this.pbStandard3.TabIndex = 5;
-            this.pbStandard3.TabStop = false;
+            pbStandard3.Location = new Point(102, 269);
+            pbStandard3.Name = "pbStandard3";
+            pbStandard3.Size = new Size(100, 100);
+            pbStandard3.TabIndex = 5;
+            pbStandard3.TabStop = false;
             // 
             // lblTotalStandard
             // 
-            this.lblTotalStandard.AutoSize = true;
-            this.lblTotalStandard.Location = new System.Drawing.Point(261, 137);
-            this.lblTotalStandard.Name = "lblTotalStandard";
-            this.lblTotalStandard.Size = new System.Drawing.Size(124, 20);
-            this.lblTotalStandard.TabIndex = 8;
-            this.lblTotalStandard.Text = "Общий эталон:";
+            lblTotalStandard.AutoSize = true;
+            lblTotalStandard.Location = new Point(261, 137);
+            lblTotalStandard.Name = "lblTotalStandard";
+            lblTotalStandard.Size = new Size(124, 20);
+            lblTotalStandard.TabIndex = 8;
+            lblTotalStandard.Text = "Общий эталон:";
             // 
             // pbStandardSum
             // 
-            this.pbStandardSum.Location = new System.Drawing.Point(275, 160);
-            this.pbStandardSum.Name = "pbStandardSum";
-            this.pbStandardSum.Size = new System.Drawing.Size(100, 100);
-            this.pbStandardSum.TabIndex = 7;
-            this.pbStandardSum.TabStop = false;
+            pbStandardSum.Location = new Point(275, 160);
+            pbStandardSum.Name = "pbStandardSum";
+            pbStandardSum.Size = new Size(100, 100);
+            pbStandardSum.TabIndex = 7;
+            pbStandardSum.TabStop = false;
             // 
             // tmCheckSignShow
             // 
-            this.tmCheckSignShow.Tick += new System.EventHandler(this.tmCheckSignShow_Tick);
+            tmCheckSignShow.Tick += tmCheckSignShow_Tick;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { pbGettingStandard, lblWorkStatus });
+            statusStrip1.Location = new Point(0, 379);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(421, 22);
+            statusStrip1.TabIndex = 9;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // pbGettingStandard
+            // 
+            pbGettingStandard.Name = "pbGettingStandard";
+            pbGettingStandard.Size = new Size(100, 16);
+            // 
+            // lblWorkStatus
+            // 
+            lblWorkStatus.Name = "lblWorkStatus";
+            lblWorkStatus.Size = new Size(0, 17);
             // 
             // DoMCStandardCreateInterface
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(421, 381);
-            this.Controls.Add(this.lblTotalStandard);
-            this.Controls.Add(this.pbStandardSum);
-            this.Controls.Add(this.lblStandard3Ready);
-            this.Controls.Add(this.pbStandard3);
-            this.Controls.Add(this.lblStandard2Ready);
-            this.Controls.Add(this.pbStandard2);
-            this.Controls.Add(this.lblStandard1Ready);
-            this.Controls.Add(this.pbStandard1);
-            this.Controls.Add(this.btnCreateStandard);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "DoMCStandardCreateInterface";
-            this.Text = "Создание эталона";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.DoMCStandardCreateInterface_FormClosed);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.DoMCStandardCreateInterface_Paint);
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandard3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbStandardSum)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(9F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(421, 401);
+            Controls.Add(statusStrip1);
+            Controls.Add(lblTotalStandard);
+            Controls.Add(pbStandardSum);
+            Controls.Add(lblStandard3Ready);
+            Controls.Add(pbStandard3);
+            Controls.Add(lblStandard2Ready);
+            Controls.Add(pbStandard2);
+            Controls.Add(lblStandard1Ready);
+            Controls.Add(pbStandard1);
+            Controls.Add(btnCreateStandard);
+            Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Margin = new Padding(4, 5, 4, 5);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "DoMCStandardCreateInterface";
+            Text = "Создание эталона";
+            FormClosed += DoMCStandardCreateInterface_FormClosed;
+            Paint += DoMCStandardCreateInterface_Paint;
+            ((System.ComponentModel.ISupportInitialize)pbStandard1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandard3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbStandardSum).EndInit();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -174,5 +198,8 @@
         private System.Windows.Forms.Label lblTotalStandard;
         private System.Windows.Forms.PictureBox pbStandardSum;
         private System.Windows.Forms.Timer tmCheckSignShow;
+        private StatusStrip statusStrip1;
+        private ToolStripProgressBar pbGettingStandard;
+        private ToolStripStatusLabel lblWorkStatus;
     }
 }

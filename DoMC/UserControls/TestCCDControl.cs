@@ -935,7 +935,7 @@ namespace DoMC.Forms
                     SetPrograssbarPosition(ProgressbarStep);
                     var lastcmd = MainController.LastCommand;
                     if (lastcmd.FullName?.Contains("CCD") ?? false)
-                        lblWorkStatus.Text = MainController.LastCommand?.GetDescription() ?? "";//CurrentOperation.GetDescription();
+                        lblWorkStatus.Text = MainController.LastCommand?.GetDescriptionOrFullName() ?? "";//CurrentOperation.GetDescriptionOrFullName();
                 }
                 catch { }
             }

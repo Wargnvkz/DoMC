@@ -138,7 +138,7 @@ namespace DoMCLib.Forms
                 var cfg = SocketConfigurations[SocketN];
                 ss.Configuration = cfg;
             }
-            ss.Text = "Параметры гнеда " + SocketN;
+            ss.Text = "Параметры гнеда " + (SocketN+1);
             if (ss.ShowDialog() == DialogResult.OK)
             {
                 var cfg = ss.Configuration;

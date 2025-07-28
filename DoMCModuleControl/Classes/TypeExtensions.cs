@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Reflection;
 
-namespace DoMCLib.Classes
+namespace DoMCModuleControl.Classes
 {
     public static class TypeExtensions
     {

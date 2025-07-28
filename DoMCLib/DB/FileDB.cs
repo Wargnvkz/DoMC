@@ -71,7 +71,7 @@ namespace DoMCLib.DB
             renewCancelationTockenSource = new CancellationTokenSource();
             Task.Run(async () =>
             {
-                while (renewCancelationTockenSource.Token.IsCancellationRequested)
+                while (!renewCancelationTockenSource.Token.IsCancellationRequested)
                 {
                     try
                     {

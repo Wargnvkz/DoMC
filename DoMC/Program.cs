@@ -48,7 +48,7 @@ namespace DoMC
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
             DisplayMessage.Show(e.Exception.Message, "Îרטבךא  ג ןנמדנאללו");
-            Controller.GetLogger("ProgramExceptions").Add(DoMCModuleControl.Logging.LoggerLevel.Critical, e.Exception.Message);
+            Controller.GetLogger("Îרטבךא ןנמדנאללû").Add(DoMCModuleControl.Logging.LoggerLevel.Critical, e.Exception.Message);
         }
 
         static void ShowSplash()

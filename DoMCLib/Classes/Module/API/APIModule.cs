@@ -17,9 +17,11 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.AspNetCore.Http.Metadata;
+using System.ComponentModel;
 
 namespace DoMCLib.Classes.Module.API
 {
+    [Description("API")]
     public partial class APIModule : AbstractModuleBase
     {
         WebApplication _app;
@@ -134,12 +136,12 @@ namespace DoMCLib.Classes.Module.API
                 await _app.StartAsync();
                 MainController.GetObserver().Notify("REST.APIModule.Started", null);
                 IsStarted = true;
-                MainController.GetLogger(this.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.Information, "Сервер REST APIModule запущен");
+                MainController.GetLogger(this.GetType().GetDescriptionOrName()).Add(DoMCModuleControl.Logging.LoggerLevel.Information, "Сервер REST APIModule запущен");
                 _app.Logger.LogInformation("Server started on http://0.0.0.0:8080");
             }
             catch (Exception ex)
             {
-                MainController.GetLogger(this.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.Critical, "Ошибка при запуске сервера: ", ex);
+                MainController.GetLogger(this.GetType().GetDescriptionOrName()).Add(DoMCModuleControl.Logging.LoggerLevel.Critical, "Ошибка при запуске сервера: ", ex);
                 _app?.Logger.LogError(ex, "Failed to start server");
             }
         }
@@ -151,11 +153,11 @@ namespace DoMCLib.Classes.Module.API
                 await _app.StopAsync();
                 _app.Logger.LogInformation("Server stopped");
                 MainController.GetObserver().Notify("REST.APIModule.Stopped", null);
-                MainController.GetLogger(this.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.Information, "Сервер REST APIModule остановлен");
+                MainController.GetLogger(this.GetType().GetDescriptionOrName()).Add(DoMCModuleControl.Logging.LoggerLevel.Information, "Сервер REST APIModule остановлен");
             }
             catch (Exception ex)
             {
-                MainController.GetLogger(this.GetType().Name).Add(DoMCModuleControl.Logging.LoggerLevel.Critical, "Ошибка: ", ex);
+                MainController.GetLogger(this.GetType().GetDescriptionOrName()).Add(DoMCModuleControl.Logging.LoggerLevel.Critical, "Ошибка: ", ex);
                 _app.Logger.LogError(ex, "Failed to stop server");
 
             }

@@ -9,6 +9,7 @@ using DoMCModuleControl.Modules;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -16,6 +17,7 @@ using System.Threading.Tasks;
 
 namespace DoMCLib.Classes.Module.DB
 {
+    [Description("База данных")]
     public class DBModule : AbstractModuleBase
     {
         public string DBPath;
@@ -32,7 +34,7 @@ namespace DoMCLib.Classes.Module.DB
         public DBModule(IMainController MainController) : base(MainController)
         {
             errorNotifier = new ThrottledErrorNotifier(MainController.GetObserver(), 300, 5);
-            WorkingLog = MainController.GetLogger($"{this.GetType().Name}");
+            WorkingLog = MainController.GetLogger($"{this.GetType().GetDescriptionOrName()}");
             ObserverForDataStorage = new Observer(WorkingLog);
             ObserverForDataStorage.NotificationReceivers += ObserverForDataStorage_NotificationReceived;
             ExternalObserver = MainController.GetObserver();

@@ -60,7 +60,7 @@ namespace DoMC
         {
             Context = (DoMCLib.Classes.DoMCApplicationContext)data;
             Controller = controller;
-            WorkingLog = controller.GetLogger("SettingInterface");
+            WorkingLog = controller.GetLogger("Интерфейс настройки");
             observer = controller.GetObserver();
             //CurrentContext = context;
             //contextProcessor = new ModelCommandProcessor(controller, CurrentContext);

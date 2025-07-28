@@ -7,6 +7,7 @@ using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace DoMCLib.Classes.Module.ArchiveDB
 {
+    [Description("Архив")]
     public partial class ArchiveDBModule : DoMCModuleControl.Modules.AbstractModuleBase
     {
         ArchiveDBConfiguration Configuration;
@@ -31,7 +33,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
         public ArchiveDBModule(IMainController MainController) : base(MainController)
         {
             errorNotifier = new ThrottledErrorNotifier(MainController.GetObserver(), 300, 5);
-            WorkingLog = MainController.GetLogger($"{this.GetType().Name}");
+            WorkingLog = MainController.GetLogger($"{this.GetType().GetDescriptionOrName()}");
             ObserverForDataStorage = MainController.GetObserver();//new Observer(WorkingLog);
             ObserverForDataStorage.NotificationReceivers += ObserverForDataStorage_NotificationReceived;
         }

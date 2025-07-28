@@ -20,9 +20,11 @@ using DoMCLib.Tools;
 using System.Threading;
 using DoMCLib.Classes.Module.CCD;
 using DoMCModuleControl.Commands;
+using System.ComponentModel;
 
 namespace DoMCLib.Classes.Module.LCB
 {
+    [Description("БУС")]
     // Изначально это был другой класс который я пытаюсь переделать на AbstractModuleBase
     public partial class LCBModule : AbstractModuleBase
     {
@@ -67,7 +69,7 @@ namespace DoMCLib.Classes.Module.LCB
             Broadcast = new IPEndPoint(IPAddress.Broadcast, portTo);
             Localaddress = new IPEndPoint(IPAddress.Any, portFromComputer);
             Any = new IPEndPoint(IPAddress.Any, 0);
-            WorkingLog = mainController.GetLogger(this.GetType().Name);
+            WorkingLog = mainController.GetLogger(this.GetType().GetDescriptionOrName());
             CurrentObserver = mainController.GetObserver();
         }
 
