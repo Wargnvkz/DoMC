@@ -10,6 +10,7 @@ using DoMCModuleControl.Commands;
 using DoMCLib.Classes.Module.CCD.Commands.Classes;
 using System.Threading;
 using DoMCLib.Classes.Module.LCB;
+using System.ComponentModel;
 
 /// <summary>
 /// Управление получением данных из платы и передача данных в плату
@@ -20,6 +21,7 @@ namespace DoMCLib.Classes.Module.CCD
     /// <summary>
     /// Управление получением данных из платы и передача данных в плату
     /// </summary>
+    [Description("Команды плат ПЗС")]
     public partial class CCDCardDataModule : AbstractModuleBase
     {
         CCDCardTCPClient[] tcpClients;

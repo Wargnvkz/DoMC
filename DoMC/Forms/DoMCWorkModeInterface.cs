@@ -732,7 +732,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля архива");
             try
             {
-                await new DoMCLib.Classes.Module.ArchiveDB.Commands.StopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.ArchiveDB.Commands.StopCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync();
             }
             catch (Exception ex)
             {
