@@ -42,13 +42,13 @@ namespace DoMCModuleControl
                     {
                         try
                         {
-                            Logger.Add(LoggerLevel.FullDetailedInformation, $"Событие {eventName} передано в {handler.GetType().Name}");
+                            Logger.Add(LoggerLevel.FullDetailedInformation, $"Событие {eventName} передано в {handler.Method.DeclaringType?.FullName}.{handler.Method.Name}");
                             await handler(eventName, eventData);
-                            Logger.Add(LoggerLevel.FullDetailedInformation, $"Событие {eventName} в {handler.GetType().Name} завершено");
+                            Logger.Add(LoggerLevel.FullDetailedInformation, $"Событие {eventName} в {handler.Method.DeclaringType?.FullName}.{handler.Method.Name} завершено");
                         }
                         catch (Exception ex)
                         {
-                            Logger.Add(LoggerLevel.Critical, $"Ошибка при обработке сообщения {eventName}{(eventData != null ? $" с данными {eventData}" : string.Empty)} в методе {handler.Method.Name}:", ex);
+                            Logger.Add(LoggerLevel.Critical, $"Ошибка при обработке сообщения {eventName}{(eventData != null ? $" с данными {eventData}" : string.Empty)} в методе {handler.Method.DeclaringType?.FullName}.{handler.Method.Name}:", ex);
                         }
                     });
                 }
