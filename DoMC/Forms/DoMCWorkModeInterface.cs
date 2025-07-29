@@ -662,7 +662,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Перевод БУС в режим настройки");
             try
             {
-                await new DoMCLib.Classes.Module.LCB.Commands.SetLCBNonWorkModeCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.LCB.Commands.SetLCBNonWorkModeCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
             }
             catch (Exception ex)
             {
@@ -672,7 +672,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля БУС");
             try
             {
-                await new DoMCLib.Classes.Module.LCB.Commands.LCBStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.LCB.Commands.LCBStopCommand(Controller, Controller.GetModule(typeof(LCBModule))).ExecuteCommandAsync();
             }
             catch (Exception ex)
             {
@@ -689,7 +689,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Выключение бракёра");
             try
             {
-                await new DoMCLib.Classes.Module.RDPB.Commands.TurnOffCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.RDPB.Commands.TurnOffCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
             }
             catch (Exception ex)
             {
@@ -700,7 +700,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля бракёра");
             try
             {
-                await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
             }
             catch (Exception ex)
             {
@@ -717,7 +717,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля базы данных");
             try
             {
-                await new DoMCLib.Classes.Module.DB.Commands.StopCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync();
+                await new DoMCLib.Classes.Module.DB.Commands.StopCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync();
             }
             catch (Exception ex)
             {
@@ -2055,6 +2055,7 @@ namespace DoMC
         }
         public void CheckIfAllSocketsGood(CycleImagesCCD CurrentCycleCCD)
         {
+            //for(int i=0; i<CurrentCycleCCD.CurrentImages.Length;i++)
             Parallel.For(0, CurrentCycleCCD.CurrentImages.Length, new ParallelOptions() { MaxDegreeOfParallelism = this.MaxDegreeOfParallelism }, i =>
             {
                 try

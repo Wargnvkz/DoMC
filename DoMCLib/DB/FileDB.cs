@@ -77,7 +77,7 @@ namespace DoMCLib.DB
                     {
                         var newCycleCache = GetDBFileHeaderList(DBDirectory);
                         _PendingCycleCache = newCycleCache;
-                        var newBoxCache = GetBoxFileHeaderList(DBDirectory);
+                        var newBoxCache = GetBoxFileHeaderList(BoxDirectory);
                         _PendingBoxCache = newBoxCache;
 
                         bool needToClearMemory = false;
@@ -297,6 +297,7 @@ namespace DoMCLib.DB
         public string GetFileName(long id)
         {
             var ch = CycleDataFiles.Find(f => f.CycleHeader.CycleID == id);
+            if (ch == null) throw new FileNotFoundException();
             return ch.FileName;
         }
 
@@ -369,7 +370,9 @@ namespace DoMCLib.DB
             var fromTicks = start.Ticks;
             var toTicks = end.Ticks;
 
-            var list = BoxFiles.Where(cd => cd.BoxHeader.BoxTicks >= fromTicks && cd.BoxHeader.BoxTicks <= toTicks).Select(c => Box.ToDBBox(c.BoxHeader)).ToList();
+            var list = BoxFiles.Where(cd => cd.BoxHeader.BoxTicks >= fromTicks && cd.BoxHeader.BoxTicks <= toTicks).Select(c => 
+            Box.ToDBBox(c.BoxHeader)
+            ).ToList();
             return list;
         }
 

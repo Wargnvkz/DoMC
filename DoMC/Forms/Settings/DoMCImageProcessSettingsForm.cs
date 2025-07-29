@@ -136,7 +136,7 @@ namespace DoMCLib.Forms
             ipp.Decisions[1].Operations.Clear();
             for (int i = 0; i < 5; i++)
             {
-                if ((DecisionOperationType)ActionDefects[i].SelectedValue != DecisionOperationType.None)
+                if ((DecisionOperationType)ActionColors[i].SelectedValue != DecisionOperationType.None)
                 {
                     var operation = new DecisionOperation();
                     operation.OperationType = (DecisionOperationType)ActionColors[i].SelectedValue;
