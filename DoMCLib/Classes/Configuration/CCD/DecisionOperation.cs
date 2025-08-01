@@ -36,7 +36,7 @@ namespace DoMCLib.Classes.Configuration.CCD
                     return res;
 
                 case DecisionOperationType.Difference:
-                    return new short[][,] { ImageTools.GetDifference(img[0], img[1], ipp.GetRectangle()) };
+                    return new short[][,] { ImageTools.GetDifference(img[0], img[1], null) };
                 default: return img;
             }
         }

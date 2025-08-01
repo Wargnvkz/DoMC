@@ -291,48 +291,10 @@ namespace DoMCLib.Tools
             return dev;
         }
 
-        /*public static double CalculateTotalDeviation(short[][,] images, int StartFrame, int EndFrame)
-        {
-            var standardsN = images.Length;
-            if (images == null || images.Length == 0)
-                return 0;
-            var devsocket = new double[standardsN];
-            //var dev = new double[512];
-            double avg = 0;
-            double avg2 = 0;
-            for (int x = 0; x < 512; x++)
-            {
-                for (int y = StartFrame; y < EndFrame + 1; y++)
-                {
-                    for (int s = 0; s < standardsN; s++)
-                    {
-                        var p = (short)images[s][y, x];
-                        avg += p;
-                        avg2 += p * p;
-                    }
 
-                }
-            }
-            var dev = Math.Sqrt(avg2 / 512 - avg / 512 * avg / 512);
-            return dev;
-        }*/
         public static Deviation CalculateDeviationFull(short[][,] images, Rectangle? rect = null)
         {
-            Rectangle r;
-            if (rect == null)
-                r = new Rectangle(0, 0, 511, 511);
-            else
-            {
-                var X = rect.Value.X;
-                var Y = rect.Value.Y;
-                var right = rect.Value.Right;
-                var bottom = rect.Value.Bottom;
-                X = X < 0 ? 0 : X;
-                Y = Y < 0 ? 0 : Y;
-                right = right >= 512 ? 511 : right;
-                bottom = bottom >= 512 ? 511 : bottom;
-                r = new Rectangle(X, Y, right - X, bottom - Y);
-            }
+            var r = MakeCorrectRectangle(rect);
 
 
             if (images?.Any(i => i == null) ?? true)
@@ -400,7 +362,7 @@ namespace DoMCLib.Tools
         {
             var dif = new short[512, 512];
             if (standard == null || currentimage == null) return dif;
-
+            rect = MakeCorrectRectangle(rect);
             {
                 for (int x = rect?.Left ?? 0; x <= (rect?.Right ?? 511); x++)
                 {
@@ -414,30 +376,7 @@ namespace DoMCLib.Tools
                 return dif;
             }
         }
-
-        public static bool IsErrorSocketImage(short[,] difference, short[,] image, short[,] standard, int firstline, int lastline, double maxError)
-        {
-            for (int x = 0; x < 512; x++)
-            {
-                for (int y = 0; y < 512; y++)
-                {
-                    if (Math.Abs(difference[y, x]) > maxError) return true;
-                }
-            }
-            return false;
-        }
-        public static bool IsBadSocketImage(short[,] difference, Rectangle rect, double maxError)
-        {
-            var processedImg = ImageTools.DeviationByLine(difference, 10);
-            for (int x = rect.X; x < rect.X + rect.Width; x++)
-            {
-                for (int y = rect.Y; y < rect.Y + rect.Height; y++)
-                {
-                    if (Math.Abs(processedImg[y, x]) > maxError) return true;
-                }
-            }
-            return false;
-        }
+               
 
         public static short[,] GetNewStandard(short[,] standard, short[,] image, double k)
         {
@@ -697,6 +636,7 @@ namespace DoMCLib.Tools
             var sum = new double[512];
             var sum2 = new double[512];
             var dev = new double[512];
+            region = MakeCorrectRectangle(region);
             for (int x = region.X; x < region.X + region.Width; x++)
             {
                 for (int y = region.Y; y < region.Y + region.Height; y++)
@@ -1026,21 +966,7 @@ namespace DoMCLib.Tools
         }
         public static short MaxDeviation(short[,] img, out Point Max, Rectangle? rect = null)
         {
-            Rectangle r;
-            if (rect == null)
-                r = new Rectangle(0, 0, 511, 511);
-            else
-            {
-                var X = rect.Value.X;
-                var Y = rect.Value.Y;
-                var right = rect.Value.Right;
-                var bottom = rect.Value.Bottom;
-                X = X < 0 ? 0 : X;
-                Y = Y < 0 ? 0 : Y;
-                right = right >= 512 ? 511 : right;
-                bottom = bottom >= 512 ? 511 : bottom;
-                r = new Rectangle(X, Y, right - X, bottom - Y);
-            }
+            var r = MakeCorrectRectangle(rect);
             Point pMax = new Point(-1, -1);
             short max = short.MinValue;
             for (int x = r.Left; x <= r.Right; x++)
@@ -1062,6 +988,36 @@ namespace DoMCLib.Tools
         public static short Average(short[,] img, Rectangle? rect = null)
         {
             if (img == null) return 0;
+            var r = MakeCorrectRectangle(rect);
+            long sum = 0;
+            int n = 0;
+            for (int x = r.Left; x <= r.Right; x++)
+            {
+                for (int y = r.Top; y <= r.Bottom; y++)
+                {
+                    sum += img[y, x];
+                    n++;
+                }
+            }
+            return (short)(sum / n);
+        }
+        public static short[,] ClearOutsideRect(short[,] img, Rectangle? rect = null)
+        {
+            if (img == null) return null;
+            var res = new short[512, 512];
+            var r = MakeCorrectRectangle(rect);
+            for (int x = r.Left; x <= r.Right; x++)
+            {
+                for (int y = r.Top; y <= r.Bottom; y++)
+                {
+                    res[y, x] = img[y, x];
+                }
+            }
+            return res;
+        }
+
+        private static Rectangle MakeCorrectRectangle(Rectangle? rect = null)
+        {
             Rectangle r;
             if (rect == null)
                 r = new Rectangle(0, 0, 511, 511);
@@ -1077,18 +1033,9 @@ namespace DoMCLib.Tools
                 bottom = bottom >= 512 ? 511 : bottom;
                 r = new Rectangle(X, Y, right - X, bottom - Y);
             }
-            long sum = 0;
-            int n = 0;
-            for (int x = r.Left; x <= r.Right; x++)
-            {
-                for (int y = r.Top; y <= r.Bottom; y++)
-                {
-                    sum += img[y, x];
-                    n++;
-                }
-            }
-            return (short)(sum / n);
+            return r;
         }
+
         public static ImageProcessResult CheckIfSocketGood(short[,] Current, short[,] StandardImage, ImageProcessParameters ipp)
         {
             var result = new ImageProcessResult();

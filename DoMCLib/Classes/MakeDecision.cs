@@ -57,11 +57,13 @@ namespace DoMCLib.Classes
             switch (DecisionAction)
             {
                 case MakeDecisionAction.Average:
-                    var avg = ImageTools.Average(res[0]);
+                    var avg = ImageTools.Average(res[0], ipp.GetRectangle());
 
                     return avg < ParameterCompareGoodIfLess;
                 case MakeDecisionAction.Max:
-                    var imgarr = res[0].Cast<short>().ToArray();
+                    var resultImage = ImageTools.ClearOutsideRect(res[0], ipp.GetRectangle());
+                    ResultImg = resultImage;
+                    var imgarr = resultImage.Cast<short>().ToArray();
                     var max = Math.Max(Math.Abs(imgarr.Max()), Math.Abs(imgarr.Min()));
                     var index = Array.FindIndex<short>(imgarr, e => Math.Abs(e) == max);
                     MaxCoord = new Point(index % 512, index / 512);

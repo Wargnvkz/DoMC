@@ -1,4 +1,6 @@
-﻿using DoMC.Tools;
+﻿using DoMC.Forms;
+using DoMC.Tools;
+using DoMCLib.Classes;
 using DoMCLib.Classes.Configuration.CCD;
 using DoMCLib.Tools;
 using System;
@@ -44,7 +46,8 @@ namespace DoMCLib.Forms
 
         private Panel[] SocketPanels;
         private bool FirstStart = true;
-        public DoMCSocketSettingsListForm()
+        private DoMCApplicationContext Context;
+        public DoMCSocketSettingsListForm(DoMCApplicationContext context)
         {
             InitializeComponent();
 
@@ -52,7 +55,7 @@ namespace DoMCLib.Forms
             var keys = UserInterfaceControls.SocketRectSize.Keys.ToList();
             for (int i = 0; i < keys.Count; i++)
                 cmbSocketQuantity.Items.Add(keys[i].ToString());
-
+            Context = context;
         }
 
         private void FillSockets()
@@ -138,7 +141,7 @@ namespace DoMCLib.Forms
                 var cfg = SocketConfigurations[SocketN];
                 ss.Configuration = cfg;
             }
-            ss.Text = "Параметры гнеда " + (SocketN+1);
+            ss.Text = "Параметры гнеда " + (SocketN + 1);
             if (ss.ShowDialog() == DialogResult.OK)
             {
                 var cfg = ss.Configuration;
@@ -149,10 +152,22 @@ namespace DoMCLib.Forms
 
         private void bntCopy_Click(object sender, EventArgs e)
         {
+
+            var form = new DoMCSocketCopyParametersForm(Context, SocketConfigurations, SocketQuantity, DoMCSocketCopyParametersOption.FullAccess);
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                MessageBox.Show("Параметры успешно скопированы");
+            }
+            else
+            {
+                MessageBox.Show("Копирование отменено");
+            }
+
+            /*
             for (int i = 1; i < SocketQuantity; i++)
             {
                 SocketConfigurations[i] = SocketConfigurations[0].Clone();
-            }
+            }*/
             UserInterfaceControls.SetSocketStatuses(SocketPanels, UserInterfaceControls.GetListOfSetStandardSocketConfiguration(SocketQuantity, SocketConfigurations), Color.Green, Color.DarkGray);
 
         }

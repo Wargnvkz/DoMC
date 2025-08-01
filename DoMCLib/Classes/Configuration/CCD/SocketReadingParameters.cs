@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using DoMCLib.Classes.Module.CCD.CCDCardDataExchangeCommandClasses;
+using static DoMCLib.Classes.Configuration.CCD.SocketParameters;
 
 namespace DoMCLib.Classes.Configuration.CCD
 {
@@ -85,6 +86,32 @@ namespace DoMCLib.Classes.Configuration.CCD
             };
             return cfg;
 
+        }
+        public void FillTarget(ref SocketReadingParameters target, CopySocketReadingParameters copySocketReadingParameters)
+        {
+            if (!copySocketReadingParameters.HasAnySelection()) return;
+            if (target == null) target = new SocketReadingParameters();
+            if (copySocketReadingParameters.FilterModule) target.FilterModule = FilterModule;
+            if (copySocketReadingParameters.CompareThreshold) target.CompareThreshold = CompareThreshold;
+            if (copySocketReadingParameters.DataType) target.DataType = DataType;
+            if (copySocketReadingParameters.Exposition) target.Exposition = Exposition;
+            if (copySocketReadingParameters.FrameDuration) target.FrameDuration = FrameDuration;
+            if (copySocketReadingParameters.MeasureDelay) target.MeasureDelay = MeasureDelay;
+            if (copySocketReadingParameters.AnswerAfterScanAutomaticly) target.AnswerAfterScanAutomaticly = AnswerAfterScanAutomaticly;
+        }
+        public class CopySocketReadingParameters
+        {
+            public bool FilterModule;
+            public bool CompareThreshold;
+            public bool DataType;
+            public bool Exposition;
+            public bool FrameDuration;
+            public bool MeasureDelay;
+            public bool AnswerAfterScanAutomaticly;
+            public bool HasAnySelection()
+            {
+                return FilterModule || CompareThreshold || DataType || Exposition || FrameDuration || MeasureDelay || AnswerAfterScanAutomaticly;
+            }
         }
     }
 }

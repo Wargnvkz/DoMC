@@ -2019,11 +2019,12 @@ namespace DoMC
         private void miSocketsSettings_Click(object sender, EventArgs e)
         {
 
-            var form = new DoMCLib.Forms.DoMCImageProcessSettingsListForm();
+            var form = new DoMCLib.Forms.DoMCImageProcessSettingsListForm(Context);
 
-            form.SocketParameters = Context.Configuration.ReadingSocketsSettings.CCDSocketParameters;
+            form.SocketParameters = Context.Configuration.ReadingSocketsSettings.CCDSocketParameters.CloneParameters();
             if (form.ShowDialog() == DialogResult.OK)
             {
+                Context.Configuration.ReadingSocketsSettings.CCDSocketParameters = form.SocketParameters.CloneParameters();
                 Context.Configuration.SaveReadingSocketsSettings();
                 NotifyConfigurationUpdated();
             }

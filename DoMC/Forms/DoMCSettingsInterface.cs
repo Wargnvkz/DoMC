@@ -175,12 +175,15 @@ namespace DoMC
 
         private void FillSettingPage()
         {
-            _ = Task.Run(async ()=> { 
-                try { 
-                    if (SettingsUpdated!=null) 
-                        await SettingsUpdated(this); 
-                } 
-                catch { } });
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    if (SettingsUpdated != null)
+                        await SettingsUpdated(this);
+                }
+                catch { }
+            });
 
             miLEDSettings.Checked = Context.Configuration.ReadingSocketsSettings.IsLCBSettingsSet();
             miReadParameters.Checked = Context.Configuration.ReadingSocketsSettings.IsReadingParametersSet();
@@ -238,7 +241,7 @@ namespace DoMC
 
         private void miReadParameters_Click(object sender, EventArgs e)
         {
-            var ssf = new DoMCLib.Forms.DoMCSocketSettingsListForm();
+            var ssf = new DoMCLib.Forms.DoMCSocketSettingsListForm(Context);
             ssf.SocketQuantity = Context.Configuration.HardwareSettings.SocketQuantity;
             ssf.SocketConfigurations = Context.Configuration.ReadingSocketsSettings.CCDSocketParameters;
             if (ssf.ShowDialog() == DialogResult.OK)
@@ -567,6 +570,7 @@ namespace DoMC
             tbArchive.Font = new Font(tbArchive.Font.FontFamily, 8f);
             tbArchive.Scale(new SizeF(1, 1));
             archiveForm = new DoMCArchiveForm(Controller, Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath, Context.Configuration.HardwareSettings.ArchiveDBConfig.ArchiveDBPath);
+            archiveForm.Font = new Font(archiveForm.Font.FontFamily, 8);
             archiveForm.Visible = true;
             archiveForm.TopLevel = false;
             archiveForm.Parent = tbArchive;

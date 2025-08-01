@@ -9,6 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using DoMCLib.Classes.Configuration.CCD;
+using DoMC.Forms;
+using DoMCLib.Classes;
+using System.Runtime.CompilerServices;
 
 namespace DoMCLib.Forms
 {
@@ -20,9 +23,11 @@ namespace DoMCLib.Forms
         private Panel[] SocketPanels;
 
         public SocketParameters[] SocketParameters;
-        public DoMCImageProcessSettingsListForm()
+        DoMCApplicationContext Context;
+        public DoMCImageProcessSettingsListForm(DoMCApplicationContext context)
         {
             InitializeComponent();
+            Context = context;
         }
 
         public new DialogResult ShowDialog()
@@ -62,12 +67,23 @@ namespace DoMCLib.Forms
 
         private void btnExpandToAll_Click(object sender, EventArgs e)
         {
-            var ip1 = SocketParameters[0].ImageCheckingParameters;
+            var form = new DoMCSocketCopyParametersForm(Context, SocketParameters, SocketQuantity, DoMCSocketCopyParametersOption.DecisionMakingAccess);
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                MessageBox.Show("Параметры успешно скопированы");
+            }
+            else
+            {
+                MessageBox.Show("Копирование отменено");
+            }
+            /*var ip1 = SocketParameters[0].ImageCheckingParameters;
             for (int i = 1; i < SocketParameters.Length; i++)
             {
                 SocketParameters[i].ImageCheckingParameters = ip1.Clone();
-            }
+            }*/
 
         }
     }
+
+
 }
