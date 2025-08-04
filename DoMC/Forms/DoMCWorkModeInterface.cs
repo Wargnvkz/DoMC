@@ -566,6 +566,7 @@ namespace DoMC
                 RDPBCurrentStatus.IsStarted = true;
             }
             catch { RDPBCurrentStatus.IsStarted = false; }
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"RDPBCurrentStatus.IsStarted={RDPBCurrentStatus.IsStarted}");
             if (!RDPBCurrentStatus.IsStarted)
             {
                 ErrorMsg = "Ошибка при запуске модуля бракёра";
@@ -687,6 +688,7 @@ namespace DoMC
         {
             if (!RDPBCurrentStatus.IsStarted) return true;
             WorkingLog.Add(LoggerLevel.Critical, "Выключение бракёра");
+            RDPBCurrentStatus.IsStarted = false;
             try
             {
                 await new DoMCLib.Classes.Module.RDPB.Commands.TurnOffCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
@@ -707,7 +709,6 @@ namespace DoMC
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при остановке модуля бракёра", ex);
                 return false;
             }
-            RDPBCurrentStatus.IsStarted = false;
             return true;
 
         }
@@ -1211,43 +1212,8 @@ namespace DoMC
 
                         if (RDPBCurrentStatus.IsStarted)
                         {
-                            /*if (RDPBCurrentStatus.BlockIsOn != ((ActiveDevices & WorkingModule.RDPB) == WorkingModule.RDPB))
-                            {
-                                RDPBCurrentStatus.ErrorCounter++;
-                                WorkingLog.Add(LoggerLevel.Critical, $"Состояние бракера не соответствует состоянию выбранному пользователем. Проход: {RDPBCurrentStatus.ErrorCounter}");
-                                if (RDPBCurrentStatus.ErrorCounter > 2)
-                                {
-                                    if ((ActiveDevices & WorkingModule.RDPB) == WorkingModule.RDPB)
-                                    {
-                                        WorkingLog.Add(LoggerLevel.Critical, "Бракер выключен, но должен быть включен.");
-                                        //WorkingLog.Add(LoggerLevel.Critical, "Бракер выключен, но должен быть включен. Включаю бракер");
-                                        Task.Run(async () =>
-                                        {
-                                            try
-                                            {
-                                                await new DoMCLib.Classes.Module.RDPB.Commands.SendSetIsOkCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
-                                            }
-                                            catch
-                                            {
+                            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Работа с бракёром");
 
-                                            }
-
-                                        });
-                                        //MainController.CreateCommandInstance(typeof(RDPBModule.TurnOnCommand)).ExecuteCommand();
-                                    }
-                                    else
-                                    {
-                                        WorkingLog.Add(LoggerLevel.Critical, "Бракер включен, но должен выключен.");
-                                        //WorkingLog.Add(LoggerLevel.Critical, "Бракер включен, но должен выключен. Выключаю бракер");
-                                        MainController.CreateCommandInstance(typeof(RDPBModule.TurnOffCommand)).ExecuteCommand();
-                                    }
-                                    RDPBCurrentStatus.ErrorCounter = 0;
-                                }
-                            }
-                            else
-                            {
-                                RDPBCurrentStatus.ErrorCounter = 0;
-                            }*/
                             WorkingStep = WorkStep.RDPBSend;
                             WorkingStepTime[(int)WorkStep.RDPBSend] = sw.ElapsedTicks;
 

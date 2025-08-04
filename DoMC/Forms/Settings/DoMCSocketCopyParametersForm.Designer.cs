@@ -28,10 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            DataGridView dgvCardNumbers;
             dgvCardNumberText = new DataGridViewTextBoxColumn();
             dgvBtnOn = new DataGridViewButtonColumn();
             dgvBtnOff = new DataGridViewButtonColumn();
-            label1 = new Label();
+            lblSocketQuantityCaption = new Label();
             pnlSockets = new Panel();
             bntReset = new Button();
             btnOK = new Button();
@@ -49,28 +50,13 @@
             cbCheckRectBottom = new CheckBox();
             cbCheckRectTop = new CheckBox();
             panel1 = new Panel();
+            lblWhereToCopyCaption = new Label();
+            lblWhatToCopyCaption = new Label();
             dgvCardNumbers = new DataGridView();
-            ((System.ComponentModel.ISupportInitialize)dgvCardNumbers).BeginInit();
             gbReadingParameters.SuspendLayout();
             gbCheckingParameters.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvCardNumbers).BeginInit();
             SuspendLayout();
-            // 
-            // dgvCardNumbers
-            // 
-            dgvCardNumbers.AllowUserToAddRows = false;
-            dgvCardNumbers.AllowUserToDeleteRows = false;
-            dgvCardNumbers.AllowUserToResizeRows = false;
-            dgvCardNumbers.BackgroundColor = SystemColors.Control;
-            dgvCardNumbers.BorderStyle = BorderStyle.None;
-            dgvCardNumbers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvCardNumbers.Columns.AddRange(new DataGridViewColumn[] { dgvCardNumberText, dgvBtnOn, dgvBtnOff });
-            dgvCardNumbers.Location = new Point(824, 59);
-            dgvCardNumbers.MultiSelect = false;
-            dgvCardNumbers.Name = "dgvCardNumbers";
-            dgvCardNumbers.RowHeadersVisible = false;
-            dgvCardNumbers.Size = new Size(293, 444);
-            dgvCardNumbers.TabIndex = 9;
-            dgvCardNumbers.CellContentClick += dgvCardNumbers_CellContentClick;
             // 
             // dgvCardNumberText
             // 
@@ -93,15 +79,15 @@
             dgvBtnOff.Name = "dgvBtnOff";
             dgvBtnOff.Width = 80;
             // 
-            // label1
+            // lblSocketQuantityCaption
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(234, 22);
-            label1.Margin = new Padding(4, 0, 4, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(107, 15);
-            label1.TabIndex = 0;
-            label1.Text = "Количество гнезд:";
+            lblSocketQuantityCaption.AutoSize = true;
+            lblSocketQuantityCaption.Location = new Point(238, 4);
+            lblSocketQuantityCaption.Margin = new Padding(4, 0, 4, 0);
+            lblSocketQuantityCaption.Name = "lblSocketQuantityCaption";
+            lblSocketQuantityCaption.Size = new Size(107, 15);
+            lblSocketQuantityCaption.TabIndex = 0;
+            lblSocketQuantityCaption.Text = "Количество гнезд:";
             // 
             // pnlSockets
             // 
@@ -161,7 +147,7 @@
             // lblSocketQuantity
             // 
             lblSocketQuantity.AutoSize = true;
-            lblSocketQuantity.Location = new Point(359, 22);
+            lblSocketQuantity.Location = new Point(363, 4);
             lblSocketQuantity.Margin = new Padding(4, 0, 4, 0);
             lblSocketQuantity.Name = "lblSocketQuantity";
             lblSocketQuantity.Size = new Size(13, 15);
@@ -283,11 +269,48 @@
             panel1.Size = new Size(127, 89);
             panel1.TabIndex = 101;
             // 
+            // dgvCardNumbers
+            // 
+            dgvCardNumbers.AllowUserToAddRows = false;
+            dgvCardNumbers.AllowUserToDeleteRows = false;
+            dgvCardNumbers.AllowUserToResizeRows = false;
+            dgvCardNumbers.BackgroundColor = SystemColors.Control;
+            dgvCardNumbers.BorderStyle = BorderStyle.None;
+            dgvCardNumbers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvCardNumbers.Columns.AddRange(new DataGridViewColumn[] { dgvCardNumberText, dgvBtnOn, dgvBtnOff });
+            dgvCardNumbers.Location = new Point(824, 59);
+            dgvCardNumbers.MultiSelect = false;
+            dgvCardNumbers.Name = "dgvCardNumbers";
+            dgvCardNumbers.RowHeadersVisible = false;
+            dgvCardNumbers.Size = new Size(293, 444);
+            dgvCardNumbers.TabIndex = 9;
+            dgvCardNumbers.CellContentClick += dgvCardNumbers_CellContentClick;
+            // 
+            // lblWhereToCopyCaption
+            // 
+            lblWhereToCopyCaption.AutoSize = true;
+            lblWhereToCopyCaption.Location = new Point(238, 41);
+            lblWhereToCopyCaption.Name = "lblWhereToCopyCaption";
+            lblWhereToCopyCaption.Size = new Size(156, 15);
+            lblWhereToCopyCaption.TabIndex = 12;
+            lblWhereToCopyCaption.Text = "В какие гнезда копировать:";
+            // 
+            // lblWhatToCopyCaption
+            // 
+            lblWhatToCopyCaption.AutoSize = true;
+            lblWhatToCopyCaption.Location = new Point(12, 41);
+            lblWhatToCopyCaption.Name = "lblWhatToCopyCaption";
+            lblWhatToCopyCaption.Size = new Size(174, 15);
+            lblWhatToCopyCaption.TabIndex = 13;
+            lblWhatToCopyCaption.Text = "Какие параметры копировать:";
+            // 
             // DoMCSocketCopyParametersForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1130, 539);
+            Controls.Add(lblWhatToCopyCaption);
+            Controls.Add(lblWhereToCopyCaption);
             Controls.Add(gbCheckingParameters);
             Controls.Add(gbReadingParameters);
             Controls.Add(dgvCardNumbers);
@@ -297,25 +320,25 @@
             Controls.Add(btnOK);
             Controls.Add(bntReset);
             Controls.Add(pnlSockets);
-            Controls.Add(label1);
+            Controls.Add(lblSocketQuantityCaption);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Margin = new Padding(4, 3, 4, 3);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "DoMCSocketCopyParametersForm";
-            Text = "Сохранение изображений гнезд";
-            ((System.ComponentModel.ISupportInitialize)dgvCardNumbers).EndInit();
+            Text = "Копирование параметров гнезда 1";
             gbReadingParameters.ResumeLayout(false);
             gbReadingParameters.PerformLayout();
             gbCheckingParameters.ResumeLayout(false);
             gbCheckingParameters.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvCardNumbers).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblSocketQuantityCaption;
         private System.Windows.Forms.Panel pnlSockets;
         private System.Windows.Forms.Button bntReset;
         private System.Windows.Forms.Button btnOK;
@@ -337,5 +360,7 @@
         private CheckBox cbCheckRectTop;
         private Panel panel1;
         private CheckBox cbDecisionOperations;
+        private Label lblWhereToCopyCaption;
+        private Label lblWhatToCopyCaption;
     }
 }
