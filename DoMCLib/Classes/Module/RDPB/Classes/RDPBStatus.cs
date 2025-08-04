@@ -29,9 +29,9 @@ namespace DoMCLib.Classes.Module.RDPB.Classes
         public long RDPBTimeoutInns;
         private long RDPBConnectionTimeout;
         public string ManualCommand;
-        public bool IsStarted;
 
         private Stopwatch Timer;
+
 
         #region Temporary RDPB data
         public int CurrentBoxDefectCycles;

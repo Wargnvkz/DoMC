@@ -111,6 +111,7 @@ namespace DoMC
         int SaveTimeoutInSecodns = 300;
 
         volatile bool RDPBResult = true;
+        volatile bool RDPBIsStarted = false;
         SynchronizationContext UIContext;
         //DoMCOperation CurrentOperation = DoMCOperation.Idle;
 
@@ -563,11 +564,11 @@ namespace DoMC
             {
                 //CurrentOperation = DoMCOperation.StartRDPB;
                 await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStartCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
-                RDPBCurrentStatus.IsStarted = true;
+                RDPBIsStarted = true;
             }
-            catch { RDPBCurrentStatus.IsStarted = false; }
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"RDPBCurrentStatus.IsStarted={RDPBCurrentStatus.IsStarted}");
-            if (!RDPBCurrentStatus.IsStarted)
+            catch { RDPBIsStarted = false; }
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"RDPBCurrentStatus.IsStarted={RDPBIsStarted}");
+            if (!RDPBIsStarted)
             {
                 ErrorMsg = "Ошибка при запуске модуля бракёра";
                 WorkingLog.Add(LoggerLevel.Critical, ErrorMsg);
@@ -686,9 +687,13 @@ namespace DoMC
 
         private async Task<bool> StopRDPB()
         {
-            if (!RDPBCurrentStatus.IsStarted) return true;
             WorkingLog.Add(LoggerLevel.Critical, "Выключение бракёра");
-            RDPBCurrentStatus.IsStarted = false;
+            if (!RDPBIsStarted)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "Бракёр не был включен");
+                return true;
+            }
+            RDPBIsStarted = false;
             try
             {
                 await new DoMCLib.Classes.Module.RDPB.Commands.TurnOffCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
@@ -1210,7 +1215,7 @@ namespace DoMC
                         //Проверить, работает ли бракер, если он был включен
                         RDPBResult = true;
 
-                        if (RDPBCurrentStatus.IsStarted)
+                        if (RDPBIsStarted)
                         {
                             WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Работа с бракёром");
 
@@ -1286,6 +1291,11 @@ namespace DoMC
 
 
                         }
+                        else
+                        {
+                            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Бракёр не включен");
+                        }
+
                         CurrentCycleCCD.TransporterSide = RDPBCurrentStatus.CurrentTransporterSide;
                         WorkingStep = WorkStep.RecalcStandards;
                         WorkingStepTime[(int)WorkStep.RecalcStandards] = sw.ElapsedTicks;
