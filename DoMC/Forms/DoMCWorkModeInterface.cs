@@ -48,14 +48,13 @@ namespace DoMC
 
         int CardTimeout = 30000;
         volatile bool IsConfigurationLoadedSuccessfully;
-        volatile bool IsWorkingModeStarted;
 
 
         SocketStatuses socketStatuses;
 
         int[] ErrorsBySockets = new int[96];
 
-        Task WorkingThread;
+        //Task WorkingThread;
 
         //ошибки устройств
         WorkingModule DevicesErrors;
@@ -65,12 +64,14 @@ namespace DoMC
         //PressButton[] DeviceButtons;
         Dictionary<WorkingModule, PressButton> DevicesFlagButtons;
 
-        bool ForceStop;
+        //bool ForceStop;
 
         DateTime lastDrawCycleTime = DateTime.Now;
         DateTime lastErrorCheck = DateTime.Now;
         DateTime lastBoxRead = DateTime.MinValue;
         TimeSpan lastBoxReadTime = new TimeSpan(0, 2, 0);
+        DateTime lastArchiveStatusRead;
+        TimeSpan lastArchiveStatusReadTime = new TimeSpan(0, 0, 20);
 
         WorkStep WorkingStep = WorkStep.Stopped;
         long[] WorkingStepTime = new long[Enum.GetNames(typeof(WorkStep)).Count() + 1];
@@ -90,7 +91,7 @@ namespace DoMC
         int CCDReadsFailed;
         int CCDReadsFailedMax = 5;
         DateTime CCDStart, CCDEnd;
-        bool WasErrorWhileWorking;
+        //bool WasErrorWhileWorking = false;
         public DoMCInterfaceDataExchangeErrors Errors = new DoMCInterfaceDataExchangeErrors();
         volatile bool wasSynchro = true;
 
@@ -101,7 +102,6 @@ namespace DoMC
         //DBModuleStatus
 
         int MaxDegreeOfParallelism = 16;
-        bool WasErrorWhileWorked = false;
 
         int DBCyclesCCDLeftInQueue = 0;
         (Exception, DateTime) LastDBException;
@@ -114,6 +114,7 @@ namespace DoMC
         volatile bool RDPBIsStarted = false;
         SynchronizationContext UIContext;
         //DoMCOperation CurrentOperation = DoMCOperation.Idle;
+        PollingController WorkingProcessController;
 
         public DoMCWorkModeInterface()
         {
@@ -145,6 +146,12 @@ namespace DoMC
             ShowDevicesButtonStatuses();
             LoadArchiveTab();
             await StartArchiveDB();
+            WorkingProcessController = new PollingController(
+                this,
+                PrepareToStartWork,
+                WorkProc,
+                StopWork
+                );
         }
 
         private async Task Observer_NotificationReceivers(string EventName, object? data)
@@ -340,20 +347,20 @@ namespace DoMC
 
         private async void btnStartStop_Click(object sender, EventArgs e)
         {
-            if (IsWorkingModeStarted)
+            WorkingLog.Add(LoggerLevel.Critical, "Нажата кнопка Пуск");
+
+            if (WorkingProcessController.IsRunning)
             {
-                await StopWork();
+                WorkingLog.Add(LoggerLevel.Critical, "Остановливаем работу");
+                await WorkingProcessController.StopAsync();
             }
             else
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Начинаем работу");
                 socketStatuses = new SocketStatuses(96);
                 //WorkCancellationTokenSource = new CancellationTokenSource();
                 GetIsDevicesButtonWorking();
-                if (await PrepareToStartWork())
-                {
-                    StartReading();
-                }
-                else
+                if (!await WorkingProcessController.StartAsync())
                 {
                     await StartFailed();
                 }
@@ -363,11 +370,10 @@ namespace DoMC
 
         private async Task<bool> PrepareToStartWork()
         {
+
             string ErrorMsg;
             ResetTemporaryStatistics();
-            WorkingLog.Add(LoggerLevel.Critical, "");
             IsConfigurationLoadedSuccessfully = false;
-            WasErrorWhileWorked = false;
             Errors.CCDNotRespond = false;
             WorkingLog.Add(LoggerLevel.Critical, "Загрузка конфигурации гнезд");
             // CurrentOperation = DoMCOperation.StartCCD;
@@ -445,7 +451,6 @@ namespace DoMC
             }
 
             pbStartStop.Text = "Стоп";
-            IsWorkingModeStarted = true;
             pbStartStop.BackColor = Color.Green;
 
             IsConfigurationLoadedSuccessfully = true;
@@ -454,24 +459,15 @@ namespace DoMC
 
 
 
-        private async Task StopWork()
+        private async Task StopWork(WorkingStatus status)
         {
             //if (WorkCancellationTokenSource == null) return;
             //WorkCancellationTokenSource?.Cancel();
-            WorkingLog.Add(LoggerLevel.Critical, "Попытка остановить работу");
-            if (!IsWorkingModeStarted) return;
             WorkingLog.Add(LoggerLevel.Critical, "Остановка работы");
             Context.IsInWorkingMode = false;
-            try
-            {
-                await StopReading();
-            }
-            catch
-            {
-            }
             pbStartStop.Text = "Пуск";
 
-            if (!ForceStop)
+            if (status != WorkingStatus.Error)
             {
                 pbStartStop.BackColor = SystemColors.Control;
             }
@@ -505,14 +501,7 @@ namespace DoMC
 
         }
         #region Start Procedures
-        private void StartReading()
-        {
-            WorkingLog.Add(LoggerLevel.Critical, "Запуск чтения");
-            IsWorkingModeStarted = true;
-            WasErrorWhileWorking = false;
-            ForceStop = false;
-            WorkingThread = Task.Run(WorkProc);
-        }
+
 
         private async Task<bool> StartLCB()
         {
@@ -631,21 +620,7 @@ namespace DoMC
 
         #endregion
         #region Stop procedures
-        private async Task StopReading()
-        {
 
-            IsWorkingModeStarted = false;
-            WorkingLog.Add(LoggerLevel.Critical, "Остановка работы");
-            try
-            {
-                await WorkingThread;
-            }
-            catch (Exception ex)
-            {
-                WorkingLog.Add(LoggerLevel.Critical, "Ошибка при остановке работы", ex);
-            }
-
-        }
         private async Task<bool> StopCCD()
         {
             WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля плат CCD");
@@ -774,7 +749,7 @@ namespace DoMC
             return;
         }
 
-        private async Task WorkProc()
+        private async Task<WorkingStatus> WorkProc(CancellationToken ct)
         {
             WorkingLog.Add(LoggerLevel.Critical, "Начало чтения");
             CCDReadsFailed = 0;
@@ -784,7 +759,7 @@ namespace DoMC
             sw.Start();
             try
             {
-                while (IsWorkingModeStarted)
+                while (!ct.IsCancellationRequested)
                 {
                     WorkingLog.Add(LoggerLevel.Critical, "--------------- Начало цикла чтения ---------------");
 
@@ -819,12 +794,10 @@ namespace DoMC
                     Array.Copy(Context.Configuration.HardwareSettings.SocketsToCheck, CurrentCycleCCD.SocketsToCheck, 96);
 
                     // Если рабочий режим не запущен или система не может работать, потому что не загружена конфигурация, останавливаем и выходим с ошибкой
-                    if (!IsWorkingModeStarted || !IsConfigurationLoadedSuccessfully)
+                    if (!IsConfigurationLoadedSuccessfully)
                     {
-                        IsWorkingModeStarted = false;
-                        WasErrorWhileWorking = true;
-                        IsConfigurationLoadedSuccessfully = false;
-                        break;
+                        return WorkingStatus.Error;
+
                     }
 
                     WorkingStep = WorkStep.WaitForSyncroSignal;
@@ -881,8 +854,7 @@ namespace DoMC
                                         WorkingLog.Add(LoggerLevel.Critical, "Не удалось остановить работу БУС. ", ex);
                                         Errors.CCDNotRespond = true;
                                         Errors.LCBDoesNotRespond = true;
-                                        IsWorkingModeStarted = false;
-                                        WasErrorWhileWorking = true;
+
                                     }
                                     WorkingLog.Add(LoggerLevel.Critical, "Маячки спрятаны. Перезапуск");
                                     try
@@ -894,8 +866,6 @@ namespace DoMC
                                         WorkingLog.Add(LoggerLevel.Critical, "Не удалось запустить БУС в работу. ", ex);
                                         Errors.CCDNotRespond = true;
                                         Errors.LCBDoesNotRespond = true;
-                                        IsWorkingModeStarted = false;
-                                        WasErrorWhileWorking = true;
                                     }
                                     continue;
                                 }
@@ -904,9 +874,7 @@ namespace DoMC
                                     WorkingLog.Add(LoggerLevel.Critical, "Маячки выдвинуты. Остановка работы");
                                     Errors.CCDNotRespond = true;
                                     Errors.LCBDoesNotRespond = true;
-                                    IsWorkingModeStarted = false;
-                                    WasErrorWhileWorking = true;
-                                    break;
+                                    return WorkingStatus.Error;
                                 }
                             }
                             else
@@ -922,18 +890,14 @@ namespace DoMC
                             WorkingLog.Add(LoggerLevel.Critical, "БУС не ответил");
                             Errors.CCDNotRespond = true;
                             Errors.LCBDoesNotRespond = true;
-                            IsWorkingModeStarted = false;
-                            WasErrorWhileWorking = true;
-                            break;
+                            return WorkingStatus.Error;
                         }
 
                         if (CCDReadsFailed >= CCDReadsFailedMax)
                         {
                             WorkingLog.Add(LoggerLevel.Critical, "Ошибка при чтении данных гнезд. Чтение не завершено. Остановка.");
                             Errors.CCDNotRespond = true;
-                            IsWorkingModeStarted = false;
-                            WasErrorWhileWorking = true;
-                            break;
+                            return WorkingStatus.Error;
                         }
                         else
                         {
@@ -947,8 +911,7 @@ namespace DoMC
                             var start = DateTime.Now;
                             while ((DateTime.Now - start).TotalSeconds < Context.Configuration.HardwareSettings.Timeouts.WaitForCCDCardAnswerTimeoutInSeconds && !wasSynchro)
                             {
-                                if (!IsWorkingModeStarted) throw new DoMCException("Работа остановлена пользователем");
-                                Application.DoEvents();
+                                if (ct.IsCancellationRequested) return WorkingStatus.Canceled;
                             }
 
 
@@ -1358,9 +1321,7 @@ namespace DoMC
                                     WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при постановке в очередь ({ex.Message}).");
                                     if (ActiveDevices.HasFlag(WorkingModule.LocalDB))
                                     {
-                                        WasErrorWhileWorked = true;
                                         MessageBox.Show(ex.Message, "Ошибка передачи в БД", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                        continue;
                                     }
 
                                 }
@@ -1424,17 +1385,15 @@ namespace DoMC
             catch (Exception ex)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при работе.", ex);
-                WasErrorWhileWorked = true;
+                return WorkingStatus.Error;
             }
-            // если была критическая ошибка, останавливаем работу
-            if (WasErrorWhileWorked)
+            finally
             {
-                WorkingLog.Add(LoggerLevel.Critical, "Ошибка во время работы. Остановка цикла работы");
-                ForceStop = true;
+                // если была критическая ошибка, останавливаем работу
+                WorkingStep = WorkStep.Stopped;
+                WorkingStepTime[(int)WorkStep.Stopped] = sw.ElapsedTicks;
             }
-            WorkingStep = WorkStep.Stopped;
-            WorkingStepTime[(int)WorkStep.Stopped] = sw.ElapsedTicks;
-
+            return WorkingStatus.Completed;
         }
 
         private void ProcessRDPBStatusGetWithBoxCreation(RDPBStatus newStatus)
@@ -1704,6 +1663,8 @@ namespace DoMC
                         var lvi = new ListViewItem(new string[] { box.CompletedTime.ToString("G"), box.BadCyclesCount.ToString(), box.TransporterSideToString() });
                         lvBoxes.Items.Add(lvi);
                     }
+                    await GetArchiveDBModuleStatus();
+
                 }
             }
             lblFooterStep.Text = $"Текущий шаг: {GetWorkStepText(WorkingStep)}";
@@ -1717,12 +1678,7 @@ namespace DoMC
             }
             // обновляем данные о нажатых/отжатых кнопках
             GetIsDevicesButtonWorking();
-            if (ForceStop)
-            {
-                WorkingLog.Add(LoggerLevel.Critical, "Ошибка во время работы. Остановка работы устройств");
-                await StopWork();
-                ForceStop = false;
-            }
+
             if (RDPBCurrentStatus.IsTimeout)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Бракер не ответил");
@@ -1732,7 +1688,12 @@ namespace DoMC
             {
                 DevicesErrors &= ~WorkingModule.RDPB;
             }
-            await GetArchiveDBModuleStatus();
+            if (ArchiveDBModuleStatus.IsStarted && (now - lastArchiveStatusRead) > lastArchiveStatusReadTime)
+            {
+                lastArchiveStatusRead = now;
+                await GetArchiveDBModuleStatus();
+
+            }
         }
 
         private void CurrentDraw()
@@ -1804,7 +1765,7 @@ namespace DoMC
         private async void pbDevices_Click(object sender, EventArgs e)
         {
             GetIsDevicesButtonWorking();
-            if (IsWorkingModeStarted)
+            if (WorkingProcessController.IsRunning)
             {
                 if (ActiveDevices.HasFlag(WorkingModule.RDPB))
                 {
@@ -1840,7 +1801,7 @@ namespace DoMC
 
             try
             {
-                await StopWork();
+                await WorkingProcessController.StopAsync();
             }
             catch { }
             try
@@ -1905,7 +1866,7 @@ namespace DoMC
                 {
                     try
                     {
-                        await StopWork();
+                        await WorkingProcessController.StopAsync();
                     }
                     catch { }
                     var wmf = new DoMCSettingsInterface();
@@ -1945,7 +1906,7 @@ namespace DoMC
         private void miCreateNewStandard_Click(object sender, EventArgs e)
         {
 
-            if (IsWorkingModeStarted)
+            if (WorkingProcessController.IsRunning)
             {
                 MessageBox.Show("ПМК запущено. Для создания эталонов нужно остановить работу ПМК", "Создание эталонов");
                 return;

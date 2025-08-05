@@ -93,7 +93,7 @@ namespace DoMCLib.Classes.Module.DB
             BoxDatas.Enqueue(box);
         }
 
-        private void Process()
+        private async Task Process()
         {
             IsStarted = true;
             while (!cancelationTockenSource.Token.IsCancellationRequested)
@@ -143,7 +143,7 @@ namespace DoMCLib.Classes.Module.DB
 
                 }
                 ExternalObserver.Notify(this, "BoxSave", "NonSaved", BoxDatas.Count);
-                Task.Delay(100).Wait();
+                await Task.Delay(5000);
             }
             IsStarted = false;
         }
