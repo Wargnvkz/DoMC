@@ -47,8 +47,8 @@ namespace DoMC
     {
 
         int CardTimeout = 30000;
-        bool IsConfigurationLoadedSuccessfully;
-        bool IsWorkingModeStarted;
+        volatile bool IsConfigurationLoadedSuccessfully;
+        volatile bool IsWorkingModeStarted;
 
 
         SocketStatuses socketStatuses;
@@ -106,7 +106,7 @@ namespace DoMC
         int DBCyclesCCDLeftInQueue = 0;
         (Exception, DateTime) LastDBException;
         int TotalDefectCycles = 0;
-        CancellationTokenSource WorkCancellationTokenSource;
+        //CancellationTokenSource WorkCancellationTokenSource;
         DateTime lastSavedConfiguration;
         int SaveTimeoutInSecodns = 300;
 
@@ -347,7 +347,7 @@ namespace DoMC
             else
             {
                 socketStatuses = new SocketStatuses(96);
-                WorkCancellationTokenSource = new CancellationTokenSource();
+                //WorkCancellationTokenSource = new CancellationTokenSource();
                 GetIsDevicesButtonWorking();
                 if (await PrepareToStartWork())
                 {
@@ -456,8 +456,11 @@ namespace DoMC
 
         private async Task StopWork()
         {
-            if (WorkCancellationTokenSource == null) return;
-            WorkCancellationTokenSource?.Cancel();
+            //if (WorkCancellationTokenSource == null) return;
+            //WorkCancellationTokenSource?.Cancel();
+            WorkingLog.Add(LoggerLevel.Critical, "Попытка остановить работу");
+            if (!IsWorkingModeStarted) return;
+            WorkingLog.Add(LoggerLevel.Critical, "Остановка работы");
             Context.IsInWorkingMode = false;
             try
             {
@@ -489,7 +492,7 @@ namespace DoMC
 
         public async Task StartFailed()
         {
-            WorkCancellationTokenSource.Cancel();
+            //WorkCancellationTokenSource.Cancel();
 
 
             /*await new DoMCLib.Classes.Module.CCD.Commands.StopCommand(MainController, MainController.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
@@ -749,6 +752,7 @@ namespace DoMC
         }
         private async Task StopModules()
         {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Остановка модулей");
             await StopCCD();
             await StopLCB();
             await StopRDPB();
@@ -1425,6 +1429,7 @@ namespace DoMC
             // если была критическая ошибка, останавливаем работу
             if (WasErrorWhileWorked)
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка во время работы. Остановка цикла работы");
                 ForceStop = true;
             }
             WorkingStep = WorkStep.Stopped;
@@ -1714,6 +1719,7 @@ namespace DoMC
             GetIsDevicesButtonWorking();
             if (ForceStop)
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Ошибка во время работы. Остановка работы устройств");
                 await StopWork();
                 ForceStop = false;
             }
