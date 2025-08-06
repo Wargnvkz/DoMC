@@ -28,158 +28,155 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnOK = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.txbLocalConnectionString = new System.Windows.Forms.TextBox();
-            this.btnLocalDBBrowse = new System.Windows.Forms.Button();
-            this.btnRemoteDBBrowse = new System.Windows.Forms.Button();
-            this.txbRemoteConnectionString = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.lblTimeBeforeMoveDataToArchive = new System.Windows.Forms.Label();
-            this.txbDelayBeforeMoveDataToArchive = new System.Windows.Forms.TextBox();
-            this.lblSeconds = new System.Windows.Forms.Label();
-            this.SuspendLayout();
+            btnOK = new Button();
+            btnCancel = new Button();
+            label1 = new Label();
+            txbLocalConnectionString = new TextBox();
+            btnLocalDBBrowse = new Button();
+            btnRemoteDBBrowse = new Button();
+            txbRemoteConnectionString = new TextBox();
+            label2 = new Label();
+            lblTimeBeforeMoveDataToArchive = new Label();
+            txbDelayBeforeMoveDataToArchive = new TextBox();
+            lblSeconds = new Label();
+            SuspendLayout();
             // 
             // btnOK
             // 
-            this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOK.Location = new System.Drawing.Point(18, 286);
-            this.btnOK.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(112, 35);
-            this.btnOK.TabIndex = 0;
-            this.btnOK.Text = "OK";
-            this.btnOK.UseVisualStyleBackColor = true;
+            btnOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnOK.DialogResult = DialogResult.OK;
+            btnOK.Location = new Point(18, 286);
+            btnOK.Margin = new Padding(4, 5, 4, 5);
+            btnOK.Name = "btnOK";
+            btnOK.Size = new Size(112, 35);
+            btnOK.TabIndex = 0;
+            btnOK.Text = "OK";
+            btnOK.UseVisualStyleBackColor = true;
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(827, 286);
-            this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(112, 35);
-            this.btnCancel.TabIndex = 1;
-            this.btnCancel.Text = "Отмена";
-            this.btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCancel.DialogResult = DialogResult.Cancel;
+            btnCancel.Location = new Point(827, 286);
+            btnCancel.Margin = new Padding(4, 5, 4, 5);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(112, 35);
+            btnCancel.TabIndex = 1;
+            btnCancel.Text = "Отмена";
+            btnCancel.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(18, 14);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(289, 20);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Строка подключения локальной БД:";
+            label1.AutoSize = true;
+            label1.Location = new Point(18, 14);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(161, 20);
+            label1.TabIndex = 2;
+            label1.Text = "Папка хранения БД:";
             // 
             // txbLocalConnectionString
             // 
-            this.txbLocalConnectionString.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbLocalConnectionString.Location = new System.Drawing.Point(22, 38);
-            this.txbLocalConnectionString.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.txbLocalConnectionString.Name = "txbLocalConnectionString";
-            this.txbLocalConnectionString.Size = new System.Drawing.Size(793, 26);
-            this.txbLocalConnectionString.TabIndex = 3;
+            txbLocalConnectionString.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txbLocalConnectionString.Location = new Point(22, 38);
+            txbLocalConnectionString.Margin = new Padding(4, 5, 4, 5);
+            txbLocalConnectionString.Name = "txbLocalConnectionString";
+            txbLocalConnectionString.Size = new Size(793, 26);
+            txbLocalConnectionString.TabIndex = 3;
             // 
             // btnLocalDBBrowse
             // 
-            this.btnLocalDBBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLocalDBBrowse.Location = new System.Drawing.Point(827, 35);
-            this.btnLocalDBBrowse.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnLocalDBBrowse.Name = "btnLocalDBBrowse";
-            this.btnLocalDBBrowse.Size = new System.Drawing.Size(112, 35);
-            this.btnLocalDBBrowse.TabIndex = 4;
-            this.btnLocalDBBrowse.Text = "Обзор...";
-            this.btnLocalDBBrowse.UseVisualStyleBackColor = true;
-            this.btnLocalDBBrowse.Click += new System.EventHandler(this.btnLocalDBBrowse_Click);
+            btnLocalDBBrowse.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnLocalDBBrowse.Location = new Point(827, 35);
+            btnLocalDBBrowse.Margin = new Padding(4, 5, 4, 5);
+            btnLocalDBBrowse.Name = "btnLocalDBBrowse";
+            btnLocalDBBrowse.Size = new Size(112, 35);
+            btnLocalDBBrowse.TabIndex = 4;
+            btnLocalDBBrowse.Text = "Обзор...";
+            btnLocalDBBrowse.UseVisualStyleBackColor = true;
+            btnLocalDBBrowse.Click += btnLocalDBBrowse_Click;
             // 
             // btnRemoteDBBrowse
             // 
-            this.btnRemoteDBBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRemoteDBBrowse.Location = new System.Drawing.Point(827, 129);
-            this.btnRemoteDBBrowse.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnRemoteDBBrowse.Name = "btnRemoteDBBrowse";
-            this.btnRemoteDBBrowse.Size = new System.Drawing.Size(112, 35);
-            this.btnRemoteDBBrowse.TabIndex = 7;
-            this.btnRemoteDBBrowse.Text = "Обзор...";
-            this.btnRemoteDBBrowse.UseVisualStyleBackColor = true;
-            this.btnRemoteDBBrowse.Click += new System.EventHandler(this.btnRemoteDBBrowse_Click);
+            btnRemoteDBBrowse.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnRemoteDBBrowse.Location = new Point(827, 129);
+            btnRemoteDBBrowse.Margin = new Padding(4, 5, 4, 5);
+            btnRemoteDBBrowse.Name = "btnRemoteDBBrowse";
+            btnRemoteDBBrowse.Size = new Size(112, 35);
+            btnRemoteDBBrowse.TabIndex = 7;
+            btnRemoteDBBrowse.Text = "Обзор...";
+            btnRemoteDBBrowse.UseVisualStyleBackColor = true;
+            btnRemoteDBBrowse.Click += btnRemoteDBBrowse_Click;
             // 
             // txbRemoteConnectionString
             // 
-            this.txbRemoteConnectionString.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbRemoteConnectionString.Location = new System.Drawing.Point(22, 132);
-            this.txbRemoteConnectionString.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.txbRemoteConnectionString.Name = "txbRemoteConnectionString";
-            this.txbRemoteConnectionString.Size = new System.Drawing.Size(793, 26);
-            this.txbRemoteConnectionString.TabIndex = 6;
+            txbRemoteConnectionString.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txbRemoteConnectionString.Location = new Point(22, 132);
+            txbRemoteConnectionString.Margin = new Padding(4, 5, 4, 5);
+            txbRemoteConnectionString.Name = "txbRemoteConnectionString";
+            txbRemoteConnectionString.Size = new Size(793, 26);
+            txbRemoteConnectionString.TabIndex = 6;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 108);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(289, 20);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Строка подключения удаленной БД:";
+            label2.AutoSize = true;
+            label2.Location = new Point(18, 108);
+            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(217, 20);
+            label2.TabIndex = 5;
+            label2.Text = "Папка хранения архива БД:";
             // 
             // lblTimeBeforeMoveDataToArchive
             // 
-            this.lblTimeBeforeMoveDataToArchive.AutoSize = true;
-            this.lblTimeBeforeMoveDataToArchive.Location = new System.Drawing.Point(18, 215);
-            this.lblTimeBeforeMoveDataToArchive.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblTimeBeforeMoveDataToArchive.Name = "lblTimeBeforeMoveDataToArchive";
-            this.lblTimeBeforeMoveDataToArchive.Size = new System.Drawing.Size(281, 20);
-            this.lblTimeBeforeMoveDataToArchive.TabIndex = 8;
-            this.lblTimeBeforeMoveDataToArchive.Text = "Время до переноса данных в архив:";
+            lblTimeBeforeMoveDataToArchive.AutoSize = true;
+            lblTimeBeforeMoveDataToArchive.Location = new Point(18, 215);
+            lblTimeBeforeMoveDataToArchive.Margin = new Padding(4, 0, 4, 0);
+            lblTimeBeforeMoveDataToArchive.Name = "lblTimeBeforeMoveDataToArchive";
+            lblTimeBeforeMoveDataToArchive.Size = new Size(281, 20);
+            lblTimeBeforeMoveDataToArchive.TabIndex = 8;
+            lblTimeBeforeMoveDataToArchive.Text = "Время до переноса данных в архив:";
             // 
             // txbDelayBeforeMoveDataToArchive
             // 
-            this.txbDelayBeforeMoveDataToArchive.Location = new System.Drawing.Point(312, 211);
-            this.txbDelayBeforeMoveDataToArchive.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.txbDelayBeforeMoveDataToArchive.Name = "txbDelayBeforeMoveDataToArchive";
-            this.txbDelayBeforeMoveDataToArchive.Size = new System.Drawing.Size(148, 26);
-            this.txbDelayBeforeMoveDataToArchive.TabIndex = 9;
+            txbDelayBeforeMoveDataToArchive.Location = new Point(312, 211);
+            txbDelayBeforeMoveDataToArchive.Margin = new Padding(4, 5, 4, 5);
+            txbDelayBeforeMoveDataToArchive.Name = "txbDelayBeforeMoveDataToArchive";
+            txbDelayBeforeMoveDataToArchive.Size = new Size(148, 26);
+            txbDelayBeforeMoveDataToArchive.TabIndex = 9;
             // 
             // lblSeconds
             // 
-            this.lblSeconds.AutoSize = true;
-            this.lblSeconds.Location = new System.Drawing.Point(471, 215);
-            this.lblSeconds.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblSeconds.Name = "lblSeconds";
-            this.lblSeconds.Size = new System.Drawing.Size(34, 20);
-            this.lblSeconds.TabIndex = 10;
-            this.lblSeconds.Text = "сек";
+            lblSeconds.AutoSize = true;
+            lblSeconds.Location = new Point(471, 215);
+            lblSeconds.Margin = new Padding(4, 0, 4, 0);
+            lblSeconds.Name = "lblSeconds";
+            lblSeconds.Size = new Size(34, 20);
+            lblSeconds.TabIndex = 10;
+            lblSeconds.Text = "сек";
             // 
             // DoMCDBSettingsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(957, 340);
-            this.Controls.Add(this.lblSeconds);
-            this.Controls.Add(this.txbDelayBeforeMoveDataToArchive);
-            this.Controls.Add(this.lblTimeBeforeMoveDataToArchive);
-            this.Controls.Add(this.btnRemoteDBBrowse);
-            this.Controls.Add(this.txbRemoteConnectionString);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.btnLocalDBBrowse);
-            this.Controls.Add(this.txbLocalConnectionString);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnOK);
-            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Name = "DoMCDBSettingsForm";
-            this.Text = "Настройка строк подключения к БД";
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(9F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(957, 340);
+            Controls.Add(lblSeconds);
+            Controls.Add(txbDelayBeforeMoveDataToArchive);
+            Controls.Add(lblTimeBeforeMoveDataToArchive);
+            Controls.Add(btnRemoteDBBrowse);
+            Controls.Add(txbRemoteConnectionString);
+            Controls.Add(label2);
+            Controls.Add(btnLocalDBBrowse);
+            Controls.Add(txbLocalConnectionString);
+            Controls.Add(label1);
+            Controls.Add(btnCancel);
+            Controls.Add(btnOK);
+            Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            Margin = new Padding(4, 5, 4, 5);
+            Name = "DoMCDBSettingsForm";
+            Text = "Настройка подключения к БД";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
