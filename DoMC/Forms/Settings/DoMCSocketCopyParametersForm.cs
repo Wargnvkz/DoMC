@@ -51,7 +51,7 @@ namespace DoMC.Forms
                 col.HeaderCell.Style.Padding = new Padding(0);
             }
             SocketPanels = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets, SocketChange_Click);
-            SocketParametersToCopy = context.Configuration.ReadingSocketsSettings.CCDSocketParameters[0].Clone();
+            SocketParametersToCopy = socketParameters[0].Clone();
             SocketParameters = socketParameters;
             switch (displyOption)
             {

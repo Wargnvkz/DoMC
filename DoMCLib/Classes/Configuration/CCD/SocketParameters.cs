@@ -23,8 +23,16 @@ namespace DoMCLib.Classes.Configuration.CCD
         public void FillTarget(ref SocketParameters target, CopySocketParameters copySocketParameters)
         {
             if (target == null) target = new SocketParameters();
-            ReadingParameters.FillTarget(ref target.ReadingParameters, copySocketParameters.CopySocketReadingParameters);
-            ImageCheckingParameters.FillTarget(ref target.ImageCheckingParameters, copySocketParameters.CopyImageProcessParameters);
+            if (copySocketParameters.CopySocketReadingParameters.HasAnySelection())
+            {
+                if (target.ReadingParameters == null) target.ReadingParameters = new SocketReadingParameters();
+                ReadingParameters.FillTarget(ref target.ReadingParameters, copySocketParameters.CopySocketReadingParameters);
+            }
+            if (copySocketParameters.CopyImageProcessParameters.HasAnySelection())
+            {
+                if (target.ImageCheckingParameters == null) target.ImageCheckingParameters = new ImageProcessParameters();
+                ImageCheckingParameters.FillTarget(ref target.ImageCheckingParameters, copySocketParameters.CopyImageProcessParameters);
+            }
         }
 
         public class CopySocketParameters

@@ -28,10 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridView dgvCardNumbers;
-            dgvCardNumberText = new DataGridViewTextBoxColumn();
-            dgvBtnOn = new DataGridViewButtonColumn();
-            dgvBtnOff = new DataGridViewButtonColumn();
             lblSocketQuantityCaption = new Label();
             pnlSockets = new Panel();
             bntReset = new Button();
@@ -52,32 +48,14 @@
             panel1 = new Panel();
             lblWhereToCopyCaption = new Label();
             lblWhatToCopyCaption = new Label();
+            dgvCardNumberText = new DataGridViewTextBoxColumn();
+            dgvBtnOn = new DataGridViewButtonColumn();
+            dgvBtnOff = new DataGridViewButtonColumn();
             dgvCardNumbers = new DataGridView();
             gbReadingParameters.SuspendLayout();
             gbCheckingParameters.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvCardNumbers).BeginInit();
             SuspendLayout();
-            // 
-            // dgvCardNumberText
-            // 
-            dgvCardNumberText.DataPropertyName = "CardName";
-            dgvCardNumberText.HeaderText = "Плата";
-            dgvCardNumberText.Name = "dgvCardNumberText";
-            dgvCardNumberText.Resizable = DataGridViewTriState.False;
-            // 
-            // dgvBtnOn
-            // 
-            dgvBtnOn.DataPropertyName = "On";
-            dgvBtnOn.HeaderText = "Включить";
-            dgvBtnOn.Name = "dgvBtnOn";
-            dgvBtnOn.Width = 80;
-            // 
-            // dgvBtnOff
-            // 
-            dgvBtnOff.DataPropertyName = "Off";
-            dgvBtnOff.HeaderText = "Выключить";
-            dgvBtnOff.Name = "dgvBtnOff";
-            dgvBtnOff.Width = 80;
             // 
             // lblSocketQuantityCaption
             // 
@@ -269,23 +247,6 @@
             panel1.Size = new Size(127, 89);
             panel1.TabIndex = 101;
             // 
-            // dgvCardNumbers
-            // 
-            dgvCardNumbers.AllowUserToAddRows = false;
-            dgvCardNumbers.AllowUserToDeleteRows = false;
-            dgvCardNumbers.AllowUserToResizeRows = false;
-            dgvCardNumbers.BackgroundColor = SystemColors.Control;
-            dgvCardNumbers.BorderStyle = BorderStyle.None;
-            dgvCardNumbers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvCardNumbers.Columns.AddRange(new DataGridViewColumn[] { dgvCardNumberText, dgvBtnOn, dgvBtnOff });
-            dgvCardNumbers.Location = new Point(824, 59);
-            dgvCardNumbers.MultiSelect = false;
-            dgvCardNumbers.Name = "dgvCardNumbers";
-            dgvCardNumbers.RowHeadersVisible = false;
-            dgvCardNumbers.Size = new Size(293, 444);
-            dgvCardNumbers.TabIndex = 9;
-            dgvCardNumbers.CellContentClick += dgvCardNumbers_CellContentClick;
-            // 
             // lblWhereToCopyCaption
             // 
             lblWhereToCopyCaption.AutoSize = true;
@@ -304,16 +265,58 @@
             lblWhatToCopyCaption.TabIndex = 13;
             lblWhatToCopyCaption.Text = "Какие параметры копировать:";
             // 
+            // dgvCardNumberText
+            // 
+            dgvCardNumberText.DataPropertyName = "CardName";
+            dgvCardNumberText.HeaderText = "Плата";
+            dgvCardNumberText.Name = "dgvCardNumberText";
+            dgvCardNumberText.ReadOnly = true;
+            dgvCardNumberText.Resizable = DataGridViewTriState.False;
+            // 
+            // dgvBtnOn
+            // 
+            dgvBtnOn.DataPropertyName = "On";
+            dgvBtnOn.HeaderText = "Включить";
+            dgvBtnOn.Name = "dgvBtnOn";
+            dgvBtnOn.Resizable = DataGridViewTriState.False;
+            dgvBtnOn.Width = 80;
+            // 
+            // dgvBtnOff
+            // 
+            dgvBtnOff.DataPropertyName = "Off";
+            dgvBtnOff.HeaderText = "Выключить";
+            dgvBtnOff.Name = "dgvBtnOff";
+            dgvBtnOff.Resizable = DataGridViewTriState.False;
+            dgvBtnOff.Width = 80;
+            // 
+            // dgvCardNumbers
+            // 
+            dgvCardNumbers.AllowUserToAddRows = false;
+            dgvCardNumbers.AllowUserToDeleteRows = false;
+            dgvCardNumbers.AllowUserToResizeColumns = false;
+            dgvCardNumbers.AllowUserToResizeRows = false;
+            dgvCardNumbers.BackgroundColor = SystemColors.Control;
+            dgvCardNumbers.BorderStyle = BorderStyle.None;
+            dgvCardNumbers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvCardNumbers.Columns.AddRange(new DataGridViewColumn[] { dgvCardNumberText, dgvBtnOn, dgvBtnOff });
+            dgvCardNumbers.Location = new Point(825, 59);
+            dgvCardNumbers.MultiSelect = false;
+            dgvCardNumbers.Name = "dgvCardNumbers";
+            dgvCardNumbers.RowHeadersVisible = false;
+            dgvCardNumbers.Size = new Size(292, 444);
+            dgvCardNumbers.TabIndex = 14;
+            dgvCardNumbers.CellContentClick += dgvCardNumbers_CellContentClick;
+            // 
             // DoMCSocketCopyParametersForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1130, 539);
+            Controls.Add(dgvCardNumbers);
             Controls.Add(lblWhatToCopyCaption);
             Controls.Add(lblWhereToCopyCaption);
             Controls.Add(gbCheckingParameters);
             Controls.Add(gbReadingParameters);
-            Controls.Add(dgvCardNumbers);
             Controls.Add(lblSocketQuantity);
             Controls.Add(btnSetAll);
             Controls.Add(btnCancel);
@@ -345,10 +348,6 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnSetAll;
         private System.Windows.Forms.Label lblSocketQuantity;
-        private DataGridView dgvCardNumbers;
-        private DataGridViewTextBoxColumn dgvCardNumberText;
-        private DataGridViewButtonColumn dgvBtnOn;
-        private DataGridViewButtonColumn dgvBtnOff;
         private GroupBox gbReadingParameters;
         private GroupBox gbCheckingParameters;
         private CheckBox cbExposition;
@@ -362,5 +361,9 @@
         private CheckBox cbDecisionOperations;
         private Label lblWhereToCopyCaption;
         private Label lblWhatToCopyCaption;
+        private DataGridView dgvCardNumbers;
+        private DataGridViewTextBoxColumn dgvCardNumberText;
+        private DataGridViewButtonColumn dgvBtnOn;
+        private DataGridViewButtonColumn dgvBtnOff;
     }
 }

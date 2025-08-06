@@ -12,6 +12,7 @@ using DoMCLib.Classes.Configuration.CCD;
 using DoMC.Forms;
 using DoMCLib.Classes;
 using System.Runtime.CompilerServices;
+using DoMC;
 
 namespace DoMCLib.Forms
 {
@@ -55,6 +56,8 @@ namespace DoMCLib.Forms
             {
                 var n = (int)ctrl.Tag;
                 var form = new DoMCImageProcessSettingsForm();
+                if (SocketParameters[n] == null) SocketParameters = new SocketParameters[Context.Configuration.HardwareSettings.SocketQuantity];
+                if (SocketParameters[n].ImageCheckingParameters == null) SocketParameters[n].ImageCheckingParameters = new ImageProcessParameters();
                 form.ImageCheckingParameters = SocketParameters[n].ImageCheckingParameters.Clone();
                 if (form.ShowDialog() == DialogResult.OK)
                 {
@@ -76,11 +79,6 @@ namespace DoMCLib.Forms
             {
                 MessageBox.Show("Копирование отменено");
             }
-            /*var ip1 = SocketParameters[0].ImageCheckingParameters;
-            for (int i = 1; i < SocketParameters.Length; i++)
-            {
-                SocketParameters[i].ImageCheckingParameters = ip1.Clone();
-            }*/
 
         }
     }
