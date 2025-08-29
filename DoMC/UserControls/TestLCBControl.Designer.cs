@@ -401,6 +401,7 @@
             txbTestLCBDelayLengthMm.Name = "txbTestLCBDelayLengthMm";
             txbTestLCBDelayLengthMm.Size = new Size(79, 23);
             txbTestLCBDelayLengthMm.TabIndex = 34;
+            txbTestLCBDelayLengthMm.TextChanged += txbTestLCBDelayLengthMm_TextChanged;
             txbTestLCBDelayLengthMm.DoubleClick += txbInput_DoubleClick;
             // 
             // txbTestLCBPreformLengthMm
