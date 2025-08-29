@@ -1,4 +1,4 @@
-﻿namespace DoMCLib.Forms
+﻿namespace DoMC.Forms
 {
     partial class ShowPreformImages
     {

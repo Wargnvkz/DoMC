@@ -146,6 +146,16 @@ namespace DoMCLib.Forms
             }
             ipp.Decisions[1].DecisionAction = (MakeDecisionAction)cbColorResult.SelectedValue;
             ipp.Decisions[1].ParameterCompareGoodIfLess = (short)nudColorParameterResult.Value;
+
+        }
+        private void num_DoubleClick(object sender, EventArgs e)
+        {
+            if (sender is NumericUpDown num)
+            {
+                var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения", false, (int)num.Value);
+                if (newvalue >= 0)
+                    num.Value = newvalue;
+            }
         }
     }
 }

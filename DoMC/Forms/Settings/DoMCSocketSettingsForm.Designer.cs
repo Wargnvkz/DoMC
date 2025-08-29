@@ -28,226 +28,214 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.nudMeasureDelay = new System.Windows.Forms.NumericUpDown();
-            this.label11 = new System.Windows.Forms.Label();
-            this.nudDataType = new System.Windows.Forms.NumericUpDown();
-            this.label10 = new System.Windows.Forms.Label();
-            this.nudFilterModule = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
-            this.nudFrameDuration = new System.Windows.Forms.NumericUpDown();
-            this.nudExposition = new System.Windows.Forms.NumericUpDown();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.btnOK = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.epError = new System.Windows.Forms.ErrorProvider(this.components);
-            this.btnImageParameters = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMeasureDelay)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudDataType)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudFilterModule)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudFrameDuration)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudExposition)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.epError)).BeginInit();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            nudMeasureDelay = new NumericUpDown();
+            label11 = new Label();
+            nudDataType = new NumericUpDown();
+            label10 = new Label();
+            nudFilterModule = new NumericUpDown();
+            label4 = new Label();
+            nudFrameDuration = new NumericUpDown();
+            nudExposition = new NumericUpDown();
+            label3 = new Label();
+            label2 = new Label();
+            btnOK = new Button();
+            btnCancel = new Button();
+            epError = new ErrorProvider(components);
+            btnImageParameters = new Button();
+            ((System.ComponentModel.ISupportInitialize)nudMeasureDelay).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudDataType).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudFilterModule).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudFrameDuration).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudExposition).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)epError).BeginInit();
+            SuspendLayout();
             // 
             // nudMeasureDelay
             // 
-            this.nudMeasureDelay.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.nudMeasureDelay.Location = new System.Drawing.Point(239, 147);
-            this.nudMeasureDelay.Maximum = new decimal(new int[] {
-            32767,
-            0,
-            0,
-            0});
-            this.nudMeasureDelay.Name = "nudMeasureDelay";
-            this.nudMeasureDelay.Size = new System.Drawing.Size(75, 29);
-            this.nudMeasureDelay.TabIndex = 52;
+            nudMeasureDelay.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            nudMeasureDelay.Location = new Point(279, 170);
+            nudMeasureDelay.Margin = new Padding(4, 3, 4, 3);
+            nudMeasureDelay.Maximum = new decimal(new int[] { 32767, 0, 0, 0 });
+            nudMeasureDelay.Name = "nudMeasureDelay";
+            nudMeasureDelay.Size = new Size(88, 29);
+            nudMeasureDelay.TabIndex = 52;
+            nudMeasureDelay.DoubleClick += num_DoubleClick;
             // 
             // label11
             // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label11.Location = new System.Drawing.Point(12, 149);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(138, 24);
-            this.label11.TabIndex = 51;
-            this.label11.Text = "Задержка, мс:";
+            label11.AutoSize = true;
+            label11.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label11.Location = new Point(14, 172);
+            label11.Margin = new Padding(4, 0, 4, 0);
+            label11.Name = "label11";
+            label11.Size = new Size(138, 24);
+            label11.TabIndex = 51;
+            label11.Text = "Задержка, мс:";
             // 
             // nudDataType
             // 
-            this.nudDataType.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.nudDataType.Location = new System.Drawing.Point(239, 111);
-            this.nudDataType.Maximum = new decimal(new int[] {
-            32767,
-            0,
-            0,
-            0});
-            this.nudDataType.Name = "nudDataType";
-            this.nudDataType.Size = new System.Drawing.Size(75, 29);
-            this.nudDataType.TabIndex = 49;
+            nudDataType.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            nudDataType.Location = new Point(279, 128);
+            nudDataType.Margin = new Padding(4, 3, 4, 3);
+            nudDataType.Maximum = new decimal(new int[] { 32767, 0, 0, 0 });
+            nudDataType.Name = "nudDataType";
+            nudDataType.Size = new Size(88, 29);
+            nudDataType.TabIndex = 49;
+            nudDataType.DoubleClick += num_DoubleClick;
             // 
             // label10
             // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label10.Location = new System.Drawing.Point(12, 113);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(121, 24);
-            this.label10.TabIndex = 48;
-            this.label10.Text = "Тип данных:";
+            label10.AutoSize = true;
+            label10.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label10.Location = new Point(14, 130);
+            label10.Margin = new Padding(4, 0, 4, 0);
+            label10.Name = "label10";
+            label10.Size = new Size(121, 24);
+            label10.TabIndex = 48;
+            label10.Text = "Тип данных:";
             // 
             // nudFilterModule
             // 
-            this.nudFilterModule.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.nudFilterModule.Location = new System.Drawing.Point(239, 75);
-            this.nudFilterModule.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.nudFilterModule.Name = "nudFilterModule";
-            this.nudFilterModule.Size = new System.Drawing.Size(75, 29);
-            this.nudFilterModule.TabIndex = 40;
+            nudFilterModule.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            nudFilterModule.Location = new Point(279, 87);
+            nudFilterModule.Margin = new Padding(4, 3, 4, 3);
+            nudFilterModule.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
+            nudFilterModule.Name = "nudFilterModule";
+            nudFilterModule.Size = new Size(88, 29);
+            nudFilterModule.TabIndex = 40;
+            nudFilterModule.DoubleClick += num_DoubleClick;
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(12, 77);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(199, 24);
-            this.label4.TabIndex = 36;
-            this.label4.Text = "Модуль фильтрации:";
+            label4.AutoSize = true;
+            label4.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label4.Location = new Point(14, 89);
+            label4.Margin = new Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(199, 24);
+            label4.TabIndex = 36;
+            label4.Text = "Модуль фильтрации:";
             // 
             // nudFrameDuration
             // 
-            this.nudFrameDuration.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.nudFrameDuration.Location = new System.Drawing.Point(239, 41);
-            this.nudFrameDuration.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.nudFrameDuration.Name = "nudFrameDuration";
-            this.nudFrameDuration.Size = new System.Drawing.Size(75, 29);
-            this.nudFrameDuration.TabIndex = 34;
-            this.nudFrameDuration.Value = new decimal(new int[] {
-            1300,
-            0,
-            0,
-            0});
-            this.nudFrameDuration.DoubleClick += new System.EventHandler(this.numExposition_DoubleClick);
+            nudFrameDuration.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            nudFrameDuration.Location = new Point(279, 47);
+            nudFrameDuration.Margin = new Padding(4, 3, 4, 3);
+            nudFrameDuration.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
+            nudFrameDuration.Name = "nudFrameDuration";
+            nudFrameDuration.Size = new Size(88, 29);
+            nudFrameDuration.TabIndex = 34;
+            nudFrameDuration.Value = new decimal(new int[] { 1300, 0, 0, 0 });
+            nudFrameDuration.DoubleClick += num_DoubleClick;
             // 
             // nudExposition
             // 
-            this.nudExposition.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.nudExposition.Location = new System.Drawing.Point(239, 6);
-            this.nudExposition.Maximum = new decimal(new int[] {
-            65535,
-            0,
-            0,
-            0});
-            this.nudExposition.Name = "nudExposition";
-            this.nudExposition.Size = new System.Drawing.Size(75, 29);
-            this.nudExposition.TabIndex = 33;
-            this.nudExposition.Value = new decimal(new int[] {
-            40,
-            0,
-            0,
-            0});
-            this.nudExposition.DoubleClick += new System.EventHandler(this.numExposition_DoubleClick);
-            this.nudExposition.Validating += new System.ComponentModel.CancelEventHandler(this.nudExposition_Validating);
+            nudExposition.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            nudExposition.Location = new Point(279, 7);
+            nudExposition.Margin = new Padding(4, 3, 4, 3);
+            nudExposition.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
+            nudExposition.Name = "nudExposition";
+            nudExposition.Size = new Size(88, 29);
+            nudExposition.TabIndex = 33;
+            nudExposition.Value = new decimal(new int[] { 40, 0, 0, 0 });
+            nudExposition.DoubleClick += num_DoubleClick;
+            nudExposition.Validating += nudExposition_Validating;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(12, 43);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(146, 24);
-            this.label3.TabIndex = 32;
-            this.label3.Text = "Длина фрейма:";
+            label3.AutoSize = true;
+            label3.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label3.Location = new Point(14, 50);
+            label3.Margin = new Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(146, 24);
+            label3.TabIndex = 32;
+            label3.Text = "Длина фрейма:";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(12, 11);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(122, 24);
-            this.label2.TabIndex = 31;
-            this.label2.Text = "Экспозиция:";
+            label2.AutoSize = true;
+            label2.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label2.Location = new Point(14, 13);
+            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(122, 24);
+            label2.TabIndex = 31;
+            label2.Text = "Экспозиция:";
             // 
             // btnOK
             // 
-            this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnOK.Location = new System.Drawing.Point(12, 274);
-            this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(106, 37);
-            this.btnOK.TabIndex = 53;
-            this.btnOK.Text = "OK";
-            this.btnOK.UseVisualStyleBackColor = true;
+            btnOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnOK.DialogResult = DialogResult.OK;
+            btnOK.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnOK.Location = new Point(14, 316);
+            btnOK.Margin = new Padding(4, 3, 4, 3);
+            btnOK.Name = "btnOK";
+            btnOK.Size = new Size(124, 43);
+            btnOK.TabIndex = 53;
+            btnOK.Text = "OK";
+            btnOK.UseVisualStyleBackColor = true;
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.CausesValidation = false;
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnCancel.Location = new System.Drawing.Point(208, 274);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(106, 37);
-            this.btnCancel.TabIndex = 54;
-            this.btnCancel.Text = " Отмена";
-            this.btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCancel.CausesValidation = false;
+            btnCancel.DialogResult = DialogResult.Cancel;
+            btnCancel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnCancel.Location = new Point(243, 316);
+            btnCancel.Margin = new Padding(4, 3, 4, 3);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(124, 43);
+            btnCancel.TabIndex = 54;
+            btnCancel.Text = " Отмена";
+            btnCancel.UseVisualStyleBackColor = true;
             // 
             // epError
             // 
-            this.epError.ContainerControl = this;
+            epError.ContainerControl = this;
             // 
             // btnImageParameters
             // 
-            this.btnImageParameters.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnImageParameters.Location = new System.Drawing.Point(16, 182);
-            this.btnImageParameters.Name = "btnImageParameters";
-            this.btnImageParameters.Size = new System.Drawing.Size(298, 68);
-            this.btnImageParameters.TabIndex = 83;
-            this.btnImageParameters.Text = "Настройки приятия решения";
-            this.btnImageParameters.UseVisualStyleBackColor = true;
-            this.btnImageParameters.Click += new System.EventHandler(this.btnImageParameters_Click);
+            btnImageParameters.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnImageParameters.Location = new Point(19, 210);
+            btnImageParameters.Margin = new Padding(4, 3, 4, 3);
+            btnImageParameters.Name = "btnImageParameters";
+            btnImageParameters.Size = new Size(348, 78);
+            btnImageParameters.TabIndex = 83;
+            btnImageParameters.Text = "Настройки приятия решения";
+            btnImageParameters.UseVisualStyleBackColor = true;
+            btnImageParameters.Click += btnImageParameters_Click;
             // 
             // DoMCSocketSettingsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(326, 323);
-            this.Controls.Add(this.btnImageParameters);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnOK);
-            this.Controls.Add(this.nudMeasureDelay);
-            this.Controls.Add(this.label11);
-            this.Controls.Add(this.nudDataType);
-            this.Controls.Add(this.label10);
-            this.Controls.Add(this.nudFilterModule);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.nudFrameDuration);
-            this.Controls.Add(this.nudExposition);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Name = "DoMCSocketSettingsForm";
-            this.Text = "SettingsForm";
-            ((System.ComponentModel.ISupportInitialize)(this.nudMeasureDelay)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudDataType)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudFilterModule)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudFrameDuration)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudExposition)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.epError)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(380, 373);
+            Controls.Add(btnImageParameters);
+            Controls.Add(btnCancel);
+            Controls.Add(btnOK);
+            Controls.Add(nudMeasureDelay);
+            Controls.Add(label11);
+            Controls.Add(nudDataType);
+            Controls.Add(label10);
+            Controls.Add(nudFilterModule);
+            Controls.Add(label4);
+            Controls.Add(nudFrameDuration);
+            Controls.Add(nudExposition);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Margin = new Padding(4, 3, 4, 3);
+            Name = "DoMCSocketSettingsForm";
+            Text = "SettingsForm";
+            ((System.ComponentModel.ISupportInitialize)nudMeasureDelay).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudDataType).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudFilterModule).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudFrameDuration).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudExposition).EndInit();
+            ((System.ComponentModel.ISupportInitialize)epError).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

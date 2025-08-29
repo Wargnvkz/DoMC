@@ -80,7 +80,7 @@ namespace DoMC.Classes
             _cts.Cancel();
             await _pollingTask;
             _pollingTask = null;
-            _cts.Dispose();
+            _cts?.Dispose();
             _cts = null;
         }
     }

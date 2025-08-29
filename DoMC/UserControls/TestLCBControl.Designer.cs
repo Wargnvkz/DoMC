@@ -401,6 +401,7 @@
             txbTestLCBDelayLengthMm.Name = "txbTestLCBDelayLengthMm";
             txbTestLCBDelayLengthMm.Size = new Size(79, 23);
             txbTestLCBDelayLengthMm.TabIndex = 34;
+            txbTestLCBDelayLengthMm.DoubleClick += txbInput_DoubleClick;
             // 
             // txbTestLCBPreformLengthMm
             // 
@@ -410,6 +411,8 @@
             txbTestLCBPreformLengthMm.Name = "txbTestLCBPreformLengthMm";
             txbTestLCBPreformLengthMm.Size = new Size(79, 23);
             txbTestLCBPreformLengthMm.TabIndex = 33;
+            txbTestLCBPreformLengthMm.TextChanged += txbTestLCBPreformLengthMm_TextChanged;
+            txbTestLCBPreformLengthMm.DoubleClick += txbInput_DoubleClick;
             // 
             // lblTestLCBDelayLengthValue
             // 
@@ -441,6 +444,8 @@
             txbTestLCBDelayLength.Name = "txbTestLCBDelayLength";
             txbTestLCBDelayLength.Size = new Size(79, 23);
             txbTestLCBDelayLength.TabIndex = 30;
+            txbTestLCBDelayLength.TextChanged += txbTestLCBDelayLength_TextChanged;
+            txbTestLCBDelayLength.DoubleClick += txbInput_DoubleClick;
             // 
             // lblTestLCBDelayLength
             // 
@@ -485,6 +490,8 @@
             txbTestLCBPreformLength.Name = "txbTestLCBPreformLength";
             txbTestLCBPreformLength.Size = new Size(79, 23);
             txbTestLCBPreformLength.TabIndex = 26;
+            txbTestLCBPreformLength.TextChanged += txbTestLCBPreformLength_TextChanged;
+            txbTestLCBPreformLength.DoubleClick += txbInput_DoubleClick;
             // 
             // lblTestLCBPreformLength
             // 
@@ -554,6 +561,7 @@
             txbTestLCBCurrent.Name = "txbTestLCBCurrent";
             txbTestLCBCurrent.Size = new Size(76, 23);
             txbTestLCBCurrent.TabIndex = 24;
+            txbTestLCBCurrent.DoubleClick += txbInput_DoubleClick;
             // 
             // lblTestLCBCurrent
             // 
@@ -907,9 +915,9 @@
             cbTestLCBOutput5.Location = new Point(10, 219);
             cbTestLCBOutput5.Margin = new Padding(4, 5, 4, 5);
             cbTestLCBOutput5.Name = "cbTestLCBOutput5";
-            cbTestLCBOutput5.Size = new Size(105, 21);
+            cbTestLCBOutput5.Size = new Size(129, 21);
             cbTestLCBOutput5.TabIndex = 5;
-            cbTestLCBOutput5.Text = "Запас PC12";
+            cbTestLCBOutput5.Text = "Синхронизация";
             cbTestLCBOutput5.UseVisualStyleBackColor = true;
             // 
             // cbTestLCBOutput4
@@ -918,9 +926,9 @@
             cbTestLCBOutput4.Location = new Point(10, 182);
             cbTestLCBOutput4.Margin = new Padding(4, 5, 4, 5);
             cbTestLCBOutput4.Name = "cbTestLCBOutput4";
-            cbTestLCBOutput4.Size = new Size(129, 21);
+            cbTestLCBOutput4.Size = new Size(91, 21);
             cbTestLCBOutput4.TabIndex = 4;
-            cbTestLCBOutput4.Text = "Синхронизация";
+            cbTestLCBOutput4.Text = "Запасной";
             cbTestLCBOutput4.UseVisualStyleBackColor = true;
             // 
             // cbTestLCBOutput3

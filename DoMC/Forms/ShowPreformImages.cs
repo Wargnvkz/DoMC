@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace DoMCLib.Forms
+namespace DoMC.Forms
 {
     public partial class ShowPreformImages : Form
     {
@@ -67,7 +67,7 @@ namespace DoMCLib.Forms
 
         private async Task Observer_NotificationReceivers(string arg1, object? arg2)
         {
-            if (arg1 == EventNamesList.InterfaceImagesSelected)
+            if (arg1 == DoMCLib.EventNamesList.InterfaceImagesSelected)
             {
                 if (arg2 != null)
                 {
@@ -201,7 +201,7 @@ namespace DoMCLib.Forms
                             var ErrStr = ImageProcessResult.ErrorToString();
                             lblResultResult.Text = isSocketGood ? "✓" : ErrStr;// "X";
 
-                            ImageProcessResult = new Classes.ImageProcessResult();
+                            ImageProcessResult = new DoMCLib.Classes.ImageProcessResult();
                             ImageProcessResult.ResultImage = DoMCLib.Tools.ImageTools.GetDifference(StandardImageToDraw, ImageToDraw);
                         }
                         break;
@@ -228,11 +228,11 @@ namespace DoMCLib.Forms
                     case DefectMethod.Gradient:
                         {
                             var stat = ImageTools.CalculateDeviationFull(new short[][,] { StandardImageToDraw });
-                            var k = 25000d / stat.Max[0];
+                            /*var k = 25000d / stat.Max[0];
                             var std = ImageTools.Multiply(StandardImageToDraw, k);
-                            var img = ImageTools.Multiply(ImageToDraw, k);
-                            var dif = DoMCLib.Tools.ImageTools.GetDifference(std, img);
-                            var grad = ImageTools.GradientAbs(dif);
+                            var img = ImageTools.Multiply(ImageToDraw, k);*/
+                            var dif = DoMCLib.Tools.ImageTools.GetDifference(StandardImageToDraw, ImageToDraw);
+                            var grad = ImageTools.Gradient(dif);
 
                             ImageProcessResult.ResultImage = grad;
                         }
@@ -506,17 +506,17 @@ namespace DoMCLib.Forms
             CheckArea = ImageProcessParameters.GetRectangle();
             if (ImageProcessParameters.Decisions[0].Operations.Count == 0)
             {
-                ImageProcessParameters.Decisions[0].Operations.Add(new Classes.Configuration.CCD.DecisionOperation() { OperationType = Classes.Configuration.CCD.DecisionOperationType.Difference, Parameter = 0 });
-                ImageProcessParameters.Decisions[0].Operations.Add(new Classes.Configuration.CCD.DecisionOperation() { OperationType = Classes.Configuration.CCD.DecisionOperationType.Dispersion, Parameter = 10 });
-                ImageProcessParameters.Decisions[0].Result = Classes.Configuration.CCD.DecisionActionResult.Defect;
-                ImageProcessParameters.Decisions[0].DecisionAction = Classes.MakeDecisionAction.Max;
+                ImageProcessParameters.Decisions[0].Operations.Add(new DoMCLib.Classes.Configuration.CCD.DecisionOperation() { OperationType = DoMCLib.Classes.Configuration.CCD.DecisionOperationType.Difference, Parameter = 0 });
+                ImageProcessParameters.Decisions[0].Operations.Add(new DoMCLib.Classes.Configuration.CCD.DecisionOperation() { OperationType = DoMCLib.Classes.Configuration.CCD.DecisionOperationType.Dispersion, Parameter = 10 });
+                ImageProcessParameters.Decisions[0].Result = DoMCLib.Classes.Configuration.CCD.DecisionActionResult.Defect;
+                ImageProcessParameters.Decisions[0].DecisionAction = DoMCLib.Classes.MakeDecisionAction.Max;
                 ImageProcessParameters.Decisions[0].ParameterCompareGoodIfLess = 1500;
             }
             if (ImageProcessParameters.Decisions[1].Operations.Count == 0)
             {
-                ImageProcessParameters.Decisions[1].Operations.Add(new Classes.Configuration.CCD.DecisionOperation() { OperationType = Classes.Configuration.CCD.DecisionOperationType.Difference, Parameter = 0 });
-                ImageProcessParameters.Decisions[1].Result = Classes.Configuration.CCD.DecisionActionResult.Color;
-                ImageProcessParameters.Decisions[1].DecisionAction = Classes.MakeDecisionAction.Average;
+                ImageProcessParameters.Decisions[1].Operations.Add(new DoMCLib.Classes.Configuration.CCD.DecisionOperation() { OperationType = DoMCLib.Classes.Configuration.CCD.DecisionOperationType.Difference, Parameter = 0 });
+                ImageProcessParameters.Decisions[1].Result = DoMCLib.Classes.Configuration.CCD.DecisionActionResult.Color;
+                ImageProcessParameters.Decisions[1].DecisionAction = DoMCLib.Classes.MakeDecisionAction.Average;
                 ImageProcessParameters.Decisions[1].ParameterCompareGoodIfLess = 1500;
             }
         }
@@ -989,6 +989,16 @@ namespace DoMCLib.Forms
                 newline[i] = Math.Round(line[i], 10);
             }
             return newline;
+        }
+
+        private void num_DoubleClick(object sender, EventArgs e)
+        {
+            if (sender is NumericUpDown num)
+            {
+                var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения", false, (int)num.Value);
+                if (newvalue >= 0)
+                    num.Value = newvalue;
+            }
         }
 
     }

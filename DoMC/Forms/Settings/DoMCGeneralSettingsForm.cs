@@ -14,22 +14,36 @@ namespace DoMCLib.Forms
     {
         public DoMCStandardRecalculationSettings Value
         {
-            get {
+            get
+            {
                 var res = new DoMCStandardRecalculationSettings();
-                int.TryParse(txbCycles.Text, out res.NCycle);
-                double.TryParse(txbStandardPercent.Text, out res.StandardPercent);
+                res.NCycle = (int)nudCycles.Value;
+                res.StandardPercent = (int)nudStandardPercent.Value;
                 return res;
             }
-            set {
+            set
+            {
                 var gs = value;
-                txbCycles.Text = gs.NCycle.ToString();
-                txbStandardPercent.Text = gs.StandardPercent.ToString("F2");
+                nudCycles.Value = gs.NCycle;
+                nudStandardPercent.Value = (int)gs.StandardPercent;
             }
         }
-        
+
         public DoMCGeneralSettingsForm()
         {
             InitializeComponent();
+        }
+        private void num_DoubleClick(object sender, EventArgs e)
+        {
+            if (sender is NumericUpDown nud)
+            {
+                var title = "";
+                if (nud == nudCycles) title = "(Количество расчетных циклов)";
+                if (nud == nudStandardPercent) title = "(Процентов остающихся от изначального эталона)";
+                var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, (int)nud.Value);
+                if (newvalue >= 0)
+                    nud.Value = newvalue;
+            }
         }
     }
 }

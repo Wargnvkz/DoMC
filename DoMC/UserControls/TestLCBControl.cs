@@ -690,6 +690,7 @@ namespace DoMC.UserControls
             if (newvalue >= 0)
                 txb.Text = newvalue.ToString();
         }
+                
 
     }
 }

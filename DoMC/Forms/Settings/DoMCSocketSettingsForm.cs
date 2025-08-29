@@ -141,22 +141,24 @@ namespace DoMCLib.Forms
             return base.ShowDialog();
         }
 
-        private void numExposition_DoubleClick(object sender, EventArgs e)
+        private void num_DoubleClick(object sender, EventArgs e)
         {
-            var nud = (NumericUpDown)sender;
-            var title = "";
-            if (nud == nudExposition) title = "(Экспозиция)";
-            if (nud == nudFrameDuration) title = "(Длина фрейма)";
-            /*if (nud == nudDeviationWindow) title = "(Точек рассчета)";
-            if (nud == nudDeviationExcess) title = "(Максимальное значение оклонения)";
-            if (nud == nudAverageExcess) title = "(Максимальное значение среднего)";
-            if (nud == nudTop) title = "(Верхняя граница области проверки)";
-            if (nud == nudBottom) title = "(Нижняя граница области проверки)";
-            if (nud == nudLeft) title = "(Левая граница области проверки)";
-            if (nud == nudRight) title = "(Правая граница области проверки)";*/
-            var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, (int)nud.Value);
-            if (newvalue >= 0)
-                nud.Value = newvalue;
+            if (sender is NumericUpDown nud)
+            {
+                var title = "";
+                if (nud == nudExposition) title = "(Экспозиция)";
+                if (nud == nudFrameDuration) title = "(Длина фрейма)";
+                /*if (nud == nudDeviationWindow) title = "(Точек рассчета)";
+                if (nud == nudDeviationExcess) title = "(Максимальное значение оклонения)";
+                if (nud == nudAverageExcess) title = "(Максимальное значение среднего)";
+                if (nud == nudTop) title = "(Верхняя граница области проверки)";
+                if (nud == nudBottom) title = "(Нижняя граница области проверки)";
+                if (nud == nudLeft) title = "(Левая граница области проверки)";
+                if (nud == nudRight) title = "(Правая граница области проверки)";*/
+                var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, (int)nud.Value);
+                if (newvalue >= 0)
+                    nud.Value = newvalue;
+            }
         }
 
         private void nudExposition_Validating(object sender, CancelEventArgs e)
@@ -217,5 +219,6 @@ namespace DoMCLib.Forms
             }
 
         }
+
     }
 }

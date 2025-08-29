@@ -155,5 +155,26 @@ namespace DoMCLib.Forms
             }
         }
 
+        private void dgvSockets_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // проверяем, чтобы кликнули по строке, а не по заголовку
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                var cell = dgvSockets.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+                // проверяем, что это числовая колонка (можешь уточнить по типу или имени колонки)
+                if (cell.OwningColumn.ValueType == typeof(int) || cell.OwningColumn.ValueType == typeof(decimal))
+                {
+                    cell.Value = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения", false, (int)cell.Value);
+                    /*using (var form = new PinPadForm()) // твое окно для ввода цифр
+                    {
+                        if (form.ShowDialog() == DialogResult.OK)
+                        {
+                            cell.Value = form.Result; // результат из твоей формы
+                        }
+                    }*/
+                }
+            }
+        }
     }
 }

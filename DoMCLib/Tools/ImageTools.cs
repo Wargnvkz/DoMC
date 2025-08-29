@@ -376,7 +376,7 @@ namespace DoMCLib.Tools
                 return dif;
             }
         }
-               
+
 
         public static short[,] GetNewStandard(short[,] standard, short[,] image, double k)
         {
@@ -448,7 +448,7 @@ namespace DoMCLib.Tools
             {
                 for (int y = 0; y <= 510; y++)
                 {
-                    grad[y, x] = (short)(/*(src[y, x + 1] - src[y, x]) / 2 +*/ (src[y + 1, x] - src[y, x])/*/2*/);
+                    grad[y, x] = (short)(/*(src[y, x + 1] - src[y, x]) / 2 +*/ (src[y + 1, x] - src[y, x]) / 2);
                 }
             }
             return grad;

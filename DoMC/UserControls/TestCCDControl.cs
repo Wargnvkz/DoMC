@@ -416,7 +416,7 @@ namespace DoMC.Forms
             if (kheight > 1) kheight = 1;
             var wd = (int)(Width - 520 * kwidth * 3 - 50);
             WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"wd={wd}");
-            pnlSockets.Size = new Size(wd, socketButtonsHeight);//new Size(wd, (int)(512*kheight));
+            pnlSockets.Size = new Size(wd, socketButtonsHeight);//new Size(wd, (int)(512*kheight)); 
 
             pbTestReadImage.Location = new Point(wd + 10, pbTestReadImage.Location.Y);
             pbTestReadImage.Size = new Size((int)(512 * kwidth), (int)(512 * kheight));

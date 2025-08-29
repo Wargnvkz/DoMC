@@ -337,7 +337,7 @@ namespace DoMC.Forms
                 return;
             }
             var nsocket = (int)nudArchiveSocketNumber.Value;
-            var showPreformImages = new DoMCLib.Forms.ShowPreformImages();
+            var showPreformImages = new DoMC.Forms.ShowPreformImages();
 
             var simage = cycle.SocketImages.Find(si => si.SocketNumber == nsocket);
             if (simage == null)

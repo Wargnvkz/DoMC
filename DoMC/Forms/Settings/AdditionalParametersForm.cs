@@ -46,5 +46,15 @@ namespace DoMCLib.Forms
         {
             InitializeComponent();
         }
+
+        private void num_DoubleClick(object sender, EventArgs e)
+        {
+            if (sender is NumericUpDown num)
+            {
+                var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения", false, (int)num.Value);
+                if (newvalue >= 0)
+                    num.Value = newvalue;
+            }
+        }
     }
 }

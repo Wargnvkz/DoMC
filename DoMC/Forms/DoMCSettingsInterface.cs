@@ -20,7 +20,7 @@ namespace DoMC
     public partial class DoMCSettingsInterface : Form, IDoMCSettingsUpdatedProvider//, IMainUserInterface
     {
 
-        DoMCLib.Forms.ShowPreformImages checkpreformalgorithmsForm;
+        DoMC.Forms.ShowPreformImages checkpreformalgorithmsForm;
 
         bool invertColors = false;
         //bool IsAbleToWork = false;
@@ -97,7 +97,7 @@ namespace DoMC
 
             try
             {
-                checkpreformalgorithmsForm = new DoMCLib.Forms.ShowPreformImages();
+                checkpreformalgorithmsForm = new DoMC.Forms.ShowPreformImages();
                 checkpreformalgorithmsForm.SetObserver(observer);
                 //checkpreformalgorithmsForm.WindowState = FormWindowState.Maximized;
                 checkpreformalgorithmsForm.TopLevel = false;

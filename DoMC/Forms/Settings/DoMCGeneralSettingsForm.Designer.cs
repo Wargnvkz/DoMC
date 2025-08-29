@@ -28,110 +28,128 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnOK = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.txbStandardPercent = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txbCycles = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.groupBox1.SuspendLayout();
-            this.SuspendLayout();
+            btnOK = new Button();
+            btnCancel = new Button();
+            groupBox1 = new GroupBox();
+            nudStandardPercent = new NumericUpDown();
+            nudCycles = new NumericUpDown();
+            label4 = new Label();
+            label2 = new Label();
+            label1 = new Label();
+            groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudStandardPercent).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudCycles).BeginInit();
+            SuspendLayout();
             // 
             // btnOK
             // 
-            this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOK.Location = new System.Drawing.Point(12, 64);
-            this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(75, 23);
-            this.btnOK.TabIndex = 6;
-            this.btnOK.Text = "OK";
-            this.btnOK.UseVisualStyleBackColor = true;
+            btnOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnOK.DialogResult = DialogResult.OK;
+            btnOK.Location = new Point(14, 74);
+            btnOK.Margin = new Padding(4, 3, 4, 3);
+            btnOK.Name = "btnOK";
+            btnOK.Size = new Size(88, 27);
+            btnOK.TabIndex = 6;
+            btnOK.Text = "OK";
+            btnOK.UseVisualStyleBackColor = true;
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(380, 64);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 7;
-            this.btnCancel.Text = "Отмена";
-            this.btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCancel.DialogResult = DialogResult.Cancel;
+            btnCancel.Location = new Point(443, 74);
+            btnCancel.Margin = new Padding(4, 3, 4, 3);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(88, 27);
+            btnCancel.TabIndex = 7;
+            btnCancel.Text = "Отмена";
+            btnCancel.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.txbStandardPercent);
-            this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.txbCycles);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(442, 42);
-            this.groupBox1.TabIndex = 8;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Коррекция эталона";
+            groupBox1.Controls.Add(nudStandardPercent);
+            groupBox1.Controls.Add(nudCycles);
+            groupBox1.Controls.Add(label4);
+            groupBox1.Controls.Add(label2);
+            groupBox1.Controls.Add(label1);
+            groupBox1.Location = new Point(14, 14);
+            groupBox1.Margin = new Padding(4, 3, 4, 3);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Padding = new Padding(4, 3, 4, 3);
+            groupBox1.Size = new Size(516, 48);
+            groupBox1.TabIndex = 8;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Коррекция эталона";
+            // 
+            // nudStandardPercent
+            // 
+            nudStandardPercent.Font = new Font("Microsoft Sans Serif", 9F);
+            nudStandardPercent.Location = new Point(248, 19);
+            nudStandardPercent.Margin = new Padding(6, 3, 6, 3);
+            nudStandardPercent.Name = "nudStandardPercent";
+            nudStandardPercent.Size = new Size(74, 21);
+            nudStandardPercent.TabIndex = 55;
+            nudStandardPercent.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            nudStandardPercent.DoubleClick += num_DoubleClick;
+            // 
+            // nudCycles
+            // 
+            nudCycles.Font = new Font("Microsoft Sans Serif", 9F);
+            nudCycles.Location = new Point(59, 19);
+            nudCycles.Margin = new Padding(6, 3, 6, 3);
+            nudCycles.Maximum = new decimal(new int[] { 10000, 0, 0, 0 });
+            nudCycles.Name = "nudCycles";
+            nudCycles.Size = new Size(74, 21);
+            nudCycles.TabIndex = 54;
+            nudCycles.Value = new decimal(new int[] { 10, 0, 0, 0 });
+            nudCycles.DoubleClick += num_DoubleClick;
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(285, 19);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(132, 13);
-            this.label4.TabIndex = 10;
-            this.label4.Text = "% изначального эталона";
-            // 
-            // txbStandardPercent
-            // 
-            this.txbStandardPercent.Location = new System.Drawing.Point(219, 16);
-            this.txbStandardPercent.Name = "txbStandardPercent";
-            this.txbStandardPercent.Size = new System.Drawing.Size(60, 20);
-            this.txbStandardPercent.TabIndex = 9;
-            this.txbStandardPercent.Text = "1";
+            label4.AutoSize = true;
+            label4.Location = new Point(332, 22);
+            label4.Margin = new Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(144, 15);
+            label4.TabIndex = 10;
+            label4.Text = "% изначального эталона";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(115, 19);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(98, 13);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "циклов останется";
-            // 
-            // txbCycles
-            // 
-            this.txbCycles.Location = new System.Drawing.Point(54, 16);
-            this.txbCycles.Name = "txbCycles";
-            this.txbCycles.Size = new System.Drawing.Size(55, 20);
-            this.txbCycles.TabIndex = 7;
-            this.txbCycles.Text = "10";
+            label2.AutoSize = true;
+            label2.Location = new Point(134, 22);
+            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(104, 15);
+            label2.TabIndex = 8;
+            label2.Text = "циклов останется";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(39, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "Через";
+            label1.AutoSize = true;
+            label1.Location = new Point(10, 22);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(39, 15);
+            label1.TabIndex = 6;
+            label1.Text = "Через";
             // 
             // DoMCGeneralSettingsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(467, 99);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnOK);
-            this.Name = "DoMCGeneralSettingsForm";
-            this.Text = "Настройки обновления эталона";
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(545, 114);
+            Controls.Add(groupBox1);
+            Controls.Add(btnCancel);
+            Controls.Add(btnOK);
+            Margin = new Padding(4, 3, 4, 3);
+            Name = "DoMCGeneralSettingsForm";
+            Text = "Настройки обновления эталона";
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudStandardPercent).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudCycles).EndInit();
+            ResumeLayout(false);
         }
 
         #endregion
@@ -139,9 +157,9 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox txbStandardPercent;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txbCycles;
         private System.Windows.Forms.Label label1;
+        private NumericUpDown nudCycles;
+        private NumericUpDown nudStandardPercent;
     }
 }
