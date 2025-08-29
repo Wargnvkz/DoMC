@@ -165,7 +165,11 @@ namespace DoMCLib.Forms
                 // проверяем, что это числовая колонка (можешь уточнить по типу или имени колонки)
                 if (cell.OwningColumn.ValueType == typeof(int) || cell.OwningColumn.ValueType == typeof(decimal))
                 {
-                    cell.Value = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения", false, (int)cell.Value);
+                    if (dgvSockets.IsCurrentCellInEditMode)
+                        dgvSockets.EndEdit();
+                    var res = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения", false, (int)cell.Value);
+                    if (res > 0)
+                        cell.Value = res;
                     /*using (var form = new PinPadForm()) // твое окно для ввода цифр
                     {
                         if (form.ShowDialog() == DialogResult.OK)
