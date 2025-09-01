@@ -600,7 +600,7 @@ namespace DoMC
 
         public async Task SetArchiveDBConfiguration()
         {
-            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров работы модуля базы данных");
+            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров работы модуля архива");
             try
             {
                 await new DoMCLib.Classes.Module.ArchiveDB.Commands.SetConfigurationCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig);
