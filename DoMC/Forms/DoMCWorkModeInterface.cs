@@ -617,7 +617,7 @@ namespace DoMC
 
         public async Task<bool> SetDBConfiguration()
         {
-            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров роботы модуля базы данных");
+            WorkingLog.Add(LoggerLevel.Critical, "Установка параметров работы модуля базы данных");
             return await new DoMCLib.Classes.Module.DB.Commands.SetConfigurationCommand(Controller, Controller.GetModule(typeof(DBModule))).ExecuteCommandAsync(Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath);
         }
 
