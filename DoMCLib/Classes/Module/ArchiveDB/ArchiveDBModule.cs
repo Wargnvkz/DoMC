@@ -64,17 +64,22 @@ namespace DoMCLib.Classes.Module.ArchiveDB
         }
         public async Task StartAsync()
         {
-            Storage = new DataStorage(Configuration.LocalDBPath, Configuration.ArchiveDBPath, WorkingLog, ObserverForDataStorage);
-            WorkingLog.Add(LoggerLevel.Critical, "Модуль переноса данных в архив запущен");
+            if (IsStarted) return;
+            IsStarted = true;
             cancelationTockenSource = new CancellationTokenSource();
+            Storage = new DataStorage(Configuration.LocalDBPath, Configuration.ArchiveDBPath, WorkingLog, ObserverForDataStorage);
             task = Task.Run(() => Process());
+            WorkingLog.Add(LoggerLevel.Critical, "Модуль переноса данных в архив запущен");
         }
 
         public async Task StopAsync()
         {
-            if (cancelationTockenSource == null || !IsStarted)
+            if (!IsStarted) return;
+            if (cancelationTockenSource == null)
             {
                 IsStarted = false;
+                cancelationTockenSource?.Cancel();
+                if (task != null && !task.IsCompleted) await task;
                 return;
             }
             cancelationTockenSource?.Cancel();
@@ -86,6 +91,7 @@ namespace DoMCLib.Classes.Module.ArchiveDB
             }
             catch (TaskCanceledException) { }
             Storage.Dispose();
+            Storage = null;
             IsStarted = false;
         }
 

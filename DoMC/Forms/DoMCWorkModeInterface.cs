@@ -450,6 +450,9 @@ namespace DoMC
                 }
             }
 
+            await SetArchiveDBConfiguration();
+            await StartArchiveDB();
+
             pbStartStop.Text = "Стоп";
             pbStartStop.BackColor = Color.Green;
 

@@ -46,7 +46,7 @@ namespace DoMC
         TestLCBInterface TestLCBInterface;
         CheckSettings CheckSettingsInterface;
         TestRDPBControl TestRDPBControlInterface;
-        bool MovingCyclesToArchive = false;
+        bool IsMovingCyclesToArchive = false;
 
         public event Func<object?, Task> SettingsUpdated;
 
@@ -231,10 +231,12 @@ namespace DoMC
         #endregion Settings
 
 
-        private void DoMCMainInterface_FormClosed(object sender, FormClosedEventArgs e)
+        private async void DoMCMainInterface_FormClosed(object sender, FormClosedEventArgs e)
         {
             observer.NotificationReceivers -= Observer_NotificationReceivers;
             observer.Notify(DoMCApplicationContext.SettingsInterfaceClosedEventName, null);
+            if (IsMovingCyclesToArchive)
+                await new DoMCLib.Classes.Module.ArchiveDB.Commands.StopCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule))).ExecuteCommandAsync();
         }
 
         #region Menu
@@ -525,16 +527,16 @@ namespace DoMC
         private async void btnMoveToArchive_Click(object sender, EventArgs e)
         {
 
-            if (MovingCyclesToArchive)
+            if (!IsMovingCyclesToArchive)
             {
-                MovingCyclesToArchive = false;
+                IsMovingCyclesToArchive = true;
                 await new DoMCLib.Classes.Module.ArchiveDB.Commands.StartCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule))).ExecuteCommandAsync();
                 btnMoveToArchive.BackColor = SystemColors.Control;
 
             }
             else
             {
-                MovingCyclesToArchive = true;
+                IsMovingCyclesToArchive = false;
                 await new DoMCLib.Classes.Module.ArchiveDB.Commands.StopCommand(Controller, Controller.GetModule(typeof(DoMCLib.Classes.Module.ArchiveDB.ArchiveDBModule))).ExecuteCommandAsync();
                 btnMoveToArchive.BackColor = Color.DarkGreen;
             }
