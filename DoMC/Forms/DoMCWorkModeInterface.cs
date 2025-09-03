@@ -743,6 +743,7 @@ namespace DoMC
 
         public async Task<bool> GetArchiveDBModuleStatus()
         {
+            if (Controller == null) return false;
             return ArchiveDBModuleStatus.IsStarted = await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetWorkingStatusCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync();
         }
 
@@ -1625,6 +1626,7 @@ namespace DoMC
         private async void timer1_Tick(object sender, EventArgs e)
         {
             var now = DateTime.Now;
+            await GetArchiveDBModuleStatus();
 
             if (Context != null)
             {
@@ -1651,7 +1653,6 @@ namespace DoMC
                 }
                 lblTotalDefectCycles.Text = TotalDefectCycles.ToString();
 
-
                 if (ArchiveDBModuleStatus.IsStarted && (now - lastBoxRead) > lastBoxReadTime)
                 {
                     lastBoxRead = now;
@@ -1666,7 +1667,6 @@ namespace DoMC
                         var lvi = new ListViewItem(new string[] { box.CompletedTime.ToString("G"), box.BadCyclesCount.ToString(), box.TransporterSideToString() });
                         lvBoxes.Items.Add(lvi);
                     }
-                    await GetArchiveDBModuleStatus();
 
                 }
             }
@@ -1694,8 +1694,6 @@ namespace DoMC
             if (ArchiveDBModuleStatus.IsStarted && (now - lastArchiveStatusRead) > lastArchiveStatusReadTime)
             {
                 lastArchiveStatusRead = now;
-                await GetArchiveDBModuleStatus();
-
             }
         }
 
