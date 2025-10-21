@@ -61,4 +61,15 @@ namespace DoMCLib.Classes.Module.ArchiveDB.Commands
         }
 
     }
+
+    public class GetCyclesWithDefectsFromCommand : GenericCommandBase<double, List<DefectedCycleSockets>>
+    {
+        public GetCyclesWithDefectsFromCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
+        protected override async Task Executing()
+        {
+            var defectList = ((ArchiveDBModule)Module).GetDefectsList(InputData);
+            SetOutput(defectList);
+        }
+
+    }
 }

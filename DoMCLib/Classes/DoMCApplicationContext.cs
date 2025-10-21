@@ -30,6 +30,7 @@ namespace DoMCLib.Classes
         public int[] EquipmentSocket2CardSocket;
         public bool IsInWorkingMode;
         public LastCCDAction LastAction;
+        public WorkingState WorkingState = new WorkingState();
         public DoMCApplicationContext()
         {
             Configuration = new ApplicationConfiguration(FileName);

@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DoMCLib.Classes.Module.ArchiveDB;
+using DoMCModuleControl;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,38 +14,111 @@ namespace DoMCLib.Classes.Module.API.Controllers
     [ApiController] // Упрощает обработку APIModule (валидация, JSON)
     public class StatusController : ControllerBase
     {
+
+        private readonly Func<DoMCApplicationContext> _getContext;
+        private readonly Func<IMainController> _getController;
+
+        public StatusController(Func<DoMCApplicationContext> getContext, Func<IMainController> getController)
+        {
+            _getContext = getContext;
+            _getController = getController;
+        }
+
         [HttpGet] // GET /api/status
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(new { status = "Running", timestamp = DateTime.UtcNow });
+            var context = _getContext();
+            var response = new StatusResponse()
+            {
+                WorkingState = context.WorkingState,
+                LastDefects = await context.WorkingState.GetDefectesCycles(_getController(), 2)
+            };
+            return Ok(response);
         }
 
-        [HttpGet("{id}")] // GET /api/status/123
-        public IActionResult GetById(int id)
+        /*[HttpPost("start")] // POST /api/status
+        public IActionResult Start()
         {
-            return Ok(new { status = $"Running with ID {id}", timestamp = DateTime.UtcNow });
+            var context = _getContext();
+            context.WorkingState.StartWork();
+            return Ok();
         }
 
-        [HttpPost] // POST /api/status
-        public IActionResult Post([FromBody] StatusRequest request)
+        [HttpPost("stop")] // POST /api/status
+        public IActionResult Stop()
         {
-            return Ok(new { message = $"Received status: {request.Status}" });
-        }        
+            var context = _getContext();
+            context.WorkingState.StartWork();
+            return Ok();
+        }
+        [HttpPost("reset-statistics")] // POST /api/status
+        public IActionResult ResetStatistics()
+        {
+            var context = _getContext();
+            context.WorkingState.ResetStatistics();
+            return Ok();
+        }
+
+        [HttpPost("reset-cycles")] // POST /api/status
+        public IActionResult ResetCycles()
+        {
+            var context = _getContext();
+            context.WorkingState.ResetTotalDefectCyles();
+
+            return Ok();
+        }*/
     }
 
-    public class StatusRequest
+    [Route("api/[controller]")] // Маршрут: /api/control
+    [ApiController] // Упрощает обработку APIModule (валидация, JSON)
+    public class ControlController : ControllerBase
     {
-        public string Status { get; set; }
+
+        private readonly Func<DoMCApplicationContext> _getContext;
+        private readonly Func<IMainController> _getController;
+
+        public ControlController(Func<DoMCApplicationContext> getContext, Func<IMainController> getController)
+        {
+            _getContext = getContext;
+            _getController = getController;
+        }
+
+        [HttpPost("start")] // POST /api/control
+        public IActionResult Start()
+        {
+            var context = _getContext();
+            context.WorkingState.StartWork();
+            return Ok();
+        }
+
+        [HttpPost("stop")] // POST /api/control
+        public IActionResult Stop()
+        {
+            var context = _getContext();
+            context.WorkingState.StartWork();
+            return Ok();
+        }
+        [HttpPost("reset-statistics")] // POST /api/control
+        public IActionResult ResetStatistics()
+        {
+            var context = _getContext();
+            context.WorkingState.ResetStatistics();
+            return Ok();
+        }
+
+        [HttpPost("reset-cycles")] // POST /api/control
+        public IActionResult ResetCycles()
+        {
+            var context = _getContext();
+            context.WorkingState.ResetTotalDefectCyles();
+
+            return Ok();
+        }
     }
 
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ServerController : ControllerBase
+    public class StatusResponse
     {
-        [HttpGet("status")]
-        public IActionResult GetStatus()
-        {
-            return Ok(new { status = "Server is running", timestamp = DateTime.UtcNow });
-        }
+        public WorkingState WorkingState;
+        public List<DefectedCycleSockets> LastDefects;
     }
 }

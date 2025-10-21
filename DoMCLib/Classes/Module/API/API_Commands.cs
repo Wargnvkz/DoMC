@@ -25,5 +25,11 @@ namespace DoMCLib.Classes.Module.API.Commands
         public StopRESTAPIServerCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
         protected override async Task Executing() => await ((APIModule)Module).StopServer();
     }
+    [Description("Передача состояния приложения модуля обмена данными REST API")]
+    public class SetContextRESTAPIServerCommand : GenericCommandBase<APIContextData, bool>
+    {
+        public SetContextRESTAPIServerCommand(IMainController mainController, AbstractModuleBase module) : base(mainController, module) { }
+        protected override Task Executing() => ((APIModule)Module).SetDoMCApplicationContext(InputData);
+    }
 
 }

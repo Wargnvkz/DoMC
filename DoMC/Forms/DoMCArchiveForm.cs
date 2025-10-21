@@ -593,7 +593,7 @@ namespace DoMC.Forms
                 LocalArchiveCycles = LocalArchiveCycles.FindAll(lc => lc.IsSocketsGood.Any(s => !s));
             RemoteArchiveCycles = DS.RemoteGetCycles(dtArchiveFrom, dtArchiveTo);
             if (RemoteArchiveCycles.Count > 0)
-                RemoteArchiveCycles.FindAll(lc => lc.IsSocketsGood.Any(s => !s));
+                RemoteArchiveCycles = RemoteArchiveCycles.FindAll(lc => lc.IsSocketsGood.Any(s => !s));
 
 
             if (LocalArchiveCycles != null)

@@ -79,13 +79,16 @@ namespace DoMC.Forms
         private void ApplyNewContext(DoMCLib.Classes.DoMCApplicationContext context)
         {
             if (context == null || context.Configuration == null || context.Configuration.HardwareSettings == null) return;
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "TestCCDControl: Получена новая конфигурация");
             CurrentContext = context;
             SocketQuantity = CurrentContext.Configuration.HardwareSettings.SocketQuantity;
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: Всего гнезд: {SocketQuantity}");
             FillSettingPage();
         }
 
         private void FillSettingPage()
         {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "TestCCDControl: Заполнение страницы данными");
             CreateTestCCDPanelSocketStatuses();
             SetTestCCDPanelSocketStatuses();
         }
@@ -395,27 +398,27 @@ namespace DoMC.Forms
 
         private void SetControlSize(int Width, int Height)
         {
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Maximize window");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "TestCCDControl: Maximize window");
 
             #region Test tab
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Screen.FromControl");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "TestCCDControl: Screen.FromControl");
             var swidth = Width;
             var sheight = Height;
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"WxH={swidth}x{sheight}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: WxH={swidth}x{sheight}");
 
             var pbtotalwidth = swidth - btnCycleStop.Width;// - 300;
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"pbtotalwidth ={pbtotalwidth}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: pbtotalwidth ={pbtotalwidth}");
             var pbwidth = pbtotalwidth / 3.2 - 18;
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"pbwidth={pbwidth}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: pbwidth={pbwidth}");
             var pbheight = sheight / 2 - 20;
             var socketButtonsHeight = 380;// sheight / 2 - 100;
             double kwidth = (double)pbwidth / 512;
             double kheight = (double)pbheight / 512;
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"KW x KH= {kwidth} x {kheight}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: KW x KH= {kwidth} x {kheight}");
             if (kwidth > 1) kwidth = 1;
             if (kheight > 1) kheight = 1;
             var wd = (int)(Width - 520 * kwidth * 3 - 50);
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"wd={wd}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: wd={wd}");
             pnlSockets.Size = new Size(wd, socketButtonsHeight);//new Size(wd, (int)(512*kheight)); 
 
             pbTestReadImage.Location = new Point(wd + 10, pbTestReadImage.Location.Y);
@@ -454,8 +457,8 @@ namespace DoMC.Forms
             var topchart = pbTestReadImage.Location.Y + pbTestReadImage.Size.Height;
             var graphHeight = sheight - topchart - 20;
             if (graphHeight < 1) graphHeight = 1;
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"topchart={topchart}");
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"graphHeight ={graphHeight}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: topchart={topchart}");
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: graphHeight ={graphHeight}");
 
             chTestReadLine.Location = new Point(pbTestReadImage.Location.X, topchart + 10);
             chTestReadLine.Size = new Size((int)(512 * kwidth), graphHeight);
@@ -484,6 +487,7 @@ namespace DoMC.Forms
 
         private void TestCCDInterface_Resize(object sender, EventArgs e)
         {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: Изменен размер окна на {this.Width}x{this.Height}") ;
             SetControlSize(this.Width, this.Height);
         }
 
@@ -919,10 +923,12 @@ namespace DoMC.Forms
 
         private void CreateTestCCDPanelSocketStatuses()
         {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "TestCCDControl: Создание списка гнезд");
             TestSocketsSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets, TestShowSocketImages_Click);
         }
         private void SetTestCCDPanelSocketStatuses()
         {
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "TestCCDControl: Установка статусов гнезд в списке");
             UserInterfaceControls.SetSocketStatuses(TestSocketsSettingsSocketsPanelList, IsSocketsReadAndGood, Color.DarkGray, Color.Green, Color.Red, Color.Yellow);
         }
 

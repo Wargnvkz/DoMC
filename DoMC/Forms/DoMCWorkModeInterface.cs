@@ -50,9 +50,6 @@ namespace DoMC
         volatile bool IsConfigurationLoadedSuccessfully;
 
 
-        SocketStatuses socketStatuses;
-
-        int[] ErrorsBySockets = new int[96];
 
         //Task WorkingThread;
 
@@ -105,7 +102,6 @@ namespace DoMC
 
         int DBCyclesCCDLeftInQueue = 0;
         (Exception, DateTime) LastDBException;
-        int TotalDefectCycles = 0;
         //CancellationTokenSource WorkCancellationTokenSource;
         DateTime lastSavedConfiguration;
         int SaveTimeoutInSecodns = 300;
@@ -152,6 +148,26 @@ namespace DoMC
                 WorkProc,
                 StopWork
                 );
+            Context?.WorkingState.SetRefreshWorkingForm(RefreshAll);
+            Context?.WorkingState.SetStartWorkProc(StartWork);
+            Context?.WorkingState.SetStopWorkProc(StopWork);
+
+        }
+        private void RefreshAll()
+        {
+            this.Invoke(this.Refresh);
+        }
+
+        private async Task StartWork()
+        {
+            if (!this.Visible) return;
+            await this.InvokeAsync(StartWorkingProcess);
+
+        }
+        private async Task StopWork()
+        {
+            if (!this.Visible) return;
+            await this.InvokeAsync(StopWorkingProcess);
         }
 
         private async Task Observer_NotificationReceivers(string EventName, object? data)
@@ -351,20 +367,37 @@ namespace DoMC
 
             if (WorkingProcessController.IsRunning)
             {
-                WorkingLog.Add(LoggerLevel.Critical, "Остановливаем работу");
-                await WorkingProcessController.StopAsync();
+                await StopWorkingProcess();
             }
             else
             {
-                WorkingLog.Add(LoggerLevel.Critical, "Начинаем работу");
-                socketStatuses = new SocketStatuses(96);
-                //WorkCancellationTokenSource = new CancellationTokenSource();
-                GetIsDevicesButtonWorking();
-                if (!await WorkingProcessController.StartAsync())
-                {
-                    await StartFailed();
-                }
+                await StartWorkingProcess();
             }
+        }
+
+        private async Task StopWorkingProcess()
+        {
+            WorkingLog.Add(LoggerLevel.Critical, "Остановливаем работу");
+            await WorkingProcessController.StopAsync();
+            Context.WorkingState.IsRunning = false;
+
+        }
+        private async Task StartWorkingProcess()
+        {
+            WorkingLog.Add(LoggerLevel.Critical, "Начинаем работу");
+            Context.WorkingState.SocketStatuses = new SocketStatuses(96);
+            //WorkCancellationTokenSource = new CancellationTokenSource();
+            GetIsDevicesButtonWorking();
+            if (!await WorkingProcessController.StartAsync())
+            {
+                await StartFailed();
+                Context.WorkingState.IsRunning = false;
+            }
+            else
+            {
+                Context.WorkingState.IsRunning = true;
+            }
+
         }
 
 
@@ -1353,10 +1386,10 @@ namespace DoMC
                         //WorkingLog.Add("Эталоны 14: " + InterfaceDataExchange.SocketStandardExist());
 
                         //добавляем результаты проверки гнезд в список
-                        socketStatuses.Add(CurrentCycleCCD.TimeLCBSyncSignalGot, CurrentCycleCCD.IsSocketGood);
+                        Context.WorkingState.SocketStatuses?.Add(CurrentCycleCCD.TimeLCBSyncSignalGot, CurrentCycleCCD.IsSocketGood);
                         for (int i = 0; i < CurrentCycleCCD.IsSocketGood.Length; i++)
                             if (!CurrentCycleCCD.IsSocketGood[i])
-                                ErrorsBySockets[i]++;
+                                Context.WorkingState.ErrorsBySockets[i]++;
 
                     }
 
@@ -1636,8 +1669,11 @@ namespace DoMC
                     CurrentDraw();
                     lastDrawCycleTime = LCBStatus.TimeOfLCBSynchrosignal;
                     if (LCBStatus.TimePreviousSyncSignalGot != null)
-                        lblCycleDurationValue.Text = (LCBStatus.TimeOfLCBSynchrosignal - LCBStatus.TimePreviousSyncSignalGot.Value).TotalSeconds.ToString("F1") + " с";
-
+                    {
+                        Context.WorkingState.CycleDuration = (LCBStatus.TimeOfLCBSynchrosignal - LCBStatus.TimePreviousSyncSignalGot.Value).TotalSeconds;
+                        lblCycleDurationValue.Text = Context.WorkingState.CycleDuration.ToString("F1") + " с";
+                    }
+                    Context.WorkingState.CurrentBoxDefectCycles = RDPBCurrentStatus.CurrentBoxDefectCycles;
                     lblCurrentBoxDefectCycles.Text = RDPBCurrentStatus.CurrentBoxDefectCycles.ToString();
                 }
                 //if (IsWorkingModeStarted)
@@ -1651,23 +1687,35 @@ namespace DoMC
                         pnlCurrentSockets.BackColor = this.BackColor;
                     }
                 }
-                lblTotalDefectCycles.Text = TotalDefectCycles.ToString();
+                lblTotalDefectCycles.Text = Context.WorkingState.TotalDefectCycles.ToString();
 
                 if (ArchiveDBModuleStatus.IsStarted && (now - lastBoxRead) > lastBoxReadTime)
                 {
                     lastBoxRead = now;
                     var start = now.AddHours(-5);
-                    var boxes = await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetBoxFromCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(start);
-                    boxes = boxes.OrderBy(b => b.CompletedTime).ToList();
-
-                    lvBoxes.Items.Clear();
-                    for (int i = 0; i < boxes.Count; i++)
+                    try
                     {
-                        var box = boxes[i];
-                        var lvi = new ListViewItem(new string[] { box.CompletedTime.ToString("G"), box.BadCyclesCount.ToString(), box.TransporterSideToString() });
-                        lvBoxes.Items.Add(lvi);
-                    }
+                        var boxes = await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetBoxFromCommand(Controller, Controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(start);
+                        boxes = boxes.OrderBy(b => b.CompletedTime).ToList();
+                        Context.WorkingState.Boxes = boxes;
 
+                        lvBoxes.Items.Clear();
+                        for (int i = 0; i < boxes.Count; i++)
+                        {
+                            var box = boxes[i];
+                            var lvi = new ListViewItem(new string[] { box.CompletedTime.ToString("G"), box.BadCyclesCount.ToString(), box.TransporterSideToString() });
+                            lvBoxes.Items.Add(lvi);
+                        }
+                        Errors.ArchiveModuleError = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        WorkingLog.Add(LoggerLevel.Critical, "Ошибка при чтении списка выпущенных коробов", ex);
+                        if (WorkingProcessController.IsRunning)
+                        {
+                            Errors.ArchiveModuleError = true;
+                        }
+                    }
                 }
             }
             lblFooterStep.Text = $"Текущий шаг: {GetWorkStepText(WorkingStep)}";
@@ -1701,8 +1749,8 @@ namespace DoMC
         {
             pnlCurrentSockets.Invalidate();
             chCurrentLastHourSumBad.Series[0].Points.Clear();
-            if (socketStatuses == null) return;
-            var badPreformQuantity = socketStatuses.GetBadPreformsForSockets();
+            if (Context.WorkingState.SocketStatuses == null) return;
+            var badPreformQuantity = Context.WorkingState.SocketStatuses.GetBadPreformsForSockets();
             for (int i = 0; i < badPreformQuantity.Length; i++)
             {
                 chCurrentLastHourSumBad.Series[0].Points.AddXY(i + 1, badPreformQuantity[i]);
@@ -1718,31 +1766,28 @@ namespace DoMC
         {
 
             lbCurrentErrors.Items.Clear();
-            var errors = Errors;
-            var dict = errors.ToDictionary();
-            foreach (var p in dict)
+            var errors = Errors.ActualErrors();
+            Context.WorkingState.EquipmentErrors = errors;
+            foreach (var p in errors)
             {
-                if (p.Value)
-                    lbCurrentErrors.Items.Add(errors.KeyToText(p.Key));
+                lbCurrentErrors.Items.Add(p);
             }
 
         }
 
         private void pnlCurrentSockets_Paint(object sender, PaintEventArgs e)
         {
-            var goodsockets = socketStatuses?.GetLast() ?? new bool[96];// InterfaceDataExchange?.CurrentCycleCCD?.IsSocketGood ?? new bool[96];
+            var goodsockets = Context.WorkingState.SocketStatuses?.GetLast() ?? new bool[96];// InterfaceDataExchange?.CurrentCycleCCD?.IsSocketGood ?? new bool[96];
             var socketsToSave = new bool[96];
-            var IsSocketsChecking = Context?.Configuration?.HardwareSettings?.SocketsToCheck ?? new bool[96];
-            var bmp = DrawMatrix(pnlCurrentSockets.Size, goodsockets, socketsToSave, ErrorsBySockets, IsSocketsChecking, Color.LawnGreen, Color.Red, Color.LightGray, Color.LimeGreen, pbCurrentShowStatistics.IsPressed);
+            var IsSocketsChecking = Context.Configuration?.HardwareSettings?.SocketsToCheck ?? new bool[96];
+            var bmp = DrawMatrix(pnlCurrentSockets.Size, goodsockets, socketsToSave, Context.WorkingState.ErrorsBySockets, IsSocketsChecking, Color.LawnGreen, Color.Red, Color.LightGray, Color.LimeGreen, pbCurrentShowStatistics.IsPressed);
             e.Graphics.DrawImage(bmp, 0, 0);
 
         }
 
-
-
         private void miResetStatistics_Click(object sender, EventArgs e)
         {
-            ErrorsBySockets = new int[96];
+            Context.WorkingState.ResetStatistics();
             pnlCurrentSockets.Invalidate();
             //Statuses = new List<SocketStatus>();
         }
@@ -1855,7 +1900,7 @@ namespace DoMC
 
         private void miResetCounter_Click(object sender, EventArgs e)
         {
-            TotalDefectCycles = 0;
+            Context.WorkingState.ResetTotalDefectCyles();
         }
 
         private async void miSettings_Click(object sender, EventArgs e)
@@ -1872,22 +1917,29 @@ namespace DoMC
                     catch { }
                     var wmf = new DoMCSettingsInterface();
                     wmf.SetMainController(Controller, Context);
+                    WorkingLog.Add(LoggerLevel.Critical, "Скрываем окно рабочего режима");
                     this.Hide();
+                    WorkingLog.Add(LoggerLevel.Critical, "Показываем окно настроек");
                     try
                     {
                         wmf.ShowDialog();
                     }
                     catch { }
+                    WorkingLog.Add(LoggerLevel.Critical, "Показываем окно рабочего режима");
                     this.Show();
+                    WorkingLog.Add(LoggerLevel.Critical, "Начинаем применение настроек");
                     var loadingForm = new LoadingDataForm();
                     loadingForm.Show();
+                    WorkingLog.Add(LoggerLevel.Critical, "Показываем окно ожидания");
                     Application.DoEvents();
+                    WorkingLog.Add(LoggerLevel.Critical, "Применяем новые настройки");
                     try
                     {
                         await ChangeWorkingSettings();
                     }
                     finally
                     {
+                        WorkingLog.Add(LoggerLevel.Critical, "Применение настроек завершено");
                         loadingForm.Close();
                     }
                 }
@@ -1900,6 +1952,8 @@ namespace DoMC
         }
         private async Task ChangeWorkingSettings()
         {
+            WorkingLog.Add(LoggerLevel.Critical, "Изменение рабочих настроек");
+
             await SetArchiveDBConfiguration();
         }
 
@@ -2207,79 +2261,10 @@ namespace DoMC
                 default: return "Неизвестно";
             }
         }
+
+
     }
 
-    public class SocketStatus
-    {
-        public DateTime CycleDT;
-        public bool[] IsSocketGood;
-    }
-
-    public class SocketStatuses
-    {
-        private int SocketQuantity;
-        private List<SocketStatus> Statuses;
-        private double DeleteAfter = 3600;
-        public SocketStatuses(int socketQuantity)
-        {
-            Statuses = new List<SocketStatus>();
-            SocketQuantity = socketQuantity;
-        }
-        public void Add(SocketStatus ss)
-        {
-            if (ss.IsSocketGood.Length != SocketQuantity) return;
-            lock (Statuses)
-            {
-                ClearByTime();
-                Statuses.Add(ss);
-            }
-        }
-        public void Add(DateTime cycleDT, bool[] isSocketsGood)
-        {
-            if (isSocketsGood.Length != SocketQuantity) return;
-            lock (Statuses)
-            {
-                ClearByTime();
-                Statuses.Add(new SocketStatus() { CycleDT = cycleDT, IsSocketGood = isSocketsGood });
-            }
-        }
-
-        private void ClearByTime()
-        {
-            var now = DateTime.Now;
-            Statuses.RemoveAll(s => (now - s.CycleDT).TotalSeconds > DeleteAfter);
-            Statuses.RemoveAll(s => s == null);
-            Statuses.TrimExcess();
-        }
-
-        public int[] GetBadPreformsForSockets()
-        {
-            int[] sum = new int[SocketQuantity];
-            lock (Statuses)
-            {
-                foreach (var ss in Statuses)
-                {
-                    if (ss != null)
-                    {
-                        for (int n = 0; n < SocketQuantity; n++)
-                        {
-                            sum[n] += ss.IsSocketGood[n] ? 0 : 1;
-                        }
-                    }
-                }
-            }
-            return sum;
-        }
-
-        public bool[] GetLast()
-        {
-            if (Statuses.Count == 0) return Enumerable.Repeat(true, 96).ToArray();
-            var maxDT = Statuses.Max(s => s.CycleDT);
-            var lastStatus = Statuses.Find(s => s.CycleDT == maxDT);
-            if (lastStatus == null) return new bool[96];
-            else return lastStatus.IsSocketGood;
-        }
-    }
 
     public class DisplayCycleData
     {

@@ -257,7 +257,7 @@ namespace DoMCLib.Classes.Module.LCB
                 {
                     WorkingLog?.Add(LoggerLevel.Critical, "Не могу отправить пакет. ", ex);
                     CurrentObserver.Notify(this, Operations.SendCommand.ToString(), EventType.Error.ToString(), ex);
-                    throw ex;
+                    throw;
                 }
             }
         }
@@ -290,7 +290,7 @@ namespace DoMCLib.Classes.Module.LCB
                         {
                             WorkingLog.Add(LoggerLevel.Critical, $"Не удалость прочитать из сокета UDP, хотя в нем {len} байт", ex);
                             CurrentObserver.Notify(this, Operations.ReadUDP.ToString(), EventType.Error.ToString(), ex);
-                            throw ex;
+                            throw;
                         }
 
                         try

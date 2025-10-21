@@ -34,7 +34,8 @@
         public bool NotEnoughTimeToProcessData;
         public bool NotEnoughTimeToProcessSQL; // определять по накоплению данных в хранилищах. Среднее время каждого действия за некоторый период?
         public bool RemovingDefectedPreformsBlockError; // Ошибка бракёра
-        public bool RemoteInterfaceModuleError;
+        public bool RemoteInterfaceModuleError; //Ошибка модуля удаленного интерфейса
+        public bool ArchiveModuleError; // Ошибка модуля работы с архивом
         public int MissedSyncrosignalCounter = 0;
 
 
@@ -63,6 +64,7 @@
             res["NotEnoughTimeToProcessSQL"] = NotEnoughTimeToProcessSQL;
             res["RemovingDefectedPreformsBlockError"] = RemovingDefectedPreformsBlockError;
             res["RemoteInterfaceModuleError"] = RemoteInterfaceModuleError;
+            res["ArchiveModuleError"] = ArchiveModuleError;
 
             return res;
         }
@@ -92,9 +94,14 @@
                 case "NotEnoughTimeToProcessSQL": return "Не хватает времени на обработку данных SQL";
                 case "RemovingDefectedPreformsBlockError": return "Ошибка бракёра";
                 case "RemoteInterfaceModuleError": return "Ошибка модуля удаленного интерфейса";
-
+                case "ArchiveModuleError": return "Ошибка модуля работы с архивом";
             }
             return "";
+        }
+
+        public List<string> ActualErrors()
+        {
+            return ToDictionary().Where(kv => kv.Value).Select(kv => KeyToText(kv.Key)).ToList();
         }
 
     }

@@ -39,6 +39,7 @@ namespace DoMC
 
             var mainForm = (Form)Controller.GetMainUserInterface();
             mainForm.Shown += (sender, args) => mainForm.Activate();
+            new DoMCLib.Classes.Module.API.Commands.SetContextRESTAPIServerCommand(Controller, Controller.GetModule(typeof(APIModule))).ExecuteCommandAsync(new() { context = Context, controller = Controller }).FireAndForget();
             new DoMCLib.Classes.Module.API.Commands.StartRESTAPIServerCommand(Controller, Controller.GetModule(typeof(APIModule))).ExecuteCommandAsync().FireAndForget();
             //APIModule
             Application.Run(mainForm);

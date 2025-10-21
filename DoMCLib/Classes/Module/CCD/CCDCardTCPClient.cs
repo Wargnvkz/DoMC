@@ -126,7 +126,7 @@ namespace DoMCLib.Classes.Module.CCD
             {
 
                 WorkingLog.Add(LoggerLevel.Information, $"Плата: {CardNumber}. Соединение не удалось установить. " + ex.Message);
-                throw ex;
+                throw;
 
             }
         }

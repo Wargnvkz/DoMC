@@ -1,23 +1,24 @@
 ﻿using DoMCModuleControl;
 using DoMCModuleControl.Modules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using System.Runtime.InteropServices.JavaScript;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Routing.Patterns;
-using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices.JavaScript;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DoMCLib.Classes.Module.API
 {
@@ -25,6 +26,8 @@ namespace DoMCLib.Classes.Module.API
     public partial class APIModule : AbstractModuleBase
     {
         WebApplication _app;
+        DoMCApplicationContext _applicationContext;
+        IMainController _controller;
         public bool IsStarted { get; private set; } = false;
         public APIModule(IMainController MainController) : base(MainController)
         {
@@ -36,12 +39,14 @@ namespace DoMCLib.Classes.Module.API
             try
             {
                 var builder = WebApplication.CreateBuilder();
+
                 builder.Services.AddLogging(logging =>
                 {
                     //logging.AddConsole();
                     logging.AddFile("Logs/restApi.log");
                     logging.SetMinimumLevel(LogLevel.Debug);
                 });
+
                 // Настройка сервисов
                 builder.Services.AddControllers()
                     .AddApplicationPart(this.GetType().Assembly)
@@ -60,6 +65,14 @@ namespace DoMCLib.Classes.Module.API
                 {
                     options.Conventions.Add(new RouteTokenTransformerConvention(new LowercaseRouteTransformer()));
                 });
+
+                builder.Services.AddSingleton(() => _applicationContext);
+                builder.Services.AddSingleton(() => _controller);
+                builder.Services.AddControllers()
+                  .AddJsonOptions(options =>
+                  {
+                      options.JsonSerializerOptions.IncludeFields = true;
+                  });
 
                 _app = builder.Build();
                 // Обработка ошибок
@@ -83,14 +96,14 @@ namespace DoMCLib.Classes.Module.API
                 _app.UseRouting();
                 _app.MapControllers();
 
-                _app.MapGet("/statusA", () => new { status = "Running", timestamp = DateTime.UtcNow });
+                /*_app.MapGet("/statusA", () => new { status = "Running", timestamp = DateTime.UtcNow });
                 _app.MapGet("/statusB/{id}", (int id) => new { status = $"Running {id}" });
                 _app.MapGet("/statusC", async (HttpContext context) =>
                 {
                     // Сложная логика
                     return Results.Ok(new { status = "Running", timestamp = DateTime.UtcNow });
                 });
-                _app.MapGet("/statusD", () => Results.Json(new { status = "Running" }, statusCode: 200));
+                _app.MapGet("/statusD", () => Results.Json(new { status = "Running" }, statusCode: 200));*/
                 _app.MapGet("/debug/routes", ([FromServices] IEnumerable<EndpointDataSource> endpointDataSources) =>
                 {
                     try
@@ -167,10 +180,22 @@ namespace DoMCLib.Classes.Module.API
                 _app = null;
             }
         }
+        public Task SetDoMCApplicationContext(APIContextData data)
+        {
+            _applicationContext = data.context;
+            _controller = data.controller;
+            return Task.CompletedTask;
+        }
         public class LowercaseRouteTransformer : IOutboundParameterTransformer
         {
             public string TransformOutbound(object value) => value?.ToString()?.ToLowerInvariant();
         }
 
+    }
+
+    public class APIContextData
+    {
+        public IMainController controller;
+        public DoMCApplicationContext context;
     }
 }
