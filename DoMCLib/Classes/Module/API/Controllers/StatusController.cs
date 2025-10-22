@@ -31,7 +31,8 @@ namespace DoMCLib.Classes.Module.API.Controllers
             var response = new APIStatusResponse()
             {
                 WorkingState = context.WorkingState,
-                LastDefects = await context.WorkingState.GetDefectesCycles(_getController(), 2)
+                LastDefects = await context.WorkingState.GetDefectesCycles(_getController(), 12),
+                Boxes = await context.WorkingState.GetBoxes(_getController(), 12)
             };
             return Ok(response);
         }
@@ -90,5 +91,6 @@ namespace DoMCLib.Classes.Module.API.Controllers
     {
         public WorkingState WorkingState;
         public List<DefectedCycleSockets> LastDefects;
+        public List<Box> Boxes;
     }
 }

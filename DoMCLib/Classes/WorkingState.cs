@@ -61,7 +61,11 @@ namespace DoMCLib.Classes
 
         public async Task<List<DefectedCycleSockets>> GetDefectesCycles(IMainController controller, double PeriodInHours)
         {
-            return await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetCyclesWithDefectsFromCommand(controller, controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(2);
+            return await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetCyclesWithDefectsFromCommand(controller, controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(PeriodInHours);
+        }
+        public async Task<List<Box>> GetBoxes(IMainController controller, double PeriodInHours)
+        {
+            return await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetBoxFromCommand(controller, controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(DateTime.Now.AddHours(-PeriodInHours));
         }
     }
 
@@ -76,6 +80,11 @@ namespace DoMCLib.Classes
         private int SocketQuantity;
         private List<SocketStatus> Statuses;
         private double DeleteAfter = 3600;
+        public SocketStatuses()
+        {
+            Statuses = new List<SocketStatus>();
+            SocketQuantity = 96;
+        }
         public SocketStatuses(int socketQuantity)
         {
             Statuses = new List<SocketStatus>();

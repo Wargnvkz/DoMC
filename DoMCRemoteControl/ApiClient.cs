@@ -20,7 +20,7 @@ namespace DoMCRemoteControl
         public async Task<APIStatusResponse?> GetStatusAsync()
         {
             var json = await _http.GetStringAsync("api/status");
-            return JsonSerializer.Deserialize<APIStatusResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<APIStatusResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, IncludeFields = true });
         }
 
         public async Task PostAsync(string endpoint)

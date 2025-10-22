@@ -1559,6 +1559,7 @@ namespace DoMC
                         pnlCurrentSockets.BackColor = this.BackColor;
                     }
                 }
+                Context.WorkingState.TotalDefectCycles = RDPBCurrentStatus.TotalDefectCycles;
                 lblTotalDefectCycles.Text = Context.WorkingState.TotalDefectCycles.ToString();
 
                 if (ArchiveDBModuleStatus.IsStarted && (now - lastBoxRead) > lastBoxReadTime)

@@ -350,7 +350,7 @@
             lvBoxes.Location = new Point(1517, 789);
             lvBoxes.Margin = new Padding(4, 3, 4, 3);
             lvBoxes.Name = "lvBoxes";
-            lvBoxes.Size = new Size(290, 275);
+            lvBoxes.Size = new Size(290, 271);
             lvBoxes.TabIndex = 34;
             lvBoxes.UseCompatibleStateImageBehavior = false;
             lvBoxes.View = View.Details;
