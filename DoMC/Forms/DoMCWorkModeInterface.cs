@@ -1808,7 +1808,25 @@ namespace DoMC
                     WorkingLog.Add(LoggerLevel.Critical, "Применяем новые настройки");
                     try
                     {
-                        await ChangeWorkingSettings();
+                        if (UIContext != null)
+                        {
+                            var tcs = new TaskCompletionSource();
+                            UIContext.Post(async _ =>
+                            {
+                                try
+                                {
+                                    await ChangeWorkingSettings();
+                                    tcs.SetResult();
+                                }
+                                catch (Exception ex)
+                                {
+                                    tcs.SetException(ex);
+                                }
+                            }, null);
+                            await tcs.Task; // дождёмся завершения
+                        }
+                        else
+                            await ChangeWorkingSettings();
                     }
                     finally
                     {

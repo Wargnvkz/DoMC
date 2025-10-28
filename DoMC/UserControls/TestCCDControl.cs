@@ -81,7 +81,10 @@ namespace DoMC.Forms
         private async Task SettingsUpdateProvider_SettingsUpdated(object? sender)
         {
             var context = SettingsUpdateProvider.GetContext();
-            ApplyNewContext(context);
+            if (UIContext != null)
+                UIContext.Post(_ => ApplyNewContext(context), null);
+            else
+                ApplyNewContext(context);
         }
 
         private void ApplyNewContext(DoMCLib.Classes.DoMCApplicationContext context)
