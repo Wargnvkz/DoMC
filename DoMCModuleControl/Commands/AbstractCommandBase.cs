@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -129,6 +130,18 @@ namespace DoMCModuleControl.Commands
             Error = null;
             try
             {
+                //var stackTrace = new StackTrace();
+                /*Controller.GetLogger(Module.GetType().GetDescriptionOrName()).Add(Logging.LoggerLevel.FullDetailedInformation,
+                    String.Join(
+                        "\n",
+                        stackTrace.GetFrames().Select(
+                            f => $"{f.GetMethod()?.Name ?? ""}({f.GetFileName()}({f.GetFileLineNumber()}))"
+                            )
+                        )
+                    );
+                */
+                Controller.GetLogger(Module.GetType().GetDescriptionOrName()).
+                    Add(Logging.LoggerLevel.FullDetailedInformation, $"Команда {CommandName} запущена {Environment.StackTrace}");
                 Controller.GetLogger(Module.GetType().GetDescriptionOrName()).Add(Logging.LoggerLevel.FullDetailedInformation, $"Начало выполнения кода команды {CommandName}.");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Started}", InputData);
                 Controller.LastCommand = this.GetType();
@@ -167,7 +180,7 @@ namespace DoMCModuleControl.Commands
             if (OutputData is T result)
                 return result;
 
-            throw new InvalidOperationException($"Тип выходных данных {OutputData?.GetType().Name??"null"} не соответствует ожидаемому {typeof(T).Name}.");
+            throw new InvalidOperationException($"Тип выходных данных {OutputData?.GetType().Name ?? "null"} не соответствует ожидаемому {typeof(T).Name}.");
 
         }
         protected virtual async Task ExecuteCommandAsync(object? inputData)

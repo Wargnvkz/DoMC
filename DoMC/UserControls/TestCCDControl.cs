@@ -66,8 +66,16 @@ namespace DoMC.Forms
             MainController = Controller;
             WorkingLog = logger;
             SettingsUpdateProvider = settingsUpdateProvider;
+            Disposed += OnDispose;
             SettingsUpdateProvider.SettingsUpdated += SettingsUpdateProvider_SettingsUpdated;
             UIContext = SynchronizationContext.Current;
+        }
+        private void OnDispose(object? sender, EventArgs e)
+        {
+            if (SettingsUpdateProvider != null)
+            {
+                SettingsUpdateProvider.SettingsUpdated -= SettingsUpdateProvider_SettingsUpdated;
+            }
         }
 
         private async Task SettingsUpdateProvider_SettingsUpdated(object? sender)
@@ -487,7 +495,7 @@ namespace DoMC.Forms
 
         private void TestCCDInterface_Resize(object sender, EventArgs e)
         {
-            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: Изменен размер окна на {this.Width}x{this.Height}") ;
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"TestCCDControl: Изменен размер окна на {this.Width}x{this.Height}");
             SetControlSize(this.Width, this.Height);
         }
 
@@ -924,7 +932,15 @@ namespace DoMC.Forms
         private void CreateTestCCDPanelSocketStatuses()
         {
             WorkingLog.Add(LoggerLevel.FullDetailedInformation, "TestCCDControl: Создание списка гнезд");
-            TestSocketsSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets, TestShowSocketImages_Click);
+            try
+            {
+                TestSocketsSettingsSocketsPanelList = UserInterfaceControls.CreateSocketStatusPanels(SocketQuantity, ref pnlSockets, TestShowSocketImages_Click);
+            }
+            catch (Exception ex)
+            {
+                WorkingLog.Add(LoggerLevel.Critical, "TestCCDControl: Ошибка при попытке создания списка гнезд", ex);
+
+            }
         }
         private void SetTestCCDPanelSocketStatuses()
         {

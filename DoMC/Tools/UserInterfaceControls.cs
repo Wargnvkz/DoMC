@@ -37,8 +37,10 @@ namespace DoMC.Tools
                 MainPanel.Width = wh.Item1 * 20;
                 MainPanel.Height = wh.Item2 * 20;
             }
-            foreach (Control ctl in MainPanel.Controls) { ctl.Hide(); }
+            List<Control> controls = new List<Control>();
+            foreach (Control ctl in MainPanel.Controls) { controls.Add(ctl); }
             MainPanel.Controls.Clear();
+            controls.ForEach(c => {c.Hide();c.Dispose();});
             var SubPanels = new Panel[SocketQuantity];
             var socketsize = GetPanelSocketSize(MainPanel, SocketQuantity);
             int n = 0;

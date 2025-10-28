@@ -176,10 +176,12 @@ namespace DoMC.UserControls
             if (TestLCBTestStarted) return;
             if (TestLCBConnected)
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Нажате кнопка отключения от бракера");
                 await TestLCBStop();
             }
             else
             {
+                WorkingLog.Add(LoggerLevel.Critical, "Нажате кнопка отключения к бракеру");
                 await TestLCBStart();
 
             }
@@ -690,7 +692,7 @@ namespace DoMC.UserControls
             if (newvalue >= 0)
                 txb.Text = newvalue.ToString();
         }
-                
+
 
     }
 }
