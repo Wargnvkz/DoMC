@@ -104,7 +104,7 @@ namespace DoMCLib.Forms
             if (txb == txbPreformLength) title = "длина преформы";
             if (txb == txbLCBKoefficient) title = "Коэффициент";
             int.TryParse(txb.Text, out int Current);
-            var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, Current);
+            var newvalue = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, Current);
             if (newvalue >= 0)
                 txb.Text = newvalue.ToString();
         }

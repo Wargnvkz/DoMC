@@ -1,5 +1,4 @@
-﻿using DoMC.Classes;
-using DoMCLib.Configuration;
+﻿using DoMCLib.Configuration;
 using DoMCLib.Tools;
 using DoMCModuleControl;
 using System;
@@ -12,8 +11,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DoMCForms.Classes;
 
-namespace DoMC.Forms
+namespace DoMCForms
 {
     public partial class ShowPreformImages : Form
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace DoMCLib.Dialogs
+namespace DoMCForms.Dialogs
 {
     public class DigitalInput
     {

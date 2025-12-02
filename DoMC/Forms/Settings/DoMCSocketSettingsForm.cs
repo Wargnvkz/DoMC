@@ -155,7 +155,7 @@ namespace DoMCLib.Forms
                 if (nud == nudBottom) title = "(Нижняя граница области проверки)";
                 if (nud == nudLeft) title = "(Левая граница области проверки)";
                 if (nud == nudRight) title = "(Правая граница области проверки)";*/
-                var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, (int)nud.Value);
+                var newvalue = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, (int)nud.Value);
                 if (newvalue >= 0)
                     nud.Value = newvalue;
             }

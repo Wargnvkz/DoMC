@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
@@ -13,8 +13,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DoMCForms\DoMCForms.csproj" />
     <ProjectReference Include="..\DoMCLib\DoMCLib.csproj" />
+    <ProjectReference Include="..\DoMCModuleControl\DoMCModuleControl.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Dialogs\DisplayMessage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="DoMCArchiveForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ShowPreformImages.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>

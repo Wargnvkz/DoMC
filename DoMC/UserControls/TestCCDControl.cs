@@ -319,7 +319,7 @@ namespace DoMC.Forms
                     if (!notAnsweredCards)
                     {
                         var logText = $"Плата гнезда {SelectedSocket} не отвечает.";
-                        DisplayMessage.Show(logText, "Ошибка");
+                        DoMCForms.Dialogs.DisplayMessage.Show(logText, "Ошибка");
                         return;
                     }
                     ProgressbarStep++;
@@ -848,7 +848,7 @@ namespace DoMC.Forms
 
         private void numFrame_DoubleClick(object sender, EventArgs e)
         {
-            var value = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog("Введите номер линии", false, (int)numFrame.Value);
+            var value = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog("Введите номер линии", false, (int)numFrame.Value);
             if (value >= 0 && value < 512)
             {
                 numFrame.Value = value;

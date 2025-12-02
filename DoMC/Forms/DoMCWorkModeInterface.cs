@@ -77,7 +77,7 @@ namespace DoMC
         ILogger WorkingLog;
         Observer observer;
         DoMCApplicationContext Context;
-        DoMCArchiveForm? archiveForm = null;
+        DoMCForms.DoMCArchiveForm? archiveForm = null;
 
         CycleImagesCCD? CurrentCycleData;
 
@@ -334,7 +334,7 @@ namespace DoMC
         #endregion
         private void LoadArchiveTab()
         {
-            archiveForm = new DoMC.Forms.DoMCArchiveForm(Controller, Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath, Context.Configuration.HardwareSettings.ArchiveDBConfig.ArchiveDBPath);
+            archiveForm = new DoMCForms.DoMCArchiveForm(Controller, Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath, Context.Configuration.HardwareSettings.ArchiveDBConfig.ArchiveDBPath);
             archiveForm.TopLevel = false;
             archiveForm.Parent = tbpArchive;
             archiveForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -353,11 +353,11 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Необработанное исключение: ", e.Exception);
             if (e.Exception is DoMCException)
             {
-                DisplayMessage.Show(e.Exception.Message, "Ошибка");
+                DoMCForms.Dialogs.DisplayMessage.Show(e.Exception.Message, "Ошибка");
             }
             else
             {
-                DisplayMessage.Show(e.Exception.Message + "\r\n" + e.Exception.StackTrace, "Ошибка");
+                DoMCForms.Dialogs.DisplayMessage.Show(e.Exception.Message + "\r\n" + e.Exception.StackTrace, "Ошибка");
             }
         }
 
@@ -1837,7 +1837,7 @@ namespace DoMC
             }
             catch (Exception ex)
             {
-                DisplayMessage.Show(ex.Message + ex.StackTrace, "Ошибка");
+                DoMCForms.Dialogs.DisplayMessage.Show(ex.Message + ex.StackTrace, "Ошибка");
             }
 
         }

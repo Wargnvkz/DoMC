@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace DoMC
+namespace DoMCForms.Dialogs
 {
     public partial class DisplayMessage : Form
     {

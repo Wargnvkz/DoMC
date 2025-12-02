@@ -20,7 +20,7 @@ namespace DoMCArchive
             {
                 if (!String.IsNullOrEmpty(dbArchivePath) && Path.Exists(dbArchivePath))
                 {
-                    var archive = new DoMC.Forms.DoMCArchiveForm(new EmptyController(), dbPath, dbArchivePath);
+                    var archive = new DoMCForms.DoMCArchiveForm(new EmptyController(), dbPath, dbArchivePath);
                     Application.Run(archive);
                 }
                 else

@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
 
-namespace DoMC.Forms
+namespace DoMCForms
 {
     public partial class DoMCArchiveForm : Form
     {
@@ -337,7 +337,7 @@ namespace DoMC.Forms
                 return;
             }
             var nsocket = (int)nudArchiveSocketNumber.Value;
-            var showPreformImages = new DoMC.Forms.ShowPreformImages();
+            var showPreformImages = new DoMCForms.ShowPreformImages();
 
             var simage = cycle.SocketImages.Find(si => si.SocketNumber == nsocket);
             if (simage == null)
@@ -516,21 +516,21 @@ namespace DoMC.Forms
         }
         private void nudArchiveSocketNumber_DoubleClick(object sender, EventArgs e)
         {
-            var newValue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog("Введите номер гнезда", false, (int)nudArchiveSocketNumber.Value);
+            var newValue = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog("Введите номер гнезда", false, (int)nudArchiveSocketNumber.Value);
             if (newValue >= 0)
                 nudArchiveSocketNumber.Value = newValue;
         }
 
         private void nudArchiveFrom_DoubleClick(object sender, EventArgs e)
         {
-            var newValue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog("Введите час начала периода", false, (int)nudArchiveFrom.Value);
+            var newValue = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog("Введите час начала периода", false, (int)nudArchiveFrom.Value);
             if (newValue >= 0)
                 nudArchiveFrom.Value = newValue;
         }
 
         private void nudArchiveTo_DoubleClick(object sender, EventArgs e)
         {
-            var newValue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog("Введите час конца периода", false, (int)nudArchiveTo.Value);
+            var newValue = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog("Введите час конца периода", false, (int)nudArchiveTo.Value);
             if (newValue >= 0)
                 nudArchiveTo.Value = newValue;
         }

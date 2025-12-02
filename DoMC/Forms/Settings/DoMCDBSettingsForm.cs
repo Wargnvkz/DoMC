@@ -1,4 +1,4 @@
-﻿using DoMCLib.Dialogs;
+﻿using DoMCForms.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

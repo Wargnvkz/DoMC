@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DoMC\DoMC.csproj" />
+    <ProjectReference Include="..\DoMCForms\DoMCForms.csproj" />
   </ItemGroup>
 
 </Project>

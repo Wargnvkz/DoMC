@@ -40,7 +40,7 @@ namespace DoMCLib.Forms
                 var title = "";
                 if (nud == nudCycles) title = "(Количество расчетных циклов)";
                 if (nud == nudStandardPercent) title = "(Процентов остающихся от изначального эталона)";
-                var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, (int)nud.Value);
+                var newvalue = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, (int)nud.Value);
                 if (newvalue >= 0)
                     nud.Value = newvalue;
             }

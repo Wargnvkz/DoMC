@@ -37,7 +37,7 @@ namespace DoMC
         SettingsPageSocketsStatus SettingsPageSocketsStatusShow = SettingsPageSocketsStatus.IsSocketSettingsOk;
 
         Bitmap bmpCheckSign = new Bitmap(512, 512);
-        DoMCArchiveForm archiveForm = null;
+        DoMCForms.DoMCArchiveForm archiveForm = null;
 
         //ModelCommandProcessor contextProcessor;
 
@@ -163,11 +163,11 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Необработанная ошибка:", e.Exception);
             if (e.Exception is DoMCException)
             {
-                DisplayMessage.Show(e.Exception.Message, "Ошибка");
+                DoMCForms.Dialogs.DisplayMessage.Show(e.Exception.Message, "Ошибка");
             }
             else
             {
-                DisplayMessage.Show(e.Exception.Message + "\r\n" + e.Exception.StackTrace, "Ошибка");
+                DoMCForms.Dialogs.DisplayMessage.Show(e.Exception.Message + "\r\n" + e.Exception.StackTrace, "Ошибка");
             }
         }
 
@@ -571,7 +571,7 @@ namespace DoMC
             if (archiveForm != null) return;
             tbArchive.Font = new Font(tbArchive.Font.FontFamily, 8f);
             tbArchive.Scale(new SizeF(1, 1));
-            archiveForm = new DoMCArchiveForm(Controller, Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath, Context.Configuration.HardwareSettings.ArchiveDBConfig.ArchiveDBPath);
+            archiveForm = new DoMCForms.DoMCArchiveForm(Controller, Context.Configuration.HardwareSettings.ArchiveDBConfig.LocalDBPath, Context.Configuration.HardwareSettings.ArchiveDBConfig.ArchiveDBPath);
             archiveForm.Font = new Font(archiveForm.Font.FontFamily, 8);
             archiveForm.Visible = true;
             archiveForm.TopLevel = false;

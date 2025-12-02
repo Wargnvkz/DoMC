@@ -115,7 +115,7 @@ namespace DoMC.UserControls
             catch (Exception ex)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при отлючении", ex);
-                DisplayMessage.Show("Ошибка при отлючении", "Ошибка");
+                DoMCForms.Dialogs.DisplayMessage.Show("Ошибка при отлючении", "Ошибка");
 
             }
 
@@ -135,7 +135,7 @@ namespace DoMC.UserControls
                 WorkingLog.Add(LoggerLevel.Critical, "Не удалось подключиться к бракеру", ex);
                 btnRDPBTestConnect.BackColor = Color.Red;
                 TestRDPBConnected = false;
-                DisplayMessage.Show("Не удалось подключиться к бракеру", "Ошибка");
+                DoMCForms.Dialogs.DisplayMessage.Show("Не удалось подключиться к бракеру", "Ошибка");
             }
 
         }

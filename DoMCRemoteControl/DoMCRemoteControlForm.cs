@@ -1,8 +1,10 @@
+using DoMCForms;
 using DoMCLib.Classes.Module.API.Controllers;
 using DoMCLib.Tools;
+using Microsoft.AspNetCore.Mvc;
+using System.Configuration;
 using System.Windows.Forms.DataVisualization.Charting;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Configuration;
 
 namespace DoMCRemoteControl
 {
@@ -10,28 +12,61 @@ namespace DoMCRemoteControl
     {
         private string DoMCIP = "localhost";//"192.168.211.100";
         private int DoMCPort = 8080;
+        private string LocalDBPath;
+        private string RemoteDBPath;
+
         private ApiClient _api;
         APIStatusResponse _LastStatus;
         private int ShowPeriodInHours = 2;
         public bool NoConnection = false;
+        DoMCArchiveForm archiveForm = null;
+        DateTime? LastActionTime;
+
         public DoMCRemoteControlForm()
         {
             InitializeComponent();
             ReadConfig();
             SetDoMCServerAddress();
+            LoadArchiveTab();
+            HookAllControls(archiveForm);
+            HookAllControls(this);
+
         }
 
         private void ReadConfig()
         {
             DoMCIP = ConfigurationManager.AppSettings["IP"];
             int.TryParse(ConfigurationManager.AppSettings["Port"], out DoMCPort);
+            LocalDBPath = ConfigurationManager.AppSettings["DB"];
+            RemoteDBPath = ConfigurationManager.AppSettings["DBArchive"];
         }
 
         private void SaveConfig()
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["IP"].Value = DoMCIP;
-            config.AppSettings.Settings["Port"].Value = DoMCPort.ToString();
+            if (config.AppSettings.Settings["IP"] == null)
+                config.AppSettings.Settings.Add("IP", DoMCIP);
+            else
+                config.AppSettings.Settings["IP"].Value = DoMCIP;
+
+
+            if (config.AppSettings.Settings["Port"] == null)
+                config.AppSettings.Settings.Add("Port", DoMCPort.ToString());
+            else
+                config.AppSettings.Settings["Port"].Value = DoMCPort.ToString();
+
+
+            if (config.AppSettings.Settings["DB"] == null)
+                config.AppSettings.Settings.Add("DB", LocalDBPath);
+            else
+                config.AppSettings.Settings["DB"].Value = LocalDBPath;
+
+            if (config.AppSettings.Settings["DBArchive"] == null)
+                config.AppSettings.Settings.Add("DBArchive", RemoteDBPath);
+            else
+                config.AppSettings.Settings["DBArchive"].Value = RemoteDBPath;
+
+
             config.Save(ConfigurationSaveMode.Modified);
 
             ConfigurationManager.RefreshSection("appSettings");
@@ -98,6 +133,13 @@ namespace DoMCRemoteControl
         {
             await RequestStatus();
             RefreshAll();
+            if (LastActionTime != null)
+            {
+                if ((DateTime.Now - LastActionTime.Value).TotalSeconds > 120 && tabPages.SelectedIndex != 0)
+                {
+                    tabPages.SelectedIndex = 0;
+                }
+            }
         }
 
         private void RefreshAll()
@@ -229,18 +271,61 @@ namespace DoMCRemoteControl
             var settingsForm = new SettingsForm();
             settingsForm.IP = DoMCIP;
             settingsForm.Port = DoMCPort;
+            settingsForm.LocalDBPath = LocalDBPath;
+            settingsForm.RemoteDBPath = RemoteDBPath;
             if (settingsForm.ShowDialog() == DialogResult.OK)
             {
                 DoMCIP = settingsForm.IP;
                 DoMCPort = settingsForm.Port;
+                LocalDBPath = settingsForm.LocalDBPath;
+                RemoteDBPath = settingsForm.RemoteDBPath;
                 SaveConfig();
                 SetDoMCServerAddress();
+
+                if (archiveForm != null)
+                    archiveForm.SetParameters(LocalDBPath, RemoteDBPath);
             }
         }
 
         private void cbCurrentShowStatistics_CheckedChanged(object sender, EventArgs e)
         {
             pnlCurrentSockets.Invalidate();
+        }
+
+
+        private void LoadArchiveTab()
+        {
+            archiveForm = new DoMCForms.DoMCArchiveForm(new EmptyController(), LocalDBPath, RemoteDBPath);
+            archiveForm.TopLevel = false;
+            archiveForm.Parent = tbpArchive;
+            archiveForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            archiveForm.StartPosition = FormStartPosition.Manual;
+            archiveForm.Location = new Point(0, 0);
+            //tbpArchive.Scale(new SizeF(1f, 1f));
+            archiveForm.Scale(new SizeF(1f, 1f));
+            archiveForm.Size = new Size(tbpArchive.ClientSize.Width, tbpArchive.ClientSize.Height);
+            archiveForm.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
+            archiveForm.Visible = true;
+
+        }
+
+        private void tbpState_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        void HookAllControls(Control root)
+        {
+            foreach (Control c in root.Controls)
+            {
+                c.MouseMove += (_, __) => ResetIdleTimer();
+                c.KeyPress += (_, __) => ResetIdleTimer();
+                HookAllControls(c);
+            }
+        }
+        private void ResetIdleTimer()
+        {
+            LastActionTime = DateTime.Now;
         }
     }
 }

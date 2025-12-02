@@ -92,7 +92,7 @@ namespace DoMCLib.Forms
         private void txbMachineNumber_DoubleClick(object sender, EventArgs e)
         {
             int.TryParse(txbMachineNumber.Text, out int machineNumber);
-            var value = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog("Введите номер линии", false, machineNumber);
+            var value = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog("Введите номер линии", false, machineNumber);
             if (value >= 0)
             {
                 txbMachineNumber.Text = value.ToString();

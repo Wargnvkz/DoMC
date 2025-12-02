@@ -34,6 +34,12 @@
             label2 = new Label();
             nudPort = new NumericUpDown();
             txbIP = new TextBox();
+            btnRemoteDBBrowse = new Button();
+            txbRemoteConnectionString = new TextBox();
+            label1 = new Label();
+            btnLocalDBBrowse = new Button();
+            txbLocalConnectionString = new TextBox();
+            label3 = new Label();
             ((System.ComponentModel.ISupportInitialize)nudPort).BeginInit();
             SuspendLayout();
             // 
@@ -41,7 +47,7 @@
             // 
             btnOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             btnOK.DialogResult = DialogResult.OK;
-            btnOK.Location = new Point(12, 78);
+            btnOK.Location = new Point(12, 216);
             btnOK.Name = "btnOK";
             btnOK.Size = new Size(75, 40);
             btnOK.TabIndex = 0;
@@ -52,7 +58,7 @@
             // 
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(158, 78);
+            btnCancel.Location = new Point(738, 216);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 40);
             btnCancel.TabIndex = 1;
@@ -98,11 +104,79 @@
             txbIP.Size = new Size(166, 29);
             txbIP.TabIndex = 8;
             // 
+            // btnRemoteDBBrowse
+            // 
+            btnRemoteDBBrowse.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnRemoteDBBrowse.Location = new Point(700, 158);
+            btnRemoteDBBrowse.Margin = new Padding(4, 5, 4, 5);
+            btnRemoteDBBrowse.Name = "btnRemoteDBBrowse";
+            btnRemoteDBBrowse.Size = new Size(112, 35);
+            btnRemoteDBBrowse.TabIndex = 14;
+            btnRemoteDBBrowse.Text = "Обзор...";
+            btnRemoteDBBrowse.UseVisualStyleBackColor = true;
+            btnRemoteDBBrowse.Click += btnRemoteDBBrowse_Click;
+            // 
+            // txbRemoteConnectionString
+            // 
+            txbRemoteConnectionString.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txbRemoteConnectionString.Location = new Point(12, 165);
+            txbRemoteConnectionString.Margin = new Padding(4, 5, 4, 5);
+            txbRemoteConnectionString.Name = "txbRemoteConnectionString";
+            txbRemoteConnectionString.Size = new Size(680, 23);
+            txbRemoteConnectionString.TabIndex = 13;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 145);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(158, 15);
+            label1.TabIndex = 12;
+            label1.Text = "Папка хранения архива БД:";
+            // 
+            // btnLocalDBBrowse
+            // 
+            btnLocalDBBrowse.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnLocalDBBrowse.Location = new Point(700, 90);
+            btnLocalDBBrowse.Margin = new Padding(4, 5, 4, 5);
+            btnLocalDBBrowse.Name = "btnLocalDBBrowse";
+            btnLocalDBBrowse.Size = new Size(112, 35);
+            btnLocalDBBrowse.TabIndex = 11;
+            btnLocalDBBrowse.Text = "Обзор...";
+            btnLocalDBBrowse.UseVisualStyleBackColor = true;
+            btnLocalDBBrowse.Click += btnLocalDBBrowse_Click;
+            // 
+            // txbLocalConnectionString
+            // 
+            txbLocalConnectionString.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txbLocalConnectionString.Location = new Point(12, 97);
+            txbLocalConnectionString.Margin = new Padding(4, 5, 4, 5);
+            txbLocalConnectionString.Name = "txbLocalConnectionString";
+            txbLocalConnectionString.Size = new Size(680, 23);
+            txbLocalConnectionString.TabIndex = 10;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(12, 77);
+            label3.Margin = new Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(117, 15);
+            label3.TabIndex = 9;
+            label3.Text = "Папка хранения БД:";
+            // 
             // SettingsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(245, 130);
+            ClientSize = new Size(825, 268);
+            Controls.Add(btnRemoteDBBrowse);
+            Controls.Add(txbRemoteConnectionString);
+            Controls.Add(label1);
+            Controls.Add(btnLocalDBBrowse);
+            Controls.Add(txbLocalConnectionString);
+            Controls.Add(label3);
             Controls.Add(txbIP);
             Controls.Add(nudPort);
             Controls.Add(label2);
@@ -124,5 +198,11 @@
         private Label label2;
         private NumericUpDown nudPort;
         private TextBox txbIP;
+        private Button btnRemoteDBBrowse;
+        private TextBox txbRemoteConnectionString;
+        private Label label1;
+        private Button btnLocalDBBrowse;
+        private TextBox txbLocalConnectionString;
+        private Label label3;
     }
 }

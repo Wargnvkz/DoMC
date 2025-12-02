@@ -342,6 +342,9 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось передать данные");
                 return;
             }
+            if (CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings == null)
+                CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings = new LCBSettings() { LCBKoefficient = 75.2 };
+            CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.LEDCurrent = current;
         }
 
         private async void btnTestLCBGetMovementParameters_Click(object sender, EventArgs e)
@@ -384,6 +387,10 @@ namespace DoMC.UserControls
                 MessageBox.Show("Не удалось передать данные");
                 return;
             }
+            if (CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings == null)
+                CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings = new LCBSettings() { LCBKoefficient = 75.2 };
+            CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.DelayLength = delayLength;
+            CurrentContext.Configuration.ReadingSocketsSettings.LCBSettings.PreformLength = preformLength;
         }
 
         private async Task TestLCBSetWorkMode()
@@ -688,7 +695,7 @@ namespace DoMC.UserControls
             if (txb == txbTestLCBPreformLength) title = "длина преформы в имп";
             if (txb == txbTestLCBPreformLengthMm) title = "длина преформы в мм";
             int.TryParse(txb.Text, out int Current);
-            var newvalue = DoMCLib.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, Current);
+            var newvalue = DoMCForms.Dialogs.DigitalInput.ShowIntegerDialog($"Ввод значения {title}", false, Current);
             if (newvalue >= 0)
                 txb.Text = newvalue.ToString();
         }

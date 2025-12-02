@@ -9,21 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WinForms.DataVisualization" Version="1.9.2" />
+    <PackageReference Include="WinForms.DataVisualization" Version="1.10.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DoMCForms\DoMCForms.csproj" />
     <ProjectReference Include="..\DoMCLib\DoMCLib.csproj" />
     <ProjectReference Include="..\DoMCModuleControl\DoMCModuleControl.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Dialogs\DisplayMessage.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="Forms\DoMCArchiveForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Update="Forms\DoMCInnerVarsForm.cs">
       <SubType>Form</SubType>
     </Compile>

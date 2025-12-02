@@ -53,7 +53,7 @@ namespace DoMC
 
         private void DoMCNotFoundErrorMessage()
         {
-            DisplayMessage.Show("Не найдено устройство управления платами ПМК", "Ошибка");
+            DoMCForms.Dialogs.DisplayMessage.Show("Не найдено устройство управления платами ПМК", "Ошибка");
             this.Close();
         }
 

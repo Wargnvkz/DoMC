@@ -1,4 +1,4 @@
-﻿namespace DoMC
+﻿namespace DoMCForms.Dialogs
 {
     partial class DisplayMessage
     {
