@@ -36,13 +36,25 @@ namespace DoMCLib.Configuration
             bool result = true;
             for (int i = 0; i < CCDSocketParameters.Length; i++)
             {
-                result &= CCDSocketParameters[i] != null &&
-                CCDSocketParameters[i].ReadingParameters != null &&
-                CCDSocketParameters[i].ReadingParameters.FrameDuration != 0 &&
-                CCDSocketParameters[i].ReadingParameters.Exposition != 0 &&
-                CCDSocketParameters[i].ImageCheckingParameters != null;
+                result &= IsReadingParametersSet(i);
             }
             return result;
+        }
+        public bool IsReadingParametersSet(int socket)
+        {
+            return CCDSocketParameters[socket] != null &&
+            CCDSocketParameters[socket].ReadingParameters != null &&
+            CCDSocketParameters[socket].ReadingParameters.IsSocketReadingParametersSet();
+        }
+        public bool IsImageProcessParametersMakeDecisionSet(int socket)
+        {
+            return CCDSocketParameters[socket].ImageCheckingParameters != null
+                && CCDSocketParameters[socket].ImageCheckingParameters.IsImageProcessParametersMakeDecisionSet();
+        }
+        public bool IsImageProcessParametersWindowSet(int socket)
+        {
+            return CCDSocketParameters[socket].ImageCheckingParameters != null
+                && CCDSocketParameters[socket].ImageCheckingParameters.IsImageProcessParametersWindowSet();
         }
 
     }

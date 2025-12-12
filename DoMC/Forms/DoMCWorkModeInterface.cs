@@ -1188,11 +1188,16 @@ namespace DoMC
                         //распараллеливаем процесс
 
 
-                        WorkingLog.Add(LoggerLevel.Critical, "Поиск отклонений в гнездах");
+                        WorkingLog.Add(LoggerLevel.Information, "Поиск отклонений в гнездах");
+
                         //сохраняем изображения эталонов во все гнезда
                         SetStandardForAllCurrentCCDSockets(CurrentCycleCCD);
                         CheckIfSocketsHasImage(CurrentCycleCCD);
                         var IsAllHaveImages = CurrentCycleCCD.IsSocketHasImage.All(p => p);
+
+                        var cfgStatus = Context.Configuration.GetConfigurationFillStatus();
+                        WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Настройки гнезд: " + cfgStatus.ToString());
+
                         WorkingLog.Add(LoggerLevel.Critical, "Наличие эталонов: " + System.String.Join("", CurrentCycleCCD.StandardImages.Select((si, i) => $"{(si == null ? 0 : 1)}{(i % 8 == 7 ? " " : "")}")));
 
                         WorkingLog.Add(LoggerLevel.Critical, "Наличие изображений: " + System.String.Join("", CurrentCycleCCD.CurrentImages.Select((ci, i) => $"{(ci == null ? 0 : 1)}{(i % 8 == 7 ? " " : "")}")));

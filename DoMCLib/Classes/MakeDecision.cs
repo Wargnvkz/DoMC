@@ -18,6 +18,11 @@ namespace DoMCLib.Classes
         [DataMember]
         public short ParameterCompareGoodIfLess;
 
+        public bool IsMakeDecisionSet()
+        {
+            return Operations.Count > 0;
+        }
+
         public void AddNextOperation(DecisionOperation operation)
         {
             Operations.Add(operation);

@@ -1,7 +1,9 @@
-﻿using System.Drawing;
-using System.Runtime.Serialization;
-using DoMCLib.Classes;
+﻿using DoMCLib.Classes;
 using DoMCLib.Classes.Configuration.CCD;
+using Microsoft.Extensions.DependencyInjection;
+using System.Drawing;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.DataContracts;
 using static DoMCLib.Classes.Configuration.CCD.SocketParameters;
 
 namespace DoMCLib.Configuration
@@ -28,6 +30,25 @@ namespace DoMCLib.Configuration
         public Rectangle GetRectangle()
         {
             return new Rectangle(LeftBorder, TopBorder, RightBorder - LeftBorder, BottomBorder - TopBorder);
+        }
+
+        public bool IsImageProcessParametersMakeDecisionSet()
+        {
+            return
+                Decisions[0].IsMakeDecisionSet()
+                &&
+                Decisions[1].IsMakeDecisionSet();
+        }
+        public bool IsImageProcessParametersWindowSet()
+        {
+            return
+                TopBorder != 0
+                &&
+                BottomBorder != 511
+                &&
+                LeftBorder != 0
+                &&
+                RightBorder != 511;
         }
 
         public ImageProcessParameters Clone()

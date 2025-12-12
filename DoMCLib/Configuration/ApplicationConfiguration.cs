@@ -1,13 +1,17 @@
 ﻿#pragma warning disable IDE0063
 #pragma warning disable IDE0090
 #pragma warning disable IDE0290
+using DoMCLib.Classes.Configuration;
+using DoMCLib.Exceptions;
 using DoMCLib.Tools;
+using Microsoft.AspNetCore.Components.Forms;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DoMCLib.Configuration
@@ -246,5 +250,69 @@ namespace DoMCLib.Configuration
         {
             WriteCurrentConfigEntry(ProcessingDataSettingsFile, ProcessingDataSettings);
         }*/
+
+        public ConfigurationFillStatus GetConfigurationFillStatus()
+        {
+            var configStatus = new ConfigurationFillStatus()
+            {
+                IsStandardRecalculationSettingsSet = HardwareSettings.IsStandardRecalculationSettingsSet(),
+                IsRemoveDefectedPreformBlockConfigSet = HardwareSettings.IsRemoveDefectedPreformBlockConfigSet(),
+                IsDBSettingsSet = HardwareSettings.IsDBSettingsSet(),
+                IsLCBParametersSet = ReadingSocketsSettings.IsLCBSettingsSet(),
+            };
+            configStatus.SocketParametersStatus = new SocketParametersStatus[HardwareSettings.SocketQuantity];
+            for (int socket = 0; socket < HardwareSettings.SocketQuantity; socket++)
+            {
+                configStatus.SocketParametersStatus[socket] = new SocketParametersStatus()
+                {
+                    IsInCheck = HardwareSettings.SocketsToCheck[socket],
+                    IsReadingParametersSet = ReadingSocketsSettings.IsReadingParametersSet(socket),
+                    IsMakeDecisionOperationsSet = ReadingSocketsSettings.IsImageProcessParametersMakeDecisionSet(socket),
+                    IsWindowsCheckSet = ReadingSocketsSettings.IsImageProcessParametersWindowSet(socket)
+                };
+            }
+            return configStatus;
+        }
+    }
+
+    public class ConfigurationFillStatus
+    {
+        public bool IsStandardRecalculationSettingsSet;
+        public bool IsRemoveDefectedPreformBlockConfigSet;
+        public bool IsDBSettingsSet;
+        public bool IsLCBParametersSet;
+        public SocketParametersStatus[]? SocketParametersStatus;
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            if (SocketParametersStatus != null)
+            {
+                sb.Append("(");
+                sb.Append(String.Join(",", SocketParametersStatus.Select(p => p.ToString())));
+                sb.Append(")");
+            }
+            sb.Append(IsStandardRecalculationSettingsSet ? "1" : "0");
+            sb.Append(IsRemoveDefectedPreformBlockConfigSet ? "1" : "0");
+            sb.Append(IsDBSettingsSet ? "1" : "0");
+            sb.Append(IsLCBParametersSet ? "1" : "0");
+
+            return sb.ToString();
+        }
+    }
+    public class SocketParametersStatus
+    {
+        public bool IsInCheck;
+        public bool IsReadingParametersSet;
+        public bool IsWindowsCheckSet;
+        public bool IsMakeDecisionOperationsSet;
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append(IsInCheck ? "+" : "-");
+            sb.Append((IsReadingParametersSet ? 4 : 0)
+                + (IsWindowsCheckSet ? 2 : 0)
+                + (IsMakeDecisionOperationsSet ? 1 : 0));
+            return sb.ToString();
+        }
     }
 }

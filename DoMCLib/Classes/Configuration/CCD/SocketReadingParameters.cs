@@ -1,9 +1,10 @@
-﻿using System;
+﻿using DoMCLib.Classes.Module.CCD.CCDCardDataExchangeCommandClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Text;
-using DoMCLib.Classes.Module.CCD.CCDCardDataExchangeCommandClasses;
 using static DoMCLib.Classes.Configuration.CCD.SocketParameters;
 
 namespace DoMCLib.Classes.Configuration.CCD
@@ -68,6 +69,10 @@ namespace DoMCLib.Classes.Configuration.CCD
             var cfg = new CCDCardConfigRequest5() { Config = (byte)((ResetReady ? 1 : 0) << 2 | (AnswerWithNoRequest ? 1 : 0) << 1 | (ExternalStart ? 1 : 0)) };
             return cfg;
 
+        }
+        public bool IsSocketReadingParametersSet()
+        {
+            return FrameDuration != 0 && Exposition != 0;
         }
 
         public SocketReadingParameters Clone()

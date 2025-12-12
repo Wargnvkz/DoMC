@@ -10,7 +10,7 @@ namespace DoMCModuleControl.Commands
     {
         private TaskCompletionSource<T>? _pendingReadTask;
         private readonly SemaphoreSlim _commandLock = new SemaphoreSlim(1, 1); // блокирует параллельный доступ
-        private Func<int, bool> ResponseFilter;
+        private Func<int, bool>? ResponseFilter;
         /// <summary>
         /// Создание асинхронной задачи, которая звершается либо по таймауту, либо после установки результата в TrySetResult
         /// </summary>
@@ -132,8 +132,59 @@ namespace DoMCModuleControl.Commands
             }
         }
 
+        /// <summary>
+        /// Создание асинхронной задачи, которая звершается либо по таймауту, либо после установки результата в TrySetResult
+        /// </summary>
+        /// <param name="token">Токен отмены</param>
+        /// <param name="responseFilter">Фильтр, который проверяет при каком условии вызов TrySetResult устанавит результат команды</param>
+        /// <param name="cmd">Код выполняемый перед запуском ожидания. Например, команда переданная устройству</param>
+        /// <param name="timeoutMilliseconds">Таймаут после которого выполнение операции завершается с ошибкой</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="TimeoutException"></exception>
+        public async Task<T> AsyncCommandAsync(
+            CancellationToken token,
+            Func<int, bool>? responseFilter,
+            Func<Task> cmd,
+            int timeoutMilliseconds = 5000) // ← можно передать таймаут
+        {
+            SetExpectingResponses(responseFilter);
+            await _commandLock.WaitAsync(token);
 
-        protected void SetExpectingResponses(Func<int, bool> responseFilter)
+            try
+            {
+                if (_pendingReadTask != null)
+                    throw new InvalidOperationException("Команда уже выполняется");
+
+                _pendingReadTask = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+                cmd?.Invoke();
+
+                using (token.Register(() => _pendingReadTask.TrySetCanceled(token)))
+                {
+                    var completed = await Task.WhenAny(
+                        _pendingReadTask.Task,
+                        Task.Delay(timeoutMilliseconds, token));
+
+                    if (completed == _pendingReadTask.Task)
+                    {
+                        return await _pendingReadTask.Task; // всё ок, ответ пришёл
+                    }
+                    else
+                    {
+                        _pendingReadTask.TrySetException(new TimeoutException($"Команда не ответила за {timeoutMilliseconds} мс"));
+                        throw new TimeoutException($"Команда не ответила за {timeoutMilliseconds} мс");
+                    }
+                }
+            }
+            finally
+            {
+                _pendingReadTask = null;
+                _commandLock.Release();
+            }
+        }
+
+        protected void SetExpectingResponses(Func<int, bool>? responseFilter)
         {
             ResponseFilter = responseFilter;
         }

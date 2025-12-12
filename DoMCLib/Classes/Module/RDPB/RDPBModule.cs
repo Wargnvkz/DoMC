@@ -105,7 +105,7 @@ namespace DoMCLib.Classes.Module.RDPB
         {
             if (IsStarted)
             {
-                return await _pendingCommandController.AsyncCommand(Token, null, async () =>
+                return await _pendingCommandController.AsyncCommandAsync(Token, null, async () =>
                 {
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда модулю бракера: <{Command.ToString()}>");
                     CurrentStatus.SetTimeLastSent();

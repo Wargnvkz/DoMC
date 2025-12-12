@@ -32,12 +32,18 @@
             btnSettingsCheckCardStatus = new Button();
             lblSocketSettings = new Label();
             pnlSockets = new Panel();
+            pnlSocketConfigurationSet = new Panel();
+            lblRemoveDefectedPreformBlockConfigSet = new Label();
+            lblStandardRecalculationSettingsSet = new Label();
+            lblDBSet = new Label();
+            lblLCBParameters = new Label();
             lblCaptionDoMCCards = new Label();
             lvDoMCCards = new ListView();
             chN = new ColumnHeader();
             chIsActive = new ColumnHeader();
             chIPAddress = new ColumnHeader();
             chListSockets = new ColumnHeader();
+            pnlSockets.SuspendLayout();
             SuspendLayout();
             // 
             // btnCheckSettings
@@ -68,17 +74,66 @@
             lblSocketSettings.Location = new Point(908, 0);
             lblSocketSettings.Margin = new Padding(4, 0, 4, 0);
             lblSocketSettings.Name = "lblSocketSettings";
-            lblSocketSettings.Size = new Size(103, 15);
+            lblSocketSettings.Size = new Size(122, 15);
             lblSocketSettings.TabIndex = 11;
-            lblSocketSettings.Text = "Параметры гнезд";
+            lblSocketSettings.Text = "Состояние настроек:";
             // 
             // pnlSockets
             // 
+            pnlSockets.Controls.Add(pnlSocketConfigurationSet);
+            pnlSockets.Controls.Add(lblRemoveDefectedPreformBlockConfigSet);
+            pnlSockets.Controls.Add(lblStandardRecalculationSettingsSet);
+            pnlSockets.Controls.Add(lblDBSet);
+            pnlSockets.Controls.Add(lblLCBParameters);
             pnlSockets.Location = new Point(914, 33);
             pnlSockets.Margin = new Padding(4, 5, 4, 5);
             pnlSockets.Name = "pnlSockets";
             pnlSockets.Size = new Size(393, 528);
             pnlSockets.TabIndex = 10;
+            // 
+            // pnlSocketConfigurationSet
+            // 
+            pnlSocketConfigurationSet.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pnlSocketConfigurationSet.Location = new Point(3, 35);
+            pnlSocketConfigurationSet.Name = "pnlSocketConfigurationSet";
+            pnlSocketConfigurationSet.Size = new Size(387, 490);
+            pnlSocketConfigurationSet.TabIndex = 8;
+            // 
+            // lblRemoveDefectedPreformBlockConfigSet
+            // 
+            lblRemoveDefectedPreformBlockConfigSet.AutoSize = true;
+            lblRemoveDefectedPreformBlockConfigSet.Location = new Point(327, 5);
+            lblRemoveDefectedPreformBlockConfigSet.Name = "lblRemoveDefectedPreformBlockConfigSet";
+            lblRemoveDefectedPreformBlockConfigSet.Size = new Size(46, 15);
+            lblRemoveDefectedPreformBlockConfigSet.TabIndex = 7;
+            lblRemoveDefectedPreformBlockConfigSet.Text = "Бракер";
+            // 
+            // lblStandardRecalculationSettingsSet
+            // 
+            lblStandardRecalculationSettingsSet.AutoSize = true;
+            lblStandardRecalculationSettingsSet.Location = new Point(133, 5);
+            lblStandardRecalculationSettingsSet.Name = "lblStandardRecalculationSettingsSet";
+            lblStandardRecalculationSettingsSet.Size = new Size(130, 15);
+            lblStandardRecalculationSettingsSet.TabIndex = 5;
+            lblStandardRecalculationSettingsSet.Text = "Обновление эталонов";
+            // 
+            // lblDBSet
+            // 
+            lblDBSet.AutoSize = true;
+            lblDBSet.Location = new Point(78, 5);
+            lblDBSet.Name = "lblDBSet";
+            lblDBSet.Size = new Size(22, 15);
+            lblDBSet.TabIndex = 3;
+            lblDBSet.Text = "БД";
+            // 
+            // lblLCBParameters
+            // 
+            lblLCBParameters.AutoSize = true;
+            lblLCBParameters.Location = new Point(14, 5);
+            lblLCBParameters.Name = "lblLCBParameters";
+            lblLCBParameters.Size = new Size(29, 15);
+            lblLCBParameters.TabIndex = 1;
+            lblLCBParameters.Text = "БУС";
             // 
             // lblCaptionDoMCCards
             // 
@@ -133,6 +188,8 @@
             Controls.Add(lvDoMCCards);
             Name = "CheckSettings";
             Size = new Size(1397, 689);
+            pnlSockets.ResumeLayout(false);
+            pnlSockets.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -149,5 +206,10 @@
         private ColumnHeader chIsActive;
         private ColumnHeader chIPAddress;
         private ColumnHeader chListSockets;
+        private Label lblRemoveDefectedPreformBlockConfigSet;
+        private Label lblStandardRecalculationSettingsSet;
+        private Label lblDBSet;
+        private Label lblLCBParameters;
+        private Panel pnlSocketConfigurationSet;
     }
 }
