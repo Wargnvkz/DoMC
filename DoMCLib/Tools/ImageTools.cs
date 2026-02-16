@@ -1,4 +1,7 @@
 ﻿#pragma warning disable IDE0090
+using DoMCLib.Classes;
+using DoMCLib.Classes.Configuration.CCD;
+using DoMCLib.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,11 +10,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
-using DoMCLib.Classes;
-using DoMCLib.Classes.Configuration.CCD;
-using DoMCLib.Configuration;
 
 namespace DoMCLib.Tools
 {
@@ -290,7 +291,77 @@ namespace DoMCLib.Tools
             }
             return dev;
         }
+        public static double[,] CalculateWindowDeviation(short[,] images, int windowsSize)
+        {
+            var Deviation = new double[512, 512];
+            for (int x = 0; x < 512; x++)
+            {
+                for (int y = windowsSize / 2; y < 512 - windowsSize / 2; y++)
+                {
+                    double sum = 0;
+                    double sumSquared = 0;
+                    for (int s = -windowsSize / 2; s < windowsSize / 2; s++)
+                    {
+                        var p = (short)images[y + s, x];
+                        sum += p;
+                        sumSquared += p * p;
+                    }
+                    var avg = sum / windowsSize;
+                    Deviation[y, x] = sumSquared / windowsSize - avg * avg;
 
+                }
+            }
+            return Deviation;
+        }
+
+        public static double[] CalculateMinWindowDeviationVertical(short[,] images, int windowsSize)
+        {
+            var Deviation = new double[512];
+            for (int x = 0; x < 512; x++)
+            {
+                double min = double.MaxValue;
+                for (int y = windowsSize / 2; y < 512 - windowsSize / 2; y++)
+                {
+                    double sum = 0;
+                    double sumSquared = 0;
+                    for (int s = -windowsSize / 2; s < windowsSize / 2; s++)
+                    {
+                        var p = (short)images[y + s, x];
+                        sum += p;
+                        sumSquared += p * p;
+                    }
+                    var avg = sum / windowsSize;
+                    var dev = sumSquared / windowsSize - avg * avg;
+                    if (dev > 0)
+                        if (dev < min)
+                            min = dev;
+
+                }
+                Deviation[x] = min;
+            }
+            return Deviation;
+        }
+
+        public static short[,] CalculateWindowAverage(short[,] images, int windowsSize)
+        {
+            var Deviation = new short[512, 512];
+            for (int x = 0; x < 512; x++)
+            {
+                for (int y = windowsSize / 2; y < 512 - windowsSize / 2; y++)
+                {
+                    double sum = 0;
+                    double sumSquared = 0;
+                    for (int s = -windowsSize / 2; s < windowsSize / 2; s++)
+                    {
+                        var p = (short)images[y + s, x];
+                        sum += p;
+                    }
+                    Deviation[y, x] = (short)(sum / windowsSize);
+
+                }
+            }
+            return Deviation;
+        }
 
         public static Deviation CalculateDeviationFull(short[][,] images, Rectangle? rect = null)
         {

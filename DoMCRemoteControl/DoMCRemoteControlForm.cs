@@ -1,4 +1,5 @@
 using DoMCForms;
+using DoMCLib.Classes;
 using DoMCLib.Classes.Module.API.Controllers;
 using DoMCLib.Tools;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +18,14 @@ namespace DoMCRemoteControl
 
         private ApiClient _api;
         APIStatusResponse _LastStatus;
+        List<AverageOfSocket> _Averages;
+
         private int ShowPeriodInHours = 2;
         public bool NoConnection = false;
         DoMCArchiveForm archiveForm = null;
         DateTime? LastActionTime;
+
+        private int Socket = 1, Period = 1;
 
         public DoMCRemoteControlForm()
         {
@@ -82,6 +87,15 @@ namespace DoMCRemoteControl
             try
             {
                 _LastStatus = await _api.GetStatusAsync();
+                try
+                {
+                    _Averages = await _api.GetSocketAvergaeAsync(Socket, Period);
+                }
+                catch (Exception ex)
+                { }
+                var cycleDuration = (int)((_LastStatus?.WorkingState?.CycleDuration * 1000) ?? 0);
+                if (cycleDuration < 10000) cycleDuration = 10000;
+                timer1.Interval = cycleDuration;
                 NoConnection = false;
             }
             catch (Exception ex)
@@ -131,6 +145,10 @@ namespace DoMCRemoteControl
 
         private async void timer_Tick(object sender, EventArgs e)
         {
+            await RefreshDataAndFillForm();
+        }
+        private async Task RefreshDataAndFillForm()
+        {
             await RequestStatus();
             RefreshAll();
             if (LastActionTime != null)
@@ -145,12 +163,14 @@ namespace DoMCRemoteControl
         private void RefreshAll()
         {
             if (_LastStatus == null) return;
-            var shift = new Shift();
+            //var shift = new Shift();
             var now = DateTime.Now;
-            var from = shift.ShiftStartsAt();//now.AddHours(-ShowPeriodInHours);
+            var from = now.AddHours(-Period);//shift.ShiftStartsAt();//now.AddHours(-ShowPeriodInHours);
             var boxes = _LastStatus.Boxes.Where(b => b.CompletedTime >= from && b.CompletedTime <= now).OrderBy(box => box.CompletedTime).ToList();
             var defects = _LastStatus.LastDefects.Where(d => d.CycleDateTime >= from && d.CycleDateTime <= now).OrderBy(t => t.CycleDateTime).ToList();
             FillBoxesAndDefectsChart(boxes, defects.Select(d => d.CycleDateTime).ToList());
+            if (_Averages != null)
+                FillAverages(_Averages);
 
 
             lvBoxes.Items.Clear();
@@ -220,6 +240,22 @@ namespace DoMCRemoteControl
                 dpTotal.BorderWidth = 1;
                 chEvents.Series[0].Points.Add(dpTotal);
             }
+        }
+        private void FillAverages(List<AverageOfSocket> averages)
+        {
+            chEvents.Series[1].Points.Clear();
+
+            chEvents.Series[1].XValueType = ChartValueType.DateTime;
+            foreach (var cycle in averages)
+            {
+                var dpTotal = new DataPoint();
+                dpTotal.SetValueXY(cycle.CycleTime.ToOADate(), cycle.AveragesOfSocket);
+                dpTotal.Color = Color.Blue;
+                dpTotal.BorderWidth = 1;
+                chEvents.Series[1].Points.Add(dpTotal);
+
+            }
+
         }
 
         private void DrawMatrix(Graphics g, Size size, int[] ErrorsBySockets, bool ShowingStatistics)
@@ -326,6 +362,24 @@ namespace DoMCRemoteControl
         private void ResetIdleTimer()
         {
             LastActionTime = DateTime.Now;
+        }
+
+        private async void nudAverageSocket_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                Socket = (int)nudAverageSocket.Value;
+                Period = (int)nudAveragePeriod.Value;
+                e.Handled = true;
+                await RefreshDataAndFillForm();
+            }
+        }
+
+        private async void nudAverage_ValueChanged(object sender, EventArgs e)
+        {
+            Socket = (int)nudAverageSocket.Value;
+            Period = (int)nudAveragePeriod.Value;
+            await RefreshDataAndFillForm();
         }
     }
 }

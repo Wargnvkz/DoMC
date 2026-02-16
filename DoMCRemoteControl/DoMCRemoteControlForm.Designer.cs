@@ -31,6 +31,7 @@
             components = new System.ComponentModel.Container();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             timer1 = new System.Windows.Forms.Timer(components);
             menuStrip1 = new MenuStrip();
             tsmiSettings = new ToolStripMenuItem();
@@ -39,6 +40,11 @@
             tsmiResetCycles = new ToolStripMenuItem();
             tabPages = new TabControl();
             tbpState = new TabPage();
+            lblAveragePeriodTimeIndicator = new Label();
+            nudAveragePeriod = new NumericUpDown();
+            nudAverageSocket = new NumericUpDown();
+            lblAveragePeriod = new Label();
+            lblAverageSocket = new Label();
             lblCurrentBoxDefects = new Label();
             lblCurrentBoxDefectsCaption = new Label();
             lblNoConnection = new Label();
@@ -68,6 +74,8 @@
             menuStrip1.SuspendLayout();
             tabPages.SuspendLayout();
             tbpState.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudAveragePeriod).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudAverageSocket).BeginInit();
             ((System.ComponentModel.ISupportInitialize)chEvents).BeginInit();
             SuspendLayout();
             // 
@@ -122,11 +130,16 @@
             tabPages.Location = new Point(0, 27);
             tabPages.Name = "tabPages";
             tabPages.SelectedIndex = 0;
-            tabPages.Size = new Size(1463, 722);
+            tabPages.Size = new Size(1463, 801);
             tabPages.TabIndex = 55;
             // 
             // tbpState
             // 
+            tbpState.Controls.Add(lblAveragePeriodTimeIndicator);
+            tbpState.Controls.Add(nudAveragePeriod);
+            tbpState.Controls.Add(nudAverageSocket);
+            tbpState.Controls.Add(lblAveragePeriod);
+            tbpState.Controls.Add(lblAverageSocket);
             tbpState.Controls.Add(lblCurrentBoxDefects);
             tbpState.Controls.Add(lblCurrentBoxDefectsCaption);
             tbpState.Controls.Add(lblNoConnection);
@@ -149,18 +162,79 @@
             tbpState.Location = new Point(4, 24);
             tbpState.Name = "tbpState";
             tbpState.Padding = new Padding(3);
-            tbpState.Size = new Size(1455, 694);
+            tbpState.Size = new Size(1455, 773);
             tbpState.TabIndex = 0;
             tbpState.Text = "Состояние ПМК";
             tbpState.UseVisualStyleBackColor = true;
             tbpState.Click += tbpState_Click;
+            // 
+            // lblAveragePeriodTimeIndicator
+            // 
+            lblAveragePeriodTimeIndicator.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lblAveragePeriodTimeIndicator.AutoSize = true;
+            lblAveragePeriodTimeIndicator.Font = new Font("Segoe UI", 12F);
+            lblAveragePeriodTimeIndicator.Location = new Point(542, 506);
+            lblAveragePeriodTimeIndicator.Name = "lblAveragePeriodTimeIndicator";
+            lblAveragePeriodTimeIndicator.Size = new Size(22, 21);
+            lblAveragePeriodTimeIndicator.TabIndex = 78;
+            lblAveragePeriodTimeIndicator.Text = "ч.";
+            // 
+            // nudAveragePeriod
+            // 
+            nudAveragePeriod.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            nudAveragePeriod.Font = new Font("Segoe UI", 12F);
+            nudAveragePeriod.Location = new Point(449, 504);
+            nudAveragePeriod.Maximum = new decimal(new int[] { 12, 0, 0, 0 });
+            nudAveragePeriod.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudAveragePeriod.Name = "nudAveragePeriod";
+            nudAveragePeriod.Size = new Size(87, 29);
+            nudAveragePeriod.TabIndex = 77;
+            nudAveragePeriod.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            nudAveragePeriod.ValueChanged += nudAverage_ValueChanged;
+            nudAveragePeriod.KeyPress += nudAverageSocket_KeyPress;
+            // 
+            // nudAverageSocket
+            // 
+            nudAverageSocket.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            nudAverageSocket.Font = new Font("Segoe UI", 12F);
+            nudAverageSocket.Location = new Point(186, 504);
+            nudAverageSocket.Maximum = new decimal(new int[] { 96, 0, 0, 0 });
+            nudAverageSocket.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudAverageSocket.Name = "nudAverageSocket";
+            nudAverageSocket.Size = new Size(87, 29);
+            nudAverageSocket.TabIndex = 76;
+            nudAverageSocket.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            nudAverageSocket.ValueChanged += nudAverage_ValueChanged;
+            nudAverageSocket.KeyPress += nudAverageSocket_KeyPress;
+            // 
+            // lblAveragePeriod
+            // 
+            lblAveragePeriod.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lblAveragePeriod.AutoSize = true;
+            lblAveragePeriod.Font = new Font("Segoe UI", 12F);
+            lblAveragePeriod.Location = new Point(375, 506);
+            lblAveragePeriod.Name = "lblAveragePeriod";
+            lblAveragePeriod.Size = new Size(68, 21);
+            lblAveragePeriod.TabIndex = 75;
+            lblAveragePeriod.Text = "Период:";
+            // 
+            // lblAverageSocket
+            // 
+            lblAverageSocket.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lblAverageSocket.AutoSize = true;
+            lblAverageSocket.Font = new Font("Segoe UI", 12F);
+            lblAverageSocket.Location = new Point(117, 506);
+            lblAverageSocket.Name = "lblAverageSocket";
+            lblAverageSocket.Size = new Size(63, 21);
+            lblAverageSocket.TabIndex = 74;
+            lblAverageSocket.Text = "Гнездо:";
             // 
             // lblCurrentBoxDefects
             // 
             lblCurrentBoxDefects.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblCurrentBoxDefects.AutoSize = true;
             lblCurrentBoxDefects.Font = new Font("Segoe UI", 12F);
-            lblCurrentBoxDefects.Location = new Point(409, 388);
+            lblCurrentBoxDefects.Location = new Point(409, 403);
             lblCurrentBoxDefects.Name = "lblCurrentBoxDefects";
             lblCurrentBoxDefects.Size = new Size(16, 21);
             lblCurrentBoxDefects.TabIndex = 73;
@@ -171,7 +245,7 @@
             lblCurrentBoxDefectsCaption.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblCurrentBoxDefectsCaption.AutoSize = true;
             lblCurrentBoxDefectsCaption.Font = new Font("Segoe UI", 12F);
-            lblCurrentBoxDefectsCaption.Location = new Point(108, 385);
+            lblCurrentBoxDefectsCaption.Location = new Point(108, 400);
             lblCurrentBoxDefectsCaption.Name = "lblCurrentBoxDefectsCaption";
             lblCurrentBoxDefectsCaption.Size = new Size(295, 21);
             lblCurrentBoxDefectsCaption.TabIndex = 72;
@@ -195,7 +269,7 @@
             lblDefectsInLastHour.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblDefectsInLastHour.AutoSize = true;
             lblDefectsInLastHour.Font = new Font("Segoe UI", 12F);
-            lblDefectsInLastHour.Location = new Point(387, 364);
+            lblDefectsInLastHour.Location = new Point(387, 379);
             lblDefectsInLastHour.Name = "lblDefectsInLastHour";
             lblDefectsInLastHour.Size = new Size(16, 21);
             lblDefectsInLastHour.TabIndex = 70;
@@ -206,7 +280,7 @@
             lblErrorCounter.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblErrorCounter.AutoSize = true;
             lblErrorCounter.Font = new Font("Segoe UI", 12F);
-            lblErrorCounter.Location = new Point(108, 364);
+            lblErrorCounter.Location = new Point(108, 379);
             lblErrorCounter.Name = "lblErrorCounter";
             lblErrorCounter.Size = new Size(273, 21);
             lblErrorCounter.TabIndex = 69;
@@ -294,7 +368,7 @@
             pnlCurrentSockets.Location = new Point(108, 49);
             pnlCurrentSockets.Margin = new Padding(4, 3, 4, 3);
             pnlCurrentSockets.Name = "pnlCurrentSockets";
-            pnlCurrentSockets.Size = new Size(406, 312);
+            pnlCurrentSockets.Size = new Size(406, 327);
             pnlCurrentSockets.TabIndex = 61;
             pnlCurrentSockets.Paint += pnlCurrentSockets_Paint;
             // 
@@ -305,7 +379,7 @@
             lvDefects.Location = new Point(1121, 42);
             lvDefects.Margin = new Padding(4, 3, 4, 3);
             lvDefects.Name = "lvDefects";
-            lvDefects.Size = new Size(320, 403);
+            lvDefects.Size = new Size(320, 482);
             lvDefects.TabIndex = 60;
             lvDefects.UseCompatibleStateImageBehavior = false;
             lvDefects.View = View.Details;
@@ -344,7 +418,7 @@
             lvBoxes.Location = new Point(799, 42);
             lvBoxes.Margin = new Padding(4, 3, 4, 3);
             lvBoxes.Name = "lvBoxes";
-            lvBoxes.Size = new Size(314, 403);
+            lvBoxes.Size = new Size(314, 482);
             lvBoxes.TabIndex = 58;
             lvBoxes.UseCompatibleStateImageBehavior = false;
             lvBoxes.View = View.Details;
@@ -381,7 +455,7 @@
             lblEventsByTimeCaption.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblEventsByTimeCaption.AutoSize = true;
             lblEventsByTimeCaption.Font = new Font("Microsoft Sans Serif", 25F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            lblEventsByTimeCaption.Location = new Point(108, 409);
+            lblEventsByTimeCaption.Location = new Point(108, 449);
             lblEventsByTimeCaption.Margin = new Padding(4, 0, 4, 0);
             lblEventsByTimeCaption.Name = "lblEventsByTimeCaption";
             lblEventsByTimeCaption.Size = new Size(652, 39);
@@ -401,7 +475,7 @@
             chartArea1.AxisY.MajorGrid.Enabled = false;
             chartArea1.Name = "ChartArea1";
             chEvents.ChartAreas.Add(chartArea1);
-            chEvents.Location = new Point(108, 451);
+            chEvents.Location = new Point(108, 530);
             chEvents.Margin = new Padding(4, 3, 4, 3);
             chEvents.Name = "chEvents";
             chEvents.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.None;
@@ -414,7 +488,12 @@
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedColumn;
             series1.Name = "Series1";
             series1.YValuesPerPoint = 2;
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Color = Color.Blue;
+            series2.Name = "Series2";
             chEvents.Series.Add(series1);
+            chEvents.Series.Add(series2);
             chEvents.Size = new Size(1333, 235);
             chEvents.TabIndex = 55;
             chEvents.Text = "chart1";
@@ -424,7 +503,7 @@
             tbpArchive.Location = new Point(4, 24);
             tbpArchive.Name = "tbpArchive";
             tbpArchive.Padding = new Padding(3);
-            tbpArchive.Size = new Size(1455, 694);
+            tbpArchive.Size = new Size(1455, 773);
             tbpArchive.TabIndex = 1;
             tbpArchive.Text = "Архив";
             tbpArchive.UseVisualStyleBackColor = true;
@@ -433,7 +512,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1463, 745);
+            ClientSize = new Size(1463, 824);
             Controls.Add(tabPages);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
@@ -447,6 +526,8 @@
             tabPages.ResumeLayout(false);
             tbpState.ResumeLayout(false);
             tbpState.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudAveragePeriod).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudAverageSocket).EndInit();
             ((System.ComponentModel.ISupportInitialize)chEvents).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -487,5 +568,10 @@
         private Label lblEventsByTimeCaption;
         private System.Windows.Forms.DataVisualization.Charting.Chart chEvents;
         private TabPage tbpArchive;
+        private Label lblAveragePeriod;
+        private Label lblAverageSocket;
+        private NumericUpDown nudAveragePeriod;
+        private NumericUpDown nudAverageSocket;
+        private Label lblAveragePeriodTimeIndicator;
     }
 }

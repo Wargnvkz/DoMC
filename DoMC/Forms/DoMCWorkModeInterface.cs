@@ -40,6 +40,7 @@ using DoMCLib.Classes.Module.ArchiveDB.Commands;
 using DoMCLib.Classes.Module.CCD.Commands;
 using WorkshopEquipmentData;
 using Microsoft.AspNetCore.Mvc;
+using DoMCForms.Classes;
 
 namespace DoMC
 {
@@ -129,7 +130,12 @@ namespace DoMC
         }
         public async Task SetMainController(IMainController controller, object? data)
         {
-            Context = (DoMCLib.Classes.DoMCApplicationContext)data;
+            if (data == null || data is not DoMCLib.Classes.DoMCApplicationContext incomingContext)
+            {
+                throw new ArgumentException("Параметр должен быть типа DoMCLib.Classes.DoMCApplicationContext", nameof(data));
+            }
+            Context = incomingContext;
+            //Context = (DoMCLib.Classes.DoMCApplicationContext)data;
             Controller = controller;
             WorkingLog = controller.GetLogger("Рабочий режим");
             observer = controller.GetObserver();
@@ -151,7 +157,6 @@ namespace DoMC
             Context?.WorkingState.SetRefreshWorkingForm(RefreshAll);
             Context?.WorkingState.SetStartWorkProc(StartWork);
             Context?.WorkingState.SetStopWorkProc(StopWork);
-
         }
         private void RefreshAll()
         {
@@ -170,12 +175,21 @@ namespace DoMC
             await this.InvokeAsync(StopWorkingProcess);
         }
 
+        private async Task SetSocketQuantity(int socketQuantity)
+        {
+            await this.InvokeAsync(() =>
+            {
+                nudAverageSocket.Maximum = socketQuantity;
+            });
+        }
+
         private async Task Observer_NotificationReceivers(string EventName, object? data)
         {
             if (EventName == DoMCApplicationContext.ConfigurationUpdateEventName)
             {
                 var config = data as DoMCLib.Configuration.ApplicationConfiguration;
                 if (config == null) return;
+                await ChangeWorkingSettings();
                 archiveForm?.InvokeAsync(() => archiveForm?.SetParameters(config.HardwareSettings.ArchiveDBConfig.LocalDBPath, config.HardwareSettings.ArchiveDBConfig.ArchiveDBPath));
             }
             if (EventName.EndsWith($"{LEDCommandType.LEDSynchrosignalResponse}.{EventType.Received}"))
@@ -1192,7 +1206,11 @@ namespace DoMC
 
                         //сохраняем изображения эталонов во все гнезда
                         SetStandardForAllCurrentCCDSockets(CurrentCycleCCD);
-                        CheckIfSocketsHasImage(CurrentCycleCCD);
+                        //Проверяем есть ли изображения и получаем среднее, если гнездо рабочее
+                        var averagesOfSocketImages = CheckIfSocketsHasImageAndGetAverage(CurrentCycleCCD);
+                        //Добавляем значение в буффер средних для отображения
+                        Context.WorkingState.AddNewAverageOfCycle(CurrentCycleCCD.CycleCCDDateTime, averagesOfSocketImages).FireAndForget();
+
                         var IsAllHaveImages = CurrentCycleCCD.IsSocketHasImage.All(p => p);
 
                         var cfgStatus = Context.Configuration.GetConfigurationFillStatus();
@@ -1639,6 +1657,34 @@ namespace DoMC
             if (calulatedInterval == 0) calulatedInterval = maxbpq >= 5 ? maxbpq / 5 : 1;
             chCurrentLastHourSumBad.ChartAreas[0].AxisY.Interval = calulatedInterval;
             chCurrentLastHourSumBad.ChartAreas[0].AxisY.RoundAxisValues();
+            DrawAverageByCurrentSocket();
+        }
+
+        private async Task DrawAverageByCurrentSocket()
+        {
+            int socket = 0, period = 0;
+            await this.InvokeAsync(() =>
+            {
+                socket = (int)nudAverageSocket.Value;
+                period = (int)nudAveragePriod.Value;
+            });
+            await DrawAverageBySocket(socket, period);
+        }
+
+        private async Task DrawAverageBySocket(int socket, int period)
+        {
+            if (socket == 0 || period == 0) return;
+            var values = await Context.WorkingState.GetAverageOfSocket(socket, period);
+            chAverageOfSocketByTime.Series[0].Points.Clear();
+            var ordered = values.OrderBy(v => v.CycleTime).ToList();
+            foreach (var value in ordered)
+            {
+                chAverageOfSocketByTime.Series[0].Points.AddXY(value.CycleTime.ToOADate(), value.AveragesOfSocket);
+            }
+        }
+        private async void nudAverageParameter_ValueChanged(object sender, EventArgs e)
+        {
+            await DrawAverageByCurrentSocket();
         }
         private void ShowCurrentErrors()
         {
@@ -1849,7 +1895,7 @@ namespace DoMC
         private async Task ChangeWorkingSettings()
         {
             WorkingLog.Add(LoggerLevel.Critical, "Изменение рабочих настроек");
-
+            await SetSocketQuantity(Context?.Configuration.HardwareSettings.SocketQuantity ?? 96);
             await SetArchiveDBConfiguration();
         }
 
@@ -1926,7 +1972,8 @@ namespace DoMC
         }
         private void NotifyConfigurationUpdated()
         {
-            observer.Notify(DoMCApplicationContext.ConfigurationUpdateEventName, Context.Configuration);
+            if (Context != null && Context.Configuration != null && observer != null)
+                observer.Notify(DoMCApplicationContext.ConfigurationUpdateEventName, Context.Configuration);
         }
 
         public DoMCApplicationContext GetContext()
@@ -2004,18 +2051,21 @@ namespace DoMC
             {
                 //Если что-то пошло не так, говорим, что ошибка и считаем гнездо хорошим
                 this.Errors.ImageProcessError = true;
+                WorkingLog.Add(LoggerLevel.Critical, $"Гнездо {EquipmentSocketNumber} не обработано из-за обшибки при обработке", ex);
                 CurrentCycleCCD.IsSocketGood[EquipmentSocketNumber] = true;
             }
         }
 
-        public void CheckIfSocketsHasImage(CycleImagesCCD CurrentCycleCCD)
+        public short[] CheckIfSocketsHasImageAndGetAverage(CycleImagesCCD CurrentCycleCCD)
         {
+            short[] avg = new short[CurrentCycleCCD.CurrentImages.Length];
             Parallel.For(0, CurrentCycleCCD.CurrentImages.Length, new ParallelOptions() { MaxDegreeOfParallelism = this.MaxDegreeOfParallelism }, i =>
             {
-                CheckIfSocketHasImage(CurrentCycleCCD, i);
+                avg[i] = CheckIfSocketHasImageAndGetAverage(CurrentCycleCCD, i);
             });
+            return avg;
         }
-        public void CheckIfSocketHasImage(CycleImagesCCD CurrentCycleCCD, int EquipmentSocketNumber)
+        public short CheckIfSocketHasImageAndGetAverage(CycleImagesCCD CurrentCycleCCD, int EquipmentSocketNumber)
         {
             try
             {
@@ -2031,7 +2081,7 @@ namespace DoMC
                         Context.Configuration.ReadingSocketsSettings.CCDSocketParameters[EquipmentSocketNumber].ImageCheckingParameters.GetRectangle());
 
                     CurrentCycleCCD.IsSocketHasImage[EquipmentSocketNumber] = result > Context.Configuration.HardwareSettings.AverageToHaveImage;
-
+                    return result;
                 }
                 else
                 {
@@ -2045,6 +2095,7 @@ namespace DoMC
                 this.Errors.ImageProcessError = true;
                 CurrentCycleCCD.IsSocketHasImage[(EquipmentSocketNumber - 1)] = true;
             }
+            return 0;
 
         }
         public void RecalcAllStandards(CycleImagesCCD CurrentCycleCCD)

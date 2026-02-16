@@ -1,4 +1,5 @@
 ﻿using DoMC.Classes;
+using DoMCForms.Classes;
 using DoMCLib.Configuration;
 using DoMCLib.Tools;
 using DoMCModuleControl;

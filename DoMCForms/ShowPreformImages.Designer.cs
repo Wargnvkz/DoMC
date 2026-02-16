@@ -77,6 +77,7 @@
             lblAverageCaption = new Label();
             lblAverage = new Label();
             cbShowCheckArea = new CheckBox();
+            разницаСКОToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pbTestStandard).BeginInit();
             cmsStandardImage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbTestDifference).BeginInit();
@@ -399,9 +400,9 @@
             // 
             // cmsCalcType
             // 
-            cmsCalcType.Items.AddRange(new ToolStripItem[] { спеднеквадратическоеОтклонениеToolStripMenuItem, обычнаяРазницаToolStripMenuItem, tsmiNormalize, отклонениеНормализованногоToolStripMenuItem, tsmiGradient, tsmiVNormalize, tsmiVNormalizeDenoise });
+            cmsCalcType.Items.AddRange(new ToolStripItem[] { спеднеквадратическоеОтклонениеToolStripMenuItem, обычнаяРазницаToolStripMenuItem, tsmiNormalize, отклонениеНормализованногоToolStripMenuItem, tsmiGradient, tsmiVNormalize, tsmiVNormalizeDenoise, разницаСКОToolStripMenuItem });
             cmsCalcType.Name = "contextMenuStrip1";
-            cmsCalcType.Size = new Size(346, 158);
+            cmsCalcType.Size = new Size(346, 202);
             // 
             // спеднеквадратическоеОтклонениеToolStripMenuItem
             // 
@@ -489,6 +490,13 @@
             cbShowCheckArea.UseVisualStyleBackColor = true;
             cbShowCheckArea.CheckedChanged += cbShowCheckSquare_CheckedChanged;
             // 
+            // разницаСКОToolStripMenuItem
+            // 
+            разницаСКОToolStripMenuItem.Name = "разницаСКОToolStripMenuItem";
+            разницаСКОToolStripMenuItem.Size = new Size(345, 22);
+            разницаСКОToolStripMenuItem.Text = "Корень разницы дисперсий";
+            разницаСКОToolStripMenuItem.Click += разницаСКОToolStripMenuItem_Click;
+            // 
             // ShowPreformImages
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -573,6 +581,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiGradient;
         private System.Windows.Forms.ToolStripMenuItem tsmiVNormalize;
         private System.Windows.Forms.ToolStripMenuItem tsmiVNormalizeDenoise;
+        private ToolStripMenuItem разницаСКОToolStripMenuItem;
     }
 }
 

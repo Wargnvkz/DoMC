@@ -18,6 +18,7 @@ namespace DoMCModuleControl.Logging
     {
         private static DateTime CurrentDate = DateTime.MinValue;
         private readonly static ConcurrentDictionary<string, ConcurrentQueue<string>> MessagesOfModule = new ConcurrentDictionary<string, ConcurrentQueue<string>>();
+        private readonly static ConcurrentQueue<string> AllMessages = new ConcurrentQueue<string>();
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         private readonly Task _logTask;
         private ILogger? ExternalLogger;
@@ -89,6 +90,7 @@ namespace DoMCModuleControl.Logging
                         MessagesOfModule.TryAdd(Module, new ConcurrentQueue<string>());
                     }
                     MessagesOfModule[Module].Enqueue(msg);
+                    AllMessages.Enqueue($"[{Module}] {msg}");
                 }
             }
             catch (Exception ex) { AddMessage("Logger", $"Ошибка:{ex.Message} {ex.StackTrace}"); }
@@ -104,6 +106,7 @@ namespace DoMCModuleControl.Logging
                     if (MessagesOfModule[key].Count > 0)
                         WriteBuffer(key);
                 }
+                WriteAllMessagesBuffer();
                 Task.Delay(100).Wait();
             }
 
@@ -130,8 +133,28 @@ namespace DoMCModuleControl.Logging
                 ExternalLogger?.Add(LoggerLevel.Critical, $"Ошибка при записи сообщения для модуля {ModuleName}:{ex.Message} {ex.StackTrace}");
                 MessagesOfModule[ModuleName].Clear();
             }
-
-
+        }
+        private void WriteAllMessagesBuffer()
+        {
+            try
+            {
+                lock (lockObject)
+                {
+                    using (var File = FileSystem.GetStreamWriter(GetLogFileName("TotalLog", CurrentDate), true))
+                    {
+                        while (AllMessages.TryDequeue(out string? text))
+                        {
+                            File.WriteLine(text ?? "");
+                        }
+                        File.Flush();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExternalLogger?.Add(LoggerLevel.Critical, $"Ошибка при записи сообщения:{ex.Message} {ex.StackTrace}");
+                MessagesOfModule.Clear();
+            }
         }
 
         private void StopLog()

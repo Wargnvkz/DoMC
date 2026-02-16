@@ -3,6 +3,7 @@
     public enum MakeDecisionAction
     {
         Average,
-        Max
+        Max,
+        AverageInPercent
     }
 }

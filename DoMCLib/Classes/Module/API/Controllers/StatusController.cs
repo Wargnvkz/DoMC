@@ -86,6 +86,29 @@ namespace DoMCLib.Classes.Module.API.Controllers
         }
 
     }
+    [Route("api/[controller]")] // Маршрут: /api/control
+    [ApiController] // Упрощает обработку APIModule (валидация, JSON)
+    public class SocketsController : ControllerBase
+    {
+
+        private readonly Func<DoMCApplicationContext> _getContext;
+        private readonly Func<IMainController> _getController;
+
+        public SocketsController(Func<DoMCApplicationContext> getContext, Func<IMainController> getController)
+        {
+            _getContext = getContext;
+            _getController = getController;
+        }
+
+        [HttpGet] // POST /api/control
+        public async Task<IActionResult> Get([FromQuery] int socket, [FromQuery] int period)
+        {
+            var context = _getContext();
+            var values = await context.WorkingState.GetAverageOfSocket(socket, period);
+            return Ok(values);
+        }
+
+    }
 
     public class APIStatusResponse
     {

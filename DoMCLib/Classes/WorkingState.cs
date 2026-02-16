@@ -22,6 +22,10 @@ namespace DoMCLib.Classes
         public List<Box>? Boxes;
         public bool IsRunning;
 
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
+        public int PeriodOfAveragesInHours = 12;
+        public List<AverageOfCycle> AveragesOfCycles = new List<AverageOfCycle>();
+
 
         private Action? RefreshWorkingForm;
         private Func<Task>? StartWorkProc;
@@ -57,6 +61,46 @@ namespace DoMCLib.Classes
         public void SetStopWorkProc(Func<Task> stopProc)
         {
             StopWorkProc = stopProc;
+        }
+
+        public async Task AddNewAverageOfCycle(DateTime cycleTime, short[] averages)
+        {
+            await _lock.WaitAsync(); // Асинхронное ожидание входа
+            try
+            {
+                AveragesOfCycles.Add(new AverageOfCycle() { CycleTime = cycleTime, AveragesOfSockets = averages });
+                var RemoveTime = DateTime.Now.AddHours(-PeriodOfAveragesInHours);
+                AveragesOfCycles.RemoveAll(rec => rec.CycleTime < RemoveTime);
+                if (AveragesOfCycles.Capacity > 50000)
+                    AveragesOfCycles.TrimExcess();
+            }
+            finally
+            {
+                _lock.Release(); // Обязательно освобождаем
+            }
+        }
+
+        public async Task<List<AverageOfSocket>> GetAverageOfSocket(int socket, int PeriodInHours)
+        {
+            await _lock.WaitAsync(); // Асинхронное ожидание входа
+            try
+            {
+                var foundRecords = new List<AverageOfSocket>();
+                var from = DateTime.Now.AddHours(-PeriodInHours);
+                for (int i = 0; i < AveragesOfCycles.Count; i++)
+                {
+                    var cycle = AveragesOfCycles[i];
+                    if (cycle.CycleTime >= from)
+                    {
+                        foundRecords.Add(new AverageOfSocket() { CycleTime = cycle.CycleTime, AveragesOfSocket = cycle.AveragesOfSockets[socket] });
+                    }
+                }
+                return foundRecords;
+            }
+            finally
+            {
+                _lock.Release(); // Обязательно освобождаем
+            }
         }
 
         public async Task<List<DefectedCycleSockets>> GetDefectesCycles(IMainController controller, double PeriodInHours)
@@ -146,4 +190,14 @@ namespace DoMCLib.Classes
         }
     }
 
+    public class AverageOfCycle
+    {
+        public DateTime CycleTime;
+        public short[] AveragesOfSockets;
+    }
+    public class AverageOfSocket
+    {
+        public DateTime CycleTime;
+        public short AveragesOfSocket;
+    }
 }

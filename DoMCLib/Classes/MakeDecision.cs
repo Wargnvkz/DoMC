@@ -65,6 +65,12 @@ namespace DoMCLib.Classes
                     var avg = ImageTools.Average(res[0], ipp.GetRectangle());
 
                     return avg < ParameterCompareGoodIfLess;
+                case MakeDecisionAction.AverageInPercent:
+                    var avgImg = ImageTools.Average(res[0], ipp.GetRectangle());
+                    var avgStd = ImageTools.Average(std, ipp.GetRectangle());
+                    var RelDiff = Math.Abs((avgStd - avgImg) / avgStd) * 100;
+
+                    return RelDiff < ParameterCompareGoodIfLess;
                 case MakeDecisionAction.Max:
                     var resultImage = ImageTools.ClearOutsideRect(res[0], ipp.GetRectangle());
                     ResultImg = resultImage;
@@ -92,7 +98,8 @@ namespace DoMCLib.Classes
             return new List<Tuple<MakeDecisionAction, string>>()
             {
                 new Tuple<MakeDecisionAction, string>(MakeDecisionAction.Average,"Среднее"),
-                new Tuple<MakeDecisionAction, string>(MakeDecisionAction.Max,"Максимум")
+                new Tuple<MakeDecisionAction, string>(MakeDecisionAction.Max,"Максимум"),
+                new Tuple<MakeDecisionAction, string>(MakeDecisionAction.AverageInPercent,"Среднее %"),
             };
         }
 

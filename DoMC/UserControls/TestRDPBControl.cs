@@ -1,5 +1,10 @@
-﻿using DoMCModuleControl.Logging;
+﻿using DoMC.Classes;
+using DoMCLib.Classes;
+using DoMCLib.Classes.Module.LCB;
+using DoMCLib.Classes.Module.RDPB;
+using DoMCLib.Classes.Module.RDPB.Classes;
 using DoMCModuleControl;
+using DoMCModuleControl.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,12 +14,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DoMC.Classes;
-using DoMCLib.Classes.Module.LCB;
 using static DoMCLib.Classes.Module.LCB.LCBModule;
-using DoMCLib.Classes.Module.RDPB.Classes;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using DoMCLib.Classes.Module.RDPB;
 
 namespace DoMC.UserControls
 {
@@ -61,6 +62,11 @@ namespace DoMC.UserControls
                     }
                 }
             }*/
+            if (EventName == DoMCApplicationContext.SettingsInterfaceClosedEventName)
+            {
+                if (TestRDPBConnected)
+                    await TestRDPBStop();
+            }
         }
 
         private async Task SettingsUpdateProvider_SettingsUpdated(object? sender)
@@ -109,8 +115,20 @@ namespace DoMC.UserControls
             {
                 await new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(MainController, MainController.GetModule(typeof(RDPBModule))).ExecuteCommandAsync();
                 TestRDPBConnected = false;
-                btnRDPBTestConnect.BackColor = SystemColors.Control;
-                btnRDPBTestConnect.Text = "Подключить";
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        btnRDPBTestConnect.BackColor = SystemColors.Control;
+                        btnRDPBTestConnect.Text = "Подключить";
+                    }));
+                    return;
+                }
+                else
+                {
+                    btnRDPBTestConnect.BackColor = SystemColors.Control;
+                    btnRDPBTestConnect.Text = "Подключить";
+                }
             }
             catch (Exception ex)
             {

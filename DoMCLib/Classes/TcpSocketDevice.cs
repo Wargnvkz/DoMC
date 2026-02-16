@@ -54,8 +54,16 @@ namespace DoMCLib.Classes
 
         public void Close()
         {
-            _networkStream?.Close();
-            _tcpClient?.Close();
+            try
+            {
+                _networkStream?.Close();
+            }
+            catch { }
+            try
+            {
+                _tcpClient?.Close();
+            }
+            catch { }
         }
 
         public void SetReadTimeout(int msTimeout)
@@ -78,10 +86,10 @@ namespace DoMCLib.Classes
         {
             return _networkStream.CanWrite;
         }
-/*        public int Read(byte[] ReadBuffer, int offset, int size)
-        {
-            return _networkStream.Read(ReadBuffer, offset, size);
-        }*/
+        /*        public int Read(byte[] ReadBuffer, int offset, int size)
+                {
+                    return _networkStream.Read(ReadBuffer, offset, size);
+                }*/
     }
 
 }

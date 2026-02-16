@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 
 namespace DoMCLib.Tools
@@ -72,6 +73,114 @@ namespace DoMCLib.Tools
             for (int i = 0; i < result.Length; i++)
             {
                 result[i] = bitwiseOperation(array1[i], array2[i]);
+            }
+            return result;
+        }
+
+        public static double[,] MultiplyByValue(double[,] arr, double value)
+        {
+            var result = new double[arr.GetLength(0), arr.GetLength(1)];
+            for (int y = 0; y < arr.GetLength(0); y++)
+            {
+                for (int x = 0; x < arr.GetLength(1); x++)
+                {
+                    result[y, x] = value * arr[y, x];
+                }
+
+            }
+            return result;
+        }
+        public static double[,] AddValue(double[,] arr, double value)
+        {
+            var result = new double[arr.GetLength(0), arr.GetLength(1)];
+            for (int y = 0; y < arr.GetLength(0); y++)
+            {
+                for (int x = 0; x < arr.GetLength(1); x++)
+                {
+                    result[y, x] = value + arr[y, x];
+                }
+
+            }
+            return result;
+        }
+        public static double[,] SumArrays(double[,] arr1, double[,] arr2)
+        {
+            if (arr1.GetLength(0) != arr2.GetLength(0) || arr1.GetLength(1) != arr2.GetLength(1)) throw new ArgumentOutOfRangeException();
+            var result = new double[arr1.GetLength(0), arr1.GetLength(1)];
+            for (int y = 0; y < arr1.GetLength(0); y++)
+            {
+                for (int x = 0; x < arr1.GetLength(1); x++)
+                {
+                    result[y, x] = arr1[y, x] + arr2[y, x];
+                }
+
+            }
+            return result;
+        }
+        public static double[,] SubstactArrays(double[,] Minuend, double[,] Subtrahend)
+        {
+            if (Minuend.GetLength(0) != Subtrahend.GetLength(0) || Minuend.GetLength(1) != Subtrahend.GetLength(1)) throw new ArgumentOutOfRangeException();
+            var result = new double[Minuend.GetLength(0), Minuend.GetLength(1)];
+            for (int y = 0; y < Minuend.GetLength(0); y++)
+            {
+                for (int x = 0; x < Minuend.GetLength(1); x++)
+                {
+                    result[y, x] = Minuend[y, x] - Subtrahend[y, x];
+                }
+
+            }
+            return result;
+        }
+        public static double[,] SubstactLine(double[,] Minuend, double[] SubtrahendLine)
+        {
+            if (Minuend.GetLength(0) != SubtrahendLine.GetLength(0)) throw new ArgumentOutOfRangeException();
+            var result = new double[Minuend.GetLength(0), Minuend.GetLength(1)];
+            for (int y = 0; y < Minuend.GetLength(0); y++)
+            {
+                for (int x = 0; x < Minuend.GetLength(1); x++)
+                {
+                    result[y, x] = Math.Max(0, Minuend[y, x] - SubtrahendLine[x]);
+                }
+
+            }
+            return result;
+        }
+        public static double[,] OperationOnElement(double[,] arr, Func<double, double> operation)
+        {
+            if (operation == null) return arr;
+            var result = new double[arr.GetLength(0), arr.GetLength(1)];
+            for (int y = 0; y < arr.GetLength(0); y++)
+            {
+                for (int x = 0; x < arr.GetLength(1); x++)
+                {
+                    result[y, x] = operation(arr[y, x]);
+                }
+
+            }
+            return result;
+        }
+        public static void OperationOnElement(double[,] arr, Action<double> operation)
+        {
+            if (operation == null) return;
+            for (int y = 0; y < arr.GetLength(0); y++)
+            {
+                for (int x = 0; x < arr.GetLength(1); x++)
+                {
+                    operation(arr[y, x]);
+                }
+
+            }
+        }
+        public static short[,] ConvertToIamge(double[,] arr)
+        {
+            var result = new short[arr.GetLength(0), arr.GetLength(1)];
+            for (int y = 0; y < arr.GetLength(0); y++)
+            {
+                for (int x = 0; x < arr.GetLength(1); x++)
+                {
+                    result[y, x] = Math.Clamp((short)arr[y, x], short.MinValue, short.MaxValue);
+                }
+
             }
             return result;
         }

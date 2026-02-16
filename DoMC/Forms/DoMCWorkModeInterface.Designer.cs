@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             msWorkingModeMenu = new MenuStrip();
@@ -52,26 +54,39 @@
             lblTotalDefectCycles = new Label();
             lblCurrentBoxDefectCyclesCaption = new Label();
             lblCurrentBoxDefectCycles = new Label();
-            lblCurrentLastHourSumBadCaption = new Label();
-            pbLCB = new UserControls.PressButton();
-            pbLocalDB = new UserControls.PressButton();
-            pbRemoteDB = new UserControls.PressButton();
-            pbRDPB = new UserControls.PressButton();
+            pbLCB = new DoMC.UserControls.PressButton();
+            pbLocalDB = new DoMC.UserControls.PressButton();
+            pbRemoteDB = new DoMC.UserControls.PressButton();
+            pbRDPB = new DoMC.UserControls.PressButton();
             lblCycleDurationValue = new Label();
             lblCycleDurationCaption = new Label();
-            pbCurrentShowStatistics = new UserControls.PressButton();
+            pbCurrentShowStatistics = new DoMC.UserControls.PressButton();
             lblErrors = new Label();
             lbCurrentErrors = new ListBox();
-            chCurrentLastHourSumBad = new System.Windows.Forms.DataVisualization.Charting.Chart();
             pnlCurrentSockets = new Panel();
+            tabControl1 = new TabControl();
+            tabPage1 = new TabPage();
+            nudAveragePriod = new NumericUpDown();
+            lblAveragePeriod = new Label();
+            nudAverageSocket = new NumericUpDown();
+            lblAvergaSocketCaption = new Label();
+            chAverageOfSocketByTime = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            tabPage2 = new TabPage();
+            chCurrentLastHourSumBad = new System.Windows.Forms.DataVisualization.Charting.Chart();
             tbpArchive = new TabPage();
             timer1 = new System.Windows.Forms.Timer(components);
-            pbStartStop = new UserControls.PressButton();
+            pbStartStop = new DoMC.UserControls.PressButton();
             ssFooter = new StatusStrip();
             lblFooterStep = new ToolStripStatusLabel();
             msWorkingModeMenu.SuspendLayout();
             tabWorkAndArchive.SuspendLayout();
             tbpCurrent.SuspendLayout();
+            tabControl1.SuspendLayout();
+            tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)nudAveragePriod).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudAverageSocket).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).BeginInit();
+            tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chCurrentLastHourSumBad).BeginInit();
             ssFooter.SuspendLayout();
             SuspendLayout();
@@ -185,7 +200,6 @@
             tbpCurrent.Controls.Add(lblTotalDefectCycles);
             tbpCurrent.Controls.Add(lblCurrentBoxDefectCyclesCaption);
             tbpCurrent.Controls.Add(lblCurrentBoxDefectCycles);
-            tbpCurrent.Controls.Add(lblCurrentLastHourSumBadCaption);
             tbpCurrent.Controls.Add(pbLCB);
             tbpCurrent.Controls.Add(pbLocalDB);
             tbpCurrent.Controls.Add(pbRemoteDB);
@@ -195,8 +209,8 @@
             tbpCurrent.Controls.Add(pbCurrentShowStatistics);
             tbpCurrent.Controls.Add(lblErrors);
             tbpCurrent.Controls.Add(lbCurrentErrors);
-            tbpCurrent.Controls.Add(chCurrentLastHourSumBad);
             tbpCurrent.Controls.Add(pnlCurrentSockets);
+            tbpCurrent.Controls.Add(tabControl1);
             tbpCurrent.Location = new Point(4, 34);
             tbpCurrent.Margin = new Padding(4, 3, 4, 3);
             tbpCurrent.Name = "tbpCurrent";
@@ -273,17 +287,6 @@
             lblCurrentBoxDefectCycles.TabIndex = 13;
             lblCurrentBoxDefectCycles.Text = "0";
             lblCurrentBoxDefectCycles.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // lblCurrentLastHourSumBadCaption
-            // 
-            lblCurrentLastHourSumBadCaption.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            lblCurrentLastHourSumBadCaption.AutoSize = true;
-            lblCurrentLastHourSumBadCaption.Location = new Point(7, 519);
-            lblCurrentLastHourSumBadCaption.Margin = new Padding(4, 0, 4, 0);
-            lblCurrentLastHourSumBadCaption.Name = "lblCurrentLastHourSumBadCaption";
-            lblCurrentLastHourSumBadCaption.Size = new Size(339, 25);
-            lblCurrentLastHourSumBadCaption.TabIndex = 12;
-            lblCurrentLastHourSumBadCaption.Text = "Счетчик ошибок за последний час:";
             // 
             // pbLCB
             // 
@@ -384,27 +387,6 @@
             lbCurrentErrors.Size = new Size(738, 229);
             lbCurrentErrors.TabIndex = 2;
             // 
-            // chCurrentLastHourSumBad
-            // 
-            chCurrentLastHourSumBad.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            chartArea2.AxisX.Maximum = 100D;
-            chartArea2.AxisX.Minimum = 0D;
-            chartArea2.AxisX.MinorGrid.Enabled = true;
-            chartArea2.AxisX.MinorGrid.LineColor = Color.LightGray;
-            chartArea2.AxisX.MinorTickMark.Enabled = true;
-            chartArea2.AxisX.MinorTickMark.LineColor = Color.LightGray;
-            chartArea2.Name = "ChartArea1";
-            chCurrentLastHourSumBad.ChartAreas.Add(chartArea2);
-            chCurrentLastHourSumBad.Location = new Point(7, 568);
-            chCurrentLastHourSumBad.Margin = new Padding(4, 3, 4, 3);
-            chCurrentLastHourSumBad.Name = "chCurrentLastHourSumBad";
-            series2.ChartArea = "ChartArea1";
-            series2.Name = "Series1";
-            chCurrentLastHourSumBad.Series.Add(series2);
-            chCurrentLastHourSumBad.Size = new Size(1628, 245);
-            chCurrentLastHourSumBad.TabIndex = 1;
-            chCurrentLastHourSumBad.Text = "chart1";
-            // 
             // pnlCurrentSockets
             // 
             pnlCurrentSockets.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
@@ -416,6 +398,127 @@
             pnlCurrentSockets.TabIndex = 0;
             pnlCurrentSockets.Paint += pnlCurrentSockets_Paint;
             // 
+            // tabControl1
+            // 
+            tabControl1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tabControl1.Controls.Add(tabPage1);
+            tabControl1.Controls.Add(tabPage2);
+            tabControl1.Location = new Point(7, 524);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(1636, 300);
+            tabControl1.TabIndex = 18;
+            // 
+            // tabPage1
+            // 
+            tabPage1.Controls.Add(nudAveragePriod);
+            tabPage1.Controls.Add(lblAveragePeriod);
+            tabPage1.Controls.Add(nudAverageSocket);
+            tabPage1.Controls.Add(lblAvergaSocketCaption);
+            tabPage1.Controls.Add(chAverageOfSocketByTime);
+            tabPage1.Location = new Point(4, 34);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(1628, 262);
+            tabPage1.TabIndex = 0;
+            tabPage1.Text = "Прозрачность по гнездам";
+            tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // nudAveragePriod
+            // 
+            nudAveragePriod.Location = new Point(431, 12);
+            nudAveragePriod.Maximum = new decimal(new int[] { 12, 0, 0, 0 });
+            nudAveragePriod.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudAveragePriod.Name = "nudAveragePriod";
+            nudAveragePriod.Size = new Size(93, 30);
+            nudAveragePriod.TabIndex = 6;
+            nudAveragePriod.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            nudAveragePriod.ValueChanged += nudAverageParameter_ValueChanged;
+            // 
+            // lblAveragePeriod
+            // 
+            lblAveragePeriod.AutoSize = true;
+            lblAveragePeriod.Location = new Point(316, 14);
+            lblAveragePeriod.Name = "lblAveragePeriod";
+            lblAveragePeriod.Size = new Size(109, 25);
+            lblAveragePeriod.TabIndex = 5;
+            lblAveragePeriod.Text = "Период, ч:";
+            // 
+            // nudAverageSocket
+            // 
+            nudAverageSocket.Location = new Point(161, 12);
+            nudAverageSocket.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            nudAverageSocket.Name = "nudAverageSocket";
+            nudAverageSocket.Size = new Size(93, 30);
+            nudAverageSocket.TabIndex = 4;
+            nudAverageSocket.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            nudAverageSocket.ValueChanged += nudAverageParameter_ValueChanged;
+            // 
+            // lblAvergaSocketCaption
+            // 
+            lblAvergaSocketCaption.AutoSize = true;
+            lblAvergaSocketCaption.Location = new Point(6, 14);
+            lblAvergaSocketCaption.Name = "lblAvergaSocketCaption";
+            lblAvergaSocketCaption.Size = new Size(149, 25);
+            lblAvergaSocketCaption.TabIndex = 3;
+            lblAvergaSocketCaption.Text = "Номер гнезда:";
+            // 
+            // chAverageOfSocketByTime
+            // 
+            chAverageOfSocketByTime.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            chartArea1.AxisX.LabelStyle.Format = "HH:mm";
+            chartArea1.AxisX.Maximum = 100D;
+            chartArea1.AxisX.Minimum = 0D;
+            chartArea1.AxisX.MinorGrid.Enabled = true;
+            chartArea1.AxisX.MinorGrid.LineColor = Color.LightGray;
+            chartArea1.AxisX.MinorTickMark.Enabled = true;
+            chartArea1.AxisX.MinorTickMark.LineColor = Color.LightGray;
+            chartArea1.Name = "ChartArea1";
+            chAverageOfSocketByTime.ChartAreas.Add(chartArea1);
+            chAverageOfSocketByTime.Location = new Point(4, 42);
+            chAverageOfSocketByTime.Margin = new Padding(4, 3, 4, 3);
+            chAverageOfSocketByTime.Name = "chAverageOfSocketByTime";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Name = "Series1";
+            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            chAverageOfSocketByTime.Series.Add(series1);
+            chAverageOfSocketByTime.Size = new Size(1620, 217);
+            chAverageOfSocketByTime.TabIndex = 2;
+            chAverageOfSocketByTime.Text = "chart1";
+            // 
+            // tabPage2
+            // 
+            tabPage2.Controls.Add(chCurrentLastHourSumBad);
+            tabPage2.Location = new Point(4, 24);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new Padding(3);
+            tabPage2.Size = new Size(1628, 272);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "Счетчик ошибок за последний час";
+            tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // chCurrentLastHourSumBad
+            // 
+            chCurrentLastHourSumBad.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            chartArea2.AxisX.Maximum = 100D;
+            chartArea2.AxisX.Minimum = 0D;
+            chartArea2.AxisX.MinorGrid.Enabled = true;
+            chartArea2.AxisX.MinorGrid.LineColor = Color.LightGray;
+            chartArea2.AxisX.MinorTickMark.Enabled = true;
+            chartArea2.AxisX.MinorTickMark.LineColor = Color.LightGray;
+            chartArea2.Name = "ChartArea1";
+            chCurrentLastHourSumBad.ChartAreas.Add(chartArea2);
+            chCurrentLastHourSumBad.Location = new Point(1, 13);
+            chCurrentLastHourSumBad.Margin = new Padding(4, 3, 4, 3);
+            chCurrentLastHourSumBad.Name = "chCurrentLastHourSumBad";
+            series2.ChartArea = "ChartArea1";
+            series2.Name = "Series1";
+            chCurrentLastHourSumBad.Series.Add(series2);
+            chCurrentLastHourSumBad.Size = new Size(1620, 233);
+            chCurrentLastHourSumBad.TabIndex = 1;
+            chCurrentLastHourSumBad.Text = "chart1";
+            // 
             // tbpArchive
             // 
             tbpArchive.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
@@ -423,7 +526,7 @@
             tbpArchive.Margin = new Padding(4, 3, 4, 3);
             tbpArchive.Name = "tbpArchive";
             tbpArchive.Padding = new Padding(4, 3, 4, 3);
-            tbpArchive.Size = new Size(1644, 838);
+            tbpArchive.Size = new Size(1644, 827);
             tbpArchive.TabIndex = 1;
             tbpArchive.Text = "Архив";
             tbpArchive.UseVisualStyleBackColor = true;
@@ -486,6 +589,13 @@
             tabWorkAndArchive.ResumeLayout(false);
             tbpCurrent.ResumeLayout(false);
             tbpCurrent.PerformLayout();
+            tabControl1.ResumeLayout(false);
+            tabPage1.ResumeLayout(false);
+            tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)nudAveragePriod).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudAverageSocket).EndInit();
+            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).EndInit();
+            tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)chCurrentLastHourSumBad).EndInit();
             ssFooter.ResumeLayout(false);
             ssFooter.PerformLayout();
@@ -516,7 +626,6 @@
         private System.Windows.Forms.Label lblCycleDurationValue;
         private System.Windows.Forms.Label lblCycleDurationCaption;
         private System.Windows.Forms.ToolStripMenuItem tsmiLogsArchive;
-        private System.Windows.Forms.Label lblCurrentLastHourSumBadCaption;
         private System.Windows.Forms.ToolStripMenuItem обнулитьОбщийСчетчикСброшенныхСъемовToolStripMenuItem;
         private System.Windows.Forms.Label lblCurrentBoxDefectCyclesCaption;
         private System.Windows.Forms.Label lblCurrentBoxDefectCycles;
@@ -532,5 +641,13 @@
         private System.Windows.Forms.ToolStripMenuItem miSocketsSettings;
         private StatusStrip ssFooter;
         private ToolStripStatusLabel lblFooterStep;
+        private TabControl tabControl1;
+        private TabPage tabPage1;
+        private TabPage tabPage2;
+        private NumericUpDown nudAverageSocket;
+        private Label lblAvergaSocketCaption;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chAverageOfSocketByTime;
+        private NumericUpDown nudAveragePriod;
+        private Label lblAveragePeriod;
     }
 }

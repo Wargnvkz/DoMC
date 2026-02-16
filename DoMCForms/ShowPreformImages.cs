@@ -262,6 +262,24 @@ namespace DoMCForms
                             ImageProcessResult.ResultImage = diff;
                         }
                         break;
+                    case DefectMethod.SqrtDispersionDelta:
+                        {
+                            int window = 10;
+                            var standardImageDeviation = ImageTools.CalculateWindowDeviation(OriginalStandardImage, window);
+                            var ImageDeviation = ImageTools.CalculateWindowDeviation(OriginalImage, window);
+
+                            var DevDiff = ArrayTools.SubstactArrays(ImageDeviation, standardImageDeviation);
+
+                            var devLines = ImageTools.CalculateMinWindowDeviationVertical(OriginalImage, window);
+
+                            var DevDiffDenoised = ArrayTools.SubstactLine(DevDiff, devLines);
+                            var SqrtDevDiff = ArrayTools.OperationOnElement(DevDiffDenoised, e => Math.Sqrt(e));
+
+                            var diffImg = ArrayTools.ConvertToIamge(SqrtDevDiff);
+                            var clearedDiffImg = ImageTools.ClearOutsideRect(diffImg, ImageProcessParameters.GetRectangle());
+                            ImageProcessResult.ResultImage = clearedDiffImg;
+                        }
+                        break;
                 }
 
             }
@@ -827,7 +845,8 @@ namespace DoMCForms
             NormalizedDeviation,
             Gradient,
             VNormalize,
-            VNormalizeDenoise
+            VNormalizeDenoise,
+            SqrtDispersionDelta
         }
 
 
@@ -873,6 +892,12 @@ namespace DoMCForms
         private void tsmiVNormalizeDenoise_Click(object sender, EventArgs e)
         {
             CalculationMethod = DefectMethod.VNormalizeDenoise;
+            RecalcAndRedrawImages();
+        }
+
+        private void разницаСКОToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CalculationMethod = DefectMethod.SqrtDispersionDelta;
             RecalcAndRedrawImages();
         }
     }

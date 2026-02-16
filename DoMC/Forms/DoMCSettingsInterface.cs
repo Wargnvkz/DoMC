@@ -14,6 +14,7 @@ using DoMCModuleControl.UI;
 using DoMC.UserControls;
 using DoMCLib.Forms;
 using DoMCLib.Tools;
+using DoMCForms.Classes;
 
 namespace DoMC
 {
