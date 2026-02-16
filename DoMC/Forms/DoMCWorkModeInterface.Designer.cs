@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             msWorkingModeMenu = new MenuStrip();
             tsmiStandards = new ToolStripMenuItem();
             miLoadStandard = new ToolStripMenuItem();
@@ -70,7 +70,6 @@
             lblAveragePeriod = new Label();
             nudAverageSocket = new NumericUpDown();
             lblAvergaSocketCaption = new Label();
-            chAverageOfSocketByTime = new System.Windows.Forms.DataVisualization.Charting.Chart();
             tabPage2 = new TabPage();
             chCurrentLastHourSumBad = new System.Windows.Forms.DataVisualization.Charting.Chart();
             tbpArchive = new TabPage();
@@ -78,6 +77,7 @@
             pbStartStop = new DoMC.UserControls.PressButton();
             ssFooter = new StatusStrip();
             lblFooterStep = new ToolStripStatusLabel();
+            chAverageOfSocketByTime = new System.Windows.Forms.DataVisualization.Charting.Chart();
             msWorkingModeMenu.SuspendLayout();
             tabWorkAndArchive.SuspendLayout();
             tbpCurrent.SuspendLayout();
@@ -85,10 +85,10 @@
             tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudAveragePriod).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudAverageSocket).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).BeginInit();
             tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chCurrentLastHourSumBad).BeginInit();
             ssFooter.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).BeginInit();
             SuspendLayout();
             // 
             // msWorkingModeMenu
@@ -411,11 +411,11 @@
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(chAverageOfSocketByTime);
             tabPage1.Controls.Add(nudAveragePriod);
             tabPage1.Controls.Add(lblAveragePeriod);
             tabPage1.Controls.Add(nudAverageSocket);
             tabPage1.Controls.Add(lblAvergaSocketCaption);
-            tabPage1.Controls.Add(chAverageOfSocketByTime);
             tabPage1.Location = new Point(4, 34);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
@@ -462,30 +462,6 @@
             lblAvergaSocketCaption.Size = new Size(149, 25);
             lblAvergaSocketCaption.TabIndex = 3;
             lblAvergaSocketCaption.Text = "Номер гнезда:";
-            // 
-            // chAverageOfSocketByTime
-            // 
-            chAverageOfSocketByTime.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            chartArea1.AxisX.LabelStyle.Format = "HH:mm";
-            chartArea1.AxisX.Maximum = 100D;
-            chartArea1.AxisX.Minimum = 0D;
-            chartArea1.AxisX.MinorGrid.Enabled = true;
-            chartArea1.AxisX.MinorGrid.LineColor = Color.LightGray;
-            chartArea1.AxisX.MinorTickMark.Enabled = true;
-            chartArea1.AxisX.MinorTickMark.LineColor = Color.LightGray;
-            chartArea1.Name = "ChartArea1";
-            chAverageOfSocketByTime.ChartAreas.Add(chartArea1);
-            chAverageOfSocketByTime.Location = new Point(4, 42);
-            chAverageOfSocketByTime.Margin = new Padding(4, 3, 4, 3);
-            chAverageOfSocketByTime.Name = "chAverageOfSocketByTime";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.Name = "Series1";
-            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            chAverageOfSocketByTime.Series.Add(series1);
-            chAverageOfSocketByTime.Size = new Size(1620, 217);
-            chAverageOfSocketByTime.TabIndex = 2;
-            chAverageOfSocketByTime.Text = "chart1";
             // 
             // tabPage2
             // 
@@ -568,6 +544,23 @@
             lblFooterStep.Text = "Текущий шаг:";
             lblFooterStep.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // chAverageOfSocketByTime
+            // 
+            chAverageOfSocketByTime.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            chartArea1.AxisX.LabelStyle.Format = "dd.MM.yyyy HH:mm:ss";
+            chartArea1.Name = "ChartArea1";
+            chAverageOfSocketByTime.ChartAreas.Add(chartArea1);
+            chAverageOfSocketByTime.Location = new Point(6, 48);
+            chAverageOfSocketByTime.Name = "chAverageOfSocketByTime";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Name = "Series1";
+            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            chAverageOfSocketByTime.Series.Add(series1);
+            chAverageOfSocketByTime.Size = new Size(1616, 208);
+            chAverageOfSocketByTime.TabIndex = 7;
+            chAverageOfSocketByTime.Text = "chart1";
+            // 
             // DoMCWorkModeInterface
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -594,11 +587,11 @@
             tabPage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)nudAveragePriod).EndInit();
             ((System.ComponentModel.ISupportInitialize)nudAverageSocket).EndInit();
-            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).EndInit();
             tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)chCurrentLastHourSumBad).EndInit();
             ssFooter.ResumeLayout(false);
             ssFooter.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -646,8 +639,8 @@
         private TabPage tabPage2;
         private NumericUpDown nudAverageSocket;
         private Label lblAvergaSocketCaption;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chAverageOfSocketByTime;
         private NumericUpDown nudAveragePriod;
         private Label lblAveragePeriod;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chAverageOfSocketByTime;
     }
 }

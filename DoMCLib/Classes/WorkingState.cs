@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DoMCLib.Classes
 {
-    public class WorkingState
+    public class WorkingState : IDisposable
     {
         public SocketStatuses? SocketStatuses;
 
@@ -30,6 +31,11 @@ namespace DoMCLib.Classes
         private Action? RefreshWorkingForm;
         private Func<Task>? StartWorkProc;
         private Func<Task>? StopWorkProc;
+
+        public WorkingState()
+        {
+            LoadData();
+        }
 
         public void ResetTotalDefectCyles()
         {
@@ -80,7 +86,7 @@ namespace DoMCLib.Classes
             }
         }
 
-        public async Task<List<AverageOfSocket>> GetAverageOfSocket(int socket, int PeriodInHours)
+        public async Task<List<AverageOfSocket>> GetAverageOfSocket(int PhysicalSocketOnMatrix, int PeriodInHours)
         {
             await _lock.WaitAsync(); // Асинхронное ожидание входа
             try
@@ -92,7 +98,7 @@ namespace DoMCLib.Classes
                     var cycle = AveragesOfCycles[i];
                     if (cycle.CycleTime >= from)
                     {
-                        foundRecords.Add(new AverageOfSocket() { CycleTime = cycle.CycleTime, AveragesOfSocket = cycle.AveragesOfSockets[socket] });
+                        foundRecords.Add(new AverageOfSocket() { CycleTime = cycle.CycleTime, AveragesOfSocket = cycle.AveragesOfSockets[PhysicalSocketOnMatrix - 1] });
                     }
                 }
                 return foundRecords;
@@ -110,6 +116,20 @@ namespace DoMCLib.Classes
         public async Task<List<Box>> GetBoxes(IMainController controller, double PeriodInHours)
         {
             return await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetBoxFromCommand(controller, controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(DateTime.Now.AddHours(-PeriodInHours));
+        }
+
+        public void Dispose()
+        {
+            SaveData();
+        }
+
+        private void SaveData()
+        {
+
+        }
+        private void LoadData()
+        {
+
         }
     }
 

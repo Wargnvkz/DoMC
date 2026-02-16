@@ -3,6 +3,7 @@ using DoMCLib.Classes;
 using DoMCLib.Classes.Module.API.Controllers;
 using DoMCLib.Tools;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Configuration;
 using System.Windows.Forms.DataVisualization.Charting;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -169,8 +170,22 @@ namespace DoMCRemoteControl
             var boxes = _LastStatus.Boxes.Where(b => b.CompletedTime >= from && b.CompletedTime <= now).OrderBy(box => box.CompletedTime).ToList();
             var defects = _LastStatus.LastDefects.Where(d => d.CycleDateTime >= from && d.CycleDateTime <= now).OrderBy(t => t.CycleDateTime).ToList();
             FillBoxesAndDefectsChart(boxes, defects.Select(d => d.CycleDateTime).ToList());
+            /*if (_Averages == null)
+            {
+                _Averages = new List<AverageOfSocket>();
+
+            }*/
             if (_Averages != null)
+            {
+                /*if (_Averages.Count == 0)
+                 {
+                     _Averages.Add(new AverageOfSocket() { CycleTime = DateTime.Now, AveragesOfSocket = 100 });
+                     _Averages.Add(new AverageOfSocket() { CycleTime = DateTime.Now.AddMinutes(-1), AveragesOfSocket = 110 });
+                 }*/
                 FillAverages(_Averages);
+
+            }
+
 
 
             lvBoxes.Items.Clear();
@@ -251,7 +266,7 @@ namespace DoMCRemoteControl
                 var dpTotal = new DataPoint();
                 dpTotal.SetValueXY(cycle.CycleTime.ToOADate(), cycle.AveragesOfSocket);
                 dpTotal.Color = Color.Blue;
-                dpTotal.BorderWidth = 1;
+                dpTotal.BorderWidth = 2;
                 chEvents.Series[1].Points.Add(dpTotal);
 
             }

@@ -1,46 +1,49 @@
-﻿using DoMCLib.Classes;
+﻿using DoMC.Classes;
+using DoMC.Forms;
+using DoMC.Tools;
+using DoMC.UserControls;
+using DoMCForms.Classes;
+using DoMCLib.Classes;
+using DoMCLib.Classes.Configuration.CCD;
+using DoMCLib.Classes.Module.ArchiveDB;
+using DoMCLib.Classes.Module.ArchiveDB.Commands;
+using DoMCLib.Classes.Module.CCD;
+using DoMCLib.Classes.Module.CCD.Commands;
+using DoMCLib.Classes.Module.CCD.Commands.Classes;
+using DoMCLib.Classes.Module.DB;
+using DoMCLib.Classes.Module.LCB;
+using DoMCLib.Classes.Module.LCB.Commands;
+using DoMCLib.Classes.Module.RDPB;
+using DoMCLib.Classes.Module.RDPB.Classes;
 using DoMCLib.Configuration;
-using DoMCLib.Tools;
 using DoMCLib.DB;
 using DoMCLib.Exceptions;
+using DoMCLib.Tools;
+using DoMCModuleControl;
+using DoMCModuleControl.Logging;
+using DoMCModuleControl.UI;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DoMC.Classes;
-using DoMCModuleControl.UI;
-using DoMCModuleControl.Logging;
-using DoMCModuleControl;
-using DoMC.UserControls;
-using DoMC.Forms;
-using DoMCLib.Classes.Configuration.CCD;
-using DoMCLib.Classes.Module.CCD;
-using DoMCLib.Classes.Module.LCB;
-using DoMCLib.Classes.Module.RDPB;
-using DoMCLib.Classes.Module.DB;
-using DoMCLib.Classes.Module.ArchiveDB;
-using static DoMCLib.Classes.Module.LCB.LCBModule;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using DoMCLib.Classes.Module.RDPB.Classes;
-using System.Diagnostics;
-using DoMC.Tools;
-using System.Configuration;
-using System.CodeDom;
-using System.Drawing.Drawing2D;
-using DoMCLib.Classes.Module.CCD.Commands.Classes;
-using DoMCLib.Classes.Module.LCB.Commands;
-using DoMCLib.Classes.Module.ArchiveDB.Commands;
-using DoMCLib.Classes.Module.CCD.Commands;
+using System.Windows.Forms.DataVisualization.Charting;
 using WorkshopEquipmentData;
-using Microsoft.AspNetCore.Mvc;
-using DoMCForms.Classes;
+using static DoMCLib.Classes.Module.LCB.LCBModule;
+using static DoMCModuleControl.Commands.AbstractCommandBase;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DoMC
 {
@@ -1081,7 +1084,7 @@ namespace DoMC
                                 for (int j = 0; j < 6; j++)
                                 {
                                     var socketNum = j * 16 + i + 1;
-                                    sb.Append((getImageResult[socketNum]?.ImageData ?? null) != null ? "+" : " ");
+                                    sb.Append((getImageResult?[socketNum]?.ImageData ?? null) != null ? "+" : " ");
                                     sb.Append("  ");
                                 }
                                 WorkingLog.Add(LoggerLevel.Critical, sb.ToString());
@@ -1176,8 +1179,9 @@ namespace DoMC
                         Timings.CCDImagesProcessStarted = DateTime.Now;
 
                         // проверяем есть ли статусы и устанавливаем статусы линеек светодиодов в данных текущего цикла
-                        CurrentCycleCCD.SetLEDStatuses(BlockLedStatus, LCBStatus.TimeSyncSignalGotForShowInCycle);
-
+                        // и устанавливаем время синхросигнала
+                        CurrentCycleCCD.SetLEDStatuses(BlockLedStatus);
+                        CurrentCycleCCD.SetLCBSyncroSignal(LCBStatus.TimeSyncSignalGotForShowInCycle);
                         ImageProcessParameters[] IPParray = new ImageProcessParameters[Context.Configuration.HardwareSettings.SocketQuantity];
 
                         for (int i = 0; i < Context.Configuration.HardwareSettings.SocketQuantity; i++)
@@ -1209,7 +1213,7 @@ namespace DoMC
                         //Проверяем есть ли изображения и получаем среднее, если гнездо рабочее
                         var averagesOfSocketImages = CheckIfSocketsHasImageAndGetAverage(CurrentCycleCCD);
                         //Добавляем значение в буффер средних для отображения
-                        Context.WorkingState.AddNewAverageOfCycle(CurrentCycleCCD.CycleCCDDateTime, averagesOfSocketImages).FireAndForget();
+                        Context.WorkingState.AddNewAverageOfCycle(LCBStatus.TimeSyncSignalGotForShowInCycle, averagesOfSocketImages).FireAndForget();
 
                         var IsAllHaveImages = CurrentCycleCCD.IsSocketHasImage.All(p => p);
 
@@ -1561,7 +1565,7 @@ namespace DoMC
                 //если в этот съем еще не рисовали, то рисуем
                 if (lastDrawCycleTime < LCBStatus.TimeOfLCBSynchrosignal)
                 {
-                    CurrentDraw();
+                    await CurrentDraw();
                     lastDrawCycleTime = LCBStatus.TimeOfLCBSynchrosignal;
                     if (LCBStatus.TimePreviousSyncSignalGot != null)
                     {
@@ -1641,7 +1645,7 @@ namespace DoMC
             }
         }
 
-        private void CurrentDraw()
+        private async Task CurrentDraw()
         {
             pnlCurrentSockets.Invalidate();
             chCurrentLastHourSumBad.Series[0].Points.Clear();
@@ -1657,7 +1661,7 @@ namespace DoMC
             if (calulatedInterval == 0) calulatedInterval = maxbpq >= 5 ? maxbpq / 5 : 1;
             chCurrentLastHourSumBad.ChartAreas[0].AxisY.Interval = calulatedInterval;
             chCurrentLastHourSumBad.ChartAreas[0].AxisY.RoundAxisValues();
-            DrawAverageByCurrentSocket();
+            await DrawAverageByCurrentSocket();
         }
 
         private async Task DrawAverageByCurrentSocket()
@@ -1676,10 +1680,19 @@ namespace DoMC
             if (socket == 0 || period == 0) return;
             var values = await Context.WorkingState.GetAverageOfSocket(socket, period);
             chAverageOfSocketByTime.Series[0].Points.Clear();
+            chAverageOfSocketByTime.Series[0].XValueType = ChartValueType.DateTime;
+
+            //values.Add(new AverageOfSocket() { CycleTime = DateTime.Now, AveragesOfSocket = 100 });
+            //values.Add(new AverageOfSocket() { CycleTime = DateTime.Now.AddMinutes(-1), AveragesOfSocket = 110 });
             var ordered = values.OrderBy(v => v.CycleTime).ToList();
             foreach (var value in ordered)
             {
-                chAverageOfSocketByTime.Series[0].Points.AddXY(value.CycleTime.ToOADate(), value.AveragesOfSocket);
+                var dpTotal = new DataPoint();
+                dpTotal.SetValueXY(value.CycleTime.ToOADate(), value.AveragesOfSocket);
+                dpTotal.Color = Color.Blue;
+                dpTotal.BorderWidth = 2;
+
+                chAverageOfSocketByTime.Series[0].Points.Add(dpTotal);
             }
         }
         private async void nudAverageParameter_ValueChanged(object sender, EventArgs e)
@@ -1716,7 +1729,7 @@ namespace DoMC
             //Statuses = new List<SocketStatus>();
         }
 
-        private void pbCurrentShowStatistics_Click(object sender, EventArgs e)
+        private async void pbCurrentShowStatistics_Click(object sender, EventArgs e)
         {
             if (pbCurrentShowStatistics.IsPressed)
             {
@@ -1729,7 +1742,7 @@ namespace DoMC
                 pbCurrentShowStatistics.BackColor = SystemColors.Control;
 
             }
-            CurrentDraw();
+            await CurrentDraw();
         }
 
         private async void pbDevices_Click(object sender, EventArgs e)

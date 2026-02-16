@@ -24,17 +24,22 @@ namespace DoMCLib.Classes.Configuration.CCD
         public ImageErrorType SocketErrorType;
         public RDPBTransporterSide TransporterSide;
 
-        public void SetLEDStatuses(bool[] LEDStatuses, DateTime TimeLCBSincSignal)
+        public void SetLEDStatuses(bool[] LEDStatuses)
         {
             if (LEDStatuses == null) throw new ArgumentNullException(nameof(LEDStatuses));
-            if (TimeLCBSincSignal == DateTime.MinValue) throw new ArgumentOutOfRangeException(nameof(TimeLCBSincSignal));
             this.LEDStatuses = new bool[LEDStatuses.Length];
             for (int i = 0; i < LEDStatuses.Length; i++)
             {
                 this.LEDStatuses[i] = LEDStatuses[i];
             }
-            TimeLCBSyncSignalGot = TimeLCBSincSignal;
             LEDStatusesAdded = true;
+        }
+
+        public void SetLCBSyncroSignal(DateTime TimeLCBSincSignal)
+        {
+            if (TimeLCBSincSignal == DateTime.MinValue) throw new ArgumentOutOfRangeException(nameof(TimeLCBSincSignal));
+            TimeLCBSyncSignalGot = TimeLCBSincSignal;
+
         }
 
         public void SetImageProcessParameters(ImageProcessParameters[] parameters)

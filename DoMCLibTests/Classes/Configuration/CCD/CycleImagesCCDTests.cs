@@ -25,12 +25,13 @@ namespace DoMCLib.Classes.Configuration.CCD.Tests
                 newLedStatuses[i] = rnd.NextDouble() >= 0.5;
             }
             var datetime = DateTime.Now.AddSeconds((rnd.NextDouble() - 0.5) * 1000);
-            ciCCD.SetLEDStatuses(newLedStatuses, datetime);
+            ciCCD.SetLEDStatuses(newLedStatuses);
+            ciCCD.SetLCBSyncroSignal(datetime);
             Assert.AreEqual(datetime, ciCCD.TimeLCBSyncSignalGot);
             Assert.AreNotSame(newLedStatuses, ciCCD.LEDStatuses);
             CollectionAssert.AreEqual(newLedStatuses, ciCCD.LEDStatuses);
-            Assert.ThrowsException<ArgumentNullException>(() => ciCCD.SetLEDStatuses(null, DateTime.MinValue));
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => ciCCD.SetLEDStatuses(newLedStatuses, DateTime.MinValue));
+            Assert.ThrowsException<ArgumentNullException>(() => ciCCD.SetLEDStatuses(null));
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => ciCCD.SetLCBSyncroSignal(DateTime.MinValue));
 
         }
 
