@@ -468,11 +468,16 @@
             chartArea1.AxisX.LabelStyle.Format = "dd.MM.yyyy HH:mm:ss";
             chartArea1.AxisX.MajorGrid.Enabled = false;
             chartArea1.AxisX.MinorGrid.Enabled = true;
-            chartArea1.AxisX.MinorGrid.LineColor = Color.LightGray;
+            chartArea1.AxisX.MinorGrid.LineColor = Color.FromArgb(20, 0, 0, 0);
             chartArea1.AxisX.MinorTickMark.Enabled = true;
             chartArea1.AxisX.MinorTickMark.LineColor = Color.LightGray;
             chartArea1.AxisX2.LabelStyle.Format = "dd.MM.yyyy HH:mm:ss";
-            chartArea1.AxisY.MajorGrid.Enabled = false;
+            chartArea1.AxisY2.LabelStyle.Enabled = false;
+            chartArea1.AxisY2.LineColor = Color.Transparent;
+            chartArea1.AxisY2.MajorGrid.Enabled = false;
+            chartArea1.AxisY2.MajorTickMark.Enabled = false;
+            chartArea1.AxisY2.Maximum = 1D;
+            chartArea1.AxisY2.Minimum = 0D;
             chartArea1.Name = "ChartArea1";
             chEvents.ChartAreas.Add(chartArea1);
             chEvents.Location = new Point(108, 530);
@@ -487,6 +492,7 @@
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedColumn;
             series1.Name = "Series1";
+            series1.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
             series1.YValuesPerPoint = 2;
             series2.ChartArea = "ChartArea1";
             series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
