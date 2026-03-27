@@ -140,8 +140,7 @@ namespace DoMCModuleControl.Commands
                         )
                     );
                 */
-                Controller.GetLogger(Module.GetType().GetDescriptionOrName()).
-                    Add(Logging.LoggerLevel.FullDetailedInformation, $"Команда {CommandName} запущена {Environment.StackTrace}");
+                Controller.GetLogger(Module.GetType().GetDescriptionOrName()).Add(Logging.LoggerLevel.FullDetailedInformation, $"Команда {CommandName} запущена {Environment.StackTrace}");
                 Controller.GetLogger(Module.GetType().GetDescriptionOrName()).Add(Logging.LoggerLevel.FullDetailedInformation, $"Начало выполнения кода команды {CommandName}.");
                 Controller.GetObserver().Notify($"{CommandName}.{Events.Started}", InputData);
                 Controller.LastCommand = this.GetType();

@@ -1,4 +1,5 @@
 using DoMCForms;
+using DoMCForms.Classes;
 using DoMCLib.Classes;
 using DoMCLib.Classes.Module.API.Controllers;
 using DoMCLib.Tools;
@@ -19,7 +20,7 @@ namespace DoMCRemoteControl
 
         private ApiClient _api;
         APIStatusResponse _LastStatus;
-        List<AverageOfSocket> _Averages;
+        SocketAverageData _Averages;
 
         private int ShowPeriodInHours = 2;
         public bool NoConnection = false;
@@ -256,11 +257,15 @@ namespace DoMCRemoteControl
                 chEvents.Series[0].Points.Add(dpTotal);
             }
         }
-        private void FillAverages(List<AverageOfSocket> averages)
+        private void FillAverages(SocketAverageData averagesData)
         {
             chEvents.Series[1].Points.Clear();
 
             chEvents.Series[1].XValueType = ChartValueType.DateTime;
+            short max = short.MinValue, min = short.MaxValue;
+            var averages = averagesData.Averages;
+            var limits = averagesData.Limits;
+            var stdAverage = averagesData.StandardAverage;
             foreach (var cycle in averages)
             {
                 var dpTotal = new DataPoint();
@@ -268,9 +273,26 @@ namespace DoMCRemoteControl
                 dpTotal.Color = Color.Blue;
                 dpTotal.BorderWidth = 2;
                 chEvents.Series[1].Points.Add(dpTotal);
-
+                if (max < cycle.AveragesOfSocket) max = cycle.AveragesOfSocket;
+                if (min > cycle.AveragesOfSocket) min = cycle.AveragesOfSocket;
             }
+            /*var add = (max - min) * 0.15;
+            chEvents.ChartAreas[0].AxisY.Maximum = max + add;
+            chEvents.ChartAreas[0].AxisY.Minimum = min - add;*/
 
+            var visMinMax = DisplayAverageCalculationTools.GetMinMaxForGraph(min, max, stdAverage, (short?)limits?.DefectPercentage);
+
+            chEvents.ChartAreas[0].AxisY.Maximum = visMinMax.max;
+            chEvents.ChartAreas[0].AxisY.Minimum = visMinMax.min;
+
+            //ChartTools.RemoveSeriesLimitsLines(chEvents);
+            if (limits != null && stdAverage != null)
+            {
+                /* var minX = averages.Min(a => a.CycleTime).ToOADate();
+                 var maxX = averages.Max(a => a.CycleTime).ToOADate();
+                 ChartTools.AddLimitsSeriesLines(chEvents, stdAverage.Value, new AveragePercentageLimits() { WarningPercentage = limits.WarningPercentage, DefectPercentage = limits.DefectPercentage }, minX, maxX);*/
+                ChartTools.AddLimitsStripLines(chEvents, stdAverage.Value, new AveragePercentageLimits() { WarningPercentage = limits.WarningPercentage, DefectPercentage = limits.DefectPercentage });
+            }
         }
 
         private void DrawMatrix(Graphics g, Size size, int[] ErrorsBySockets, bool ShowingStatistics)

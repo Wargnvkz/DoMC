@@ -386,25 +386,25 @@ namespace DoMC
 
 
 
-           /* if (!(th?.IsAlive ?? false))
-            {
-                tmCheckSignShow.Enabled = false;
-                btnCreateStandard.Enabled = true;
-            }
-            if (SocketReadRepeat != CheckSignSet)
-            {
-                for (int i = 0; i <= SocketReadRepeat; i++)
-                    StandardPictures[i].Image = bmpCheckSign;
-                CheckSignSet = SocketReadRepeat;
-            }
-            if (SocketCreateCompleted)
-            {
-                pbStandardSum.Image = bmpCheckSign;
-                //tmCheckSignShow.Enabled = false;
-                //btnCreateStandard.Enabled = true;
+            /* if (!(th?.IsAlive ?? false))
+             {
+                 tmCheckSignShow.Enabled = false;
+                 btnCreateStandard.Enabled = true;
+             }
+             if (SocketReadRepeat != CheckSignSet)
+             {
+                 for (int i = 0; i <= SocketReadRepeat; i++)
+                     StandardPictures[i].Image = bmpCheckSign;
+                 CheckSignSet = SocketReadRepeat;
+             }
+             if (SocketCreateCompleted)
+             {
+                 pbStandardSum.Image = bmpCheckSign;
+                 //tmCheckSignShow.Enabled = false;
+                 //btnCreateStandard.Enabled = true;
 
-            }
-           */
+             }
+            */
         }
 
         private void DoMCStandardCreateInterface_Paint(object sender, PaintEventArgs e)

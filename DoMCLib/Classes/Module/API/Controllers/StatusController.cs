@@ -104,10 +104,17 @@ namespace DoMCLib.Classes.Module.API.Controllers
         public async Task<IActionResult> Get([FromQuery] int socket, [FromQuery] int period)
         {
             var context = _getContext();
+            if (context == null) return Empty;
             var values = await context.WorkingState.GetAverageOfSocket(socket, period);
-            return Ok(values);
+            var limits = context.Configuration.ReadingSocketsSettings?.CCDSocketParameters[socket - 1]?.ImageCheckingParameters?.AveragePercentageLimits;
+            var stdAverage = context.WorkingState?.AveragesOfStandards[socket - 1];
+            return Ok(new SocketAverageData()
+            {
+                Averages = values,
+                StandardAverage = stdAverage,
+                Limits = limits
+            });
         }
-
     }
 
     public class APIStatusResponse
@@ -115,5 +122,11 @@ namespace DoMCLib.Classes.Module.API.Controllers
         public WorkingState WorkingState;
         public List<DefectedCycleSockets> LastDefects;
         public List<Box> Boxes;
+    }
+    public class SocketAverageData
+    {
+        public List<AverageOfSocket>? Averages { get; set; }
+        public short? StandardAverage { get; set; }
+        public AveragePercentageLimits? Limits { get; set; }
     }
 }

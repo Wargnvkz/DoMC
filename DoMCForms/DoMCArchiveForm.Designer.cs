@@ -61,6 +61,7 @@
             chDefectTime = new ColumnHeader();
             chDefectSocket = new ColumnHeader();
             label1 = new Label();
+            btnReport = new Button();
             ((System.ComponentModel.ISupportInitialize)nudArchiveTo).BeginInit();
             ((System.ComponentModel.ISupportInitialize)chArchiveByTime).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudArchiveSocketNumber).BeginInit();
@@ -397,11 +398,25 @@
             label1.TabIndex = 35;
             label1.Text = "Съемы за период:";
             // 
+            // btnReport
+            // 
+            btnReport.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnReport.Font = new Font("Microsoft Sans Serif", 25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            btnReport.Location = new Point(1585, 70);
+            btnReport.Margin = new Padding(4, 3, 4, 3);
+            btnReport.Name = "btnReport";
+            btnReport.Size = new Size(223, 58);
+            btnReport.TabIndex = 37;
+            btnReport.Text = "Отчет";
+            btnReport.UseVisualStyleBackColor = true;
+            btnReport.Click += btnReport_Click;
+            // 
             // DoMCArchiveForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1821, 1061);
+            Controls.Add(btnReport);
             Controls.Add(lvDefects);
             Controls.Add(label1);
             Controls.Add(lvBoxes);
@@ -466,5 +481,6 @@
         private System.Windows.Forms.ColumnHeader chDefectTime;
         private System.Windows.Forms.ColumnHeader chDefectSocket;
         private System.Windows.Forms.Label label1;
+        private Button btnReport;
     }
 }

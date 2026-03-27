@@ -23,10 +23,26 @@ namespace DoMCRemoteControl
             var json = await _http.GetStringAsync("api/status");
             return JsonSerializer.Deserialize<APIStatusResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, IncludeFields = true });
         }
-        public async Task<List<AverageOfSocket>?> GetSocketAvergaeAsync(int socket, int period)
+        public async Task<SocketAverageData?> GetSocketAvergaeAsync(int socket, int period)
         {
             var json = await _http.GetStringAsync($"api/sockets?socket={socket}&period={period}");
-            return JsonSerializer.Deserialize<List<AverageOfSocket>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, IncludeFields = true });
+            SocketAverageData socketAverageData = new SocketAverageData();
+            try
+            {
+                socketAverageData = JsonSerializer.Deserialize<SocketAverageData>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, IncludeFields = true });
+
+            }
+            catch
+            {
+                try
+                {
+                    var list = JsonSerializer.Deserialize<List<AverageOfSocket>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true, IncludeFields = true });
+                    socketAverageData.Averages = list;
+                }
+                catch { }
+
+            }
+            return socketAverageData;
         }
 
         public async Task PostAsync(string endpoint)

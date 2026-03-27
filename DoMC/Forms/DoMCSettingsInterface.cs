@@ -126,7 +126,7 @@ namespace DoMC
             #region TestRDPB (Remove Defective Preforms Block)
             #endregion
 
-            Application.ThreadException += Application_ThreadException;
+            //Application.ThreadException += Application_ThreadException;
 
             var bmpGraphics = Graphics.FromImage(bmpCheckSign);
             bmpGraphics.DrawString("✓", new Font("Arial", 300), new SolidBrush(Color.LimeGreen), new PointF(0, 0));
@@ -159,7 +159,7 @@ namespace DoMC
 
             FillSettingPage();
         }
-        private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        /*private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
             WorkingLog.Add(LoggerLevel.Critical, "Необработанная ошибка:", e.Exception);
             if (e.Exception is DoMCException)
@@ -170,7 +170,7 @@ namespace DoMC
             {
                 DoMCForms.Dialogs.DisplayMessage.Show(e.Exception.Message + "\r\n" + e.Exception.StackTrace, "Ошибка");
             }
-        }
+        }*/
 
         #region Settings
 

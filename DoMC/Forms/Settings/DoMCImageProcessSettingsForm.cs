@@ -29,6 +29,8 @@ namespace DoMCLib.Forms
                 MaxDeviation = (short)nudDeviationExcess.Value,
                 MaxAverage = (short)nudAverageExcess.Value*/
                 GetActions(ipp);
+                ipp.AveragePercentageLimits.DefectPercentage = (int)(nudAverageDefectLimit.Value);
+                ipp.AveragePercentageLimits.WarningPercentage = (int)(nudAverageWarningLimit.Value);
                 return ipp;
             }
             set
@@ -41,6 +43,8 @@ namespace DoMCLib.Forms
                 nudDeviationExcess.Value = value.MaxDeviation;
                 nudAverageExcess.Value = value.MaxAverage;*/
                 SetActions(value);
+                nudAverageDefectLimit.Value = (int)value.AveragePercentageLimits.DefectPercentage;
+                nudAverageWarningLimit.Value = (int)value.AveragePercentageLimits.WarningPercentage;
             }
         }
 

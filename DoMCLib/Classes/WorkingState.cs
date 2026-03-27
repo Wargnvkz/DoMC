@@ -26,7 +26,7 @@ namespace DoMCLib.Classes
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
         public int PeriodOfAveragesInHours = 12;
         public List<AverageOfCycle> AveragesOfCycles = new List<AverageOfCycle>();
-
+        public short?[] AveragesOfStandards;
 
         private Action? RefreshWorkingForm;
         private Func<Task>? StartWorkProc;
@@ -118,6 +118,8 @@ namespace DoMCLib.Classes
             return await new DoMCLib.Classes.Module.ArchiveDB.Commands.GetBoxFromCommand(controller, controller.GetModule(typeof(ArchiveDBModule))).ExecuteCommandAsync(DateTime.Now.AddHours(-PeriodInHours));
         }
 
+
+
         public void Dispose()
         {
             SaveData();
@@ -208,6 +210,8 @@ namespace DoMCLib.Classes
             if (lastStatus == null) return new bool[96];
             else return lastStatus.IsSocketGood;
         }
+
+
     }
 
     public class AverageOfCycle

@@ -35,6 +35,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -119,7 +120,7 @@ namespace DoMC
         public DoMCWorkModeInterface()
         {
             InitializeComponent();
-            Application.ThreadException += Application_ThreadException;
+            //Application.ThreadException += Application_ThreadException;
             switches = new ButtonsPresses[] {
                 new ButtonsPresses(){ Button= pbStartStop, ButtonPressed=false },
                 new ButtonsPresses(){ Button= pbRDPB,ButtonPressed=false },
@@ -160,6 +161,9 @@ namespace DoMC
             Context?.WorkingState.SetRefreshWorkingForm(RefreshAll);
             Context?.WorkingState.SetStartWorkProc(StartWork);
             Context?.WorkingState.SetStopWorkProc(StopWork);
+            nudAverageSocket.Value = 1;
+            nudAveragePriod.Value = 2;
+
         }
         private void RefreshAll()
         {
@@ -365,7 +369,7 @@ namespace DoMC
 
         }
 
-        private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        /*private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
             WorkingLog.Add(LoggerLevel.Critical, "Необработанное исключение: ", e.Exception);
             if (e.Exception is DoMCException)
@@ -376,7 +380,7 @@ namespace DoMC
             {
                 DoMCForms.Dialogs.DisplayMessage.Show(e.Exception.Message + "\r\n" + e.Exception.StackTrace, "Ошибка");
             }
-        }
+        }*/
 
         private async void btnStartStop_Click(object sender, EventArgs e)
         {
@@ -403,6 +407,9 @@ namespace DoMC
         {
             WorkingLog.Add(LoggerLevel.Critical, "Начинаем работу");
             Context.WorkingState.SocketStatuses = new SocketStatuses(96);
+            WorkingLog.Add(LoggerLevel.FullDetailedInformation, "Заполняем средние эталонов по гнездам");
+            Context.WorkingState.AveragesOfStandards = DisplayAverageCalculationTools.GetAverageStandards(Context.Configuration);
+
             //WorkCancellationTokenSource = new CancellationTokenSource();
             GetIsDevicesButtonWorking();
             if (!await WorkingProcessController.StartAsync())
@@ -1679,22 +1686,56 @@ namespace DoMC
         {
             if (socket == 0 || period == 0) return;
             var values = await Context.WorkingState.GetAverageOfSocket(socket, period);
-            chAverageOfSocketByTime.Series[0].Points.Clear();
-            chAverageOfSocketByTime.Series[0].XValueType = ChartValueType.DateTime;
+            var stdAverage = Context.WorkingState.AveragesOfStandards?[socket - 1];
+            var limits = Context.Configuration.ReadingSocketsSettings.CCDSocketParameters[socket - 1]?.ImageCheckingParameters?.AveragePercentageLimits;
 
-            //values.Add(new AverageOfSocket() { CycleTime = DateTime.Now, AveragesOfSocket = 100 });
-            //values.Add(new AverageOfSocket() { CycleTime = DateTime.Now.AddMinutes(-1), AveragesOfSocket = 110 });
-            var ordered = values.OrderBy(v => v.CycleTime).ToList();
-            foreach (var value in ordered)
+            if (chAverageOfSocketByTime.InvokeRequired)
+                chAverageOfSocketByTime.Invoke(() => UpdatAvegareChart(values, stdAverage, limits));
+            else
+                UpdatAvegareChart(values, stdAverage, limits);
+
+        }
+
+        private void UpdatAvegareChart(List<AverageOfSocket> values, short? stdAverage, AveragePercentageLimits? limits)
+        {
+            try
             {
-                var dpTotal = new DataPoint();
-                dpTotal.SetValueXY(value.CycleTime.ToOADate(), value.AveragesOfSocket);
-                dpTotal.Color = Color.Blue;
-                dpTotal.BorderWidth = 2;
+                chAverageOfSocketByTime.Series.SuspendUpdates();
 
-                chAverageOfSocketByTime.Series[0].Points.Add(dpTotal);
+                chAverageOfSocketByTime.Series[0].Points.Clear();
+                chAverageOfSocketByTime.Series[0].XValueType = ChartValueType.DateTime;
+                short max = short.MinValue, min = short.MaxValue;
+
+                var ordered = values.OrderBy(v => v.CycleTime).ToList();
+                foreach (var value in ordered)
+                {
+                    var dpTotal = new DataPoint();
+                    dpTotal.SetValueXY(value.CycleTime.ToOADate(), value.AveragesOfSocket);
+                    dpTotal.Color = Color.Blue;
+                    dpTotal.BorderWidth = 2;
+
+                    chAverageOfSocketByTime.Series[0].Points.Add(dpTotal);
+                    if (max < value.AveragesOfSocket) max = value.AveragesOfSocket;
+                    if (min > value.AveragesOfSocket) min = value.AveragesOfSocket;
+                }
+
+                var visMinMax = DisplayAverageCalculationTools.GetMinMaxForGraph(min, max, stdAverage, (short?)limits?.DefectPercentage);
+
+                chAverageOfSocketByTime.ChartAreas[0].AxisY.Maximum = visMinMax.max;
+                chAverageOfSocketByTime.ChartAreas[0].AxisY.Minimum = visMinMax.min;
+
+                if (limits != null && stdAverage != null)
+                {
+                    ChartTools.AddLimitsStripLines(chAverageOfSocketByTime, stdAverage.Value, new AveragePercentageLimits() { WarningPercentage = limits.WarningPercentage, DefectPercentage = limits.DefectPercentage });
+                }
+            }
+            finally
+            {
+                chAverageOfSocketByTime.Series.ResumeUpdates();
             }
         }
+
+
         private async void nudAverageParameter_ValueChanged(object sender, EventArgs e)
         {
             await DrawAverageByCurrentSocket();
@@ -1910,6 +1951,7 @@ namespace DoMC
             WorkingLog.Add(LoggerLevel.Critical, "Изменение рабочих настроек");
             await SetSocketQuantity(Context?.Configuration.HardwareSettings.SocketQuantity ?? 96);
             await SetArchiveDBConfiguration();
+            await CurrentDraw();
         }
 
 

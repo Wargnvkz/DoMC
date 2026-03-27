@@ -1,4 +1,5 @@
 ﻿using DoMCLib.DB;
+using DoMCLib.Tools;
 using DoMCModuleControl;
 using DoMCModuleControl.Logging;
 using System;
@@ -656,5 +657,117 @@ namespace DoMCForms
                 IsRemote = isRemote;
             }
         }
+
+        private void btnReport_Click(object sender, EventArgs e)
+        {
+            List<DisplayCycleData> ArchiveCycles = new List<DisplayCycleData>();
+            List<CycleData> LocalArchiveCycles;
+            List<CycleData> RemoteArchiveCycles;
+
+            dtArchiveFrom = dtpArchiveFrom.Value.Date.AddHours((double)nudArchiveFrom.Value);
+            dtArchiveTo = dtpArchiveTo.Value.Date.AddHours((double)nudArchiveTo.Value + 1);
+            if (dtArchiveFrom > dtArchiveTo)
+            {
+                nudArchiveFrom.BackColor = Color.Red;
+                nudArchiveTo.BackColor = Color.Red;
+                MessageBox.Show("Время выбрано неправильно", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                nudArchiveFrom.BackColor = SystemColors.Window;
+                nudArchiveTo.BackColor = SystemColors.Window;
+                return;
+            }
+            nudArchiveFrom.BackColor = SystemColors.Window;
+            nudArchiveTo.BackColor = SystemColors.Window;
+
+            if (!DS.LocalIsActive && !DS.RemoteIsActive)
+            {
+                MessageBox.Show("Не получилось подключиться к базе данных", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            LocalArchiveCycles = DS.LocalGetCycles(dtArchiveFrom, dtArchiveTo);
+            RemoteArchiveCycles = DS.RemoteGetCycles(dtArchiveFrom, dtArchiveTo);
+
+
+            if (LocalArchiveCycles != null)
+                ArchiveCycles.AddRange(LocalArchiveCycles.Select(cd => new DisplayCycleData() { IsRemote = false, CycleData = cd }));
+            if (RemoteArchiveCycles != null)
+                ArchiveCycles.AddRange(RemoteArchiveCycles.Select(cd => new DisplayCycleData() { IsRemote = true, CycleData = cd }));
+
+
+            List<BoxDB> boxes = new List<BoxDB>();
+
+
+            var localboxes = DS.LocalGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
+            if (localboxes != null)
+                boxes.AddRange(localboxes);
+            var remoteboxes = DS.RemoteGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
+            if (remoteboxes != null)
+                boxes.AddRange(remoteboxes);
+
+            boxes = boxes.OrderBy(b => b.CompletedTime).ToList();
+
+
+            List<ReportStatistics> report = new List<ReportStatistics>();
+            var ArchiveGroup = ArchiveCycles.GroupBy(a => new Shift(a.CycleData.CycleDateTime));
+            foreach (var groupElement in ArchiveGroup)
+            {
+                var shiftStat = new ReportStatistics();
+                var shift = groupElement.Key;
+                shiftStat.Shift = shift;
+                var cycleList = groupElement.OrderBy(c => c.CycleData.CycleDateTime).ToList();
+                foreach (var cycle in cycleList)
+                {
+                    shiftStat.TotalCyclesCount++;
+                    var defectCount = cycle.CycleData.IsSocketsGood.Count(s => !s);
+                    if (defectCount > 10)
+                    {
+                        if (defectCount > 60)
+                            shiftStat.MultiplySocketsDefectCount60++;
+                        else
+                            shiftStat.MultiplySocketsDefectCount10++;
+                    }
+                    else
+                    {
+                        if (defectCount > 0)
+                            shiftStat.CyclesWithDefectsCount++;
+                    }
+                }
+
+                var shiftStartsAt = shift.ShiftStartsAt();
+                var shiftEndsAt = shift.ShiftEndsAt();
+
+                shiftStat.BoxQuantity = boxes.Count(b => b.CompletedTime >= shiftStartsAt && b.CompletedTime < shiftEndsAt);
+                report.Add(shiftStat);
+            }
+        }
+    }
+
+    public class ReportStatistics
+    {
+        /// <summary>
+        /// Смена
+        /// </summary>
+        public Shift Shift;
+        /// <summary>
+        /// Всего циклов машины
+        /// </summary>
+        public int TotalCyclesCount;
+        /// <summary>
+        /// циклов с дефектами. дефектных гнезд<10
+        /// </summary>
+        public int CyclesWithDefectsCount;
+        /// <summary>
+        /// циклы с дефектами. дефектных гнезд > 10. обычно связано в неправильными настройками, а не реальными дефектами.
+        /// </summary>
+        public int MultiplySocketsDefectCount10;
+        /// <summary>
+        /// циклы с дефектами. дефектных гнезд > 60. обычно связано в неправильными настройками, а не реальными дефектами.
+        /// </summary>
+        public int MultiplySocketsDefectCount60;
+        public int BoxQuantity;
+
+        public double DistinctDefectPercentage { get => CyclesWithDefectsCount * 100d / TotalCyclesCount; }
+        public double MoreThan10DefectPercentage { get => MultiplySocketsDefectCount10 * 100d / TotalCyclesCount; }
+        public double MoreThan60DefectPercentage { get => MultiplySocketsDefectCount60 * 100d / TotalCyclesCount; }
     }
 }

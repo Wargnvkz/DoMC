@@ -64,6 +64,13 @@
             cbActionColor5 = new ComboBox();
             nudActionDefectParameter5 = new NumericUpDown();
             cbActionDefect5 = new ComboBox();
+            label6 = new Label();
+            nudAverageWarningLimit = new NumericUpDown();
+            nudAverageDefectLimit = new NumericUpDown();
+            label7 = new Label();
+            label8 = new Label();
+            label9 = new Label();
+            label10 = new Label();
             ((System.ComponentModel.ISupportInitialize)nudRight).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudLeft).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudBottom).BeginInit();
@@ -80,13 +87,15 @@
             ((System.ComponentModel.ISupportInitialize)nudActionDefectParameter4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudActionColorParameter5).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudActionDefectParameter5).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudAverageWarningLimit).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)nudAverageDefectLimit).BeginInit();
             SuspendLayout();
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            label1.Location = new Point(43, 391);
+            label1.Location = new Point(40, 351);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
             label1.Size = new Size(183, 24);
@@ -96,7 +105,7 @@
             // nudRight
             // 
             nudRight.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            nudRight.Location = new Point(410, 391);
+            nudRight.Location = new Point(199, 422);
             nudRight.Margin = new Padding(4, 3, 4, 3);
             nudRight.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
             nudRight.Name = "nudRight";
@@ -108,7 +117,7 @@
             // nudLeft
             // 
             nudLeft.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            nudLeft.Location = new Point(260, 391);
+            nudLeft.Location = new Point(49, 422);
             nudLeft.Margin = new Padding(4, 3, 4, 3);
             nudLeft.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
             nudLeft.Name = "nudLeft";
@@ -119,7 +128,7 @@
             // nudBottom
             // 
             nudBottom.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            nudBottom.Location = new Point(332, 430);
+            nudBottom.Location = new Point(121, 461);
             nudBottom.Margin = new Padding(4, 3, 4, 3);
             nudBottom.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
             nudBottom.Name = "nudBottom";
@@ -131,7 +140,7 @@
             // nudTop
             // 
             nudTop.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            nudTop.Location = new Point(332, 351);
+            nudTop.Location = new Point(121, 382);
             nudTop.Margin = new Padding(4, 3, 4, 3);
             nudTop.Maximum = new decimal(new int[] { 511, 0, 0, 0 });
             nudTop.Name = "nudTop";
@@ -145,7 +154,7 @@
             btnCancel.CausesValidation = false;
             btnCancel.DialogResult = DialogResult.Cancel;
             btnCancel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            btnCancel.Location = new Point(595, 478);
+            btnCancel.Location = new Point(595, 517);
             btnCancel.Margin = new Padding(4, 3, 4, 3);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(124, 43);
@@ -158,7 +167,7 @@
             btnOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             btnOK.DialogResult = DialogResult.OK;
             btnOK.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            btnOK.Location = new Point(19, 478);
+            btnOK.Location = new Point(19, 517);
             btnOK.Margin = new Padding(4, 3, 4, 3);
             btnOK.Name = "btnOK";
             btnOK.Size = new Size(124, 43);
@@ -169,7 +178,7 @@
             // panel1
             // 
             panel1.BorderStyle = BorderStyle.FixedSingle;
-            panel1.Location = new Point(293, 363);
+            panel1.Location = new Point(82, 394);
             panel1.Margin = new Padding(4, 3, 4, 3);
             panel1.Name = "panel1";
             panel1.Size = new Size(158, 89);
@@ -471,11 +480,95 @@
             cbActionDefect5.Size = new Size(237, 32);
             cbActionDefect5.TabIndex = 121;
             // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label6.Location = new Point(377, 351);
+            label6.Margin = new Padding(4, 0, 4, 0);
+            label6.Name = "label6";
+            label6.Size = new Size(151, 24);
+            label6.TabIndex = 125;
+            label6.Text = "Границы цвета:";
+            // 
+            // nudAverageWarningLimit
+            // 
+            nudAverageWarningLimit.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            nudAverageWarningLimit.Location = new Point(617, 382);
+            nudAverageWarningLimit.Margin = new Padding(4, 3, 4, 3);
+            nudAverageWarningLimit.Maximum = new decimal(new int[] { 32000, 0, 0, 0 });
+            nudAverageWarningLimit.Name = "nudAverageWarningLimit";
+            nudAverageWarningLimit.Size = new Size(88, 29);
+            nudAverageWarningLimit.TabIndex = 126;
+            nudAverageWarningLimit.DoubleClick += num_DoubleClick;
+            // 
+            // nudAverageDefectLimit
+            // 
+            nudAverageDefectLimit.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            nudAverageDefectLimit.Location = new Point(617, 422);
+            nudAverageDefectLimit.Margin = new Padding(4, 3, 4, 3);
+            nudAverageDefectLimit.Maximum = new decimal(new int[] { 32000, 0, 0, 0 });
+            nudAverageDefectLimit.Name = "nudAverageDefectLimit";
+            nudAverageDefectLimit.Size = new Size(88, 29);
+            nudAverageDefectLimit.TabIndex = 127;
+            nudAverageDefectLimit.DoubleClick += num_DoubleClick;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label7.Location = new Point(392, 387);
+            label7.Margin = new Padding(4, 0, 4, 0);
+            label7.Name = "label7";
+            label7.Size = new Size(174, 24);
+            label7.TabIndex = 128;
+            label7.Text = "Предупреждение:";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label8.Location = new Point(392, 424);
+            label8.Margin = new Padding(4, 0, 4, 0);
+            label8.Name = "label8";
+            label8.Size = new Size(84, 24);
+            label8.TabIndex = 129;
+            label8.Text = "Дефект:";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label9.Location = new Point(704, 387);
+            label9.Margin = new Padding(4, 0, 4, 0);
+            label9.Name = "label9";
+            label9.Size = new Size(25, 24);
+            label9.TabIndex = 130;
+            label9.Text = "%";
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label10.Location = new Point(704, 424);
+            label10.Margin = new Padding(4, 0, 4, 0);
+            label10.Name = "label10";
+            label10.Size = new Size(25, 24);
+            label10.TabIndex = 131;
+            label10.Text = "%";
+            // 
             // DoMCImageProcessSettingsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(733, 534);
+            ClientSize = new Size(733, 573);
+            Controls.Add(label10);
+            Controls.Add(label9);
+            Controls.Add(label8);
+            Controls.Add(label7);
+            Controls.Add(nudAverageDefectLimit);
+            Controls.Add(nudAverageWarningLimit);
+            Controls.Add(label6);
             Controls.Add(nudActionColorParameter5);
             Controls.Add(cbActionColor5);
             Controls.Add(nudActionDefectParameter5);
@@ -531,6 +624,8 @@
             ((System.ComponentModel.ISupportInitialize)nudActionDefectParameter4).EndInit();
             ((System.ComponentModel.ISupportInitialize)nudActionColorParameter5).EndInit();
             ((System.ComponentModel.ISupportInitialize)nudActionDefectParameter5).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudAverageWarningLimit).EndInit();
+            ((System.ComponentModel.ISupportInitialize)nudAverageDefectLimit).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -573,5 +668,12 @@
         private System.Windows.Forms.ComboBox cbActionColor5;
         private System.Windows.Forms.NumericUpDown nudActionDefectParameter5;
         private System.Windows.Forms.ComboBox cbActionDefect5;
+        private Label label6;
+        private NumericUpDown nudAverageWarningLimit;
+        private NumericUpDown nudAverageDefectLimit;
+        private Label label7;
+        private Label label8;
+        private Label label9;
+        private Label label10;
     }
 }

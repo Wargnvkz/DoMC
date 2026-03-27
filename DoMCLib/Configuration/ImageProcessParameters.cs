@@ -11,12 +11,6 @@ namespace DoMCLib.Configuration
     [DataContract]
     public class ImageProcessParameters
     {
-        /*[DataMember]
-        public int DeviationWindow = 10;
-        [DataMember]
-        public short MaxDeviation = 1000;
-        [DataMember]
-        public short MaxAverage = 1000;*/
         [DataMember]
         public int TopBorder = 0;
         [DataMember]
@@ -27,6 +21,8 @@ namespace DoMCLib.Configuration
         public int RightBorder = 511;
         [DataMember]
         public MakeDecision[] Decisions = [new MakeDecision(), new MakeDecision()];
+        [DataMember]
+        public AveragePercentageLimits AveragePercentageLimits = new AveragePercentageLimits();
         public Rectangle GetRectangle()
         {
             return new Rectangle(LeftBorder, TopBorder, RightBorder - LeftBorder, BottomBorder - TopBorder);
@@ -55,15 +51,14 @@ namespace DoMCLib.Configuration
         {
             var ipp = new ImageProcessParameters()
             {
-                /*DeviationWindow = this.DeviationWindow,
-                MaxDeviation = this.MaxDeviation,
-                MaxAverage = this.MaxAverage,*/
                 TopBorder = TopBorder,
                 BottomBorder = BottomBorder,
                 LeftBorder = LeftBorder,
                 RightBorder = RightBorder
             };
             ipp.Decisions = CloneDecisions();
+            if (AveragePercentageLimits != null)
+                ipp.AveragePercentageLimits = AveragePercentageLimits.Clone();
             return ipp;
         }
         private MakeDecision[] CloneDecisions()
@@ -82,7 +77,11 @@ namespace DoMCLib.Configuration
             if (copyImageProcessParameters.BottomBorder) target.BottomBorder = BottomBorder;
             if (copyImageProcessParameters.LeftBorder) target.LeftBorder = LeftBorder;
             if (copyImageProcessParameters.RightBorder) target.RightBorder = RightBorder;
-            if (copyImageProcessParameters.Decisions) target.Decisions = CloneDecisions();
+            if (copyImageProcessParameters.Decisions)
+            {
+                target.Decisions = CloneDecisions();
+                target.AveragePercentageLimits = AveragePercentageLimits.Clone();
+            }
         }
         public class CopyImageProcessParameters
         {
