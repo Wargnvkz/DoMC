@@ -148,8 +148,8 @@ namespace DoMCModuleControl.Commands
             Func<Task> cmd,
             int timeoutMilliseconds = 5000) // ← можно передать таймаут
         {
-            SetExpectingResponses(responseFilter);
             await _commandLock.WaitAsync(token);
+            SetExpectingResponses(responseFilter);
 
             try
             {
@@ -158,7 +158,8 @@ namespace DoMCModuleControl.Commands
 
                 _pendingReadTask = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-                cmd?.Invoke();
+                if (cmd != null)
+                    await cmd();
 
                 using (token.Register(() => _pendingReadTask.TrySetCanceled(token)))
                 {

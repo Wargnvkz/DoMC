@@ -155,11 +155,15 @@ namespace DoMCLib.Classes.Module.RDPB
                 int read = 0;
 
                 // ждём, пока появятся байты
-                if (TCPClientCommandConnection.AvailableBytes() > 0)
-                {
-                    // асинхронно читаем
-                    read = await TCPClientCommandConnection.ReadAsync(tempreadbuff, 0, tempreadbuff.Length, cancellationTokenSource.Token);
-                }
+
+                // асинхронно читаем
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
+                    cancellationTokenSource.Token); // глобальный
+
+                linkedCts.CancelAfter(TimeSpan.FromSeconds(10)); // локальный таймаут
+
+                read = await TCPClientCommandConnection.ReadAsync(tempreadbuff, 0, tempreadbuff.Length, linkedCts.Token);
+
 
                 if (read > 0)
                 {
@@ -231,7 +235,11 @@ namespace DoMCLib.Classes.Module.RDPB
                         mainController.GetObserver().Notify(this, CurrentStatus.CommandType.ToString(), result.ToString(), CurrentStatus);
                         WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Получена команда от бракёра: {CurrentStatus.CommandType}");
 
-                        _pendingCommandController.TrySetResult(0, CurrentStatus);
+                        var success = _pendingCommandController.TrySetResult(0, CurrentStatus);
+                        if (!success)
+                        {
+                            WorkingLog.Add(LoggerLevel.Critical, "Не удалось установить результат команды");
+                        }
                     }
                     while (ReadBuffer.Length > 0);
                 }
@@ -253,6 +261,23 @@ namespace DoMCLib.Classes.Module.RDPB
                 {
                     await ReadNetwork();
                     ProcessBuffer();
+                }
+                catch (OperationCanceledException)
+                {
+                    if (cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        // это Stop()
+                        WorkingLog?.Add(LoggerLevel.Information, "Остановка модуля");
+                    }
+                    else
+                    {
+                        // это таймаут
+                        WorkingLog?.Add(LoggerLevel.FullDetailedInformation, "Таймаут ожидания данных");
+
+                        // тут можно инициировать реконнект
+                    }
+
+                    // можно переподключаться
                 }
                 catch (Exception ex)
                 {

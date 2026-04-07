@@ -1,7 +1,11 @@
-﻿using DoMCLib.DB;
+﻿using DoMCLib.Classes;
+using DoMCLib.DB;
 using DoMCLib.Tools;
 using DoMCModuleControl;
 using DoMCModuleControl.Logging;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.Statistics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +15,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-
 
 namespace DoMCForms
 {
@@ -660,84 +663,222 @@ namespace DoMCForms
 
         private void btnReport_Click(object sender, EventArgs e)
         {
-            List<DisplayCycleData> ArchiveCycles = new List<DisplayCycleData>();
-            List<CycleData> LocalArchiveCycles;
-            List<CycleData> RemoteArchiveCycles;
-
-            dtArchiveFrom = dtpArchiveFrom.Value.Date.AddHours((double)nudArchiveFrom.Value);
-            dtArchiveTo = dtpArchiveTo.Value.Date.AddHours((double)nudArchiveTo.Value + 1);
-            if (dtArchiveFrom > dtArchiveTo)
+            this.Cursor = Cursors.WaitCursor;
+            Application.DoEvents();
+            try
             {
-                nudArchiveFrom.BackColor = Color.Red;
-                nudArchiveTo.BackColor = Color.Red;
-                MessageBox.Show("Время выбрано неправильно", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                var dtArchiveFrom = dtpArchiveFrom.Value.Date.AddHours((double)nudArchiveFrom.Value);
+                var dtArchiveTo = dtpArchiveTo.Value.Date.AddHours((double)nudArchiveTo.Value + 1);
+
+                /*List<DisplayCycleData> ArchiveCycles = new List<DisplayCycleData>();
+                List<CycleData> LocalArchiveCycles;
+                List<CycleData> RemoteArchiveCycles;
+
+
+                if (dtArchiveFrom > dtArchiveTo)
+                {
+                    nudArchiveFrom.BackColor = Color.Red;
+                    nudArchiveTo.BackColor = Color.Red;
+                    MessageBox.Show("Время выбрано неправильно", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    nudArchiveFrom.BackColor = SystemColors.Window;
+                    nudArchiveTo.BackColor = SystemColors.Window;
+                    return;
+                }
                 nudArchiveFrom.BackColor = SystemColors.Window;
                 nudArchiveTo.BackColor = SystemColors.Window;
-                return;
-            }
-            nudArchiveFrom.BackColor = SystemColors.Window;
-            nudArchiveTo.BackColor = SystemColors.Window;
 
-            if (!DS.LocalIsActive && !DS.RemoteIsActive)
-            {
-                MessageBox.Show("Не получилось подключиться к базе данных", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            LocalArchiveCycles = DS.LocalGetCycles(dtArchiveFrom, dtArchiveTo);
-            RemoteArchiveCycles = DS.RemoteGetCycles(dtArchiveFrom, dtArchiveTo);
-
-
-            if (LocalArchiveCycles != null)
-                ArchiveCycles.AddRange(LocalArchiveCycles.Select(cd => new DisplayCycleData() { IsRemote = false, CycleData = cd }));
-            if (RemoteArchiveCycles != null)
-                ArchiveCycles.AddRange(RemoteArchiveCycles.Select(cd => new DisplayCycleData() { IsRemote = true, CycleData = cd }));
-
-
-            List<BoxDB> boxes = new List<BoxDB>();
-
-
-            var localboxes = DS.LocalGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
-            if (localboxes != null)
-                boxes.AddRange(localboxes);
-            var remoteboxes = DS.RemoteGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
-            if (remoteboxes != null)
-                boxes.AddRange(remoteboxes);
-
-            boxes = boxes.OrderBy(b => b.CompletedTime).ToList();
-
-
-            List<ReportStatistics> report = new List<ReportStatistics>();
-            var ArchiveGroup = ArchiveCycles.GroupBy(a => new Shift(a.CycleData.CycleDateTime));
-            foreach (var groupElement in ArchiveGroup)
-            {
-                var shiftStat = new ReportStatistics();
-                var shift = groupElement.Key;
-                shiftStat.Shift = shift;
-                var cycleList = groupElement.OrderBy(c => c.CycleData.CycleDateTime).ToList();
-                foreach (var cycle in cycleList)
+                if (!DS.LocalIsActive && !DS.RemoteIsActive)
                 {
-                    shiftStat.TotalCyclesCount++;
-                    var defectCount = cycle.CycleData.IsSocketsGood.Count(s => !s);
-                    if (defectCount > 10)
-                    {
-                        if (defectCount > 60)
-                            shiftStat.MultiplySocketsDefectCount60++;
-                        else
-                            shiftStat.MultiplySocketsDefectCount10++;
-                    }
-                    else
-                    {
-                        if (defectCount > 0)
-                            shiftStat.CyclesWithDefectsCount++;
-                    }
+                    MessageBox.Show("Не получилось подключиться к базе данных", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
 
-                var shiftStartsAt = shift.ShiftStartsAt();
-                var shiftEndsAt = shift.ShiftEndsAt();
+                LocalArchiveCycles = DS.LocalGetCycles(dtArchiveFrom, dtArchiveTo);
+                RemoteArchiveCycles = DS.RemoteGetCycles(dtArchiveFrom, dtArchiveTo);
 
-                shiftStat.BoxQuantity = boxes.Count(b => b.CompletedTime >= shiftStartsAt && b.CompletedTime < shiftEndsAt);
-                report.Add(shiftStat);
+
+                if (LocalArchiveCycles != null)
+                    ArchiveCycles.AddRange(LocalArchiveCycles.Select(cd => new DisplayCycleData() { IsRemote = false, CycleData = cd }));
+                if (RemoteArchiveCycles != null)
+                    ArchiveCycles.AddRange(RemoteArchiveCycles.Select(cd => new DisplayCycleData() { IsRemote = true, CycleData = cd }));
+                */
+
+                List<BoxDB> boxes = new List<BoxDB>();
+
+
+                var localboxes = DS.LocalGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
+                if (localboxes != null)
+                    boxes.AddRange(localboxes);
+                var remoteboxes = DS.RemoteGetBox(dtArchiveFrom, dtArchiveTo).OrderBy(b => b.CompletedTime).ToList();
+                if (remoteboxes != null)
+                    boxes.AddRange(remoteboxes);
+
+                boxes = boxes.OrderBy(b => b.CompletedTime).Where(b => b.CompletedTime != DateTime.MinValue).ToList();
+
+
+                List<ReportStatistics> report = new List<ReportStatistics>();
+                var ArchiveGroup = boxes.GroupBy(b => new Shift(b.CompletedTime));
+                foreach (var groupElement in ArchiveGroup)
+                {
+                    var shiftStat = new ReportStatistics();
+                    var shift = groupElement.Key;
+                    shiftStat.Shift = shift;
+                    var boxList = groupElement.OrderBy(c => c.CompletedTime).ToList();
+                    foreach (var cycle in boxList)
+                    {
+                        shiftStat.TotalBoxCount++;
+                        shiftStat.DefectsInBoxCount += cycle.BadCyclesCount;
+                    }
+
+                    report.Add(shiftStat);
+                }
+                var monthReport = report.GroupBy(r => new { r.Shift.ShiftDate.Year, r.Shift.ShiftDate.Month }).Select(g => new MonthReportStatistics
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalBoxCount = g.Sum(s => s.TotalBoxCount),
+                    DefectsInBoxCount = g.Sum(s => s.DefectsInBoxCount)
+                }).ToList();
+                StringBuilder sb = new StringBuilder();
+                //Отчет по сменам в csv файле
+                // Смена;Дата смены;Всего коробов;Всего дефектных съемов
+                sb.AppendLine("Смена;Дата смены;Всего коробов;Всего дефектных съемов;Процент дефектных съемов");
+                foreach (var r in report)
+                {
+                    sb.AppendLine($"{r.Shift.GetShiftNumber()}{(r.Shift.IsNight ? "Н" : "Д")};{r.Shift.ShiftDate:dd-MM-yyyy};{r.TotalBoxCount};{r.DefectsInBoxCount};{r.DefectsInBoxCount / (r.TotalBoxCount * 105d) * 100d:F3}%");
+                }
+                sb.AppendLine();
+                //отчет по месяцам в csv файле
+                sb.AppendLine("Год;Месяц;Всего коробов;Всего дефектных съемов;Процент дефектных съемов");
+                foreach (var r in monthReport)
+                {
+                    sb.AppendLine($"{r.Year};{r.Month};{r.TotalBoxCount};{r.DefectsInBoxCount};{r.DefectsInBoxCount / (r.TotalBoxCount * 105d) * 100d:F3}%");
+                }
+
+
+                #region Statistics
+                /*
+                var data = new double[boxes.Count, 8];
+                for (int i = 0; i < boxes.Count; i++)
+                {
+                    var shift = new Shift(boxes[i].CompletedTime);     // смена с 8 до 20 и с 20 до 8
+                    data[i, 0] = shift.GetShiftNumber();              // Номер смены
+                    data[i, 1] = shift.IsNight ? 0 : 1;              // Ночная смена?
+                    data[i, 2] = boxes[i].CompletedTime.Hour;              // Час производства
+                    data[i, 3] = boxes[i].CompletedTime.Minute;            // Минута (важна для циклов!)
+                    if (i > 0)
+                    {
+                        var boxFillTime = Math.Round((boxes[i].CompletedTime - boxes[i - 1].CompletedTime).TotalMinutes);
+                        data[i, 4] = Math.Min(boxFillTime, 120);
+                    }
+                    else
+                        data[i, 4] = 120;
+                    data[i, 5] = boxes[i].CompletedTime.DayOfWeek >= DayOfWeek.Saturday ? 1 : 0;    // выходной?
+
+                    // Близость к пересменке (0 - начало, 1 - конец)
+                    data[i, 6] = (boxes[i].CompletedTime - shift.ShiftStartsAt()).Hours;
+                    data[i, 7] = boxes[i].BadCyclesCount;                  // ЦЕЛЕВАЯ ПЕРЕМЕННАЯ (наш "брак")
+                }
+                int targetIndex = 7;
+                var matrix = DenseMatrix.OfArray(data);
+                for (int j = 0; j < data.GetLength(1); j++)
+                {
+                    var col = matrix.Column(j);
+                    double mean = col.Mean();
+                    double stdDev = col.StandardDeviation();
+
+                    if (stdDev > 0)
+                    {
+                        matrix.SetColumn(j, (col - mean) / stdDev);
+                    }
+                }
+                var correlationMatrix = (matrix.Transpose() * matrix) / (matrix.RowCount - 1);
+                var evd = correlationMatrix.Evd();
+
+                // 3. Получаем результат
+                Vector<System.Numerics.Complex> values = evd.EigenValues;
+
+                // 3. Берем вектор самой главной компоненты (последний столбец)
+                var mainVector = evd.EigenVectors.Column(targetIndex);
+
+                sb.AppendLine();
+                sb.AppendLine($"Собственные значения");
+
+                // 4. Смотрим веса (влияние) каждого поля в этой компоненте
+                string[] labels = { "Shift", "IsNight", "Hour", "Minute", "SecondsFromLastBox", "IsWeekend", "RateFromShiftStart", "Defects" };
+                for (int i = 0; i < labels.Length; i++)
+                {
+                    sb.AppendLine($"{labels[i]}: {mainVector[i]:F4}");
+                }
+
+                // 2. Индекс колонки с процентом брака (твое поле №8)
+
+                var rateColumn = matrix.Column(targetIndex);
+
+                sb.AppendLine($"--- Корреляция с Процентом брака ({labels[targetIndex]}) ---");
+
+                for (int i = 0; i < labels.Length; i++)
+                {
+                    if (i == targetIndex) continue;
+
+                    // Считаем корреляцию Пирсона между текущим столбцом и браком
+                    double correlation = Correlation.Pearson(matrix.Column(i), rateColumn);
+
+                    // Интерпретируем результат
+                    string influence = correlation > 0 ? "Растет брак" : "Снижается брак";
+                    if (Math.Abs(correlation) < 0.1) influence = "Почти не влияет";
+
+                    sb.AppendLine($"{labels[i].PadRight(12)}: {correlation:F4} ({influence})");
+                }
+
+                sb.AppendLine($"--- Распределение ({labels[targetIndex]}) ---");
+
+                for (int i = 0; i < labels.Length; i++)
+                {
+                    if (i == targetIndex) continue;
+                    // в словарь в ключ записываем значение поля i, а в значение: сумму процентов брака для этих записей
+                    Dictionary<double, double> distribution = new Dictionary<double, double>();
+                    for (int j = 0; j < data.GetLength(0); j++)
+                    {
+                        double key = data[j, i];
+                        double value = data[j, targetIndex];
+                        if (!distribution.ContainsKey(key))
+                            distribution[key] = 0;
+                        distribution[key] += value;
+                    }
+                    // сортируем словарь по ключу и записываем результат в sb построчно
+                    foreach (var kvp in distribution.OrderBy(k => k.Key))
+                    {
+                        sb.AppendLine($"{labels[i].PadRight(12)} = {kvp.Key:F4} -> {kvp.Value:F4}");
+                    }
+
+                }
+                */
+                #endregion Statistics
+
+
+
+                //var eigenvalues=EigenSimple.GetPrincipalEigen(dataToAnalize);
+
+                this.Cursor = Cursors.Default;
+                //выбираем файл для сохранения
+                var sfd = new SaveFileDialog();
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        File.WriteAllText(sfd.FileName, sb.ToString(), Encoding.UTF8);
+                        MessageBox.Show("Отчет сохранен");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при сохранении отчета: {ex.Message}");
+                    }
+                }
+            }
+            finally
+            {
+                this.Cursor = Cursors.Default;
             }
         }
     }
@@ -749,25 +890,76 @@ namespace DoMCForms
         /// </summary>
         public Shift Shift;
         /// <summary>
-        /// Всего циклов машины
+        /// Всего коробов выпущено
         /// </summary>
-        public int TotalCyclesCount;
+        public int TotalBoxCount;
         /// <summary>
-        /// циклов с дефектами. дефектных гнезд<10
+        /// количество девектных съемов в коробе
         /// </summary>
-        public int CyclesWithDefectsCount;
-        /// <summary>
-        /// циклы с дефектами. дефектных гнезд > 10. обычно связано в неправильными настройками, а не реальными дефектами.
-        /// </summary>
-        public int MultiplySocketsDefectCount10;
-        /// <summary>
-        /// циклы с дефектами. дефектных гнезд > 60. обычно связано в неправильными настройками, а не реальными дефектами.
-        /// </summary>
-        public int MultiplySocketsDefectCount60;
-        public int BoxQuantity;
-
-        public double DistinctDefectPercentage { get => CyclesWithDefectsCount * 100d / TotalCyclesCount; }
-        public double MoreThan10DefectPercentage { get => MultiplySocketsDefectCount10 * 100d / TotalCyclesCount; }
-        public double MoreThan60DefectPercentage { get => MultiplySocketsDefectCount60 * 100d / TotalCyclesCount; }
+        public int DefectsInBoxCount;
     }
+    public class MonthReportStatistics
+    {
+        /// <summary>
+        /// Год
+        /// </summary>
+        public int Year;
+        /// <summary>
+        /// Месяц
+        /// </summary>
+        public int Month;
+        /// <summary>
+        /// Всего коробов выпущено
+        /// </summary>
+        public int TotalBoxCount;
+        /// <summary>
+        /// количество девектных съемов в коробе
+        /// </summary>
+        public int DefectsInBoxCount;
+    }
+
+    /*public class EigenSimple
+    {
+        public static (double eigenvalue, double[] eigenvector) GetPrincipalEigen(double[,] matrix, int iterations = 100)
+        {
+            Center(ref matrix);
+            int n = matrix.GetLength(0);
+            double[] v = new double[n];
+            for (int i = 0; i < n; i++) v[i] = 1.0; // Начальное приближение
+
+            double eigenvalue = 0;
+
+            for (int iter = 0; iter < iterations; iter++)
+            {
+                // 1. Умножаем матрицу на вектор: w = A * v
+                double[] w = new double[n];
+                for (int i = 0; i < n; i++)
+                    for (int j = 0; j < n; j++)
+                        w[i] += matrix[i, j] * v[j];
+
+                // 2. Находим норму (длину) вектора — это наше приближенное lambda
+                eigenvalue = 0;
+                for (int i = 0; i < n; i++) eigenvalue += w[i] * w[i];
+                eigenvalue = Math.Sqrt(eigenvalue);
+
+                // 3. Нормализуем вектор для следующей итерации
+                for (int i = 0; i < n; i++) v[i] = w[i] / eigenvalue;
+            }
+
+            return (eigenvalue, v);
+        }
+
+        public static void Center(ref double[,] values)
+        {
+            for(int j=0; j<values.GetLength(1); j++)
+            {
+                double sum = 0;
+                for (int i = 0; i < values.GetLength(0); i++)
+                    sum += values[i, j];
+                double mean = sum / values.GetLength(0);
+                for (int i = 0; i < values.GetLength(0); i++)
+                    values[i, j] -= mean;
+            }
+        }
+    }*/
 }

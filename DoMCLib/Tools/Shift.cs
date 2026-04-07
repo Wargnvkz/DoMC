@@ -80,12 +80,26 @@ namespace DoMCLib.Tools
                 return true;
             }
         }
-                
+
         public static int GetShiftNumber(DateTime StartShift, bool IsNightShift)
         {
             int ShiftNumber;
             var days = (StartShift - DateTime.MinValue).TotalDays;
             if (IsNightShift)
+            {
+                ShiftNumber = System.Convert.ToInt32(Math.Round(((days + 1) % 4 + 1)));
+            }
+            else
+            {
+                ShiftNumber = System.Convert.ToInt32(Math.Round(((days + 2) % 4 + 1)));
+            }
+            return ShiftNumber;
+        }
+        public int GetShiftNumber()
+        {
+            int ShiftNumber;
+            var days = (ShiftDate - DateTime.MinValue).TotalDays;
+            if (IsNight)
             {
                 ShiftNumber = System.Convert.ToInt32(Math.Round(((days + 1) % 4 + 1)));
             }
