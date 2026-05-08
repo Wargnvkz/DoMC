@@ -32,5 +32,9 @@ namespace DoMCModuleControl.Logging
         /// <returns></returns>
         public void Flush();
 
+        public string GetBasePath();
+        public string GetModulePath();
+        public string GetModulePath(string ModuleName);
+
     }
 }

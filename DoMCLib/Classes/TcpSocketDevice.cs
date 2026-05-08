@@ -57,11 +57,8 @@ namespace DoMCLib.Classes
             try
             {
                 _networkStream?.Close();
-            }
-            catch { }
-            try
-            {
-                _tcpClient?.Close();
+                _networkStream = null;
+                _tcpClient = null;
             }
             catch { }
         }

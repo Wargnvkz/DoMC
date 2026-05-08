@@ -29,15 +29,15 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             msWorkingModeMenu = new MenuStrip();
             tsmiStandards = new ToolStripMenuItem();
             miLoadStandard = new ToolStripMenuItem();
             miCreateNewStandard = new ToolStripMenuItem();
-            сохранитьToolStripMenuItem = new ToolStripMenuItem();
+            tsmiSave = new ToolStripMenuItem();
             tsmiStatistics = new ToolStripMenuItem();
             miResetStatistics = new ToolStripMenuItem();
             обнулитьОбщийСчетчикСброшенныхСъемовToolStripMenuItem = new ToolStripMenuItem();
@@ -66,6 +66,7 @@
             pnlCurrentSockets = new Panel();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            chAverageOfSocketByTime = new System.Windows.Forms.DataVisualization.Charting.Chart();
             nudAveragePriod = new NumericUpDown();
             lblAveragePeriod = new Label();
             nudAverageSocket = new NumericUpDown();
@@ -77,18 +78,20 @@
             pbStartStop = new DoMC.UserControls.PressButton();
             ssFooter = new StatusStrip();
             lblFooterStep = new ToolStripStatusLabel();
-            chAverageOfSocketByTime = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            btnTest = new Button();
+            pnlTest = new Panel();
             msWorkingModeMenu.SuspendLayout();
             tabWorkAndArchive.SuspendLayout();
             tbpCurrent.SuspendLayout();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudAveragePriod).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudAverageSocket).BeginInit();
             tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chCurrentLastHourSumBad).BeginInit();
             ssFooter.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).BeginInit();
+            pnlTest.SuspendLayout();
             SuspendLayout();
             // 
             // msWorkingModeMenu
@@ -109,7 +112,7 @@
             // 
             // tsmiStandards
             // 
-            tsmiStandards.DropDownItems.AddRange(new ToolStripItem[] { miLoadStandard, miCreateNewStandard, сохранитьToolStripMenuItem });
+            tsmiStandards.DropDownItems.AddRange(new ToolStripItem[] { miLoadStandard, miCreateNewStandard, tsmiSave });
             tsmiStandards.Name = "tsmiStandards";
             tsmiStandards.Size = new Size(99, 34);
             tsmiStandards.Text = "Эталоны";
@@ -128,12 +131,12 @@
             miCreateNewStandard.Text = "Создать...";
             miCreateNewStandard.Click += miCreateNewStandard_Click;
             // 
-            // сохранитьToolStripMenuItem
+            // tsmiSave
             // 
-            сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
-            сохранитьToolStripMenuItem.Size = new Size(189, 30);
-            сохранитьToolStripMenuItem.Text = "Сохранить...";
-            сохранитьToolStripMenuItem.Click += miSaveStandard_Click;
+            tsmiSave.Name = "tsmiSave";
+            tsmiSave.Size = new Size(189, 30);
+            tsmiSave.Text = "Сохранить...";
+            tsmiSave.Click += miSaveStandard_Click;
             // 
             // tsmiStatistics
             // 
@@ -161,7 +164,6 @@
             tsmiLogsArchive.Name = "tsmiLogsArchive";
             tsmiLogsArchive.Size = new Size(169, 34);
             tsmiLogsArchive.Text = "Папка журналов";
-            tsmiLogsArchive.Click += tsmiLogsArchive_Click;
             // 
             // miSocketsSettings
             // 
@@ -424,6 +426,23 @@
             tabPage1.Text = "Прозрачность по гнездам";
             tabPage1.UseVisualStyleBackColor = true;
             // 
+            // chAverageOfSocketByTime
+            // 
+            chAverageOfSocketByTime.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            chartArea1.AxisX.LabelStyle.Format = "dd.MM.yyyy HH:mm:ss";
+            chartArea1.Name = "ChartArea1";
+            chAverageOfSocketByTime.ChartAreas.Add(chartArea1);
+            chAverageOfSocketByTime.Location = new Point(6, 48);
+            chAverageOfSocketByTime.Name = "chAverageOfSocketByTime";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Name = "Series1";
+            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            chAverageOfSocketByTime.Series.Add(series1);
+            chAverageOfSocketByTime.Size = new Size(1616, 208);
+            chAverageOfSocketByTime.TabIndex = 7;
+            chAverageOfSocketByTime.Text = "chart1";
+            // 
             // nudAveragePriod
             // 
             nudAveragePriod.Location = new Point(431, 12);
@@ -544,38 +563,44 @@
             lblFooterStep.Text = "Текущий шаг:";
             lblFooterStep.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // chAverageOfSocketByTime
+            // btnTest
             // 
-            chAverageOfSocketByTime.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            chartArea1.AxisX.LabelStyle.Format = "dd.MM.yyyy HH:mm:ss";
-            chartArea1.Name = "ChartArea1";
-            chAverageOfSocketByTime.ChartAreas.Add(chartArea1);
-            chAverageOfSocketByTime.Location = new Point(6, 48);
-            chAverageOfSocketByTime.Name = "chAverageOfSocketByTime";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.Name = "Series1";
-            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
-            chAverageOfSocketByTime.Series.Add(series1);
-            chAverageOfSocketByTime.Size = new Size(1616, 208);
-            chAverageOfSocketByTime.TabIndex = 7;
-            chAverageOfSocketByTime.Text = "chart1";
+            btnTest.Location = new Point(3, 13);
+            btnTest.Name = "btnTest";
+            btnTest.Size = new Size(75, 23);
+            btnTest.TabIndex = 6;
+            btnTest.Text = "тест";
+            btnTest.UseVisualStyleBackColor = true;
+            btnTest.Click += btnTest_Click;
+            // 
+            // pnlTest
+            // 
+            pnlTest.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            pnlTest.Controls.Add(btnTest);
+            pnlTest.Location = new Point(0, 682);
+            pnlTest.Name = "pnlTest";
+            pnlTest.Size = new Size(147, 221);
+            pnlTest.TabIndex = 7;
+            pnlTest.Visible = false;
             // 
             // DoMCWorkModeInterface
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1799, 932);
+            Controls.Add(pnlTest);
             Controls.Add(ssFooter);
             Controls.Add(pbStartStop);
             Controls.Add(tabWorkAndArchive);
             Controls.Add(msWorkingModeMenu);
+            KeyPreview = true;
             Margin = new Padding(4, 3, 4, 3);
             Name = "DoMCWorkModeInterface";
             Text = "Рабочий режим ПМК";
             WindowState = FormWindowState.Maximized;
             FormClosing += DoMCWorkModeInterface_FormClosing;
             FormClosed += DoMCWorkModeInterface_FormClosed;
+            KeyUp += DoMCWorkModeInterface_KeyUp;
             Resize += DoMCWorkModeInterface_Resize;
             msWorkingModeMenu.ResumeLayout(false);
             msWorkingModeMenu.PerformLayout();
@@ -585,13 +610,14 @@
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).EndInit();
             ((System.ComponentModel.ISupportInitialize)nudAveragePriod).EndInit();
             ((System.ComponentModel.ISupportInitialize)nudAverageSocket).EndInit();
             tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)chCurrentLastHourSumBad).EndInit();
             ssFooter.ResumeLayout(false);
             ssFooter.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)chAverageOfSocketByTime).EndInit();
+            pnlTest.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -630,7 +656,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ToolStripMenuItem miSettings;
         private System.Windows.Forms.ToolStripMenuItem miCreateNewStandard;
-        private System.Windows.Forms.ToolStripMenuItem сохранитьToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsmiSave;
         private System.Windows.Forms.ToolStripMenuItem miSocketsSettings;
         private StatusStrip ssFooter;
         private ToolStripStatusLabel lblFooterStep;
@@ -642,5 +668,7 @@
         private NumericUpDown nudAveragePriod;
         private Label lblAveragePeriod;
         private System.Windows.Forms.DataVisualization.Charting.Chart chAverageOfSocketByTime;
+        private Button btnTest;
+        private Panel pnlTest;
     }
 }

@@ -67,8 +67,10 @@ namespace DoMCLib.Classes
                     return avg < ParameterCompareGoodIfLess;
                 case MakeDecisionAction.AverageInPercent:
                     var avgImg = ImageTools.Average(res[0], ipp.GetRectangle());
+                    if (std == null) throw new Exception("Нет изображение эталона");
                     var avgStd = ImageTools.Average(std, ipp.GetRectangle());
-                    var RelDiff = Math.Abs((avgStd - avgImg) / avgStd) * 100;
+                    if (avgStd == 0) avgStd++;
+                    var RelDiff = Math.Abs(avgImg * 100d / avgStd);
 
                     return RelDiff < ParameterCompareGoodIfLess;
                 case MakeDecisionAction.Max:

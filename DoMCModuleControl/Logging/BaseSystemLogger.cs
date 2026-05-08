@@ -38,6 +38,16 @@ namespace DoMCModuleControl.Logging
 
         }
 
+        public string GetBasePath()
+        {
+            return "";
+        }
+
+        public string GetPath(string ModuleName)
+        {
+            return "";
+        }
+
         public void RegisterExternalLogger(ILogger logger)
         {
             ExternalLogger = logger;

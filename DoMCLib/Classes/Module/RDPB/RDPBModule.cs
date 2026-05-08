@@ -47,6 +47,8 @@ namespace DoMCLib.Classes.Module.RDPB
         Task task;
         CancellationTokenSource cancellationTokenSource;
         PendingCommandController<RDPBStatus> _pendingCommandController = new PendingCommandController<RDPBStatus>();
+        private SemaphoreSlim _reconnectLock = new(1, 1);
+        int _timeoutCounter = 0;
 
         public RDPBModule(IMainController MainController) : base(MainController)
         {
@@ -88,6 +90,64 @@ namespace DoMCLib.Classes.Module.RDPB
             WorkingLog.Add(LoggerLevel.Critical, "Модуль остановлен");
         }
 
+        //Use HandleConnectionLost(string reason) instead
+        private async Task ReconnectLoop()
+        {
+            WorkingLog.Add(LoggerLevel.Critical, $"Попытка переподключения");
+            WorkingLog.Add(LoggerLevel.Critical, $"Отключаем соединение");
+            TCPClientCommandConnection.Close();
+
+            for (int i = 1; i <= 5; i++)
+            {
+                try
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, $"Попытка переподключения {i}");
+
+                    await TCPClientCommandConnection.ConnectAsync(remoteIP, (int)(CurrentStatus.RDPBTimeoutInns / 10000), cancellationTokenSource.Token);
+
+                    WorkingLog.Add(LoggerLevel.Critical, "Соединение восстановлено");
+
+                    _timeoutCounter = 0;
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    WorkingLog.Add(LoggerLevel.Critical, "Ошибка переподключения", ex);
+                    await Task.Delay(2000);
+                }
+            }
+
+            WorkingLog.Add(LoggerLevel.Critical, "Не удалось восстановить соединение");
+        }
+        private async Task HandleConnectionLost(string reason)
+        {
+            _timeoutCounter++;
+            WorkingLog.Add(LoggerLevel.Critical, $"Потеря соединения: {reason}");
+
+            // 1. сброс pending
+            _pendingCommandController.SetException(
+                new Exception("Соединение потеряно"));
+
+            // 2. закрытие
+            try { TCPClientCommandConnection?.Close(); } catch { }
+
+
+
+            // 3. реконнект
+            await _reconnectLock.WaitAsync();
+            try
+            {
+                if (_timeoutCounter == 0) return; // уже восстановились
+
+                await ReconnectLoop();
+            }
+            finally
+            {
+                _reconnectLock.Release();
+            }
+
+        }
+
         /*private bool DoConnectionNeedToRestart()
         {
             if (TCPClientCommandConnection?.Connected ?? false)
@@ -124,7 +184,16 @@ namespace DoMCLib.Classes.Module.RDPB
                     var str = stat.ToString();
                     WorkingLog.Add(LoggerLevel.FullDetailedInformation, $"Команда бракеру: <{str.Trim()}>");
                     var bytes = Encoding.ASCII.GetBytes(str);
-                    await TCPClientCommandConnection.WriteAsync(bytes, 0, bytes.Length, cancellationTokenSource.Token);
+                    try
+                    {
+                        await TCPClientCommandConnection.WriteAsync(bytes, 0, bytes.Length, cancellationTokenSource.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        WorkingLog.Add(LoggerLevel.Critical, "Ошибка передачи данных бракеру: ", ex);
+                        await HandleConnectionLost(ex.Message);
+                        throw;
+                    }
                 });
             }
             else
@@ -160,7 +229,7 @@ namespace DoMCLib.Classes.Module.RDPB
                 using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(
                     cancellationTokenSource.Token); // глобальный
 
-                linkedCts.CancelAfter(TimeSpan.FromSeconds(10)); // локальный таймаут
+                linkedCts.CancelAfter(TimeSpan.FromSeconds(30)); // локальный таймаут
 
                 read = await TCPClientCommandConnection.ReadAsync(tempreadbuff, 0, tempreadbuff.Length, linkedCts.Token);
 
@@ -175,6 +244,7 @@ namespace DoMCLib.Classes.Module.RDPB
             catch (Exception ex)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при чтении данных от бракёра. ", ex);
+                throw;
             }
 
         }
@@ -274,10 +344,9 @@ namespace DoMCLib.Classes.Module.RDPB
                         // это таймаут
                         WorkingLog?.Add(LoggerLevel.FullDetailedInformation, "Таймаут ожидания данных");
 
-                        // тут можно инициировать реконнект
+                        await HandleConnectionLost("Таймаут ожидания данных");
                     }
 
-                    // можно переподключаться
                 }
                 catch (Exception ex)
                 {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,5 +57,19 @@ namespace DoMCModuleControl.Logging
             BaseLogger = null;
         }
 
+        public string GetBasePath()
+        {
+            return BaseLogger.GetBasePath();
+        }
+
+        public string GetModulePath()
+        {
+            return BaseLogger.GetPath(ModuleName);
+        }
+
+        public string GetModulePath(string ModuleName)
+        {
+            return BaseLogger.GetPath(ModuleName);
+        }
     }
 }

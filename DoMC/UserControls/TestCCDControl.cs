@@ -59,6 +59,7 @@ namespace DoMC.Forms
         int PrograssbarMaxStep = 6;
         Task currentRunningReadingTask = null;
         LongInterfaceOperation CurrentOperation = new LongInterfaceOperation();
+        bool _ReadError = false;
 
         public TestCCDControl(IMainController Controller, ILogger logger, DoMC.Classes.IDoMCSettingsUpdatedProvider settingsUpdateProvider)
         {
@@ -201,7 +202,7 @@ namespace DoMC.Forms
         }
         private async Task TestReadAllSockets()
         {
-
+            _ReadError = false;
             AllImages = new short[socketMax][,];
             errorReadingData.Clear();
             try
@@ -256,11 +257,10 @@ namespace DoMC.Forms
                                         }
                                         catch (Exception ex)
                                         {
-
                                         }
 
                                     }
-
+                                    _ReadError = ImageData.Item1;
                                     ProgressbarStep++;
                                 }
                                 else

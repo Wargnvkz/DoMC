@@ -21,6 +21,7 @@ using DoMCLib.Exceptions;
 using DoMCLib.Tools;
 using DoMCModuleControl;
 using DoMCModuleControl.Logging;
+using DoMCModuleControl.Modules;
 using DoMCModuleControl.UI;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -36,6 +37,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,7 +65,6 @@ namespace DoMC
 
         //работает ли устройство или мы его отключили вручную
         WorkingModule ActiveDevices;
-        //PressButton[] DeviceButtons;
         Dictionary<WorkingModule, PressButton> DevicesFlagButtons;
 
         //bool ForceStop;
@@ -87,8 +88,6 @@ namespace DoMC
         CycleImagesCCD? CurrentCycleData;
 
         public event Func<object?, Task> SettingsUpdated;
-
-        ButtonsPresses[] switches;
 
         int CCDReadsFailed;
         int CCDReadsFailedMax = 5;
@@ -121,15 +120,10 @@ namespace DoMC
         {
             InitializeComponent();
             //Application.ThreadException += Application_ThreadException;
-            switches = new ButtonsPresses[] {
-                new ButtonsPresses(){ Button= pbStartStop, ButtonPressed=false },
-                new ButtonsPresses(){ Button= pbRDPB,ButtonPressed=false },
-                new ButtonsPresses(){ Button=pbLocalDB ,ButtonPressed=false},
-                new ButtonsPresses(){ Button=pbRemoteDB, ButtonPressed=false }
-            };
 
             MaxDegreeOfParallelism = Environment.ProcessorCount;
             UIContext = SynchronizationContext.Current;
+            FillJournalMenu();
 
         }
         public async Task SetMainController(IMainController controller, object? data)
@@ -164,6 +158,30 @@ namespace DoMC
             nudAverageSocket.Value = 1;
             nudAveragePriod.Value = 2;
 
+        }
+
+        private void FillJournalMenu()
+        {
+            //tsmiLogsArchive
+            var baseType = typeof(AbstractModuleBase);
+
+            // Получаем текущую сборку и ищем типы
+            var derivedTypes = AppDomain.CurrentDomain.GetAssemblies()
+    .SelectMany(assembly => assembly.GetTypes())
+    .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(baseType))
+    .ToList();
+            foreach (var derivedType in derivedTypes)
+            {
+                var moduleName = derivedType.GetDescriptionOrName();
+                var mi = new ToolStripMenuItem();
+                mi.Text = moduleName;
+                mi.Click += (sender, e) =>
+                {
+                    var dir = WorkingLog.GetModulePath(moduleName);
+                    FileAndDirectoryTools.OpenFolder(dir);
+                };
+                tsmiLogsArchive.DropDownItems.Add(mi);
+            }
         }
         private void RefreshAll()
         {
@@ -1276,6 +1294,9 @@ namespace DoMC
                                             RDPBResult = false;
                                             WorkingLog.Add(LoggerLevel.Critical, "Ошибка бракера.", ex);
 
+                                            WorkingLog.Add(LoggerLevel.Critical, "Остановка модуля бракера");
+                                            new DoMCLib.Classes.Module.RDPB.Commands.RDPBStopCommand(Controller, Controller.GetModule(typeof(RDPBModule))).ExecuteCommandAsync().FireAndForget();
+
                                         },
                                         UIContext
                                      );
@@ -1637,7 +1658,7 @@ namespace DoMC
             // обновляем данные о нажатых/отжатых кнопках
             GetIsDevicesButtonWorking();
 
-            if (RDPBCurrentStatus.IsTimeout)
+            if (RDPBCurrentStatus.IsTimeout && ActiveDevices.HasFlag(WorkingModule.RDPB))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Бракер не ответил");
                 DevicesErrors |= WorkingModule.RDPB;
@@ -2052,6 +2073,7 @@ namespace DoMC
         }
         public void CheckIfAllSocketsGood(CycleImagesCCD CurrentCycleCCD)
         {
+            Errors.ImageProcessError = false;
             //for(int i=0; i<CurrentCycleCCD.CurrentImages.Length;i++)
             Parallel.For(0, CurrentCycleCCD.CurrentImages.Length, new ParallelOptions() { MaxDegreeOfParallelism = this.MaxDegreeOfParallelism }, i =>
             {
@@ -2074,25 +2096,31 @@ namespace DoMC
                 if (Context.Configuration.HardwareSettings.SocketsToCheck[EquipmentSocketNumber]
                     && CurrentCycleCCD.CurrentImages[EquipmentSocketNumber] != null
                     && (CurrentCycleCCD.LEDStatuses == null
-                    || CurrentCycleCCD.LEDStatuses[LEDLineNumber]))
+                    || CurrentCycleCCD.LEDStatuses[LEDLineNumber])
+                    )
                 {
                     //есть ли конфигурация этого гнезда
                     if (Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[EquipmentSocketNumber].StandardImage != null)
                     {
-                        if (Context.Configuration.HardwareSettings.SocketsToCheck[EquipmentSocketNumber])
-                        {
-                            var result = DoMCLib.Tools.ImageTools.CheckIfSocketGood(
-                                CurrentCycleCCD.CurrentImages[EquipmentSocketNumber],
-                                Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[EquipmentSocketNumber].StandardImage,
-                                Context.Configuration.ReadingSocketsSettings.CCDSocketParameters[EquipmentSocketNumber].ImageCheckingParameters);
 
-                            CurrentCycleCCD.Average = result.Average;
-                            CurrentCycleCCD.IsSocketGood[EquipmentSocketNumber] = result.IsSocketGood;
-                            CurrentCycleCCD.MaxDeviation = result.MaxDeviation;
-                            CurrentCycleCCD.MaxDeviationPoint = result.MaxDeviationPoint;
-                            CurrentCycleCCD.Differences[EquipmentSocketNumber] = result.ResultImage;
-                            CurrentCycleCCD.SocketErrorType = result.SocketErrorType;
+                        var result = DoMCLib.Tools.ImageTools.CheckIfSocketGood(
+                            CurrentCycleCCD.CurrentImages[EquipmentSocketNumber],
+                            Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[EquipmentSocketNumber].StandardImage,
+                            Context.Configuration.ReadingSocketsSettings.CCDSocketParameters[EquipmentSocketNumber].ImageCheckingParameters);
+
+                        CurrentCycleCCD.Average = result.Average;
+                        CurrentCycleCCD.IsSocketGood[EquipmentSocketNumber] = result.IsSocketGood;
+                        CurrentCycleCCD.MaxDeviation = result.MaxDeviation;
+                        CurrentCycleCCD.MaxDeviationPoint = result.MaxDeviationPoint;
+                        CurrentCycleCCD.Differences[EquipmentSocketNumber] = result.ResultImage;
+                        CurrentCycleCCD.SocketErrorType = result.SocketErrorType;
+                        if (result.IsExceptionWhileCalculated)
+                        {
+                            WorkingLog.Add(LoggerLevel.Critical, $"Ошибка при принятии решения для гнезда {EquipmentSocketNumber}: {result.ExceptionMessage ?? ""}");
+                            CurrentCycleCCD.IsSocketGood[EquipmentSocketNumber] = true;
+                            Errors.ImageProcessError = true;
                         }
+
 
                     }
                 }
@@ -2199,7 +2227,7 @@ namespace DoMC
 
         private void tsmiLogsArchive_Click(object sender, EventArgs e)
         {
-            var dir = System.IO.Path.Combine(Application.StartupPath, "Logs");
+            var dir = WorkingLog.GetBasePath();
             FileAndDirectoryTools.OpenFolder(dir);
         }
 
@@ -2264,7 +2292,77 @@ namespace DoMC
             }
         }
 
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            Errors.ImageProcessError = false;
 
+            var oldStd = new short[96][,];
+            Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage = new SocketStandardsImage[96];
+            if (Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage != null)
+            {
+                for (int i = 0; i < Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage.Length; i++)
+                {
+                    oldStd[i] = Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i]?.StandardImage ?? null;
+                }
+            }
+            var CurrentCycleCCD = new CycleImagesCCD();
+            CurrentCycleCCD.CurrentImages = new short[96][,];
+            CurrentCycleCCD.Differences = new short[96][,];
+            CurrentCycleCCD.IsSocketGood = new bool[96];
+            CurrentCycleCCD.LEDStatuses = Enumerable.Range(0, 12).Select(i => true).ToArray();
+            var rnd = new Random(0);
+            for (int i = 0; i < CurrentCycleCCD.CurrentImages.Length; i++)
+            {
+                var diffPercent = 10d;
+                var img = new short[512, 512];
+                long sum = 0;
+                for (int x = 0; x < 512; x++)
+                {
+                    for (int y = 0; y < 512; y++)
+                    {
+                        var v = (short)rnd.Next(200, short.MaxValue / 2);
+                        img[y, x] = v;
+                        sum += v;
+
+                    }
+                }
+                CurrentCycleCCD.CurrentImages[i] = img;
+
+                var avg = sum / 262144;
+                var diff = avg * diffPercent / 100;
+                var std = new short[512, 512];
+                for (int x = 0; x < 512; x++)
+                {
+                    for (int y = 0; y < 512; y++)
+                    {
+                        std[y, x] = (short)(img[y, x] - diff);
+
+                    }
+                }
+                Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i] = new SocketStandardsImage();
+                Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i].StandardImage = std;
+            }
+
+            CheckIfAllSocketsGood(CurrentCycleCCD);
+
+            /*for (int i = 0; i < 96; i++)
+            {
+                CheckIfSocketGood(CurrentCycleCCD, i);
+            }*/
+
+            for (int i = 0; i < Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage.Length; i++)
+            {
+                Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i].StandardImage = oldStd[i];
+            }
+        }
+
+        private void DoMCWorkModeInterface_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Alt && e.Control && e.KeyCode == Keys.F12)
+            {
+                pnlTest.Visible = !pnlTest.Visible;
+            }
+        }
     }
 
 

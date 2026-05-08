@@ -1,4 +1,6 @@
 ﻿using DoMCModuleControl;
+using DoMCModuleControl.External;
+using DoMCModuleControl.Logging;
 using DoMCModuleControl.Modules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -43,7 +45,7 @@ namespace DoMCLib.Classes.Module.API
                 builder.Services.AddLogging(logging =>
                 {
                     //logging.AddConsole();
-                    logging.AddFile("Logs/restApi.log");
+                    logging.AddFile($"{BaseFilesLogger.GetBasePath(new FileSystem())}/restApi.log");
                     logging.SetMinimumLevel(LogLevel.Debug);
                 });
 

@@ -25,6 +25,16 @@ namespace DoMCTestingTools.ClassesForTests
 
         }
 
+        public string GetBasePath()
+        {
+            return "";
+        }
+
+        public string GetModulePath()
+        {
+            return "";
+        }
+
         public void SetMaxLogginLevel(LoggerLevel level)
         {
 

@@ -10,6 +10,8 @@ namespace DoMCLib.Classes
         public Point? MaxDeviationPoint;
         public short MaxDeviation;
         public bool IsSocketGood;
+        public bool IsExceptionWhileCalculated;
+        public string? ExceptionMessage;
         public string ErrorToString()
         {
             List<string> defects = new List<string>();

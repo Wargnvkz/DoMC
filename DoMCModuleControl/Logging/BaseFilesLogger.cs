@@ -25,12 +25,26 @@ namespace DoMCModuleControl.Logging
         private IFileSystem FileSystem;
         private static object lockObject = new object();
         public ConcurrentBag<string> RegisteredModuleNames = new ConcurrentBag<string>();
+        public readonly string BasePath;
 
         public BaseFilesLogger(IFileSystem fileSystem)
         {
+            BasePath = GetBasePath(fileSystem);
             if (fileSystem == null) throw new ArgumentNullException(nameof(fileSystem));
             FileSystem = fileSystem;
             _logTask = Task.Run(WriteMessagesSync);
+        }
+
+        public static string GetBasePath(IFileSystem FileSystem)
+        {
+            try
+            {
+                return System.Configuration.ConfigurationManager.AppSettings["LogPath"];
+            }
+            catch
+            {
+                return FileSystem.PathCombine(FileSystem.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location ?? ".") ?? ".", "Logs");
+            }
         }
 
         private string GetLogFileName(string ModuleName, DateTime ShiftDate)
@@ -41,9 +55,10 @@ namespace DoMCModuleControl.Logging
             return filename;
         }
 
-        private string GetPath(string ModuleName)
+        public string GetPath(string ModuleName)
         {
-            var path = FileSystem.PathCombine(FileSystem.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()?.Location ?? ".") ?? ".", "Logs", ModuleName);
+            string? path = null;
+            path = FileSystem.PathCombine(BasePath, ModuleName);
 
             if (!path.EndsWith('\\')) path += '\\';
             FileSystem.CreateDirectory(path);
@@ -195,6 +210,12 @@ namespace DoMCModuleControl.Logging
         {
             return GetLogFileName(ModuleName, CurrentDate);
         }
+
+        public string GetBasePath()
+        {
+            return BasePath;
+        }
+
     }
 
 }

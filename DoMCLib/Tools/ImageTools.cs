@@ -1114,18 +1114,29 @@ namespace DoMCLib.Tools
             result.SocketErrorType = ImageErrorType.None;
             if (ipp.Decisions != null)
             {
-                for (int i = 0; i < ipp.Decisions.Length; i++)
+                try
                 {
+                    result.IsExceptionWhileCalculated = false;
+                    result.ExceptionMessage = null;
 
-                    var imgres = ipp.Decisions[i].IsImageGood(StandardImage, Current, ipp, out short[,] resImg, out Point? maxCoord);
-                    if (!imgres)
+                    for (int i = 0; i < ipp.Decisions.Length; i++)
                     {
-                        result.IsSocketGood = false;
-                        result.SocketErrorType |= ipp.Decisions[i].Result == DecisionActionResult.Defect ? ImageErrorType.Defect : ImageErrorType.Average;
-                    }
-                    if (maxCoord != null) result.MaxDeviationPoint = maxCoord;
-                    if (i == 0) result.ResultImage = resImg;
 
+                        var imgres = ipp.Decisions[i].IsImageGood(StandardImage, Current, ipp, out short[,] resImg, out Point? maxCoord);
+                        if (!imgres)
+                        {
+                            result.IsSocketGood = false;
+                            result.SocketErrorType |= ipp.Decisions[i].Result == DecisionActionResult.Defect ? ImageErrorType.Defect : ImageErrorType.Average;
+                        }
+                        if (maxCoord != null) result.MaxDeviationPoint = maxCoord;
+                        if (i == 0) result.ResultImage = resImg;
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result.IsExceptionWhileCalculated = true;
+                    result.ExceptionMessage = ex.Message;
                 }
                 return result;
             }
