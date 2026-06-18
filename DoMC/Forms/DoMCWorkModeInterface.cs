@@ -35,6 +35,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
@@ -406,6 +407,7 @@ namespace DoMC
 
             if (WorkingProcessController.IsRunning)
             {
+                Context.WorkingState.LastStopReason = StopReason.Manual;
                 await StopWorkingProcess();
             }
             else
@@ -452,37 +454,45 @@ namespace DoMC
             Errors.CCDNotRespond = false;
             WorkingLog.Add(LoggerLevel.Critical, "Загрузка конфигурации гнезд");
             // CurrentOperation = DoMCOperation.StartCCD;
-            if (!(await DoMCEquipmentCommands.StartCCD(Controller, Context, WorkingLog)).Item1)
+            if (!(await DoMCEquipmentCommands.StartCCD(Controller, Context, WorkingLog) is var startResult && startResult.Item1))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при подключении к платам ПЗС");
                 Errors.CCDNotRespond = true;
+                Context.WorkingState.LastStopReason = StopReason.CCDFailure;
+                Context.WorkingState.CCDCardsFails = startResult.Item2.CardsNotAnswered();
                 DoMCNotAbleLoadConfigurationErrorMessage();
                 return false;
             }
 
             //CurrentOperation = DoMCOperation.SettingReadingParameters;
-            if (!(await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(Controller, Context, WorkingLog)).Item1)
+            if (!(await DoMCEquipmentCommands.LoadCCDReadingParametersConfiguration(Controller, Context, WorkingLog) is var loadParamsResult && loadParamsResult.Item1))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка загрузки параметров чтения гнезд. Остановка работы");
                 Errors.CCDNotRespond = true;
+                Context.WorkingState.LastStopReason = StopReason.CCDFailure;
+                Context.WorkingState.CCDCardsFails = loadParamsResult.Item2.CardsNotAnswered();
                 DoMCNotAbleLoadConfigurationErrorMessage();
                 return false;
             }
 
             //CurrentOperation = DoMCOperation.SettingExposition;
-            if (!(await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(Controller, Context, WorkingLog)).Item1)
+            if (!(await DoMCEquipmentCommands.LoadCCDExpositionConfiguration(Controller, Context, WorkingLog) is var loadExpositionResult && loadExpositionResult.Item1))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка загрузки экспозиции. Остановка работы");
                 Errors.CCDNotRespond = true;
+                Context.WorkingState.LastStopReason = StopReason.CCDFailure;
+                Context.WorkingState.CCDCardsFails = loadExpositionResult.Item2.CardsNotAnswered();
                 DoMCNotAbleLoadConfigurationErrorMessage();
                 return false;
             }
 
             //CurrentOperation = DoMCOperation.SetFastReading;
-            if (!(await DoMCEquipmentCommands.SetFastRead(Controller, Context, WorkingLog)).Item1)
+            if (!(await DoMCEquipmentCommands.SetFastRead(Controller, Context, WorkingLog) is var setFastReadResult && setFastReadResult.Item1))
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при подключении к платам ПЗС");
                 Errors.CCDNotRespond = true;
+                Context.WorkingState.LastStopReason = StopReason.CCDFailure;
+                Context.WorkingState.CCDCardsFails = setFastReadResult.Item2.CardsNotAnswered();
                 DoMCNotAbleLoadConfigurationErrorMessage();
                 return false;
             }
@@ -494,6 +504,7 @@ namespace DoMC
                 if (!await StartLCB())
                 {
                     Errors.LCBDoesNotRespond = true;
+                    Context.WorkingState.LastStopReason = StopReason.LCBFailure;
                     DoMCNotAbleLoadConfigurationErrorMessage();
                     return false;
                 }
@@ -521,6 +532,7 @@ namespace DoMC
             {
                 if (!await StartRDPB())
                 {
+                    Context.WorkingState.LastStopReason = StopReason.Prepare;
                     return false;
                 }
             }
@@ -895,7 +907,8 @@ namespace DoMC
 
 
                     var readResult = await new DoMCLib.Classes.Module.CCD.Commands.SendReadAllSocketsWithExternalSignalCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
-                    WasLastOperationSuccessful = readResult.CardsNotAnswered().Count == 0;
+                    Context.WorkingState.CCDCardsFails = readResult.CardsNotAnswered();
+                    WasLastOperationSuccessful = Context.WorkingState.CCDCardsFails.Count == 0;
                     //WasLastOperationSuccessful = Context.ReadSockets(MainController, WorkingLog, true, out CCDCardDataCommandResponse resdResult, cancellationTokenSource: WorkCancellationTokenSource);
 
                     //Ждем пока произойдет чтение
@@ -953,6 +966,7 @@ namespace DoMC
                                     WorkingLog.Add(LoggerLevel.Critical, "Маячки выдвинуты. Остановка работы");
                                     Errors.CCDNotRespond = true;
                                     Errors.LCBDoesNotRespond = true;
+                                    Context.WorkingState.LastStopReason = StopReason.LCBBeaconFailure;
                                     return WorkingStatus.Error;
                                 }
                             }
@@ -969,6 +983,7 @@ namespace DoMC
                             WorkingLog.Add(LoggerLevel.Critical, "БУС не ответил");
                             Errors.CCDNotRespond = true;
                             Errors.LCBDoesNotRespond = true;
+                            Context.WorkingState.LastStopReason = StopReason.LCBFailure;
                             return WorkingStatus.Error;
                         }
 
@@ -976,6 +991,7 @@ namespace DoMC
                         {
                             WorkingLog.Add(LoggerLevel.Critical, "Ошибка при чтении данных гнезд. Чтение не завершено. Остановка.");
                             Errors.CCDNotRespond = true;
+                            Context.WorkingState.LastStopReason = StopReason.CCDFailure;
                             return WorkingStatus.Error;
                         }
                         else
@@ -1083,6 +1099,7 @@ namespace DoMC
                     try
                     {
                         getImageResult = await new DoMCLib.Classes.Module.CCD.Commands.CCDAllSocketsImagesCommand(Controller, Controller.GetModule(typeof(CCDCardDataModule))).ExecuteCommandAsync(Context);
+                        Context.WorkingState.CCDCardsFails = getImageResult.CardsNotAnswered();
                     }
                     catch
                     {
@@ -1099,6 +1116,7 @@ namespace DoMC
                     {
                         WorkingLog.Add(LoggerLevel.Critical, "Ошибка при получении изображения.");// Остановка");
                         Errors.CCDNotRespond = true;
+                        Context.WorkingState.LastStopReason = StopReason.CCDFailure;
 
                         WorkingLog.Add(LoggerLevel.Critical, "Полученные кадры гнезд:");
                         try
@@ -1477,6 +1495,7 @@ namespace DoMC
             catch (Exception ex)
             {
                 WorkingLog.Add(LoggerLevel.Critical, "Ошибка при работе.", ex);
+                Context.WorkingState.LastStopReason = StopReason.UnhandledException;
                 return WorkingStatus.Error;
             }
             finally
@@ -1578,10 +1597,7 @@ namespace DoMC
                 Context.Configuration.LoadStandardSettings(od.FileName);
                 SetWindowStandardTitle(od.FileName);
             }
-
         }
-
-
 
         private async void timer1_Tick(object sender, EventArgs e)
         {
@@ -1764,14 +1780,17 @@ namespace DoMC
         private void ShowCurrentErrors()
         {
 
-            lbCurrentErrors.Items.Clear();
+            lbCurrentStatuses.Items.Clear();
             var errors = Errors.ActualErrors();
             Context.WorkingState.EquipmentErrors = errors;
             foreach (var p in errors)
             {
-                lbCurrentErrors.Items.Add(p);
+                lbCurrentStatuses.Items.Add(p);
             }
-
+            if (!Context.WorkingState.IsRunning && Context.WorkingState.LastStopReason.HasValue)
+            {
+                lbCurrentStatuses.Items.Add($"Причина остановки: {Context.WorkingState.GetWorkingStatusString()}");
+            }
         }
 
         private void pnlCurrentSockets_Paint(object sender, PaintEventArgs e)
@@ -2297,14 +2316,21 @@ namespace DoMC
             Errors.ImageProcessError = false;
 
             var oldStd = new short[96][,];
+            var oldCheckSockets = new bool[96];
             Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage = new SocketStandardsImage[96];
             if (Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage != null)
             {
                 for (int i = 0; i < Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage.Length; i++)
                 {
                     oldStd[i] = Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i]?.StandardImage ?? null;
+                    oldCheckSockets[i] = Context.Configuration.HardwareSettings.SocketsToCheck[i];
                 }
             }
+            for (int i = 0; i < Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage.Length; i++)
+            {
+                Context.Configuration.HardwareSettings.SocketsToCheck[i] = true;
+            }
+
             var CurrentCycleCCD = new CycleImagesCCD();
             CurrentCycleCCD.CurrentImages = new short[96][,];
             CurrentCycleCCD.Differences = new short[96][,];
@@ -2343,16 +2369,17 @@ namespace DoMC
                 Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i].StandardImage = std;
             }
 
-            CheckIfAllSocketsGood(CurrentCycleCCD);
+            //CheckIfAllSocketsGood(CurrentCycleCCD);
 
-            /*for (int i = 0; i < 96; i++)
+            for (int i = 0; i < 96; i++)
             {
                 CheckIfSocketGood(CurrentCycleCCD, i);
-            }*/
+            }
 
             for (int i = 0; i < Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage.Length; i++)
             {
                 Context.Configuration.ProcessingDataSettings.CCDSocketStandardsImage[i].StandardImage = oldStd[i];
+                Context.Configuration.HardwareSettings.SocketsToCheck[i] = oldCheckSockets[i];
             }
         }
 

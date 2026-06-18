@@ -46,6 +46,7 @@
             miSettings = new ToolStripMenuItem();
             tabWorkAndArchive = new TabControl();
             tbpCurrent = new TabPage();
+            label1 = new Label();
             lvBoxes = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -61,8 +62,7 @@
             lblCycleDurationValue = new Label();
             lblCycleDurationCaption = new Label();
             pbCurrentShowStatistics = new DoMC.UserControls.PressButton();
-            lblErrors = new Label();
-            lbCurrentErrors = new ListBox();
+            lbCurrentStatuses = new ListBox();
             pnlCurrentSockets = new Panel();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
@@ -197,6 +197,7 @@
             // tbpCurrent
             // 
             tbpCurrent.BackColor = SystemColors.Control;
+            tbpCurrent.Controls.Add(label1);
             tbpCurrent.Controls.Add(lvBoxes);
             tbpCurrent.Controls.Add(lblTotalDefectCyclesCaption);
             tbpCurrent.Controls.Add(lblTotalDefectCycles);
@@ -209,8 +210,7 @@
             tbpCurrent.Controls.Add(lblCycleDurationValue);
             tbpCurrent.Controls.Add(lblCycleDurationCaption);
             tbpCurrent.Controls.Add(pbCurrentShowStatistics);
-            tbpCurrent.Controls.Add(lblErrors);
-            tbpCurrent.Controls.Add(lbCurrentErrors);
+            tbpCurrent.Controls.Add(lbCurrentStatuses);
             tbpCurrent.Controls.Add(pnlCurrentSockets);
             tbpCurrent.Controls.Add(tabControl1);
             tbpCurrent.Location = new Point(4, 34);
@@ -220,6 +220,16 @@
             tbpCurrent.Size = new Size(1644, 827);
             tbpCurrent.TabIndex = 0;
             tbpCurrent.Text = "Текущий";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(884, 13);
+            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(98, 25);
+            label1.TabIndex = 20;
+            label1.Text = "Статусы:";
             // 
             // lvBoxes
             // 
@@ -367,27 +377,17 @@
             pbCurrentShowStatistics.Text = "Показать статистику";
             pbCurrentShowStatistics.Click += pbCurrentShowStatistics_Click;
             // 
-            // lblErrors
-            // 
-            lblErrors.AutoSize = true;
-            lblErrors.Location = new Point(884, 7);
-            lblErrors.Margin = new Padding(4, 0, 4, 0);
-            lblErrors.Name = "lblErrors";
-            lblErrors.Size = new Size(92, 25);
-            lblErrors.TabIndex = 3;
-            lblErrors.Text = "Ошибки:";
-            // 
             // lbCurrentErrors
             // 
-            lbCurrentErrors.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            lbCurrentErrors.BackColor = SystemColors.Control;
-            lbCurrentErrors.FormattingEnabled = true;
-            lbCurrentErrors.ItemHeight = 25;
-            lbCurrentErrors.Location = new Point(884, 35);
-            lbCurrentErrors.Margin = new Padding(4, 3, 4, 3);
-            lbCurrentErrors.Name = "lbCurrentErrors";
-            lbCurrentErrors.Size = new Size(738, 229);
-            lbCurrentErrors.TabIndex = 2;
+            lbCurrentStatuses.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lbCurrentStatuses.BackColor = SystemColors.Control;
+            lbCurrentStatuses.FormattingEnabled = true;
+            lbCurrentStatuses.ItemHeight = 25;
+            lbCurrentStatuses.Location = new Point(884, 38);
+            lbCurrentStatuses.Margin = new Padding(4, 3, 4, 3);
+            lbCurrentStatuses.Name = "lbCurrentErrors";
+            lbCurrentStatuses.Size = new Size(738, 229);
+            lbCurrentStatuses.TabIndex = 2;
             // 
             // pnlCurrentSockets
             // 
@@ -632,8 +632,7 @@
         private System.Windows.Forms.Panel pnlCurrentSockets;
         private System.Windows.Forms.DataVisualization.Charting.Chart chCurrentLastHourSumBad;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Label lblErrors;
-        private System.Windows.Forms.ListBox lbCurrentErrors;
+        private System.Windows.Forms.ListBox lbCurrentStatuses;
         private System.Windows.Forms.ToolStripMenuItem tsmiStatistics;
         private System.Windows.Forms.ToolStripMenuItem miResetStatistics;
         private DoMC.UserControls.PressButton pbCurrentShowStatistics;
@@ -670,5 +669,6 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart chAverageOfSocketByTime;
         private Button btnTest;
         private Panel pnlTest;
+        private Label label1;
     }
 }

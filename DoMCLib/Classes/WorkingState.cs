@@ -22,6 +22,8 @@ namespace DoMCLib.Classes
         public List<string>? EquipmentErrors;
         public List<Box>? Boxes;
         public bool IsRunning;
+        public StopReason? LastStopReason;
+        public List<int> CCDCardsFails;
 
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
         public int PeriodOfAveragesInHours = 12;
@@ -133,8 +135,24 @@ namespace DoMCLib.Classes
         {
 
         }
-    }
 
+        public string GetWorkingStatusString()
+        {
+            if (LastStopReason == null) return "";
+            return LastStopReason.Value switch
+            {
+                StopReason.Manual => "Пользователь",
+                StopReason.LCBFailure => "Авария БУС",
+                StopReason.LCBBeaconFailure => "Авария БУС(Маячки выдвинуты)",
+                StopReason.CCDFailure => $"Ошибка плат ПЗС(платы: {(CCDCardsFails != null ? string.Join(", ", CCDCardsFails.Select(c => c + 1)) : "")})",
+                StopReason.Prepare => "Подготовка к работе",
+                StopReason.UnhandledException or _ => "Неустановленная ошибка",
+
+            };
+
+        }
+
+    }
     public class SocketStatus
     {
         public DateTime CycleDT;
@@ -211,7 +229,6 @@ namespace DoMCLib.Classes
             else return lastStatus.IsSocketGood;
         }
 
-
     }
 
     public class AverageOfCycle
@@ -223,5 +240,15 @@ namespace DoMCLib.Classes
     {
         public DateTime CycleTime;
         public short AveragesOfSocket;
+    }
+
+    public enum StopReason
+    {
+        Manual,
+        Prepare,
+        LCBFailure,
+        LCBBeaconFailure,
+        CCDFailure,
+        UnhandledException
     }
 }
