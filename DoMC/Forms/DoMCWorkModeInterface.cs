@@ -1791,6 +1791,10 @@ namespace DoMC
             {
                 lbCurrentStatuses.Items.Add($"Причина остановки: {Context.WorkingState.GetWorkingStatusString()}");
             }
+            if (Context.WorkingState.IsRunning && Context.WorkingState.CCDCardsFails != null && (Errors.CCDNotRespond || Errors.NotEnoughTimeToGetCCD || Errors.CCDFrameNotReceived || Errors.CCDMemoryError))
+            {
+                lbCurrentStatuses.Items.Add($"Платы c ошибками: {string.Join(", ", Context.WorkingState.CCDCardsFails.Select(c => c + 1))}");
+            }
         }
 
         private void pnlCurrentSockets_Paint(object sender, PaintEventArgs e)

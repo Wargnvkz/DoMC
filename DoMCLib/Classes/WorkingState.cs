@@ -147,11 +147,8 @@ namespace DoMCLib.Classes
                 StopReason.CCDFailure => $"Ошибка плат ПЗС(платы: {(CCDCardsFails != null ? string.Join(", ", CCDCardsFails.Select(c => c + 1)) : "")})",
                 StopReason.Prepare => "Подготовка к работе",
                 StopReason.UnhandledException or _ => "Неустановленная ошибка",
-
             };
-
         }
-
     }
     public class SocketStatus
     {
