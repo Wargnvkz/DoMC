@@ -116,10 +116,16 @@ namespace DoMC
         SynchronizationContext UIContext;
         //DoMCOperation CurrentOperation = DoMCOperation.Idle;
         PollingController WorkingProcessController;
+        int MaxNumberOfCyclesInMemory;
 
         public DoMCWorkModeInterface()
         {
             InitializeComponent();
+
+            var TotalRAM = MemoryInfo.GetAvailableRamInBytes();
+            MaxNumberOfCyclesInMemory = (int)(TotalRAM * 0.7 / ((512 * 512 * 2) * 3 * 96));
+
+
             //Application.ThreadException += Application_ThreadException;
 
             MaxDegreeOfParallelism = Environment.ProcessorCount;
@@ -1401,7 +1407,7 @@ namespace DoMC
                         //var ProcessDuration = InterfaceDataExchange.CCDDataEchangeStatuses.ProcessDuration * 1e-4;
 
                         //Если к этому моменту в очереди циклов больше 10 циклов, значит они не успевают сохраняться в базу данных или БД не работает
-                        if (DBCyclesCCDLeftInQueue > 10)
+                        if (DBCyclesCCDLeftInQueue > MaxNumberOfCyclesInMemory / 2)
                         {
                             Errors.NotEnoughTimeToProcessSQL = true;
                         }
@@ -1412,7 +1418,7 @@ namespace DoMC
 
                         if (!Errors.NoLocalSQL && ((ActiveDevices & WorkingModule.LocalDB) == WorkingModule.LocalDB))
                         {
-                            if (DBCyclesCCDLeftInQueue < 20)
+                            if (DBCyclesCCDLeftInQueue < MaxNumberOfCyclesInMemory)
                             {
                                 try
                                 {
@@ -1438,6 +1444,7 @@ namespace DoMC
                             }
                             else
                             {
+                                WorkingLog.Add(LoggerLevel.Critical, $"Данные невозможно передать в БД. В очереди {DBCyclesCCDLeftInQueue} элемент(а,ов)");
 
                             }
                         }
