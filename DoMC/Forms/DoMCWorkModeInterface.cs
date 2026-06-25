@@ -57,8 +57,6 @@ namespace DoMC
         int CardTimeout = 30000;
         volatile bool IsConfigurationLoadedSuccessfully;
 
-
-
         //Task WorkingThread;
 
         //ошибки устройств
@@ -1788,6 +1786,13 @@ namespace DoMC
         {
 
             lbCurrentStatuses.Items.Clear();
+            if (LCBStatus.TimeOfLCBSynchrosignal==DateTime.MinValue)
+            {
+                lbCurrentStatuses.Items.Add($"Время последнего синхросигнала: не получен");
+            }
+            else
+                lbCurrentStatuses.Items.Add($"Время последнего синхросигнала: {LCBStatus.TimeOfLCBSynchrosignal:dd-MM-yyyy HH\\:mm\\:ss.fff}");
+            lbCurrentStatuses.Items.Add($"В очереди базы данных {DBCyclesCCDLeftInQueue} из {MaxNumberOfCyclesInMemory} съемов");
             var errors = Errors.ActualErrors();
             Context.WorkingState.EquipmentErrors = errors;
             foreach (var p in errors)
